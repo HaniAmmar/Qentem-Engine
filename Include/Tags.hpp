@@ -1,24 +1,15 @@
-
-/*
- * Copyright (c) 2024 Hani Ammar
+/**
+ * @file Tags.hpp
+ * @brief Declares the tag structures and logic for Qentem template parsing and rendering.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This header defines the core data structures and logic related to template tags used
+ * throughout the Qentem Engine library. Tags.hpp provides the fundamental building blocks
+ * for parsing, representing, and manipulating tags within Qentem templates, supporting
+ * features such as loops, conditionals, variables, and custom tag extensions.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * @author Hani Ammar
+ * @date 2025
+ * @copyright MIT License
  */
 
 #ifndef QENTEM_TAGS_H

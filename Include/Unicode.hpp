@@ -1,23 +1,22 @@
-/*
- * Copyright (c) 2024 Hani Ammar
+
+/**
+ * @file Unicode.hpp
+ * @brief Provides Unicode code point to UTF-8, UTF-16, and UTF-32 encoding utilities for Qentem Engine.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This header defines templates for efficient, dependency-free conversion of Unicode code points
+ * into UTF-8, UTF-16, or UTF-32 character sequences, depending on the output character type.
+ * Designed to be header-only, cross-platform, and STL-free, these utilities are used internally
+ * by the Qentem Engine for Unicode-aware template rendering and parsing.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * Note: These functions assume the caller supplies a valid Unicode code point in the range [0, 0x10FFFF].
+ *       No runtime validation or error handling for invalid or surrogate code points is performed.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Example:
+ *   Qentem::Unicode::ToUTF<char>(0x10A7B, output);
+ *
+ * @author Hani Ammar
+ * @date 2025
+ * @copyright MIT License
  */
 
 #ifndef QENTEM_UNICODE_H
@@ -38,6 +37,11 @@ struct UnicodeToUTF;
  * ToUTF(0x10A7B, stream);
  */
 
+/**
+ * Converts a Unicode code point (0x0000 - 0x10FFFF) to UTF-8/16/32 sequence
+ * based on the Char_T size. The input value is assumed valid; caller must ensure
+ * no invalid or surrogate code points are passed.
+ */
 template <typename Char_T, typename Stream_T>
 static void ToUTF(SizeT32 unicode, Stream_T &stream) {
     UnicodeToUTF<Char_T, Stream_T, sizeof(Char_T)>::ToUTF(unicode, stream);
@@ -84,6 +88,11 @@ struct UnicodeToUTF<Char_T, Stream_T, 2U> {
 template <typename Char_T, typename Stream_T>
 struct UnicodeToUTF<Char_T, Stream_T, 4U> {
     static void ToUTF(SizeT32 unicode, Stream_T &stream) {
+        // if (unicode > 0x10FFFFU || (unicode >= 0xD800U && unicode <= 0xDFFFU)) {
+        //     // Invalid code point: ignore or handle error
+        //     return;
+        // }
+
         stream += Char_T(unicode);
     }
 };

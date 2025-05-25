@@ -1,24 +1,13 @@
-
-/*
- * Copyright (c) 2024 Hani Ammar
+/**
+ * @file VariableTag.hpp
+ * @brief Defines the VariableTag struct used for variable offsets in Qentem templates.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This header exists independently to avoid dependency cycles between Tags.hpp and Template.hpp.
+ * It is a foundational data structure used throughout the Qentem Engine library.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * @author Hani Ammar
+ * @date 2025
+ * @copyright MIT License
  */
 
 #ifndef QENTEM_VARIABLE_TAG_H
@@ -29,14 +18,25 @@
 namespace Qentem {
 namespace Tags {
 
+/**
+ * @brief Represents the metadata for a template variable.
+ *
+ * Yes, this is an entire header file just for one tiny struct. Why?
+ * Because if you dare put it in Tags.hpp or Template.hpp, C++ compilers
+ * (especially GCC) will remind you what an "incomplete type" is, and
+ * you'll be debugging include cycles until next week.
+ *
+ * VariableTag bravely lives alone to keep Tags and Template happy and
+ * your code building everywhere—even on compilers that woke up grumpy.
+ */
 struct VariableTag {
-    SizeT   Offset{0};
-    SizeT16 Length{0};
-    SizeT8  IDLength{0};
-    SizeT8  Level{0};
+    SizeT   Offset{0};   ///< Offset of the variable within the template.
+    SizeT16 Length{0};   ///< Length of the variable name.
+    SizeT8  IDLength{0}; ///< Length of the variable identifier.
+    SizeT8  Level{0};    ///< Nesting level of the variable (for scopes).
 };
 
 } // namespace Tags
 } // namespace Qentem
 
-#endif
+#endif // QENTEM_VARIABLE_TAG_H

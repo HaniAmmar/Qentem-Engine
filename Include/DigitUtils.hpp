@@ -1,23 +1,19 @@
-/*
- * Copyright (c) 2024 Hani Ammar
+/**
+ * @file DigitUtils.hpp
+ * @brief Provides advanced numeric constants and digit-processing utilities for Qentem Engine.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This header defines internal constants and helper functions for fast, precise
+ * numeric operations, including floating-point bit manipulation, power-of-five lookups,
+ * and low-level digit processing. DigitUtils.hpp enables high-performance routines for
+ * parsing, conversion, and mathematical operations, with special support for double and
+ * integer types.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The advanced constants and algorithms within this file are designed to maximize both
+ * speed and correctness, and may challenge your understanding of floating-point math.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * @author Hani Ammar
+ * @date 2025
+ * @copyright MIT License
  */
 
 #ifndef QENTEM_DIGIT_UTILS_H

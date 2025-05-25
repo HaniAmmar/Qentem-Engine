@@ -1,23 +1,18 @@
-/*
- * Copyright (c) 2024 Hani Ammar
+/**
+ * @file Template.hpp
+ * @brief Implements the core template engine for Qentem.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This header defines the primary interfaces and logic for template parsing,
+ * rendering, and variable resolution within the Qentem Engine library.
+ * It brings together all components necessary for efficient, header-only,
+ * zero-dependency template processing.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * Template.hpp serves as the entry point for users working with Qentem templates,
+ * enabling fast and flexible dynamic content generation.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * @author Hani Ammar
+ * @date 2025
+ * @copyright MIT License
  */
 
 #ifndef QENTEM_TEMPLATE_H

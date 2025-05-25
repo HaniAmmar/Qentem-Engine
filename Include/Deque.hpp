@@ -1,33 +1,5 @@
-/*
- * Copyright (c) 2025 Hani Ammar
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-#ifndef QENTEM_DEQUE_HPP
-#define QENTEM_DEQUE_HPP
-
-#include "Memory.hpp"
-
-namespace Qentem {
-
 /**
+ * @file Deque.hpp
  * @brief Double-ended queue with power-of-two capacity, backed by a ring buffer.
  *
  * This Deque implements the usual front/back push and pop in O(1) time via
@@ -46,6 +18,20 @@ namespace Qentem {
  * (in allocate(), expand(), or reset()), all biased indices stay consistent
  * without needing any full rebuild of stored mappings. This pattern yields
  * true O(1) insertion, eviction, and index lookup in dynamic table scenarios.
+ *
+ * @author Hani Ammar
+ * @date 2025
+ * @copyright MIT License
+ */
+
+#ifndef QENTEM_DEQUE_HPP
+#define QENTEM_DEQUE_HPP
+
+#include "Memory.hpp"
+
+namespace Qentem {
+
+/**
  *
  * @tparam Type_T The element type stored in the deque.
  */
