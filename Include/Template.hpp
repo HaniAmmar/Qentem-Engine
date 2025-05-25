@@ -1019,56 +1019,26 @@ struct TemplateCore {
 
     // Render
     void render(const TagBit *tag, const TagBit *end, SizeT offset, SizeT end_offset) const {
+        using HandlerFunc = void (TemplateCore::*)(const TagBit *tag, SizeT &) const;
+
+        constexpr HandlerFunc handlers[SizeT8(TagType::None)] = {
+            &TemplateCore::renderVariable, &TemplateCore::renderRawVariable,
+            &TemplateCore::renderMath,     &TemplateCore::renderSuperVariable,
+            &TemplateCore::renderInLineIf, &TemplateCore::renderLoop,
+            &TemplateCore::renderIf};
+
         while (tag < end) {
-            switch (tag->GetType()) {
-                case TagType::Variable: {
-                    renderVariable(tag->GetVariableTag(), offset);
-                    break;
-                }
-
-                case TagType::RawVariable: {
-                    renderRawVariable(tag->GetVariableTag(), offset);
-                    break;
-                }
-
-                case TagType::Math: {
-                    renderMath(tag->GetMathTag(), offset);
-                    break;
-                }
-
-                case TagType::SuperVariable: {
-                    renderSuperVariable(tag->GetSuperVariableTag(), offset);
-                    break;
-                }
-
-                case TagType::InLineIf: {
-                    renderInLineIf(tag->GetInLineIfTag(), offset);
-                    break;
-                }
-
-                case TagType::Loop: {
-                    renderLoop(tag->GetLoopTag(), offset);
-                    break;
-                }
-
-                case TagType::If: {
-                    renderIf(tag->GetIfTag(), offset);
-                    break;
-                }
-
-                default: {
-                }
-            }
-
+            (this->*handlers[SizeT8(tag->GetType())])(tag, offset);
             ++tag;
         }
 
         stream_->Write((content_ + offset), (end_offset - offset));
     }
 
-    void renderVariable(const VariableTag &tag, SizeT &offset) const {
-        const SizeT t_offset = (tag.Offset - TagPatterns::VariablePrefixLength);
-        const SizeT length   = (tag.Length + TagPatterns::VariableFullLength);
+    void renderVariable(const TagBit *tagbit, SizeT &offset) const {
+        const VariableTag &tag      = tagbit->GetVariableTag();
+        const SizeT        t_offset = (tag.Offset - TagPatterns::VariablePrefixLength);
+        const SizeT        length   = (tag.Length + TagPatterns::VariableFullLength);
 
         stream_->Write((content_ + offset), (t_offset - offset));
         offset = t_offset;
@@ -1092,9 +1062,10 @@ struct TemplateCore {
         }
     }
 
-    void renderRawVariable(const VariableTag &tag, SizeT &offset) const {
-        const SizeT t_offset = (tag.Offset - TagPatterns::RawVariablePrefixLength);
-        const SizeT length   = (tag.Length + TagPatterns::RawVariableFullLength);
+    void renderRawVariable(const TagBit *tagbit, SizeT &offset) const {
+        const VariableTag &tag      = tagbit->GetVariableTag();
+        const SizeT        t_offset = (tag.Offset - TagPatterns::RawVariablePrefixLength);
+        const SizeT        length   = (tag.Length + TagPatterns::RawVariableFullLength);
 
         stream_->Write((content_ + offset), (t_offset - offset));
         offset = t_offset;
@@ -1108,7 +1079,8 @@ struct TemplateCore {
         }
     }
 
-    void renderMath(const MathTag &tag, SizeT &offset) const {
+    void renderMath(const TagBit *tagbit, SizeT &offset) const {
+        const MathTag     &tag  = tagbit->GetMathTag();
         const QExpression *expr = tag.Expressions.First();
         QExpression        result;
 
@@ -1141,10 +1113,11 @@ struct TemplateCore {
         }
     }
 
-    void renderSuperVariable(const SuperVariableTag &tag, SizeT &offset) const {
-        const Value_T *s_var   = getValue(tag.Variable);
-        const Char_T  *content = nullptr;
-        SizeT          length  = 0;
+    void renderSuperVariable(const TagBit *tagbit, SizeT &offset) const {
+        const SuperVariableTag &tag     = tagbit->GetSuperVariableTag();
+        const Value_T          *s_var   = getValue(tag.Variable);
+        const Char_T           *content = nullptr;
+        SizeT                   length  = 0;
 
         stream_->Write((content_ + offset), (tag.Offset - offset));
         offset = tag.EndOffset;
@@ -1176,21 +1149,21 @@ struct TemplateCore {
                                     case TagType::Variable: {
                                         const VariableTag &var = sub_tag->GetVariableTag();
                                         SizeT var_offset       = (var.Offset - TagPatterns::VariablePrefixLength);
-                                        renderVariable(var, var_offset);
+                                        renderVariable(sub_tag, var_offset);
                                         break;
                                     }
 
                                     case TagType::RawVariable: {
                                         const VariableTag &r_var = sub_tag->GetVariableTag();
                                         SizeT r_var_offset = (r_var.Offset - TagPatterns::RawVariablePrefixLength);
-                                        renderRawVariable(r_var, r_var_offset);
+                                        renderRawVariable(sub_tag, r_var_offset);
                                         break;
                                     }
 
                                     case TagType::Math: {
                                         const MathTag &math        = sub_tag->GetMathTag();
                                         SizeT          math_offset = math.Offset;
-                                        renderMath(math, math_offset);
+                                        renderMath(sub_tag, math_offset);
                                         break;
                                     }
 
@@ -1213,8 +1186,9 @@ struct TemplateCore {
         }
     }
 
-    void renderInLineIf(const InLineIfTag &tag, SizeT &offset) const {
+    void renderInLineIf(const TagBit *tagbit, SizeT &offset) const {
         QExpression        result;
+        const InLineIfTag &tag  = tagbit->GetInLineIfTag();
         const QExpression *expr = tag.Case.First();
 
         stream_->Write((content_ + offset), (tag.Offset - offset));
@@ -1253,8 +1227,9 @@ struct TemplateCore {
         }
     }
 
-    void renderLoop(const LoopTag &tag, SizeT &offset) const {
+    void renderLoop(const TagBit *tagbit, SizeT &offset) const {
         Value_T        grouped_set;
+        const LoopTag &tag = tagbit->GetLoopTag();
         const Value_T *loop_set;
 
         stream_->Write((content_ + offset), (tag.Offset - offset));
@@ -1325,7 +1300,8 @@ struct TemplateCore {
         }
     }
 
-    void renderIf(const IfTag &tag, SizeT &offset) const {
+    void renderIf(const TagBit *tagbit, SizeT &offset) const {
+        const IfTag     &tag  = tagbit->GetIfTag();
         const IfTagCase *item = tag.Cases.First();
         const IfTagCase *end  = tag.Cases.End();
         QExpression      result;
