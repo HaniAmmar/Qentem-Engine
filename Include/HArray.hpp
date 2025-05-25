@@ -27,11 +27,15 @@
 
 namespace Qentem {
 /*
- * A data structure that looks like an ordered array but behaves like a hash
- * table. Any value can be accessed by its index or its name. It preserves
- * the elements' order and uses one memory block. Therefore, it has an initial
- * size, and collisions do not cause new allocations. When resized, it drops
- * deleted items and resets its hash base.
+ * A data structure that looks like an ordered array but behaves like a hash table.
+ * Elements can be accessed both by their index (array-style) and by key (hash-style).
+ *
+ * - Preserves insertion order and uses a single contiguous memory block.
+ * - No extra allocations on collisions: the initial size determines capacity.
+ * - When resized, deleted items are dropped and the hash base is rebuilt/reset.
+ *
+ * Ideal for scenarios needing fast iteration and direct lookup, combining the
+ * best aspects of arrays and hash tables.
  */
 
 /*|-------------------------------------------|*/
