@@ -37,14 +37,14 @@ struct LoopTag;
 struct IfTag;
 //////////////////////
 enum struct TagType : SizeT8 {
-    None = 0,
-    Variable,      // {var:x}
-    RawVariable,   // {raw:x}
-    Math,          // {math:x}
-    SuperVariable, // {svar:x1,x2,x3}
-    InLineIf,      // {if x}
-    Loop,          // <loop ...></loop>
-    If             // <if case="..."></if>
+    Variable      = 0, // {var:x}
+    RawVariable   = 1, // {raw:x}
+    Math          = 2, // {math:x}
+    SuperVariable = 3, // {svar:x1,x2,x3}
+    InLineIf      = 4, // {if x}
+    Loop          = 5, // <loop ...></loop>
+    If            = 6, // <if case="..."></if>
+    None          = 7,
 };
 
 struct TagBit {
@@ -188,7 +188,7 @@ struct TagBit {
         switch (GetType()) {
             case TagType::Variable:
             case TagType::RawVariable: {
-                Memory::Deallocate(storage_);
+                Memory::Deallocate(&GetVariableTag());
                 break;
             }
 
