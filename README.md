@@ -44,6 +44,7 @@ Qentem Engine is a C++ library offering high-performance template rendering and 
 ## Requirements
 
 A C++11 or later compiler.
+
 _Note_: `iostream` is currently used in tests.
 
 ## Documentation
@@ -310,6 +311,11 @@ The test suite includes over 23k lines of code, more than five times the size of
     mkdir Build
     c++ -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
     ./Build/QTest.bin
+    ```
+
+-   make
+    ```shell
+    make test
     ```
 
 -   cmake
