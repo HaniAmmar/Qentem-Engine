@@ -450,7 +450,7 @@ struct HashTable {
     }
 
     inline void expand() {
-        resize((SizeT(Capacity() == 0) + Capacity()) * SizeT{2});
+        resize((Capacity() | SizeT{2}) * SizeT{2});
     }
 
     HItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {

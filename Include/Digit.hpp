@@ -1116,7 +1116,7 @@ struct Digit {
                     }
                 }
             } else {
-                index += (number_length - SizeT{1});
+                index += SizeT(number_length - SizeT{1});
                 storage[index] = DigitUtils::DigitChar::Zero;
             }
         }

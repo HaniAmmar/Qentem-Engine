@@ -43,7 +43,7 @@ namespace Qentem {
  *         logical = absolute - PopCount();
  *
  * Because pop_count_ is reset to zero whenever the underlying storage moves
- * (in allocate(), resize(), or reset()), all biased indices stay consistent
+ * (in allocate(), expand(), or reset()), all biased indices stay consistent
  * without needing any full rebuild of stored mappings. This pattern yields
  * true O(1) insertion, eviction, and index lookup in dynamic table scenarios.
  *
@@ -130,7 +130,7 @@ struct Deque {
      */
     void operator+=(Type_T &&item) {
         if (IsFull()) {
-            resize(capacity_ * SizeT{2});
+            expand(capacity_ * SizeT{2});
         }
 
         Memory::Initialize((Storage() + tail()), Memory::Move(item));
@@ -148,7 +148,7 @@ struct Deque {
      */
     inline void operator+=(const Type_T &item) {
         if (IsFull()) {
-            resize(capacity_ * SizeT{2});
+            expand(capacity_ * SizeT{2});
         }
 
         Memory::Initialize((Storage() + tail()), item);
@@ -236,7 +236,7 @@ struct Deque {
      *
      * Returns a direct pointer to the element at the front without
      * removing it. If the deque is empty, returns nullptr. The pointer remains
-     * valid until the deque is modified (e.g., by insertion, removal, or resize).
+     * valid until the deque is modified (e.g., by insertion, removal, or expand).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -254,7 +254,7 @@ struct Deque {
      *
      * Returns a direct, mutable pointer to the element at the front without
      * removing it. If the deque is empty, returns nullptr. The pointer remains
-     * valid until the deque is modified (e.g., by insertion, removal, or resize).
+     * valid until the deque is modified (e.g., by insertion, removal, or expand).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -272,7 +272,7 @@ struct Deque {
      *
      * Returns a direct pointer to the back of the deque without removing it.
      * If the deque is empty, returns nullptr. The pointer remains valid
-     * until the deque is modified (e.g., via push, pop, or resize).
+     * until the deque is modified (e.g., via push, pop, or expand).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -290,7 +290,7 @@ struct Deque {
      *
      * Returns a direct, mutable pointer to the back of the deque without removing it.
      * If the deque is empty, returns nullptr. The pointer remains valid
-     * until the deque is modified (e.g., via push, pop, or resize).
+     * until the deque is modified (e.g., via push, pop, or expand).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -351,7 +351,7 @@ struct Deque {
         SizeT needed = (additional + Size());
 
         if (needed > Capacity()) {
-            resize(needed);
+            expand(needed);
         }
     }
 
@@ -383,7 +383,7 @@ struct Deque {
                 setSize(new_size);
             }
 
-            resize(new_size);
+            expand(new_size);
         } else {
             // Completely clear and deallocate
             Reset();
@@ -589,7 +589,7 @@ struct Deque {
      * @param new_cap Desired minimum capacity for the deque's buffer.
      * @complexity Amortized O(n) when growing (due to element moves); O(1) otherwise.
      */
-    void resize(SizeT new_cap) {
+    void expand(SizeT new_cap) {
         constexpr SizeT32 type_size = sizeof(Type_T);
 
         // 1) Bulk‐copy, two-segment style to preserve order

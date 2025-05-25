@@ -383,7 +383,7 @@ static void TestString2(QTest &test) {
     SizeT total = 0;
 
     for (const auto &item : str1) {
-        total = (total + SizeT(item) - SizeT{'0'});
+        total = SizeT(total + SizeT(item) - SizeT{'0'});
     }
 
     test.IsEqual(total, SizeT{10}, __LINE__);

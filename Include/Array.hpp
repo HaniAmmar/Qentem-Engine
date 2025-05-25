@@ -115,7 +115,7 @@ struct Array {
             const SizeT       n_size    = (Size() + src.Size());
 
             if (n_size > Capacity()) {
-                resize(n_size);
+                expand(n_size);
             }
 
             Memory::Copy((Storage() + Size()), src.Storage(), (src.Size() * type_size));
@@ -132,7 +132,7 @@ struct Array {
         const SizeT n_size = (Size() + src.Size());
 
         if (n_size > Capacity()) {
-            resize(n_size);
+            expand(n_size);
         }
 
         index_ += src.Size();
@@ -150,7 +150,7 @@ struct Array {
 
     void operator+=(Type_T &&item) {
         if (Size() == Capacity()) {
-            resize((Capacity() | (Capacity() == 0)) * SizeT{2});
+            expand((Capacity() | SizeT{1}) * SizeT{2});
         }
 
         Memory::Initialize((Storage() + Size()), Memory::Move(item));
@@ -159,7 +159,7 @@ struct Array {
 
     inline void operator+=(const Type_T &item) {
         if (Size() == Capacity()) {
-            resize((Capacity() | (Capacity() == 0)) * SizeT{2});
+            expand((Capacity() | SizeT{1}) * SizeT{2});
         }
 
         Memory::Initialize((Storage() + Size()), item);
@@ -237,7 +237,7 @@ struct Array {
                 setSize(new_size);
             }
 
-            resize(new_size);
+            expand(new_size);
             return;
         }
 
@@ -259,7 +259,7 @@ struct Array {
         const SizeT n_size = (size + Size());
 
         if (n_size > Capacity()) {
-            resize(n_size);
+            expand(n_size);
         }
     }
 
@@ -376,7 +376,7 @@ struct Array {
         capacity_ = new_capacity;
     }
 
-    void resize(SizeT new_capacity) {
+    void expand(SizeT new_capacity) {
         constexpr SizeT32 type_size = sizeof(Type_T);
         Type_T           *src       = Storage();
 

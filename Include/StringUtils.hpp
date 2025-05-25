@@ -170,7 +170,7 @@ static SizeT Hash(const Char_T *key, SizeT length) noexcept {
     SizeT offset = 0;
 
     while (offset < length) {
-        hash += (base * offset * SizeT(key[offset]));
+        hash += SizeT(base * offset * SizeT(key[offset]));
         base += offset;
 
         if (offset != length) {
