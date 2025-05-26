@@ -5,6 +5,7 @@
 -   [Introduction](#introduction)
 -   [Features](#features)
 -   [Requirements](#requirements)
+-   [Embedded / Microcontroller Support](#embedded--microcontroller-support)
 -   [Documentation](#documentation)
 -   [Live Testing](#live-testing)
 -   [Template Example](#template-example)
@@ -14,18 +15,20 @@
 -   [License](#license)
 
 ## Introduction
+
 Qentem Engine is a C++ library offering high-performance template rendering and a fast, built-in JSON parser. It is lightweight, STL-free, dependency-free, and supports deployment on native backends as well as frontend environments such as web browsers via WebAssembly.
 
 ## Features
 
 ### General
 
-* Header-only, cross-platform, and fully self-contained — STL-free and with no external dependencies.
-* High-performance numeric parsing and formatting without relying on floating-point hardware (FPU-free).
-* Supports both 32-bit and 64-bit systems, with little-endian and big-endian architectures.
-* Exception-free design — no `try`, `catch`, or `throw`.
-* Full Unicode support: UTF-8, UTF-16, and UTF-32.
-* Low memory footprint — ideal for resource-constrained environments.
+* Header-only, cross-platform, and fully self-contained—STL-free, no external dependencies.
+* High-performance numeric parsing and formatting (FPU-free).
+* Supports 32-bit and 64-bit systems; little-endian and big-endian architectures.
+* Exception-free design—no try, catch, or throw.
+* Full Unicode support: UTF-8, UTF-16, UTF-32.
+* Low memory footprint—ideal for resource-constrained environments.
+* No global mutable state; suitable for multi-threaded use with separate objects.
 
 ### Template Rendering
 
@@ -46,6 +49,10 @@ Qentem Engine is a C++ library offering high-performance template rendering and 
 A C++11 or later compiler.
 
 _Note_: `iostream` is currently used in tests.
+
+## Embedded / Microcontroller Support
+
+Qentem Engine’s modular, STL-free architecture enables it to run effectively on embedded systems and microcontroller platforms with limited resources. The core modules—including template rendering, JSON parsing, and custom containers—have been successfully tested on ESP32 and are suitable for use in Arduino-style or bare-metal C++ projects. All components are designed without exceptions, threading, or OS-specific dependencies, making them well-suited to single-threaded, minimal environments. Qentem Engine does not provide file or stream I/O code for embedded targets.
 
 ## Documentation
 
@@ -329,24 +336,4 @@ The test suite includes over 23k lines of code, more than five times the size of
 
 ## License
 
-> MIT License
->
-> Copyright (c) 2025 Hani Ammar
->
-> Permission is hereby granted, free of charge, to any person obtaining a copy
-> of this software and associated documentation files (the "Software"), to deal
-> in the Software without restriction, including without limitation the rights
-> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> copies of the Software, and to permit persons to whom the Software is
-> furnished to do so, subject to the following conditions:
->
-> The above copyright notice and this permission notice shall be included in all
-> copies or substantial portions of the Software.
->
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> SOFTWARE.
+MIT License. See the [LICENSE](LICENSE) file for details.
