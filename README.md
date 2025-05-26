@@ -1,5 +1,9 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/08uk7dxqw3vn3usi/branch/main?svg=true)](https://ci.appveyor.com/project/HaniAmmar/qentem-engine/branch/main)
 
+<p align="center">
+  <img src="./icon.png" width="335" height="336"/>
+</p>
+
 # Qentem Engine
 
 -   [Introduction](#introduction)
