@@ -12,6 +12,7 @@
 -   [Modules](#modules)
 -   [JSON Example](#json-example)
 -   [Tests](#tests)
+-   [Why C++11?](#why-c11)
 -   [License](#license)
 
 ## Introduction
@@ -333,6 +334,10 @@ The test suite includes over 23k lines of code, more than five times the size of
     cmake --build .
     ctest -C Debug
     ```
+
+## Why C++11?
+
+Qentem Engine uses C++11 as a baseline to ensure it compiles cleanly on all platforms, including Arduino and other embedded environments, where support for newer C++ standards can be inconsistent. Where possible, extra features (`constexpr`, etc.) are enabled via macros for compilers that support them.
 
 ## License
 
