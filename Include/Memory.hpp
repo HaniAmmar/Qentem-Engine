@@ -21,7 +21,7 @@ namespace Memory {
 // size = the number of bytes
 template <typename Number_T>
 inline static void SetToZero(void *pointer, Number_T size) noexcept {
-    // Number_T offset = 0;
+    Number_T offset = 0;
 
     // if (Config::IsSIMDEnabled) {
     //     const Number_T m_size = (size >> Platform::SIMD::Shift);
