@@ -21,25 +21,25 @@ namespace Memory {
 // size = the number of bytes
 template <typename Number_T>
 inline static void SetToZero(void *pointer, Number_T size) noexcept {
-    Number_T offset = 0;
+    // Number_T offset = 0;
 
-    if (Config::IsSIMDEnabled) {
-        const Number_T m_size = (size >> Platform::SIMD::Shift);
+    // if (Config::IsSIMDEnabled) {
+    //     const Number_T m_size = (size >> Platform::SIMD::Shift);
 
-        if (m_size != 0) {
-            offset = m_size;
-            offset <<= Platform::SIMD::Shift;
+    //     if (m_size != 0) {
+    //         offset = m_size;
+    //         offset <<= Platform::SIMD::Shift;
 
-            const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
-            Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
-            const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
+    //         const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
+    //         Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
+    //         const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
 
-            do {
-                Platform::SIMD::Store(m_pointer, m_zero);
-                ++m_pointer;
-            } while (m_pointer < end);
-        }
-    }
+    //         do {
+    //             Platform::SIMD::Store(m_pointer, m_zero);
+    //             ++m_pointer;
+    //         } while (m_pointer < end);
+    //     }
+    // }
 
     char *src = (char *)(pointer);
 
@@ -93,8 +93,54 @@ static constexpr const Type_T *ChangePointer(const void *value) noexcept {
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_T>
-static constexpr Type_T &&Move(Type_T &value) noexcept {
+struct ReferenceType {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct ReferenceType<Type_T &> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct ReferenceType<Type_T &&> {
+    using Type = Type_T;
+};
+
+template <typename>
+struct IsLValueReference {
+    static constexpr bool Value{false};
+};
+
+template <typename Type_T>
+struct IsLValueReference<Type_T &> {
+    static constexpr bool Value{true};
+};
+
+template <typename>
+struct IsRValueReference {
+    static constexpr bool Value{false};
+};
+
+template <typename Type_T>
+struct IsRValueReference<Type_T &&> {
+    static constexpr bool Value{true};
+};
+
+template <typename Type_T>
+static constexpr Type_T &&Forward(typename ReferenceType<Type_T>::Type &value) noexcept {
     return (Type_T &&)(value);
+}
+
+template <typename Type_T>
+static constexpr Type_T &&Forward(typename ReferenceType<Type_T>::Type &&value) noexcept {
+    static_assert(!IsLValueReference<Type_T>::Value, "Forward<T>(x): Cannot forward an lvalue as rvalue.");
+    return (Type_T &&)(value);
+}
+
+template <typename Type_T>
+static constexpr typename ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
+    return (typename ReferenceType<Type_T>::Type &&)(value);
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_T>
@@ -197,7 +243,7 @@ inline static void Initialize(Type_T *pointer, const Type_T *end, const Type_T &
 
 template <typename Type_T, typename... Values_T>
 inline static void InitializeValues(Type_T *pointer, Values_T &&...values) noexcept {
-    new (pointer) Type_T{Move(values)...};
+    new (pointer) Type_T{Forward<Values_T>(values)...};
 }
 
 template <typename Type_T, typename... Values_T>
@@ -217,7 +263,7 @@ inline static Type_T *AllocateInit() {
 template <typename Type_T, typename... Values_T>
 inline static Type_T *AllocateInit(Values_T &&...values) noexcept {
     Type_T *pointer = Allocate<Type_T>(1);
-    InitializeValues(pointer, Move(values)...);
+    InitializeValues(pointer, Forward<Values_T>(values)...);
     return pointer;
 }
 
