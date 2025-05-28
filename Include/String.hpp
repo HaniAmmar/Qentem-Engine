@@ -290,23 +290,31 @@ struct String {
         }
     }
 
-    void InsertAt(Char_T ch, SizeT index) {
+    inline void InsertAt(Char_T ch, SizeT index) {
+        constexpr SizeT size = sizeof(Char_T);
+
         if (index < Length()) {
-            Char_T       *str    = Storage();
-            Char_T       *first  = (str + index);
-            const Char_T *end    = (str + Length());
-            Char_T       *second = first;
+            const SizeT new_length = (Length() + SizeT{1});
 
-            Char_T tmp = *first;
-            *first     = ch;
+            Char_T *new_storage = Memory::Allocate<Char_T>(new_length);
 
-            while (++second < end) {
-                ch      = *second;
-                *second = tmp;
-                tmp     = ch;
+            // 1. Copy prefix [0, index)
+            if (index > 0) {
+                Memory::Copy(new_storage, Storage(), (index * size));
             }
 
-            Write(&tmp, SizeT{1});
+            // 2. Insert new char at 'index'
+            new_storage[index] = ch;
+
+            // 3. Copy suffix [index, length)
+            if (index < Length()) {
+                Memory::Copy(new_storage + index + 1, (Storage() + index), ((Length() - index) * size));
+            }
+
+            // Clean up old storage and set new storage/capacity
+            Memory::Deallocate(Storage());
+            setStorage(new_storage);
+            setLength(new_length);
         }
     }
 

@@ -26,6 +26,8 @@ template <typename Char_T>
 struct StringStream {
     using CharType = Char_T;
 
+    static constexpr SizeT ExpandFactor{4};
+
     StringStream() = default;
 
     ~StringStream() {
@@ -303,21 +305,48 @@ struct StringStream {
     }
 
     inline void InsertAt(Char_T ch, SizeT index) {
+        constexpr SizeT size = sizeof(Char_T);
         if (index < Length()) {
-            Char_T       *first  = (Storage() + index);
-            Char_T       *second = first;
-            const Char_T *end    = End();
+            const SizeT new_length = (Length() + SizeT{1});
 
-            Char_T tmp = *first;
-            *first     = ch;
+            if (new_length <= Capacity()) {
+                // Enough capacity, shift tail right by one, insert in-place.
+                Char_T *data = Storage();
 
-            while (++second < end) {
-                ch      = *second;
-                *second = tmp;
-                tmp     = ch;
+                // Shift right: move everything [index, length) -> [index+1, new_length)
+                SizeT i = Length();
+
+                while (i > index) {
+                    data[i] = data[i - SizeT{1}];
+                    --i;
+                }
+
+                data[index] = ch;
+                setLength(new_length);
+            } else {
+                // Not enough capacity: allocate a bigger buffer and copy in 3 steps.
+                SizeT   new_capacity = (new_length * ExpandFactor);
+                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignSize(new_capacity));
+
+                // 1. Copy prefix [0, index)
+                if (index > 0) {
+                    Memory::Copy(new_storage, Storage(), (index * size));
+                }
+
+                // 2. Insert new char at 'index'
+                new_storage[index] = ch;
+
+                // 3. Copy suffix [index, length)
+                if (index < Length()) {
+                    Memory::Copy(new_storage + index + 1, (Storage() + index), ((Length() - index) * size));
+                }
+
+                // Clean up old storage and set new storage/capacity
+                Memory::Deallocate(Storage());
+                setStorage(new_storage);
+                setCapacity(new_capacity);
+                setLength(new_length);
             }
-
-            *this += tmp;
         }
     }
 
@@ -444,7 +473,7 @@ struct StringStream {
         constexpr SizeT size = sizeof(Char_T);
         Char_T         *str  = Storage();
 
-        allocate(new_capacity * SizeT{4});
+        allocate(new_capacity * ExpandFactor);
 
         Memory::Copy(Storage(), str, (Length() * size));
         Memory::Deallocate(str);
