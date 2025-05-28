@@ -368,6 +368,15 @@ static void TestStringStream2(QTest &test) {
     test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
     test.IsEqual(stream, "0123456789", __LINE__);
 
+    stream.Reset();
+    stream = "01";
+    stream += "23459";
+    stream.InsertAt('8', 6);
+    stream.InsertAt('7', 6);
+    stream.InsertAt('6', 6);
+
+    test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
+    test.IsEqual(stream, "0123456789", __LINE__);
     ///////////////////
     stream.Reserve(SizeT{8});
 
@@ -424,6 +433,20 @@ static void TestStringStream2(QTest &test) {
 
     stream.WriteAt(0, "A-B-C-D-E-", 10);
     test.IsEqual(stream, "A-B-C-D-E-", __LINE__);
+
+    stream.Reset();
+    stream = "56";
+    stream += "789";
+    stream.ShiftRight(5);
+
+    str[0] = '0';
+    str[1] = '1';
+    str[2] = '2';
+    str[3] = '3';
+    str[4] = '4';
+
+    test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
+    test.IsEqual(stream, "0123456789", __LINE__);
 }
 
 static int RunStringStreamTests() {
