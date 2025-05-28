@@ -210,6 +210,30 @@ struct StringStream {
         }
     }
 
+    inline void Expect(SizeT length) {
+        length += Length();
+
+        if (Capacity() < length) {
+            expand(length);
+        }
+    }
+
+    inline void Reserve(const SizeT size) {
+        Reset();
+
+        if (size != 0) {
+            allocate(size);
+        }
+    }
+
+    inline void SetLength(SizeT length) {
+        if (Capacity() < length) {
+            expand(length);
+        }
+
+        setLength(length);
+    }
+
     inline void Clear() noexcept {
         setLength(0);
     }
@@ -220,6 +244,43 @@ struct StringStream {
         clearStorage();
         setLength(0);
         setCapacity(0);
+    }
+
+    void InsertNull() {
+        if (Capacity() == Length()) {
+            expand(Length() + SizeT{1});
+        }
+
+        Storage()[Length()] = Char_T{0};
+    }
+
+    StringView<Char_T> GetStringView() {
+        InsertNull();
+        return StringView<Char_T>{First(), Length()};
+    }
+
+    String<Char_T> GetString() {
+        if (Capacity() > Length()) {
+            const SizeT length  = Length(); // Detach() resets the length.
+            Storage()[Length()] = Char_T{0};
+            return String<Char_T>(Detach(), length);
+        }
+
+        String<Char_T> str{First(), Length()};
+
+        Reset();
+
+        return str;
+    }
+
+    Char_T *Detach() noexcept {
+        Char_T *str = Storage();
+        clearStorage();
+
+        setLength(0);
+        setCapacity(0);
+
+        return str;
     }
 
     inline void StepBack(const SizeT length) noexcept {
@@ -260,14 +321,6 @@ struct StringStream {
         }
     }
 
-    inline void SetLength(SizeT length) {
-        if (Capacity() < length) {
-            expand(length);
-        }
-
-        setLength(length);
-    }
-
     // Set the needed length to write directly to a returned buffer,
     inline Char_T *Buffer(SizeT length) {
         const SizeT new_length = (Length() + length);
@@ -281,22 +334,6 @@ struct StringStream {
         setLength(new_length);
 
         return str;
-    }
-
-    inline void Expect(SizeT length) {
-        length += Length();
-
-        if (Capacity() < length) {
-            expand(length);
-        }
-    }
-
-    void Reserve(const SizeT size) {
-        Reset();
-
-        if (size != 0) {
-            allocate(size);
-        }
     }
 
     void ShiftRight(SizeT length) {
@@ -317,43 +354,6 @@ struct StringStream {
             --to;
             *to = *from;
         }
-    }
-
-    Char_T *Detach() noexcept {
-        Char_T *str = Storage();
-        clearStorage();
-
-        setLength(0);
-        setCapacity(0);
-
-        return str;
-    }
-
-    String<Char_T> GetString() {
-        if (Capacity() > Length()) {
-            const SizeT length  = Length(); // Detach() resets the length.
-            Storage()[Length()] = Char_T{0};
-            return String<Char_T>(Detach(), length);
-        }
-
-        String<Char_T> str{First(), Length()};
-
-        Reset();
-
-        return str;
-    }
-
-    StringView<Char_T> GetStringView() {
-        InsertNull();
-        return StringView<Char_T>{First(), Length()};
-    }
-
-    void InsertNull() {
-        if (Capacity() == Length()) {
-            expand(Length() + SizeT{1});
-        }
-
-        Storage()[Length()] = Char_T{0};
     }
 
     inline Char_T *Storage() const noexcept {
