@@ -377,7 +377,7 @@ inline static constexpr Platform::SIMD::Number_T SMIDCompare(const SIMDValue &va
 // char
 template <typename Char_T, typename SIMDValue>
 struct SMIDCompare_T<Char_T, SIMDValue, 1U> {
-    inline constexpr static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+    inline static constexpr Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         return Platform::SIMD::Compare8Bit(val1, val2);
     }
 };
