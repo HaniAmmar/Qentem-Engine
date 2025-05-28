@@ -81,19 +81,10 @@ struct Deque {
      */
     Deque &operator=(Deque &&src) noexcept {
         if (this != &src) {
-            dispose();
-            setStorage(src.Storage());
-            setSize(src.Size());
-            setHead(src.head());
-            setPopCount(src.PopCount());
-            setCapacity(src.Capacity());
-
-            src.clearStorage();
-            src.setSize(0);
-            src.setHead(0);
-            src.setPopCount(0);
-            src.setCapacity(0);
+            this->~Deque();
+            new (this) Deque(Memory::Move(src));
         }
+
         return *this;
     }
 
@@ -401,7 +392,7 @@ struct Deque {
             // Unwrapped end index (may exceed Capacity())
             const SizeT end = (tail() + count);
 
-            // 3) Initialize contiguous or wrapped range
+            // 3) Initialize contiguous range
             if (end <= Capacity()) {
                 Memory::Initialize((Storage() + start), (Storage() + end));
             }
