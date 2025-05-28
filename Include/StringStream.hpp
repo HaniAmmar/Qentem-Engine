@@ -350,6 +350,44 @@ struct StringStream {
         }
     }
 
+    inline void ShiftRight(SizeT shift) {
+        constexpr SizeT size = sizeof(Char_T);
+
+        if ((shift != 0) && IsNotEmpty()) {
+            const SizeT old_length = Length();
+            const SizeT new_length = (old_length + shift);
+
+            if (new_length <= Capacity()) {
+                // Enough capacity, shift in place (backwards to avoid overlap).
+                Char_T *data = Storage();
+                SizeT   i    = old_length;
+
+                while (i > 0) {
+                    data[i + (shift - SizeT{1})] = data[i - SizeT{1}];
+
+                    --i;
+                }
+
+                setLength(new_length);
+            } else {
+                // Not enough capacity: allocate, then copy with the shift.
+                SizeT   new_capacity = (new_length * ExpandFactor);
+                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignSize(new_capacity));
+
+                // 2. Copy old data to the right position in new storage
+                if (old_length > 0) {
+                    Memory::Copy(new_storage + shift, Storage(), old_length * size);
+                }
+
+                // Clean up, set new pointers
+                Memory::Deallocate(Storage());
+                setStorage(new_storage);
+                setCapacity(new_capacity);
+                setLength(new_length);
+            }
+        }
+    }
+
     // Set the needed length to write directly to a returned buffer,
     inline Char_T *Buffer(SizeT length) {
         const SizeT new_length = (Length() + length);
@@ -363,26 +401,6 @@ struct StringStream {
         setLength(new_length);
 
         return str;
-    }
-
-    void ShiftRight(SizeT length) {
-        length += Length();
-        SizeT start = Length();
-
-        if (Capacity() < length) {
-            expand(length);
-        }
-
-        setLength(length);
-
-        Char_T *from = (Storage() + start);
-        Char_T *to   = (Storage() + length);
-
-        while (from != Storage()) {
-            --from;
-            --to;
-            *to = *from;
-        }
     }
 
     inline Char_T *Storage() const noexcept {
