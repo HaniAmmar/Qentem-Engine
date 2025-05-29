@@ -439,11 +439,11 @@ static void TestStringStream2(QTest &test) {
     stream += "789";
     stream.ShiftRight(5);
 
-    str[0] = '0';
-    str[1] = '1';
-    str[2] = '2';
-    str[3] = '3';
-    str[4] = '4';
+    stream.Storage()[0] = '0';
+    stream.Storage()[1] = '1';
+    stream.Storage()[2] = '2';
+    stream.Storage()[3] = '3';
+    stream.Storage()[4] = '4';
 
     test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
     test.IsEqual(stream, "0123456789", __LINE__);
