@@ -801,6 +801,19 @@ struct Digit {
                     SizeT32 times = fraction_length;
 
                     if (times >= DigitConst::MaxPowerOfFive) {
+                        /*  When formatting a floating-point value with a limited precision (e.g.,
+                        three significant digits), it is unnecessary—and inefficient—to carry the full precision of the
+                        underlying big integer representation.
+
+                        To optimize performance, the algorithm computes a threshold max_index representing the maximal
+                        necessary limb count for the requested output precision. If the BigInt's internal index exceeds
+                        this threshold, and further shifting is available, blocks of least-significant bits may be
+                        discarded via right-shift operations without affecting the accuracy of the final output.
+
+                        This ensures that the computational cost scales with the requested output precision rather than
+                        the internal floating-point width, dramatically improving speed when formatting numbers to short
+                        or moderate precision.
+                        */
                         const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
                                                       ? ((format.Precision / DigitConst::MaxPowerOfTen) + 2U)
                                                       : b_int.MaxIndex();
@@ -936,6 +949,7 @@ struct Digit {
         }
     }
 
+    // TODO: Rewrite formatStringNumberDefault with same rigor as BigInt, post-QenWeb
     template <typename Stream_T>
     static void formatStringNumberDefault(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                           const SizeT32 calculated_digits, SizeT32 fraction_length,
