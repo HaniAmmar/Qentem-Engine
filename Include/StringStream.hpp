@@ -233,7 +233,9 @@ struct StringStream {
             expand(length);
         }
 
-        setLength(length);
+        if (Capacity() != 0) {
+            setLength(length);
+        }
     }
 
     inline void Clear() noexcept {
