@@ -434,7 +434,7 @@ struct String {
         Char_T *new_storage = allocate(new_length + SizeT{1});
 
         if (Length() != 0) {
-            Memory::Copy(new_storage, old_storage, Length());
+            Memory::Copy(new_storage, old_storage, (Length() * size));
         }
 
         Memory::Deallocate(old_storage); // Free the old storage
