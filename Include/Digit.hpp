@@ -757,13 +757,15 @@ struct Digit {
                 bool       round_up     = false;
                 /////////////////////////////////////
                 if (no_fraction) {
-                    const SizeT32 drop    = ((!extra_digits) ? 0 : (digits - (format.Precision + 1U)));
+                    const SizeT32 drop    = (SizeT32(extra_digits) * (digits - (format.Precision + 1U)));
                     const SizeT32 m_shift = (Info_T::MantissaSize + drop);
 
-                    if (m_shift < positive_exp) {
-                        b_int <<= (positive_exp - m_shift);
-                    } else {
-                        b_int >>= (m_shift - positive_exp);
+                    int diff = (int(positive_exp) - int(m_shift));
+
+                    if (diff > 0) {
+                        b_int <<= SizeT32(diff);
+                    } else if (diff < 0) {
+                        b_int >>= SizeT32(-diff);
                     }
 
                     if (drop != 0) {
@@ -841,9 +843,9 @@ struct Digit {
                 bigIntToString(stream, b_int);
 
                 switch (format.Type) {
-                    case RealFormatType::SemiFixed: {
-                        formatStringNumberFixed<false>(stream, start_at, format.Precision, digits, fraction_length,
-                                                       round_up);
+                    case RealFormatType::Default: {
+                        formatStringNumberDefault(stream, start_at, format.Precision, digits, fraction_length,
+                                                  is_positive_exp, round_up);
                         break;
                     }
 
@@ -853,9 +855,14 @@ struct Digit {
                         break;
                     }
 
-                    default: {
-                        formatStringNumberDefault(stream, start_at, format.Precision, digits, fraction_length,
-                                                  is_positive_exp, round_up);
+                    case RealFormatType::SemiFixed: {
+                        formatStringNumberFixed<false>(stream, start_at, format.Precision, digits, fraction_length,
+                                                       round_up);
+                        break;
+                    }
+
+                    case RealFormatType::Scientific: {
+                        break;
                     }
                 }
 
@@ -935,6 +942,30 @@ struct Digit {
         }
     }
 
+    // template <typename Stream_T, typename BigInt_T>
+    // static void bigIntToString(Stream_T &stream, BigInt_T &b_int) {
+    //     using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
+    //     using NumberType = typename BigInt_T::NumberType;
+
+    //     constexpr auto mask = ((NumberType{1} << DigitConst::MaxPowerOfTen) - 1);
+
+    //     while (b_int.IsBig()) {
+    //         const SizeT length = stream.Length();
+
+    //         const NumberType rem1 = b_int.Divide(DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfTen));
+    //         NumberType       rem2 = (b_int.Number() & mask);
+    //         rem2 *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfTen);
+    //         b_int >>= DigitConst::MaxPowerOfTen;
+
+    //         NumberToString<true>(stream, (rem2 + rem1));
+
+    //         // dividing '1000000000000000000' by '1000000000' yield zeros remainder
+    //         insertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
+    //     }
+
+    //     NumberToString<true>(stream, b_int.Number());
+    // }
+
     template <typename BigInt_T>
     inline static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
@@ -949,7 +980,32 @@ struct Digit {
         }
     }
 
+    // TODO: needs more work for extremely large values (e100)
+    // template <typename BigInt_T>
+    // inline static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
+    //     using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
+    //     if QENTEM_CONST_EXPRESSION (BigInt_T::BitWidth()) {
+    //         // Magic division using reciprocal multiply + shift (for 64-bit)
+
+    //         while (drop > DigitConst::MaxPowerOfFive) {
+    //             b_int *= DigitConst::GetPowerOfOneOverFive(DigitConst::MaxPowerOfFive);
+    //             b_int >>= (DigitConst::GetPowerOfOneOverFiveShift(DigitConst::MaxPowerOfFive) + 64U);
+    //             drop -= DigitConst::MaxPowerOfFive;
+    //         }
+    //     }
+
+    //     while (drop >= DigitConst::MaxPowerOfFive) {
+    //         b_int /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+    //         drop -= DigitConst::MaxPowerOfFive;
+    //     }
+
+    //     if (drop != 0) {
+    //         b_int /= DigitConst::GetPowerOfFive(drop);
+    //     }
+    // }
+
     // TODO: Rewrite formatStringNumberDefault with same rigor as BigInt, post-QenWeb
+    // Note: Use (32 * Char_T) fixed buffer size
     template <typename Stream_T>
     static void formatStringNumberDefault(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                           const SizeT32 calculated_digits, SizeT32 fraction_length,
