@@ -437,8 +437,8 @@ struct String {
             Memory::Copy(new_storage, old_storage, (Length() * size));
         }
 
-        Memory::Deallocate(old_storage); // Free the old storage
-        setStorage(new_storage);         // Swap in new pointer
+        deallocate();            // Free the old storage
+        setStorage(new_storage); // Swap in new pointer
     }
 
     void copyString(const Char_T *str, const SizeT length) {
