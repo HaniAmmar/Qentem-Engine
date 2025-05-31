@@ -229,6 +229,17 @@ struct String {
         return length_;
     }
 
+    inline void SetLength(SizeT length) {
+        if (Length() < length) {
+            expand(length);
+        }
+
+        if (Length() != 0) {
+            Storage()[length] = Char_T{0};
+            setLength(length); // Update internal length
+        }
+    }
+
     inline Char_T *Storage() const noexcept {
         return storage_;
     }
@@ -416,9 +427,24 @@ struct String {
         return ns;
     }
 
+    void expand(const SizeT new_length) {
+        constexpr SizeT32 size = sizeof(Char_T);
+
+        Char_T *old_storage = Storage();
+        Char_T *new_storage = allocate(new_length + SizeT{1});
+
+        if (Length() != 0) {
+            Memory::Copy(new_storage, old_storage, Length());
+        }
+
+        Memory::Deallocate(old_storage); // Free the old storage
+        setStorage(new_storage);         // Swap in new pointer
+    }
+
     void copyString(const Char_T *str, const SizeT length) {
         constexpr SizeT32 size = sizeof(Char_T);
-        Char_T           *ns   = allocate(length + SizeT{1});
+
+        Char_T *ns = allocate(length + SizeT{1});
 
         Memory::Copy(ns, str, (length * size));
 
