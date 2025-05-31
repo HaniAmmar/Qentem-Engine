@@ -106,7 +106,7 @@ struct BigInt {
      * @param src Source BigInt to move from. The source is cleared after move.
      */
     BigInt(BigInt &&src) noexcept : index_{src.index_} {
-        SizeT32 index = 0U;
+        SizeT32 index = 0;
         // Move all limbs from src to this BigInt
         while (index <= index_) {
             storage_[index] = src.storage_[index];
@@ -120,7 +120,7 @@ struct BigInt {
      * @param src Source BigInt to copy from.
      */
     BigInt(const BigInt &src) noexcept : index_{src.index_} {
-        SizeT32 index = 0U;
+        SizeT32 index = 0;
         // Copy all limbs from src to this BigInt
         while (index <= index_) {
             storage_[index] = src.storage_[index];
@@ -239,7 +239,7 @@ struct BigInt {
      */
     inline friend bool operator<(const BigInt &out, const Number_T number) noexcept {
         // If BigInt has only one limb, compare directly.
-        return ((out.index_ == 0U) && (out.storage_[0U] < number));
+        return ((out.index_ == 0) && (out.storage_[0] < number));
     }
 
     /**
@@ -261,7 +261,7 @@ struct BigInt {
      */
     inline friend bool operator<=(const BigInt &out, const Number_T number) noexcept {
         // If BigInt has only one limb, compare directly.
-        return ((out.index_ == 0U) && (out.storage_[0U] <= number));
+        return ((out.index_ == 0) && (out.storage_[0] <= number));
     }
 
     /**
@@ -285,7 +285,7 @@ struct BigInt {
      */
     inline friend bool operator>(const BigInt &out, const Number_T number) noexcept {
         // If any higher limb is used, BigInt is greater.
-        return ((out.index_ != 0U) || (out.storage_[0U] > number));
+        return ((out.index_ != 0) || (out.storage_[0] > number));
     }
 
     /**
@@ -307,7 +307,7 @@ struct BigInt {
      */
     inline friend bool operator>=(const BigInt &out, const Number_T number) noexcept {
         // If any higher limb is used, BigInt is greater, or equal if single limb equals number.
-        return ((out.index_ != 0U) || (out.storage_[0U] >= number));
+        return ((out.index_ != 0) || (out.storage_[0] >= number));
     }
 
     /**
@@ -329,7 +329,7 @@ struct BigInt {
      */
     inline friend bool operator==(const BigInt &out, const Number_T number) noexcept {
         // Only equal if BigInt fits in one limb and matches number.
-        return ((out.index_ == 0U) && (out.storage_[0U] == number));
+        return ((out.index_ == 0) && (out.storage_[0] == number));
     }
 
     /**
@@ -351,7 +351,7 @@ struct BigInt {
      */
     inline friend bool operator!=(const BigInt &out, const Number_T number) noexcept {
         // Not equal if higher limbs are used or value does not match number.
-        return ((out.index_ != 0U) || (out.storage_[0U] != number));
+        return ((out.index_ != 0) || (out.storage_[0] != number));
     }
 
     /**
@@ -446,7 +446,7 @@ struct BigInt {
      * If the addition overflows a limb, carry is added to the next limb.
      * Updates the internal limb count if necessary.
      */
-    void Add(Number_T number, SizeT32 index = 0U) noexcept {
+    void Add(Number_T number, SizeT32 index = 0) noexcept {
         if (number != 0) {
             // Propagate the addition and any carry across limbs
             while (index <= MaxIndex()) {
@@ -483,7 +483,7 @@ struct BigInt {
      * If the subtraction underflows a limb, a borrow is taken from the next limb.
      * Updates the internal limb count if higher limbs become zero.
      */
-    inline void Subtract(Number_T number, SizeT32 index = 0U) noexcept {
+    inline void Subtract(Number_T number, SizeT32 index = 0) noexcept {
         if (number != 0) {
             // Propagate the subtraction and any borrow across limbs
             while (index <= MaxIndex()) {
@@ -506,7 +506,7 @@ struct BigInt {
             }
             // Otherwise, trim trailing zero limbs if any
             else if (index >= index_) {
-                while ((index_ > 0U) && (storage_[index_] == 0)) {
+                while ((index_ > 0) && (storage_[index_] == 0)) {
                     --index_;
                 }
             }
@@ -529,7 +529,7 @@ struct BigInt {
             --index;
             // Multiply the current limb; Add() will handle carry propagation.
             Add(DoubleSize<Number_T, TypeWidth()>::Multiply(storage_[index], multiplier), (index + 1U));
-        } while (index != 0U);
+        } while (index != 0);
     }
 
     /**
@@ -559,17 +559,17 @@ struct BigInt {
                 return ((TypeWidth() - 1U) - Platform::FindLastBit(divisor));
             }
 
-            return 0U;
+            return 0;
         }();
 
         // Process all lower limbs, propagating remainder as needed
-        while (index != 0U) {
+        while (index != 0) {
             --index;
             DoubleSize<Number_T, TypeWidth()>::Divide(remainder, storage_[index], divisor, initial_shift);
         }
 
         // Update the number of used limbs if highest limb is now zero
-        index_ -= SizeT32((index_ > 0U) && (storage_[index_] == 0));
+        index_ -= SizeT32((index_ > 0) && (storage_[index_] == 0));
 
         // Return the final remainder
         return remainder;
@@ -587,37 +587,37 @@ struct BigInt {
             SizeT32 move = (offset / TypeWidth()); // Number of limbs to shift
             offset -= (move * TypeWidth());        // Remaining bits to shift within a limb
 
-            // If shifting more limbs than currently used, result is zero
-            if (move > index_) {
+            if (move <= index_) {
+                // Move remaining limbs down
+                SizeT32 index = 0;
+                SizeT32 next  = (index + move);
+
+                do {
+                    storage_[index] = storage_[next];
+                    ++index;
+                    ++next;
+                } while (next <= index_);
+
+                // Zero out shifted-off high limbs
+                do {
+                    storage_[index_] = 0;
+                    --index_;
+                    --move;
+                } while (move != 0);
+            } else {
+                // If shifting more limbs than currently used, result is zero
                 Clear();
                 return;
             }
-
-            // Move remaining limbs down
-            SizeT32 index = 0U;
-            SizeT32 next  = (index + move);
-
-            do {
-                storage_[index] = storage_[next];
-                ++index;
-                ++next;
-            } while (next <= index_);
-
-            // Zero out shifted-off high limbs
-            do {
-                storage_[index_] = 0;
-                --index_;
-                --move;
-            } while (move != 0U);
         }
 
         // If any remaining bits to shift, do a partial shift in each limb
-        if (offset != 0U) {
-            SizeT32       index      = 0U;
+        if (offset != 0) {
+            SizeT32       index      = 0;
             const SizeT32 shift_size = (TypeWidth() - offset);
 
             // Shift first limb
-            storage_[0U] >>= offset;
+            storage_[0] >>= offset;
 
             // For each following limb, shift in bits from higher limb
             while (index < index_) {
@@ -627,7 +627,7 @@ struct BigInt {
             }
 
             // Trim highest limb if it became zero
-            index_ -= SizeT32((index_ != 0U) && (storage_[index_] == 0));
+            index_ -= (SizeT32((index_ != 0) && (storage_[index_] == 0)));
         }
     }
 
@@ -663,7 +663,7 @@ struct BigInt {
             // Move each limb up by 'move' positions, starting from the top
             storage_[index_ + move] = storage_[index_];
 
-            while (index_ != 0U) {
+            while (index_ != 0) {
                 --index_;
                 storage_[index_ + move] = storage_[index_];
             }
@@ -672,7 +672,7 @@ struct BigInt {
             do {
                 --move;
                 storage_[move] = 0;
-            } while (move != 0U);
+            } while (move != 0);
 
             // Update the highest used limb index
             while (storage_[index] == 0) {
@@ -683,7 +683,7 @@ struct BigInt {
         }
 
         // If any remaining bits to shift, do a partial shift in each limb
-        if (offset != 0U) {
+        if (offset != 0) {
             SizeT32        index      = index_;
             const SizeT32  shift_size = (TypeWidth() - offset);
             const Number_T carry      = (storage_[index] >> shift_size);
@@ -698,7 +698,7 @@ struct BigInt {
             }
 
             // For each lower limb, propagate bits from the lower limb up
-            while (index != 0U) {
+            while (index != 0) {
                 storage_[index] |= (storage_[index - 1U] >> shift_size);
                 --index;
                 storage_[index] <<= offset;
@@ -713,7 +713,7 @@ struct BigInt {
      * Scans from the lowest limb upwards and returns the bit index of the first non-zero bit.
      */
     inline SizeT32 FindFirstBit() const noexcept {
-        SizeT32 index = 0U;
+        SizeT32 index = 0;
 
         // Skip zero limbs from the least significant end
         while ((storage_[index] == 0) && (index <= index_)) {
@@ -744,7 +744,7 @@ struct BigInt {
      * This does not convert the full BigInt to a built-in type; it just returns storage_[0].
      */
     inline Number_T Number() const noexcept {
-        return storage_[0U];
+        return storage_[0];
     }
 
     /**
@@ -754,12 +754,12 @@ struct BigInt {
      */
     inline void Clear() noexcept {
         // Zero out all used limbs from highest down to zero
-        while (index_ != 0U) {
+        while (index_ != 0) {
             storage_[index_] = 0;
             --index_;
         }
 
-        storage_[0U] = 0;
+        storage_[0] = 0;
     }
 
     /**
@@ -817,7 +817,7 @@ struct BigInt {
      * @return True if any higher limb is non-zero.
      */
     inline bool IsBig() const noexcept {
-        return (index_ != 0U);
+        return (index_ != 0);
     }
 
     /**
@@ -883,7 +883,7 @@ struct BigInt {
      * Copies all active limbs and zeros out any unused higher limbs.
      */
     void copy(const BigInt &src) noexcept {
-        SizeT32 index = 0U;
+        SizeT32 index = 0;
 
         // Copy each used limb from source
         while (index <= src.index_) {
@@ -913,21 +913,21 @@ struct BigInt {
         switch (Operation) {
             case BigIntOperation::Set: {
                 // Assign a new value to this BigInt, clearing all higher limbs.
-                storage_[0U] = number;
-                index_       = 0U;
+                storage_[0] = number;
+                index_      = 0;
                 break;
             }
 
             case BigIntOperation::Or: {
                 // Bitwise OR with the lowest limb only.
-                storage_[0U] |= number;
+                storage_[0] |= number;
                 break;
             }
 
             case BigIntOperation::And: {
                 // Bitwise AND with the lowest limb only; higher limbs are cleared.
-                storage_[0U] &= number;
-                index_ = 0U;
+                storage_[0] &= number;
+                index_ = 0;
                 break;
             }
 
@@ -964,21 +964,21 @@ struct BigInt {
         switch (Operation) {
             case BigIntOperation::Set: {
                 // Assign lowest limb, clear higher limbs
-                storage_[0U] = Number_T(number);
-                index_       = 0U;
+                storage_[0] = Number_T(number);
+                index_      = 0;
                 break;
             }
 
             case BigIntOperation::Or: {
                 // Bitwise OR with the lowest limb only
-                storage_[0U] |= Number_T(number);
+                storage_[0] |= Number_T(number);
                 break;
             }
 
             case BigIntOperation::And: {
                 // Bitwise AND with the lowest limb, clear higher limbs
-                storage_[0U] &= Number_T(number);
-                index_ = 0U;
+                storage_[0] &= Number_T(number);
+                index_ = 0;
                 break;
             }
 
@@ -1000,7 +1000,7 @@ struct BigInt {
             SizeT32 index = 1U;
             number >>= TypeWidth();
 
-            while (number != N_Number_T{0}) {
+            while (number != 0) {
                 switch (Operation) {
                     case BigIntOperation::Set: {
                         // Assign higher limb
@@ -1024,7 +1024,7 @@ struct BigInt {
                         // Bitwise AND with higher limb
                         storage_[index] &= Number_T(number);
                         // Only keep index_ high if this limb is nonzero
-                        if (storage_[index] != Number_T(0)) {
+                        if (storage_[index] != 0) {
                             index_ = index;
                         }
 
