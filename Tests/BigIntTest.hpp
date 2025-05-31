@@ -42,7 +42,7 @@ static void StreamDigits(char *storage, unsigned int &index, BigInt_T &b_int) {
 
 template <typename BigInt_T>
 static void PrintDigits(BigInt_T b_int, StringStream<char> &stream) {
-    constexpr unsigned int max = (((b_int.TotalBits() * 30103U) / 100000U) + 1U);
+    constexpr unsigned int max = (((b_int.TotalBitWidth() * 30103U) / 100000U) + 1U);
     char                   storage[max]{0};
     unsigned int           index = 0;
 
@@ -80,72 +80,72 @@ using BigInt_64_120  = BigInt<SizeT64, 120U>;
 /////////////////////////////////////////////////////////
 
 static void TestBigInt1(QTest &test) {
-    test.IsEqual(BigInt_8_128::SizeOfType(), 1U, __LINE__);
-    test.IsEqual(BigInt_8_128::TypeWidth(), 8U, __LINE__);
-    test.IsEqual(BigInt_8_128::TotalBits(), 128U, __LINE__);
+    test.IsEqual(BigInt_8_128::ByteWidth(), 1U, __LINE__);
+    test.IsEqual(BigInt_8_128::BitWidth(), 8U, __LINE__);
+    test.IsEqual(BigInt_8_128::TotalBitWidth(), 128U, __LINE__);
     test.IsEqual(BigInt_8_128::MaxIndex(), 15U, __LINE__);
 
-    test.IsEqual(BigInt_8_63::TypeWidth(), 8U, __LINE__);
-    test.IsEqual(BigInt_8_63::TotalBits(), 64U, __LINE__);
+    test.IsEqual(BigInt_8_63::BitWidth(), 8U, __LINE__);
+    test.IsEqual(BigInt_8_63::TotalBitWidth(), 64U, __LINE__);
     test.IsEqual(BigInt_8_63::MaxIndex(), 7U, __LINE__);
 
-    test.IsEqual(BigInt_8_23::TypeWidth(), 8U, __LINE__);
-    test.IsEqual(BigInt_8_23::TotalBits(), 24U, __LINE__);
+    test.IsEqual(BigInt_8_23::BitWidth(), 8U, __LINE__);
+    test.IsEqual(BigInt_8_23::TotalBitWidth(), 24U, __LINE__);
     test.IsEqual(BigInt_8_23::MaxIndex(), 2U, __LINE__);
 
     //////////////////////////////
 
-    test.IsEqual(BigInt_16_128::SizeOfType(), 2U, __LINE__);
-    test.IsEqual(BigInt_16_128::TypeWidth(), 16U, __LINE__);
-    test.IsEqual(BigInt_16_128::TotalBits(), 128U, __LINE__);
+    test.IsEqual(BigInt_16_128::ByteWidth(), 2U, __LINE__);
+    test.IsEqual(BigInt_16_128::BitWidth(), 16U, __LINE__);
+    test.IsEqual(BigInt_16_128::TotalBitWidth(), 128U, __LINE__);
     test.IsEqual(BigInt_16_128::MaxIndex(), 7U, __LINE__);
 
-    test.IsEqual(BigInt_16_63::TypeWidth(), 16U, __LINE__);
-    test.IsEqual(BigInt_16_63::TotalBits(), 64U, __LINE__);
+    test.IsEqual(BigInt_16_63::BitWidth(), 16U, __LINE__);
+    test.IsEqual(BigInt_16_63::TotalBitWidth(), 64U, __LINE__);
     test.IsEqual(BigInt_16_63::MaxIndex(), 3U, __LINE__);
 
-    test.IsEqual(BigInt_16_120::TypeWidth(), 16U, __LINE__);
-    test.IsEqual(BigInt_16_120::TotalBits(), 128U, __LINE__);
+    test.IsEqual(BigInt_16_120::BitWidth(), 16U, __LINE__);
+    test.IsEqual(BigInt_16_120::TotalBitWidth(), 128U, __LINE__);
     test.IsEqual(BigInt_16_120::MaxIndex(), 7U, __LINE__);
 
     //////////////////////////////
 
-    test.IsEqual(BigInt_32_128::SizeOfType(), 4U, __LINE__);
-    test.IsEqual(BigInt_32_128::TypeWidth(), 32U, __LINE__);
-    test.IsEqual(BigInt_32_128::TotalBits(), 128U, __LINE__);
+    test.IsEqual(BigInt_32_128::ByteWidth(), 4U, __LINE__);
+    test.IsEqual(BigInt_32_128::BitWidth(), 32U, __LINE__);
+    test.IsEqual(BigInt_32_128::TotalBitWidth(), 128U, __LINE__);
     test.IsEqual(BigInt_32_128::MaxIndex(), 3U, __LINE__);
 
-    test.IsEqual(BigInt_32_1024::SizeOfType(), 4U, __LINE__);
-    test.IsEqual(BigInt_32_1024::TypeWidth(), 32U, __LINE__);
-    test.IsEqual(BigInt_32_1024::TotalBits(), 1024U, __LINE__);
+    test.IsEqual(BigInt_32_1024::ByteWidth(), 4U, __LINE__);
+    test.IsEqual(BigInt_32_1024::BitWidth(), 32U, __LINE__);
+    test.IsEqual(BigInt_32_1024::TotalBitWidth(), 1024U, __LINE__);
     test.IsEqual(BigInt_32_1024::MaxIndex(), 31U, __LINE__);
 
-    test.IsEqual(BigInt_32_63::TypeWidth(), 32U, __LINE__);
-    test.IsEqual(BigInt_32_63::TotalBits(), 64U, __LINE__);
+    test.IsEqual(BigInt_32_63::BitWidth(), 32U, __LINE__);
+    test.IsEqual(BigInt_32_63::TotalBitWidth(), 64U, __LINE__);
     test.IsEqual(BigInt_32_63::MaxIndex(), 1U, __LINE__);
 
-    test.IsEqual(BigInt_32_120::TypeWidth(), 32U, __LINE__);
-    test.IsEqual(BigInt_32_120::TotalBits(), 128U, __LINE__);
+    test.IsEqual(BigInt_32_120::BitWidth(), 32U, __LINE__);
+    test.IsEqual(BigInt_32_120::TotalBitWidth(), 128U, __LINE__);
     test.IsEqual(BigInt_32_120::MaxIndex(), 3U, __LINE__);
 
     //////////////////////////////
 
-    test.IsEqual(BigInt_64_128::SizeOfType(), 8U, __LINE__);
-    test.IsEqual(BigInt_64_128::TypeWidth(), 64U, __LINE__);
-    test.IsEqual(BigInt_64_128::TotalBits(), 128U, __LINE__);
+    test.IsEqual(BigInt_64_128::ByteWidth(), 8U, __LINE__);
+    test.IsEqual(BigInt_64_128::BitWidth(), 64U, __LINE__);
+    test.IsEqual(BigInt_64_128::TotalBitWidth(), 128U, __LINE__);
     test.IsEqual(BigInt_64_128::MaxIndex(), 1U, __LINE__);
 
-    test.IsEqual(BigInt_64_1024::SizeOfType(), 8U, __LINE__);
-    test.IsEqual(BigInt_64_1024::TypeWidth(), 64U, __LINE__);
-    test.IsEqual(BigInt_64_1024::TotalBits(), 1024U, __LINE__);
+    test.IsEqual(BigInt_64_1024::ByteWidth(), 8U, __LINE__);
+    test.IsEqual(BigInt_64_1024::BitWidth(), 64U, __LINE__);
+    test.IsEqual(BigInt_64_1024::TotalBitWidth(), 1024U, __LINE__);
     test.IsEqual(BigInt_64_1024::MaxIndex(), 15U, __LINE__);
 
-    test.IsEqual(BigInt_64_15::TypeWidth(), 64U, __LINE__);
-    test.IsEqual(BigInt_64_15::TotalBits(), 64U, __LINE__);
+    test.IsEqual(BigInt_64_15::BitWidth(), 64U, __LINE__);
+    test.IsEqual(BigInt_64_15::TotalBitWidth(), 64U, __LINE__);
     test.IsEqual(BigInt_64_15::MaxIndex(), 0U, __LINE__);
 
-    test.IsEqual(BigInt_64_120::TypeWidth(), 64U, __LINE__);
-    test.IsEqual(BigInt_64_120::TotalBits(), 128U, __LINE__);
+    test.IsEqual(BigInt_64_120::BitWidth(), 64U, __LINE__);
+    test.IsEqual(BigInt_64_120::TotalBitWidth(), 128U, __LINE__);
     test.IsEqual(BigInt_64_120::MaxIndex(), 1U, __LINE__);
 }
 

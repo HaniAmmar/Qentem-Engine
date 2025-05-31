@@ -65,7 +65,7 @@ namespace Qentem {
  * @tparam (empty)   Placeholder for partial specialization.
  */
 template <typename Number_T, SizeT32>
-struct DoubleSize {};
+struct DoubleWidthArithmetic {};
 
 /**
  * @brief Fixed-width arbitrary-precision unsigned integer.
@@ -203,15 +203,15 @@ struct BigInt {
         constexpr SizeT32 n_width = (sizeof(N_Number_T) * 8U);
 
         // True if target type fits in a single limb or is equal width
-        constexpr bool is_same_size    = (n_width == TypeWidth());
-        constexpr bool is_smaller_size = (n_width < TypeWidth());
+        constexpr bool is_same_size    = (n_width == BitWidth());
+        constexpr bool is_smaller_size = (n_width < BitWidth());
 
         // Fast path: fits in a single limb, just return storage_[0] truncated
         if QENTEM_CONST_EXPRESSION (is_smaller_size || is_same_size) {
             return N_Number_T(storage_[0]);
         } else {
             // Otherwise, need to assemble from multiple limbs
-            constexpr SizeT32 max_index = ((n_width / TypeWidth()) - 1U);
+            constexpr SizeT32 max_index = ((n_width / BitWidth()) - 1U);
             // Limit to the number of non-zero limbs present in this BigInt
             SizeT32    index = ((max_index <= index_) ? max_index : index_);
             N_Number_T num{0};
@@ -219,7 +219,7 @@ struct BigInt {
             // Loop through limbs from high to low, combining bits
             while (index > 0) {
                 num |= storage_[index];
-                num <<= TypeWidth();
+                num <<= BitWidth();
                 --index;
             }
 
@@ -528,7 +528,7 @@ struct BigInt {
         do {
             --index;
             // Multiply the current limb; Add() will handle carry propagation.
-            Add(DoubleSize<Number_T, TypeWidth()>::Multiply(storage_[index], multiplier), (index + 1U));
+            Add(DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(storage_[index], multiplier), (index + 1U));
         } while (index != 0);
     }
 
@@ -543,7 +543,7 @@ struct BigInt {
      */
     inline Number_T Divide(const Number_T divisor) noexcept {
         // True if the limb size is 64 bits (affects shift optimization)
-        constexpr bool is_size_64b = (TypeWidth() == 64U);
+        constexpr bool is_size_64b = (BitWidth() == 64U);
 
         // Start from the highest limb
         SizeT32  index     = index_;
@@ -556,7 +556,7 @@ struct BigInt {
         const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
             if (is_size_64b) {
                 // Optimize for 64-bit limb division
-                return ((TypeWidth() - 1U) - Platform::FindLastBit(divisor));
+                return ((BitWidth() - 1U) - Platform::FindLastBit(divisor));
             }
 
             return 0;
@@ -565,7 +565,7 @@ struct BigInt {
         // Process all lower limbs, propagating remainder as needed
         while (index != 0) {
             --index;
-            DoubleSize<Number_T, TypeWidth()>::Divide(remainder, storage_[index], divisor, initial_shift);
+            DoubleWidthArithmetic<Number_T, BitWidth()>::Divide(remainder, storage_[index], divisor, initial_shift);
         }
 
         // Update the number of used limbs if highest limb is now zero
@@ -583,9 +583,9 @@ struct BigInt {
      */
     inline void ShiftRight(SizeT32 offset) noexcept {
         // If shifting more than one limb, move limb contents down
-        if (offset >= TypeWidth()) {
-            SizeT32 move = (offset / TypeWidth()); // Number of limbs to shift
-            offset -= (move * TypeWidth());        // Remaining bits to shift within a limb
+        if (offset >= BitWidth()) {
+            SizeT32 move = (offset / BitWidth()); // Number of limbs to shift
+            offset -= (move * BitWidth());        // Remaining bits to shift within a limb
 
             if (move <= index_) {
                 // Move remaining limbs down
@@ -614,7 +614,7 @@ struct BigInt {
         // If any remaining bits to shift, do a partial shift in each limb
         if (offset != 0) {
             SizeT32       index      = 0;
-            const SizeT32 shift_size = (TypeWidth() - offset);
+            const SizeT32 shift_size = (BitWidth() - offset);
 
             // Shift first limb
             storage_[0] >>= offset;
@@ -640,9 +640,9 @@ struct BigInt {
      */
     inline void ShiftLeft(SizeT32 offset) noexcept {
         // If shifting by one or more full limbs, move the data up
-        if (offset >= TypeWidth()) {
-            SizeT32 move = (offset / TypeWidth()); // Number of limbs to shift
-            offset -= (move * TypeWidth());        // Remaining bits to shift within a limb
+        if (offset >= BitWidth()) {
+            SizeT32 move = (offset / BitWidth()); // Number of limbs to shift
+            offset -= (move * BitWidth());        // Remaining bits to shift within a limb
 
             SizeT32 index = index_;
             index += move;
@@ -685,7 +685,7 @@ struct BigInt {
         // If any remaining bits to shift, do a partial shift in each limb
         if (offset != 0) {
             SizeT32        index      = index_;
-            const SizeT32  shift_size = (TypeWidth() - offset);
+            const SizeT32  shift_size = (BitWidth() - offset);
             const Number_T carry      = (storage_[index] >> shift_size);
 
             // Shift the highest limb left
@@ -722,7 +722,7 @@ struct BigInt {
 
         // Use platform-specific method to find bit in the first non-zero limb
         // Bit index is (limb index * bits per limb) + offset within limb
-        return (Platform::FindFirstBit(storage_[index_]) + (index * TypeWidth()));
+        return (Platform::FindFirstBit(storage_[index_]) + (index * BitWidth()));
     }
 
     /**
@@ -733,7 +733,7 @@ struct BigInt {
      */
     inline SizeT32 FindLastBit() const noexcept {
         // Bit index is (limb index * bits per limb) + offset within limb
-        return (Platform::FindLastBit(storage_[index_]) + SizeT32(index_ * TypeWidth()));
+        return (Platform::FindLastBit(storage_[index_]) + SizeT32(index_ * BitWidth()));
     }
 
     ////////////////////////////////////////////////////
@@ -774,32 +774,32 @@ struct BigInt {
      * @brief Returns the maximum valid limb index for this BigInt.
      * @return The maximum index into the storage array.
      *
-     * Calculated as (TotalBits / bits per limb) - 1.
+     * Calculated as (TotalBitWidth / bits per limb) - 1.
      */
     inline static constexpr SizeT32 MaxIndex() noexcept {
-        return ((TotalBits() / TypeWidth()) - 1U);
+        return ((TotalBitWidth() / BitWidth()) - 1U);
     }
 
     /**
      * @brief Returns the number of bits in each limb.
      * @return Bits per limb (e.g., 64 for uint64_t).
      */
-    inline static constexpr SizeT32 TypeWidth() noexcept {
-        return (SizeOfType() * 8U);
+    inline static constexpr SizeT32 BitWidth() noexcept {
+        return (ByteWidth() * 8U);
     }
 
     /**
      * @brief Returns the total bit width of this BigInt.
      * @return Total number of bits represented.
      *
-     * If Width_T is not an exact multiple of TypeWidth(), rounds up to the next full limb.
+     * If Width_T is not an exact multiple of BitWidth(), rounds up to the next full limb.
      */
-    inline static constexpr SizeT32 TotalBits() noexcept {
-        // If Width_T is a multiple of TypeWidth(), just return Width_T.
+    inline static constexpr SizeT32 TotalBitWidth() noexcept {
+        // If Width_T is a multiple of BitWidth(), just return Width_T.
         // Otherwise, add another limb to cover the excess bits.
-        return (((TypeWidth() * (Width_T / TypeWidth())) == Width_T)
+        return (((BitWidth() * (Width_T / BitWidth())) == Width_T)
                     ? Width_T
-                    : ((TypeWidth() * (Width_T / TypeWidth())) + TypeWidth()));
+                    : ((BitWidth() * (Width_T / BitWidth())) + BitWidth()));
 
         // Note: In C++, (X / Y) * Y may not equal X due to integer division truncation.
     }
@@ -808,7 +808,7 @@ struct BigInt {
      * @brief Returns the size of the limb type in bytes.
      * @return Size of Number_T in bytes.
      */
-    inline static constexpr SizeT32 SizeOfType() noexcept {
+    inline static constexpr SizeT32 ByteWidth() noexcept {
         return sizeof(Number_T);
     }
 
@@ -958,7 +958,7 @@ struct BigInt {
     template <BigIntOperation Operation, typename N_Number_T>
     inline void doOperation(N_Number_T number) noexcept {
         // True if N_Number_T is wider than one limb.
-        constexpr bool is_bigger_size = (((sizeof(N_Number_T) * 8U) / TypeWidth()) > 1U);
+        constexpr bool is_bigger_size = (((sizeof(N_Number_T) * 8U) / BitWidth()) > 1U);
 
         // First, operate on the lowest limb.
         switch (Operation) {
@@ -998,7 +998,7 @@ struct BigInt {
         // If the input is wider than a single limb, operate on all higher limb chunks
         if QENTEM_CONST_EXPRESSION (is_bigger_size) {
             SizeT32 index = 1U;
-            number >>= TypeWidth();
+            number >>= BitWidth();
 
             while (number != 0) {
                 switch (Operation) {
@@ -1044,7 +1044,7 @@ struct BigInt {
                     }
                 }
 
-                number >>= TypeWidth();
+                number >>= BitWidth();
                 ++index;
             }
         }
@@ -1059,7 +1059,7 @@ struct BigInt {
  * @tparam Number_T The base type for a single limb (e.g., uint8_t).
  */
 template <typename Number_T>
-struct DoubleSize<Number_T, 8U> {
+struct DoubleWidthArithmetic<Number_T, 8U> {
     /**
      * @brief Divides a combined 16-bit value (dividend_high:dividend_low) by divisor.
      * @param[in,out] dividend_high The high 8 bits, replaced with the new high (remainder).
@@ -1106,7 +1106,7 @@ struct DoubleSize<Number_T, 8U> {
  * @tparam Number_T The base type for a single limb (e.g., uint16_t).
  */
 template <typename Number_T>
-struct DoubleSize<Number_T, 16U> {
+struct DoubleWidthArithmetic<Number_T, 16U> {
     /**
      * @brief Divides a combined 32-bit value (dividend_high:dividend_low) by divisor.
      * @param[in,out] dividend_high The high 16 bits, replaced with new high (remainder).
@@ -1153,7 +1153,7 @@ struct DoubleSize<Number_T, 16U> {
  * @tparam Number_T The base type for a single limb (e.g., uint32_t).
  */
 template <typename Number_T>
-struct DoubleSize<Number_T, 32U> {
+struct DoubleWidthArithmetic<Number_T, 32U> {
     /**
      * @brief Divides a combined 64-bit value (dividend_high:dividend_low) by divisor.
      * @param[in,out] dividend_high The high 32 bits, replaced with the new high (remainder).
@@ -1206,7 +1206,7 @@ struct DoubleSize<Number_T, 32U> {
  * @tparam Number_T The unsigned integer type for one limb (must be 64 bits wide).
  */
 template <typename Number_T>
-struct DoubleSize<Number_T, 64U> {
+struct DoubleWidthArithmetic<Number_T, 64U> {
     /**
      * @brief Performs division of a 128-bit integer by a 64-bit divisor.
      *

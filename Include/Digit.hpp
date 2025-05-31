@@ -721,7 +721,7 @@ struct Digit {
         using Info_T = DigitUtils::RealNumberInfo<Float_T, number_size>;
         // 4.9406564584124654e-324 needs about 1216 bits to store all its digits.
         using BigIntSys  = BigInt<SystemIntType, ((Info_T::Bias + 1U) + (number_size * 8U * 3U))>;
-        using DigitConst = DigitUtils::DigitConst<BigIntSys::SizeOfType()>;
+        using DigitConst = DigitUtils::DigitConst<BigIntSys::ByteWidth()>;
 
         const Number_T bias = (number & Info_T::ExponentMask);
 
@@ -920,7 +920,7 @@ struct Digit {
 
     template <typename Stream_T, typename BigInt_T>
     static void bigIntToString(Stream_T &stream, BigInt_T &b_int) {
-        using DigitConst = DigitUtils::DigitConst<BigInt_T::SizeOfType()>;
+        using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
 
         while (b_int.IsBig()) {
             const SizeT length = stream.Length();
@@ -937,7 +937,7 @@ struct Digit {
 
     template <typename BigInt_T>
     inline static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
-        using DigitConst = DigitUtils::DigitConst<BigInt_T::SizeOfType()>;
+        using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
 
         while (drop >= DigitConst::MaxPowerOfFive) {
             b_int /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
