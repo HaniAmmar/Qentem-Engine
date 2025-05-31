@@ -236,6 +236,114 @@ struct JSONUtils {
         stream.Write((content + offset2), (offset - offset2));
     }
 
+    /**
+     * @brief Removes C/C++ style inline (//) and block (/ * ... * /) comments from the stream, preserving string
+     * literals.
+     *
+     * This function operates in-place on the provided StringStream_T buffer, removing comments
+     * without allocating additional memory. It handles edge cases such as comments inside
+     * string literals and unterminated block comments at the end of the buffer.
+     *
+     * @tparam StringStream_T Stream type supporting Storage() and Length().
+     * @param stream The string stream to process.
+     */
+    template <typename StringStream_T>
+    static void StripComments(StringStream_T &stream) {
+        using Char_T = typename StringStream_T::CharType;
+
+        Char_T     *str = stream.Storage();
+        const SizeT end = stream.Length();
+
+        SizeT offset         = 0;     // Current scan position
+        SizeT comment_offset = 0;     // Start of current comment region to remove
+        SizeT comment_end    = 0;     // End of current comment region to remove
+        SizeT diff           = 0;     // Tracks total bytes removed so far
+        bool  inside_text    = false; // True if currently inside a string literal
+
+        // Scan through the buffer
+        while (offset < end) {
+            // Advance to the next possible comment or quote character
+            while ((offset < end) && (str[offset] != '/') && (str[offset] != '"')) {
+                ++offset;
+            }
+
+            SizeT tmp = offset;
+            ++offset; // Move past the found '/' or '"' for analysis
+
+            if (offset < end) {
+                if (str[tmp] == '"') {
+                    // Handle string literals: check for escaped quote
+                    SizeT escapes = 0;
+
+                    while ((tmp > 0) && (str[--tmp] == '\\')) {
+                        ++escapes;
+                    }
+
+                    // Toggle inside_text only if quote is not escaped
+                    if (((escapes & SizeT{1}) == 0)) {
+                        inside_text = !inside_text;
+                    }
+                } else if (!inside_text) {
+                    // Only consider comments outside of string literals
+                    if (offset != end) {
+                        if ((str[offset] == '/') || (str[offset] == '*')) {
+                            // Before removing new comment, shift prior non-comment data forward if needed
+                            if (comment_end != 0) {
+                                SizeT previous_comment     = comment_offset;
+                                SizeT previous_comment_end = comment_end;
+                                diff                       = (comment_end - comment_offset);
+
+                                // Shift tail to close up previous comment gap
+                                while (previous_comment < tmp) {
+                                    str[previous_comment] = str[previous_comment_end];
+                                    ++previous_comment;
+                                    ++previous_comment_end;
+                                }
+                            }
+
+                            comment_offset = (tmp - diff);
+
+                            if (str[offset] == '/') {
+                                // Inline comment: skip to end of line
+                                while ((++offset < end) && (str[offset] != '\n') && (str[offset] != '\r')) {
+                                }
+                            } else {
+                                // Block comment: skip to closing '*/' or EOF
+                                while (true) {
+                                    while ((++offset < end) && (str[offset] != '*')) {
+                                    }
+                                    // Break if end of buffer or found '*/'
+                                    if ((++offset >= end) || (str[offset] == '/')) {
+                                        break;
+                                    }
+                                }
+
+                                ++offset; // Move past '/'
+                            }
+
+                            comment_end = offset; // Mark end of this comment region
+                        }
+                    }
+                }
+            }
+        }
+
+        // If the last comment region extended to or beyond the buffer end, correct it
+        if (comment_end >= end) {
+            comment_end = end;
+        }
+
+        // Shrink stream by the size of the last removed comment region
+        stream.StepBack(comment_end - comment_offset);
+
+        // Shift any remaining content after last comment region
+        while (comment_end < end) {
+            str[comment_offset] = str[comment_end];
+            ++comment_offset;
+            ++comment_end;
+        }
+    }
+
     template <typename Char_T>
     struct Notation_T {
       private:
