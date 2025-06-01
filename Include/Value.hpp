@@ -1052,6 +1052,10 @@ struct Value {
         return false;
     }
 
+    inline bool IsBool() const noexcept {
+        return (IsTrue() || IsFalse());
+    }
+
     inline bool IsNull() const noexcept {
         const ValueType type = Type();
 
