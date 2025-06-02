@@ -237,22 +237,22 @@ struct JSONUtils {
     }
 
     /**
-     * @brief Removes C/C++ style inline (//) and block (/ * ... * /) comments from the stream, preserving string
+     * @brief Removes C/C++ style inline (//) and block (/ * ... * /) comments from the string, preserving string
      * literals.
      *
-     * This function operates in-place on the provided StringStream_T buffer, removing comments
+     * This function operates in-place on the provided String_T buffer, removing comments
      * without allocating additional memory. It handles edge cases such as comments inside
      * string literals and unterminated block comments at the end of the buffer.
      *
-     * @tparam StringStream_T Stream type supporting Storage() and Length().
-     * @param stream The string stream to process.
+     * @tparam String_T string type supporting Storage() and Length().
+     * @param string The string string to process.
      */
-    template <typename StringStream_T>
-    static void StripComments(StringStream_T &stream) {
-        using Char_T = typename StringStream_T::CharType;
+    template <typename String_T>
+    static void StripComments(String_T &string) {
+        using Char_T = typename String_T::CharType;
 
-        Char_T     *str = stream.Storage();
-        const SizeT end = stream.Length();
+        Char_T     *str = string.Storage();
+        const SizeT end = string.Length();
 
         SizeT offset         = 0;     // Current scan position
         SizeT comment_offset = 0;     // Start of current comment region to remove
@@ -333,15 +333,15 @@ struct JSONUtils {
             comment_end = end;
         }
 
-        // Shrink stream by the size of the last removed comment region
-        stream.StepBack(comment_end - comment_offset);
-
         // Shift any remaining content after last comment region
         while (comment_end < end) {
             str[comment_offset] = str[comment_end];
             ++comment_offset;
             ++comment_end;
         }
+
+        // Shrink string by the size of the last removed comment region
+        string.StepBack(comment_end - comment_offset);
     }
 
     template <typename Char_T>

@@ -1810,9 +1810,10 @@ static void TestParse6(QTest &test) {
     test.IsTrue(value.IsUndefined(), __LINE__);
 }
 
+template <typename String_T>
 static void TestStripComments(QTest &test) {
     Value<char>        value;
-    StringStream<char> in;
+    String_T           in;
     StringStream<char> out;
 
     in = R"([1,2,3,4,5,6,7,8,9,10])";
@@ -2036,7 +2037,8 @@ static int RunJSONTests() {
     test.Test("Parse Test 4", TestParse4);
     test.Test("Parse Test 5", TestParse5);
     test.Test("Parse Test 6", TestParse6);
-    test.Test("StripComments Test", TestStripComments);
+    test.Test("StripComments Test 1", TestStripComments<StringStream<char>>);
+    test.Test("StripComments Test 2", TestStripComments<String<char>>);
 
     return test.EndTests();
 }
