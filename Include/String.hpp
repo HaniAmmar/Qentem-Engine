@@ -279,11 +279,8 @@ struct String {
 
     inline void StepBack(const SizeT length) noexcept {
         if (length <= Length()) {
-            Char_T     *str     = Storage();
-            const SizeT new_len = (Length() - length);
-
-            setLength(new_len);
-            str[new_len] = Char_T{0};
+            length_ -= length;
+            Storage()[length_] = Char_T{0};
         }
     }
 
