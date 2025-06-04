@@ -406,7 +406,6 @@ struct HashTable {
      */
     inline bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
         if (IsNotEmpty() && (find(index, key) != nullptr)) {
-            --index; // Adjust because index points to the slot plus one.
             return true;
         }
 
@@ -551,12 +550,11 @@ struct HashTable {
      */
     void Clear() noexcept {
         if (IsNotEmpty()) {
-            constexpr SizeT32 size    = sizeof(SizeT);
-            SizeT            *ht      = getHashTable();
-            HItem_T          *storage = Storage();
-            Memory::SetToZero(ht, (size * Capacity()));   // Reset hash buckets
-            Memory::Dispose(storage, (storage + Size())); // Dispose each item (calls destructors)
-            setSize(0);                                   // Logical size is now zero
+            SizeT   *ht      = getHashTable();
+            HItem_T *storage = Storage();
+            Memory::SetToValue(ht, Capacity(), Capacity()); // Reset hash buckets
+            Memory::Dispose(storage, (storage + Size()));   // Dispose each item (calls destructors)
+            setSize(0);                                     // Logical size is now zero
         }
     }
 
@@ -593,8 +591,6 @@ struct HashTable {
      * all hash buckets are reset and rebuilt for consistency.
      */
     void Sort(const bool ascend = true) noexcept {
-        constexpr SizeT32 size = sizeof(SizeT);
-
         if (ascend) {
             Memory::Sort<true>(Storage(), SizeT{0}, Size()); // Sort in ascending order
         } else {
@@ -602,7 +598,8 @@ struct HashTable {
         }
 
         // Reset hash table mapping and rebuild
-        Memory::SetToZero(getHashTable(), (size * Capacity()));
+        Memory::SetToValue(getHashTable(), Capacity(), Capacity());
+
         generateHash();
     }
 
@@ -803,11 +800,9 @@ struct HashTable {
      * @return Pointer to the first item slot (after hash table).
      */
     inline HItem_T *allocate(SizeT capacity) {
-        constexpr SizeT32 size = sizeof(SizeT);
-
         SizeT *ht = allocateOnly(capacity); // Allocates raw memory and updates capacity_
 
-        Memory::SetToZero(ht, (size * Capacity())); // Zero out hash table (bucket array)
+        Memory::SetToValue(ht, Capacity(), Capacity());
 
         // Item storage comes directly after hash table in memory.
         return Memory::ChangePointer<HItem_T>(ht + Capacity());
@@ -944,9 +939,8 @@ struct HashTable {
         // Compute index in hash table using base mask.
         index = (ht + (hash & getBase()));
 
-        while (*index != 0) { // While this slot is linked to a valid item...
+        while (*index != Capacity()) { // While this slot is linked to a valid item...
             item = (storage + *index);
-            --item; // Adjust: item indices are stored as 1-based, so decrement for zero-based pointer.
 
             // Check for hash and key equality using KeyUtils.
             if (KeyUtils_T::IsEqual(hash, item->Hash, item->Key, key)) {
@@ -1013,13 +1007,12 @@ struct HashTable {
      * @return Pointer to the newly inserted item in storage.
      */
     HItem_T *insert(SizeT *index, HItem_T &&item) noexcept {
-        HItem_T *item_ptr = (Storage() + Size()); // Next available storage slot
-        ++index_;                                 // Advance item count (now valid at this slot)
-        *index = Size();                          // Store 1-based index in hash table slot
-
+        HItem_T *item_ptr = (Storage() + Size());         // Next available storage slot
+        *index            = Size();                       // Store 0-based index in hash table slot
+        ++index_;                                         // Increment count after using it
         Memory::Initialize(item_ptr, Memory::Move(item)); // Move or copy-construct in place
 
-        item_ptr->Next = 0; // End of collision chain
+        item_ptr->Next = Capacity(); // End of collision chain
 
         return item_ptr;
     }
@@ -1035,7 +1028,7 @@ struct HashTable {
     HItem_T *insert(SizeT *index, const Key_T &key, const SizeT hash) noexcept {
         HItem_T item;
         item.Hash = hash;
-        item.Next = 0;
+        item.Next = Capacity();
         item.Key  = key; // Copy key
 
         return insert(index, Memory::Move(item));
@@ -1052,7 +1045,7 @@ struct HashTable {
     HItem_T *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
         HItem_T item;
         item.Hash = hash;
-        item.Next = 0;
+        item.Next = Capacity();
         item.Key  = Memory::Move(key); // Move key
 
         return insert(index, Memory::Move(item));
@@ -1133,7 +1126,7 @@ struct HashTable {
     void remove(SizeT *index, HItem_T *item) const noexcept {
         if (item != nullptr) {
             *index     = item->Next; // Unlink from hash chain
-            item->Next = 0;          // Clear item's hash chain
+            item->Next = Capacity(); // Clear item's hash chain
             item->Hash = 0;          // Mark as deleted
 
             item->Clear(); // Zero/reset user key/value fields
@@ -1190,20 +1183,19 @@ struct HashTable {
 
             find(left_index, from);
 
-            if (*left_index != 0) { // Ensure 'from' exists
+            if (*left_index != Capacity()) { // Ensure 'from' exists
                 SizeT to_hash;
                 hashAndFind(right_index, to, to_hash); // Find/compute slot for 'to'
 
-                if (*right_index == 0) { // Ensure 'to' does not exist
+                if (*right_index == Capacity()) { // Ensure 'to' does not exist
                     SizeT index = *left_index;
-                    --index; // Get the true array index
 
                     HItem_T *item = (Storage() + index);
 
                     // Re-link the hash table chains for the moved key
                     *right_index = *left_index;
                     *left_index  = item->Next;
-                    item->Next   = 0;
+                    item->Next   = Capacity();
                     item->Hash   = to_hash;
 
                     return item;
@@ -1290,7 +1282,7 @@ struct HashTable {
      * re-allocated/copied so that the slot chains match the new memory layout.
      *
      * Algorithm:
-     *  - For each valid item (with non-zero hash), resets its `Next` pointer to 0.
+     *  - For each valid item (with non-zero hash), resets its `Next` pointer to Capacity().
      *  - Finds the correct hash slot for the item's hash.
      *  - If the slot is occupied, follows the `Next` chain to the end.
      *  - Adds the new item to the chain, updating slot indices accordingly.
@@ -1301,16 +1293,16 @@ struct HashTable {
         HItem_T       *item = src;             // Item pointer for iteration
         const HItem_T *end  = (item + Size()); // One-past-the-end
         SizeT         *index;
-        SizeT          i    = SizeT{1}; // 1-based index for hash chains
+        SizeT          i    = SizeT{0}; // 0-based index for hash chains
         const SizeT    base = getBase();
 
         while (item < end) {
-            item->Next = 0;                          // Reset chain
+            item->Next = Capacity();                 // Reset chain
             index      = (ht + (item->Hash & base)); // Find base slot
 
             // Walk to the end of the chain, if needed
-            while (*index != 0) {
-                index = &((src + (*index - SizeT{1}))->Next);
+            while (*index != Capacity()) {
+                index = &((src + *index)->Next);
             }
 
             *index = i; // Point slot (or chain) to this item

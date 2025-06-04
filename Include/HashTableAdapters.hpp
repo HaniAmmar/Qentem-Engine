@@ -105,8 +105,11 @@ struct StringKeyUtils_T {
  * This struct inherits all core hash table functionality from the generic HashTable base,
  * and is intended for use with keys that implement CharType, First(), Length(), and IsEqual().
  *
- * @tparam StringKey_T The string key type.
- * @tparam HItem_T     The hash table item type (must be compatible with the base).
+ * @tparam Key_T       Key type. Must be copyable, movable, and support equality and less-than.
+ * @tparam KeyUtils_T  Policy for key hashing and equality. Must provide static:
+ *                       - SizeT Hash(const Key_T&)
+ *                       - bool IsEqual(SizeT, SizeT, const Key_T&, const Key_T&)
+ * @tparam HItem_T     Storage type. Must have SizeT Hash, SizeT Next, Key_T Key, plus Clear(), MoveDoublecat(), etc.
  */
 template <typename StringKey_T, typename HItem_T>
 struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKey_T>, HItem_T> {
@@ -255,7 +258,6 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
 
             if (find(tmp, str, length) != nullptr) {
                 index = *tmp;
-                --index;
 
                 return true;
             }
@@ -302,22 +304,24 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     HItem_T *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
         SizeT *ht = getHashTable();
 
+        // Storage area starts after hash table area.
         HItem_T *storage = Memory::ChangePointer<HItem_T>(ht + Capacity());
         HItem_T *item;
+        // Compute index in hash table using base mask.
         index = (ht + (hash & getBase()));
 
-        while (*index != 0) {
+        while (*index != Capacity()) { // While this slot is linked to a valid item...
             item = (storage + *index);
-            --item;
 
+            // Check for hash and key equality using KeyUtils.
             if (KeyUtilsT::IsEqual(hash, item->Hash, item->Key, key, length)) {
                 return item;
             }
 
-            index = &(item->Next);
+            index = &(item->Next); // Follow the collision chain.
         }
 
-        return nullptr;
+        return nullptr; // Not found.
     }
 
     /**
