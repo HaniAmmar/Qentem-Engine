@@ -368,7 +368,7 @@ struct QTest {
     QENTEM_NOINLINE static void PrintInfo() {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
-        if QENTEM_CONST_EXPRESSION (Config::Is64bit) {
+        if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
             TestOutPut::Print("Arch: 64-bit\n");
         } else {
             TestOutPut::Print("Arch: 32-bit\n");
@@ -376,7 +376,7 @@ struct QTest {
 
         TestOutPut::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
 
-        if QENTEM_CONST_EXPRESSION (Config::IsBigEndian) {
+        if QENTEM_CONST_EXPRESSION (QentemConfig::IsBigEndian) {
             TestOutPut::Print("Endianness: Big-Endian\n");
         } else {
             TestOutPut::Print("Endianness: Little-Endian\n");
@@ -393,7 +393,7 @@ struct QTest {
         TestOutPut::Print("WASM SIMD128: On\n");
 #endif
 
-        if QENTEM_CONST_EXPRESSION (Config::AutoEscapeHTML) {
+        if QENTEM_CONST_EXPRESSION (QentemConfig::AutoEscapeHTML) {
             TestOutPut::Print("Auto Escape HTML: On\n");
         }
 

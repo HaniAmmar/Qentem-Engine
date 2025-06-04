@@ -78,7 +78,7 @@ using SystemIntTypeI = SystemIntType_All::NumberTypeI;
 #define QENTEM_TEMPLATE_DOUBLE_FORMAT Digit::RealFormatType::SemiFixed
 #endif
 ///////////////////////////////////////////////
-struct Config {
+struct QentemConfig {
     static constexpr SizeT32 DoublePrecision{QENTEM_DOUBLE_PRECISION};
     static constexpr SizeT32 TemplatePrecision{QENTEM_TEMPLATE_PRECISION};
     static constexpr SizeT32 PointerSize{sizeof(void *)};

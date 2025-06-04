@@ -197,7 +197,7 @@ template <typename StringStream_T, typename Char_T>
 static void EscapeHTMLSpecialChars(StringStream_T &stream, const Char_T *str, SizeT length) {
     using HTMLSpecialChars = HTMLSpecialChars_T<Char_T, sizeof(Char_T)>;
 
-    if (Config::AutoEscapeHTML) {
+    if (QentemConfig::AutoEscapeHTML) {
         SizeT offset = 0;
         SizeT index  = 0;
 
