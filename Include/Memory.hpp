@@ -23,7 +23,7 @@ template <typename Number_T>
 inline static void SetToZero(void *pointer, Number_T size) noexcept {
     Number_T offset = 0;
 
-    // if (Config::IsSIMDEnabled) {
+    // if (QentemConfig::IsSIMDEnabled) {
     //     const Number_T m_size = (size >> Platform::SIMD::Shift);
 
     //     if (m_size != 0) {
@@ -49,12 +49,22 @@ inline static void SetToZero(void *pointer, Number_T size) noexcept {
     }
 }
 
+template <typename Type_T, typename Value_T>
+inline static void SetToValue(Type_T *src, Value_T value, SizeT size) noexcept {
+    SizeT offset = 0;
+
+    while (offset < size) {
+        src[offset] = value;
+        ++offset;
+    }
+}
+
 // size = the number of bytes
 template <typename Number_T>
 QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T size) noexcept {
     Number_T offset = 0;
 
-    // if (Config::IsSIMDEnabled) {
+    // if (QentemConfig::IsSIMDEnabled) {
     //     const Number_T m_size = (size >> Platform::SIMD::Shift);
 
     //     if (m_size != 0) {
