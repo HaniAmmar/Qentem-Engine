@@ -40,17 +40,18 @@ struct HashTable {
         }
     }
 
-    HashTable(HashTable &&src) noexcept : hashTable_{src.hashTable_}, index_{src.index_}, capacity_{src.capacity_} {
+    inline HashTable(HashTable &&src) noexcept
+        : hashTable_{src.hashTable_}, index_{src.index_}, capacity_{src.capacity_} {
         src.setSize(0);
         src.setCapacity(0);
         src.clearHashTable();
     }
 
-    HashTable(const HashTable &src) {
+    inline HashTable(const HashTable &src) {
         copyTableWithHash(src);
     }
 
-    ~HashTable() {
+    inline ~HashTable() {
         SizeT *hashTable = getHashTable();
         HItem *storage   = Storage();
         Memory::Dispose(storage, (storage + Size()));
@@ -98,7 +99,85 @@ struct HashTable {
         return *this;
     }
 
-    bool Has(const Char_T *key, const SizeT length) const noexcept {
+    void operator+=(HashTable &&src) {
+        const SizeT  n_size   = (Size() + src.Size());
+        HItem       *src_item = src.Storage();
+        const HItem *src_end  = (src_item + src.Size());
+
+        if (n_size > Capacity()) {
+            resize(n_size);
+        }
+
+        while (src_item < src_end) {
+            if (src_item->Hash != 0) {
+                SizeT *index;
+                HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
+
+                if (storage_item == nullptr) {
+                    insert(index, Memory::Move(*src_item));
+                } else {
+                    storage_item->MoveDoublecat(*src_item);
+                }
+            }
+
+            ++src_item;
+        }
+
+        Memory::Deallocate(src.getHashTable());
+        src.clearHashTable();
+        src.setSize(0);
+        src.setCapacity(0);
+    }
+
+    void operator+=(const HashTable &src) {
+        const SizeT  n_size   = (Size() + src.Size());
+        const HItem *src_item = src.First();
+        const HItem *src_end  = src_item + src.Size();
+
+        if (n_size > Capacity()) {
+            resize(n_size);
+        }
+
+        while (src_item < src_end) {
+            if (src_item->Hash != 0) {
+                SizeT *index;
+                HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
+
+                if (storage_item == nullptr) {
+                    storage_item = insert(index, *src_item);
+                }
+
+                storage_item->CopyValue(*src_item);
+            }
+
+            ++src_item;
+        }
+    }
+
+    inline void Insert(const Char_T *key, const SizeT length) {
+        Insert(Key_T{key, length});
+    }
+
+    inline void Insert(const Key_T &key) {
+        Insert(Key_T{key});
+    }
+
+    inline void Insert(Key_T &&key) {
+        if (Size() == Capacity()) {
+            expand();
+        }
+
+        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT      *index;
+        HItem      *item = find(index, key.First(), key.Length(), hash);
+
+        if (item == nullptr) {
+            insert(index, Memory::Move(key), hash);
+            item->InitValue();
+        }
+    }
+
+    inline bool Has(const Char_T *key, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
             const SizeT hash = StringUtils::Hash(key, length);
             SizeT      *index;
@@ -110,11 +189,11 @@ struct HashTable {
         return false;
     }
 
-    bool Has(const Key_T &key) const noexcept {
+    inline bool Has(const Key_T &key) const noexcept {
         return Has(key.First(), key.Length());
     }
 
-    const Key_T *GetKey(const SizeT index) const noexcept {
+    inline const Key_T *GetKey(const SizeT index) const noexcept {
         const HItem *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
@@ -124,7 +203,7 @@ struct HashTable {
         return nullptr;
     }
 
-    const HItem *GetItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+    inline const HItem *GetItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
         if (IsNotEmpty()) {
             SizeT       *index;
             const HItem *item = find(index, key, length, hash);
@@ -141,7 +220,7 @@ struct HashTable {
         return GetItem(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
     }
 
-    const HItem *GetItem(const SizeT index) const noexcept {
+    inline const HItem *GetItem(const SizeT index) const noexcept {
         const HItem *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
@@ -151,7 +230,7 @@ struct HashTable {
         return nullptr;
     }
 
-    bool GetIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
+    inline bool GetIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
             SizeT *tmp;
 
@@ -166,7 +245,7 @@ struct HashTable {
         return false;
     }
 
-    bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
+    inline bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
         return GetIndex(index, key.First(), key.Length());
     }
 
@@ -182,7 +261,7 @@ struct HashTable {
         remove(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
     }
 
-    void RemoveIndex(const SizeT index) const noexcept {
+    inline void RemoveIndex(const SizeT index) const noexcept {
         if (index < Size()) {
             const HItem *item = (Storage() + index);
 
@@ -196,7 +275,7 @@ struct HashTable {
      * This function renames a key to a nonexisting one without changing the
      * order of its item, and returns true if successful.
      */
-    bool Rename(const Key_T &from, Key_T &&to) const noexcept {
+    inline bool Rename(const Key_T &from, Key_T &&to) const noexcept {
         if (IsNotEmpty()) {
             SizeT *left_index;
             SizeT *right_index;
@@ -227,11 +306,11 @@ struct HashTable {
         return false;
     }
 
-    bool Rename(const Key_T &from, const Key_T &to) const {
+    inline bool Rename(const Key_T &from, const Key_T &to) const {
         return Rename(from, Key_T{to});
     }
 
-    void Reserve(SizeT size) {
+    inline void Reserve(SizeT size) {
         Reset();
 
         if (size != 0) {
@@ -280,7 +359,7 @@ struct HashTable {
         resize(new_size);
     }
 
-    void Expect(const SizeT count) {
+    inline void Expect(const SizeT count) {
         const SizeT new_size = (count + Size());
 
         if (new_size > Capacity()) {
@@ -445,15 +524,31 @@ struct HashTable {
         resize((Capacity() | SizeT{2}) * SizeT{2});
     }
 
+    HItem *insert(SizeT *index, HItem &&item) noexcept {
+        HItem *item_ptr = (Storage() + Size());
+        ++index_;
+        *index = Size();
+
+        Memory::Initialize(item_ptr, Memory::Move(item));
+
+        item_ptr->Next = 0;
+
+        return item_ptr;
+    }
+
+    inline HItem *insert(SizeT *index, const HItem &item) noexcept {
+        return insert(index, HItem{item});
+    }
+
     HItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
         HItem *item = (Storage() + Size());
         ++index_;
         *index = Size();
 
-        item->Hash = hash;
-        item->Next = 0;
-
         Memory::Initialize(&(item->Key), Memory::Move(key));
+
+        item->Next = 0;
+        item->Hash = hash;
 
         return item;
     }
