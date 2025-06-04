@@ -53,10 +53,10 @@ struct HLItem_T {
         Memory::Dispose(&(item.Key));
     }
 
-    inline void CopyValue(HLItem_T const &) {
+    constexpr void CopyValue(HLItem_T const &) {
     }
 
-    inline void InitValue() {
+    constexpr void InitValue() {
     }
 };
 
@@ -66,6 +66,8 @@ struct HList : public HashTable<Key_T, HLItem_T<Key_T>> {
     using HItem  = HLItem_T<Key_T>;
     using BaseT  = HashTable<Key_T, HItem>;
     using Char_T = typename Key_T::CharType;
+
+    using BaseT::BaseT;
 };
 
 } // namespace Qentem
