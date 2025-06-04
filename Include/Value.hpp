@@ -1504,7 +1504,7 @@ struct Value {
 
     template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>>
     bool CopyValueTo(StringStream_T             &stream,
-                     const Digit::RealFormatInfo format          = Digit::RealFormatInfo{Config::DoublePrecision},
+                     const Digit::RealFormatInfo format          = Digit::RealFormatInfo{QentemConfig::DoublePrecision},
                      StringFunction_T           *string_function = nullptr) const {
         switch (Type()) {
             case ValueType::String: {
@@ -1922,7 +1922,7 @@ struct Value {
     }
 
     template <typename Stream_T>
-    inline Stream_T &Stringify(Stream_T &stream, SizeT32 precision = Config::DoublePrecision) const {
+    inline Stream_T &Stringify(Stream_T &stream, SizeT32 precision = QentemConfig::DoublePrecision) const {
         const ValueType type = Type();
 
         switch (type) {
@@ -1948,7 +1948,7 @@ struct Value {
         return stream;
     }
 
-    inline StringT Stringify(SizeT32 precision = Config::DoublePrecision) const {
+    inline StringT Stringify(SizeT32 precision = QentemConfig::DoublePrecision) const {
         StringStream<Char_T> stream;
         return Stringify(stream, precision).GetString();
     }

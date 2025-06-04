@@ -645,7 +645,7 @@ static void TestVariableTag4(QTest &test) {
     value += R"("ABC'DEF<GHI>GK<)";
     value += R"(A""BC<<DE>>FG''HI&&GK)";
 
-    if (Config::AutoEscapeHTML) {
+    if (QentemConfig::AutoEscapeHTML) {
         test.IsEqual(Template::Render(R"({var:0})", value, ss), R"(&lt;)", __LINE__);
         ss.Clear();
 
@@ -979,7 +979,7 @@ static void TestVariableTag4(QTest &test) {
         ss.Clear();
     }
 
-    if (Config::AutoEscapeHTML) {
+    if (QentemConfig::AutoEscapeHTML) {
         value.Reset();
 
         value[R"(abcd)"] = R"( &lt; < &gt; > &amp; & &quot; " &apos; ')";
@@ -2289,7 +2289,7 @@ static void TestSuperVariableTag1(QTest &test) {
 
     value[R"(x_y_z)"] = R"({0},{1}.{2}-{3}**{4}////{5}=={6} {7} {8} {9})";
 
-    if (Config::AutoEscapeHTML) {
+    if (QentemConfig::AutoEscapeHTML) {
         test.IsEqual(
             Template::Render(
                 R"({svar:x_y_z, {var:ffffff}, {var:a}, {var:4}, {var:999999999}, {var:g}, {var:h}, {var:c}, {var:d}, {var:b}, {var:e}})",
@@ -2752,7 +2752,7 @@ static void TestInlineIfTag(QTest &test) {
 
     content = R"({if case="1" true="{var:0}" false="{var:1}"})";
 
-    if (Config::AutoEscapeHTML) {
+    if (QentemConfig::AutoEscapeHTML) {
         test.IsEqual(Template::Render(content, value2, ss), R"(&amp;)", __LINE__);
         ss.Clear();
 
@@ -2767,7 +2767,7 @@ static void TestInlineIfTag(QTest &test) {
 
     content = R"({if case="0" true="{var:0}" false="{var:1}"})";
 
-    if (Config::AutoEscapeHTML) {
+    if (QentemConfig::AutoEscapeHTML) {
         test.IsEqual(Template::Render(content, value2, ss), R"(&quot;)", __LINE__);
         ss.Clear();
 

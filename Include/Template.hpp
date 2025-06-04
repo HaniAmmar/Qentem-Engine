@@ -1042,7 +1042,7 @@ struct TemplateCore {
         const Value_T *value = getValue(tag);
 
         if ((value == nullptr) ||
-            !(value->CopyValueTo(*stream_, {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT},
+            !(value->CopyValueTo(*stream_, {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT},
                                  &(StringUtils::EscapeHTMLSpecialChars<StringStream_T, Char_T>)))) {
             if (tag.IDLength != SizeT8{0}) {
                 const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
@@ -1069,7 +1069,7 @@ struct TemplateCore {
         const Value_T *value = getValue(tag);
 
         if ((value == nullptr) ||
-            !(value->CopyValueTo(*stream_, {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT}))) {
+            !(value->CopyValueTo(*stream_, {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT}))) {
             stream_->Write((content_ + t_offset), length);
         }
     }
@@ -1096,7 +1096,7 @@ struct TemplateCore {
 
                 case ExpressionType::RealNumber: {
                     Digit::NumberToString(*stream_, result.Value.Number.Real,
-                                          {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT});
+                                          {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT});
                     break;
                 }
 
