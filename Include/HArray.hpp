@@ -85,30 +85,23 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
 
     using BaseT::BaseT;
 
-    using BaseT::Capacity;
-    using BaseT::expand;
-    using BaseT::find;
-    using BaseT::insert;
-    using BaseT::IsNotEmpty;
+    using BaseT::getItem;
     using BaseT::Size;
     using BaseT::Storage;
+    using BaseT::tryInsert;
 
-    Value_T &Get(const Char_T *key, const SizeT length) {
-        if (Size() == Capacity()) {
-            expand();
-        }
+    inline Value_T &Get(const Char_T *key, const SizeT length) {
+        HItem *item = tryInsert(key, length);
+        return item->Value;
+    }
 
-        const SizeT hash = StringUtils::Hash(key, length);
-        SizeT      *index;
-        HItem      *item = find(index, key, length, hash);
+    inline Value_T &Get(const Key_T &key) {
+        HItem *item = tryInsert(key);
+        return item->Value;
+    }
 
-        if (item != nullptr) {
-            return item->Value;
-        }
-
-        item = insert(index, Key_T{key, length}, hash);
-        Memory::Initialize(&(item->Value));
-
+    inline Value_T &Get(Key_T &&key) {
+        HItem *item = tryInsert(Memory::Move(key));
         return item->Value;
     }
 
@@ -116,58 +109,50 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
         return Get(key, StringUtils::Count(key));
     }
 
-    inline Value_T &operator[](const Key_T &key) {
-        return Get(key.First(), key.Length());
-    }
-
-    Value_T &operator[](Key_T &&key) {
-        if (Size() == Capacity()) {
-            expand();
-        }
-
-        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT      *index;
-        HItem      *item = find(index, key.First(), key.Length(), hash);
-
-        if (item == nullptr) {
-            item = insert(index, Memory::Move(key), hash);
-            Memory::Initialize(&(item->Value));
-        }
-
+    inline Value_T &operator[](Key_T &&key) {
+        HItem *item = tryInsert(Memory::Move(key));
         return item->Value;
     }
 
-    void Insert(Key_T &&key, Value_T &&value) {
-        if (Size() == Capacity()) {
-            expand();
-        }
-
-        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT      *index;
-        HItem      *item = find(index, key.First(), key.Length(), hash);
-
-        if (item == nullptr) {
-            item = insert(index, Memory::Move(key), hash);
-            Memory::Initialize(&(item->Value), Memory::Move(value));
-        } else {
-            item->Value = Memory::Move(value);
-        }
-    }
-
-    inline void Insert(const Key_T &key, Value_T &&value) {
-        Insert(Key_T{key}, Memory::Move(value));
-    }
-
-    inline void Insert(Key_T &&key, const Value_T &value) {
-        Insert(Memory::Move(key), Value_T{value});
-    }
-
-    inline void Insert(const Key_T &key, const Value_T &value) {
-        Insert(Key_T{key}, Value_T{value});
+    inline Value_T &operator[](const Key_T &key) {
+        return Get(key);
     }
 
     inline void Insert(const Char_T *key, const SizeT length, Value_T &&value) {
-        Insert(Key_T{key, length}, Memory::Move(value));
+        HItem *item = tryInsert(key, length);
+        item->Value = Memory::Move(value);
+    }
+
+    inline void Insert(const Key_T &key, Value_T &&value) {
+        HItem *item = tryInsert(key.First(), key.Length());
+        item->Value = Memory::Move(value);
+    }
+
+    inline void Insert(const Key_T &key, const Value_T &value) {
+        HItem *item = tryInsert(key);
+        item->Value = Value_T{value};
+    }
+
+    inline void Insert(Key_T &&key, const Value_T &value) {
+        HItem *item = tryInsert(Memory::Move(key));
+        item->Value = Value_T{value};
+    }
+
+    inline void Insert(Key_T &&key, Value_T &&value) {
+        HItem *item = tryInsert(Memory::Move(key));
+        item->Value = Memory::Move(value);
+    }
+
+    inline Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        if (Size() != 0) {
+            HItem *item = getItem(key, length, hash);
+
+            if (item != nullptr) {
+                return &(item->Value);
+            }
+        }
+
+        return nullptr;
     }
 
     inline Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
@@ -186,25 +171,6 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
         }
 
         return nullptr;
-    }
-
-    inline Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        if (IsNotEmpty()) {
-            SizeT *index;
-            HItem *item = find(index, key, length, hash);
-
-            if (item != nullptr) {
-                return &(item->Value);
-            }
-        }
-
-        return nullptr;
-    }
-
-  private:
-    void insert(SizeT *index, Key_T &&key, const SizeT hash, Value_T &&value) noexcept {
-        HItem *item = insert(index, Memory::Move(key), hash);
-        Memory::Initialize(&(item->Value), Memory::Move(value));
     }
 };
 

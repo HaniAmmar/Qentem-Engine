@@ -111,7 +111,7 @@ struct HashTable {
         while (src_item < src_end) {
             if (src_item->Hash != 0) {
                 SizeT *index;
-                HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
+                HItem *storage_item = find(index, *src_item);
 
                 if (storage_item == nullptr) {
                     insert(index, Memory::Move(*src_item));
@@ -141,7 +141,7 @@ struct HashTable {
         while (src_item < src_end) {
             if (src_item->Hash != 0) {
                 SizeT *index;
-                HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
+                HItem *storage_item = find(index, *src_item);
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, *src_item);
@@ -155,33 +155,21 @@ struct HashTable {
     }
 
     inline void Insert(const Char_T *key, const SizeT length) {
-        Insert(Key_T{key, length});
+        tryInsert(key, length);
     }
 
     inline void Insert(const Key_T &key) {
-        Insert(Key_T{key});
+        tryInsert(key);
     }
 
     inline void Insert(Key_T &&key) {
-        if (Size() == Capacity()) {
-            expand();
-        }
-
-        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT      *index;
-        HItem      *item = find(index, key.First(), key.Length(), hash);
-
-        if (item == nullptr) {
-            insert(index, Memory::Move(key), hash);
-            item->InitValue();
-        }
+        tryInsert(Memory::Move(key));
     }
 
     inline bool Has(const Char_T *key, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
-            const SizeT hash = StringUtils::Hash(key, length);
-            SizeT      *index;
-            HItem      *item = find(index, key, length, hash);
+            SizeT *index;
+            HItem *item = find(index, key, length);
 
             return (item != nullptr);
         }
@@ -216,8 +204,12 @@ struct HashTable {
         return nullptr;
     }
 
+    inline const HItem *GetItem(const Char_T *key, const SizeT length) const noexcept {
+        return GetItem(key, length, StringUtils::Hash(key, length));
+    }
+
     inline const HItem *GetItem(const Key_T &key) const noexcept {
-        return GetItem(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
+        return GetItem(key.First(), key.Length());
     }
 
     inline const HItem *GetItem(const SizeT index) const noexcept {
@@ -234,7 +226,7 @@ struct HashTable {
         if (IsNotEmpty()) {
             SizeT *tmp;
 
-            if (find(tmp, str, length, StringUtils::Hash(str, length)) != nullptr) {
+            if (find(tmp, str, length) != nullptr) {
                 index = *tmp;
                 --index;
 
@@ -249,16 +241,16 @@ struct HashTable {
         return GetIndex(index, key.First(), key.Length());
     }
 
-    inline void Remove(const Char_T *key) const noexcept {
-        Remove(key, StringUtils::Count(key));
-    }
-
     inline void Remove(const Char_T *key, SizeT length) const noexcept {
         remove(key, length, StringUtils::Hash(key, length));
     }
 
+    inline void Remove(const Char_T *key) const noexcept {
+        Remove(key, StringUtils::Count(key));
+    }
+
     inline void Remove(const Key_T &key) const noexcept {
-        remove(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
+        Remove(key.First(), key.Length());
     }
 
     inline void RemoveIndex(const SizeT index) const noexcept {
@@ -280,7 +272,7 @@ struct HashTable {
             SizeT *left_index;
             SizeT *right_index;
 
-            find(left_index, from.First(), from.Length(), StringUtils::Hash(from.First(), from.Length()));
+            find(left_index, from.First(), from.Length());
 
             if (*left_index != 0) {
                 const SizeT to_hash = StringUtils::Hash(to.First(), to.Length());
@@ -298,6 +290,7 @@ struct HashTable {
                     item->Hash   = to_hash;
 
                     item->Key = Memory::Move(to);
+
                     return true;
                 }
             }
@@ -536,19 +529,53 @@ struct HashTable {
         return item_ptr;
     }
 
+    HItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
+        HItem item;
+        item.Hash = hash;
+        item.Next = 0;
+        item.Key  = Memory::Move(key);
+
+        return insert(index, Memory::Move(item));
+    }
+
     inline HItem *insert(SizeT *index, const HItem &item) noexcept {
         return insert(index, HItem{item});
     }
 
-    HItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
-        HItem *item = (Storage() + Size());
-        ++index_;
-        *index = Size();
+    inline HItem *tryInsert(const Char_T *key, const SizeT length) noexcept {
+        if (Size() == Capacity()) {
+            expand();
+        }
 
-        Memory::Initialize(&(item->Key), Memory::Move(key));
+        const SizeT hash = StringUtils::Hash(key, length);
+        SizeT      *index;
+        HItem      *item = find(index, key, length, hash);
 
-        item->Next = 0;
-        item->Hash = hash;
+        if (item == nullptr) {
+            item = insert(index, Key_T{key, length}, hash);
+            item->InitValue();
+        }
+
+        return item;
+    }
+
+    inline HItem *tryInsert(const Key_T &key) noexcept {
+        return tryInsert(key.First(), key.Length());
+    }
+
+    inline HItem *tryInsert(Key_T &&key) noexcept {
+        if (Size() == Capacity()) {
+            expand();
+        }
+
+        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT      *index;
+        HItem      *item = find(index, key.First(), key.Length(), hash);
+
+        if (item == nullptr) {
+            item = insert(index, Memory::Move(key), hash);
+            item->InitValue();
+        }
 
         return item;
     }
@@ -662,7 +689,24 @@ struct HashTable {
         return nullptr;
     }
 
-    void generateHash() const noexcept {
+    inline HItem *find(SizeT *&index, const Char_T *key, const SizeT length) const noexcept {
+        return find(index, key, length, StringUtils::Hash(key, length));
+    }
+
+    HItem *find(SizeT *&index, const Key_T &key) const noexcept {
+        return find(index, key.First(), key.Length());
+    }
+
+    inline HItem *find(SizeT *&index, const HItem &item) const noexcept {
+        return find(index, item.Key.First(), item.Key.Length(), item.Hash);
+    }
+
+    inline HItem *getItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        SizeT *index;
+        return find(index, key, length, hash);
+    }
+
+    void generateHash() noexcept {
         SizeT       *ht   = getHashTable();
         HItem       *src  = Storage();
         HItem       *item = src;
