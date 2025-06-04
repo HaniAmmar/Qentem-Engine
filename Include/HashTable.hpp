@@ -513,8 +513,68 @@ struct HashTable {
         capacity_ = capacity;
     }
 
+    void resize(const SizeT new_size) {
+        SizeT       *ht      = getHashTable();
+        HItem       *item    = Storage();
+        const HItem *end     = (item + Size());
+        HItem       *storage = allocate(new_size);
+
+        setSize(0);
+
+        while (item < end) {
+            if (item->Hash != 0) {
+                Memory::Initialize(storage, Memory::Move(*item));
+                ++storage;
+                ++index_;
+            }
+
+            ++item;
+        }
+
+        Memory::Deallocate(ht);
+        generateHash();
+    }
+
     inline void expand() {
         resize((Capacity() | SizeT{2}) * SizeT{2});
+    }
+
+    inline HItem *getItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        SizeT *index;
+        return find(index, key, length, hash);
+    }
+
+    HItem *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        SizeT *ht = getHashTable();
+
+        HItem *storage = Memory::ChangePointer<HItem>(ht + Capacity());
+        HItem *item;
+        index = (ht + (hash & getBase()));
+
+        while (*index != 0) {
+            item = (storage + *index);
+            --item;
+
+            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
+                return item;
+            }
+
+            index = &(item->Next);
+        }
+
+        return nullptr;
+    }
+
+    inline HItem *find(SizeT *&index, const Char_T *key, const SizeT length) const noexcept {
+        return find(index, key, length, StringUtils::Hash(key, length));
+    }
+
+    HItem *find(SizeT *&index, const Key_T &key) const noexcept {
+        return find(index, key.First(), key.Length());
+    }
+
+    inline HItem *find(SizeT *&index, const HItem &item) const noexcept {
+        return find(index, item.Key.First(), item.Key.Length(), item.Hash);
     }
 
     HItem *insert(SizeT *index, HItem &&item) noexcept {
@@ -644,66 +704,6 @@ struct HashTable {
 
             setSize(index);
         }
-    }
-
-    void resize(const SizeT new_size) {
-        SizeT       *ht      = getHashTable();
-        HItem       *item    = Storage();
-        const HItem *end     = (item + Size());
-        HItem       *storage = allocate(new_size);
-
-        setSize(0);
-
-        while (item < end) {
-            if (item->Hash != 0) {
-                Memory::Initialize(storage, Memory::Move(*item));
-                ++storage;
-                ++index_;
-            }
-
-            ++item;
-        }
-
-        Memory::Deallocate(ht);
-        generateHash();
-    }
-
-    HItem *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT *ht = getHashTable();
-
-        HItem *storage = Memory::ChangePointer<HItem>(ht + Capacity());
-        HItem *item;
-        index = (ht + (hash & getBase()));
-
-        while (*index != 0) {
-            item = (storage + *index);
-            --item;
-
-            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
-                return item;
-            }
-
-            index = &(item->Next);
-        }
-
-        return nullptr;
-    }
-
-    inline HItem *find(SizeT *&index, const Char_T *key, const SizeT length) const noexcept {
-        return find(index, key, length, StringUtils::Hash(key, length));
-    }
-
-    HItem *find(SizeT *&index, const Key_T &key) const noexcept {
-        return find(index, key.First(), key.Length());
-    }
-
-    inline HItem *find(SizeT *&index, const HItem &item) const noexcept {
-        return find(index, item.Key.First(), item.Key.Length(), item.Hash);
-    }
-
-    inline HItem *getItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT *index;
-        return find(index, key, length, hash);
     }
 
     void generateHash() noexcept {
