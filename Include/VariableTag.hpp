@@ -17,17 +17,10 @@
 
 namespace Qentem {
 namespace Tags {
+// TODO: Add QNumber for hash value or string-to-number value
 
 /**
  * @brief Represents the metadata for a template variable.
- *
- * Yes, this is an entire header file just for one tiny struct. Why?
- * Because if you dare put it in Tags.hpp or Template.hpp, C++ compilers
- * (especially GCC) will remind you what an "incomplete type" is, and
- * you'll be debugging include cycles until next week.
- *
- * VariableTag bravely lives alone to keep Tags and Template happy and
- * your code building everywhere—even on compilers that woke up grumpy.
  */
 struct VariableTag {
     SizeT   Offset{0};   ///< Offset of the variable within the template.
