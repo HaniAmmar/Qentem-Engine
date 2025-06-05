@@ -3040,7 +3040,7 @@ static void TestLoopTag2(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), R"(1030)", __LINE__);
     ss.Clear();
 
-    value.RemoveIndex(1);
+    value.RemoveAt(1);
 
     content = R"(<loop value="v">{var:v})";
     test.IsEqual(Template::Render(content, value, ss), R"(<loop value="v">{var:v})", __LINE__);
@@ -3055,7 +3055,7 @@ static void TestLoopTag2(QTest &test) {
     value += 20;
     value += 30;
 
-    value.RemoveIndex(1);
+    value.RemoveAt(1);
 
     content = R"(<loop value="v">{var:v}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), R"(1030)", __LINE__);
@@ -3103,7 +3103,7 @@ static void TestLoopTag2(QTest &test) {
                  R"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
     ss.Clear();
 
-    value.RemoveIndex(0);
+    value.RemoveAt(0);
     content = R"(<loop><l</loop>)";
     test.IsEqual(Template::Render(content, value, ss), R"(<l)", __LINE__);
     ss.Clear();

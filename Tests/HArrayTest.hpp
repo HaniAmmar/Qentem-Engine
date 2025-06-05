@@ -879,7 +879,7 @@ static void TestHArray9(QTest &test) {
         String<char> key("k-");
 
         Digit::NumberToString(key, i);
-        list.RemoveIndex(i);
+        list.RemoveAt(i);
 
         test.IsNull(list.GetValue(key), __LINE__);
     }
@@ -894,8 +894,8 @@ static void TestHArray9(QTest &test) {
     }
 
     for (SizeT i = 0; i < id; i++) {
-        list.RemoveIndex(i);
-        list.RemoveIndex(i); // Just to see if something goes wrong.
+        list.RemoveAt(i);
+        list.RemoveAt(i); // Just to see if something goes wrong.
     }
 
     for (SizeT i = 0; i < id; i++) {
@@ -915,7 +915,7 @@ static void TestHArray9(QTest &test) {
     }
 
     for (SizeT i = 0; i < id; i++) {
-        list.RemoveIndex(i);
+        list.RemoveAt(i);
     }
 
     for (SizeT i = 0; i < id; i++) {

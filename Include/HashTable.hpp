@@ -435,7 +435,7 @@ struct HashTable {
      *
      * @param index The array-style index of the item to remove.
      */
-    inline void RemoveIndex(const SizeT index) const noexcept {
+    inline void RemoveAt(const SizeT index) const noexcept {
         // Only act if index is within bounds.
         if (index < Size()) {
             HItem_T *item = (Storage() + index);

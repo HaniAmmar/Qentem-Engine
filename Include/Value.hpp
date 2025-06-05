@@ -1759,17 +1759,17 @@ struct Value {
         Remove(key, StringUtils::Count(key));
     }
 
-    void RemoveIndex(SizeT index) const noexcept {
+    void RemoveAt(SizeT index) const noexcept {
         if (isObject()) {
-            object_.RemoveIndex(index);
+            object_.RemoveAt(index);
         } else if (isArray() && (index < array_.Size())) {
             (array_.Storage() + index)->Reset();
         }
     }
 
     template <typename Number_T>
-    inline void RemoveIndex(Number_T index) const noexcept {
-        RemoveIndex(SizeT(index));
+    inline void RemoveAt(Number_T index) const noexcept {
+        RemoveAt(SizeT(index));
     }
 
     void Reset() noexcept {

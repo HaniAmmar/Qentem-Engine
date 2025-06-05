@@ -5313,51 +5313,51 @@ static void TestDeleteValue(QTest &test) {
     ValueC             value;
 
     value[0] = 1;
-    value.RemoveIndex(0);
+    value.RemoveAt(0);
     test.IsNull(value.GetValue(0), __LINE__);
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
     value[0] = "c";
-    value.RemoveIndex(SizeT32{0});
+    value.RemoveAt(SizeT32{0});
     test.IsNull(value.GetValue(0), __LINE__);
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
     value[0] = VArray{};
-    value.RemoveIndex(SizeT64{0});
+    value.RemoveAt(SizeT64{0});
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
     value[0] = false;
     value[1] = true;
-    value.RemoveIndex(0);
+    value.RemoveAt(0);
     test.IsEqual(value.Stringify(ss), R"([true])", __LINE__);
     ss.Clear();
-    value.RemoveIndex(1);
+    value.RemoveAt(1);
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
     value[0] = "abc";
     value[1] = nullptr;
-    value.RemoveIndex(1);
+    value.RemoveAt(1);
     test.IsEqual(value.Stringify(ss), R"(["abc"])", __LINE__);
     ss.Clear();
-    value.RemoveIndex(0);
+    value.RemoveAt(0);
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
-    value.RemoveIndex(1);
+    value.RemoveAt(1);
     test.IsEqual(value.Stringify(ss), R"([false,null])", __LINE__);
     ss.Clear();
-    value.RemoveIndex(0);
+    value.RemoveAt(0);
     test.IsEqual(value.Stringify(ss), R"([null])", __LINE__);
     ss.Clear();
 
-    value.RemoveIndex(2);
+    value.RemoveAt(2);
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
@@ -5378,14 +5378,14 @@ static void TestDeleteValue(QTest &test) {
     value[0] = "a";
     value[1] = VArray{};
     value[2] = VHArray{};
-    value.RemoveIndex(2);
+    value.RemoveAt(2);
     test.IsEqual(value.Stringify(ss), R"(["a",[]])", __LINE__);
     ss.Clear();
-    value.RemoveIndex(1);
+    value.RemoveAt(1);
     test.IsEqual(value.Stringify(ss), R"(["a"])", __LINE__);
     ss.Clear();
 
-    value.RemoveIndex(0);
+    value.RemoveAt(0);
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
     /////////
@@ -5393,7 +5393,7 @@ static void TestDeleteValue(QTest &test) {
     value.Reset();
 
     value["A"] = 1;
-    value.RemoveIndex(0);
+    value.RemoveAt(0);
     test.IsEqual(value.Stringify(ss), R"({})", __LINE__);
     ss.Clear();
 
@@ -5415,7 +5415,7 @@ static void TestDeleteValue(QTest &test) {
     test.IsNull(value.GetValueAt(0), __LINE__);
     test.IsEqual(value.Stringify(ss), R"({"bb":true})", __LINE__);
     ss.Clear();
-    value.RemoveIndex(1);
+    value.RemoveAt(1);
     test.IsNull(value.GetKey(0), __LINE__);
     test.IsNull(value.GetValueAt(1), __LINE__);
     test.IsEqual(value.Stringify(ss), R"({})", __LINE__);
@@ -5611,7 +5611,7 @@ static void TestCompressValue(QTest &test) {
     }
 
     value[2] = 0;
-    value.RemoveIndex(2U);
+    value.RemoveAt(2U);
     value.Compress();
 
     arr = value.GetArray();
@@ -6050,8 +6050,8 @@ static void TestGroupValue(QTest &test) {
     test.IsEqual(value.Stringify(ss), R"([null,null])", __LINE__);
     ss.Clear();
     ///////////
-    value.RemoveIndex(0);
-    value.RemoveIndex(1);
+    value.RemoveAt(0);
+    value.RemoveAt(1);
 
     value.Sort();
 

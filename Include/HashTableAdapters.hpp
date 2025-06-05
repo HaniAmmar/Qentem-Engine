@@ -218,7 +218,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::IsNotEmpty;
     using BaseT::Last;
     using BaseT::Remove;
-    using BaseT::RemoveIndex;
+    using BaseT::RemoveAt;
     using BaseT::Rename;
     using BaseT::Reserve;
     using BaseT::Reset;
