@@ -1283,7 +1283,7 @@ struct TemplateCore {
             } else {
                 while (loop_index < loop_size) {
                     LoopItem &item = loops_items_->Storage()[tag.Level];
-                    item.Value     = loop_set->GetValue(loop_index);
+                    item.Value     = loop_set->GetValueAt(loop_index);
 
                     if (item.Value != nullptr) {
                         render(s_tag, s_end, content_offset, tag.EndOffset);

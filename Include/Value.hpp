@@ -576,7 +576,7 @@ struct Value {
             }
         } else {
             if (type == ValueType::Object) {
-                Value *val = object_.GetValue(index);
+                Value *val = object_.GetValueAt(index);
 
                 if (val != nullptr) {
                     return *val;
@@ -1120,10 +1120,10 @@ struct Value {
         return 0;
     }
 
-    Value *GetValue(SizeT index) const noexcept {
+    Value *GetValueAt(SizeT index) const noexcept {
         switch (Type()) {
             case ValueType::Object: {
-                Value *val = object_.GetValue(index);
+                Value *val = object_.GetValueAt(index);
 
                 if ((val != nullptr) && (!(val->isUndefined()))) {
                     return val;
@@ -1145,7 +1145,7 @@ struct Value {
             }
 
             case ValueType::ValuePtr: {
-                return value_->GetValue(index);
+                return value_->GetValueAt(index);
             }
 
             default:

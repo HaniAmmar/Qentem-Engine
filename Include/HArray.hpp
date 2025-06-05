@@ -244,6 +244,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
                 return &(item->Value);
             }
         }
+
         return nullptr;
     }
 
@@ -256,12 +257,13 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param index The item index.
      * @return Pointer to the value, or nullptr if not found.
      */
-    inline Value_T *GetValue(const SizeT index) const noexcept {
+    inline Value_T *GetValueAt(const SizeT index) const noexcept {
         HItem *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
             return &((src + index)->Value);
         }
+
         return nullptr;
     }
 };
@@ -372,6 +374,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
                 return &(item->Value);
             }
         }
+
         return nullptr;
     }
 

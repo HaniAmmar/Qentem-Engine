@@ -373,47 +373,47 @@ static void TestHArray4(QTest &test) {
     test.IsEqual(numbers1["key10"], 1000U, __LINE__);
 
     SizeT          index = 0;
-    const SizeT32 *val   = numbers1.GetValue(index);
+    const SizeT32 *val   = numbers1.GetValueAt(index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 100U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 20U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 300U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 40U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 50U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 600U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 70U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 800U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 900U, __LINE__);
 
-    val = numbers1.GetValue(++index);
+    val = numbers1.GetValueAt(++index);
     test.IsNotNull(val, __LINE__);
     test.IsEqual(*val, 1000U, __LINE__);
 
-    val = numbers1.GetValue(SizeT{255});
+    val = numbers1.GetValueAt(SizeT{255});
     test.IsNull(val, __LINE__);
 
     numbers1 = numbers3; // Restore
@@ -627,8 +627,8 @@ static void TestHArray6(QTest &test) {
     test.IsEqual(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    test.IsEqual(strings1.GetValue(id)->First(), c_str1, __LINE__);
-    test.IsEqual(strings1.GetValue(++id)->First(), c_str2, __LINE__);
+    test.IsEqual(strings1.GetValueAt(id)->First(), c_str1, __LINE__);
+    test.IsEqual(strings1.GetValueAt(++id)->First(), c_str2, __LINE__);
 
     strings2 += strings1;
     test.IsEqual(strings2.Size(), 2U, __LINE__);
@@ -641,8 +641,8 @@ static void TestHArray6(QTest &test) {
     test.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    test.IsNotEqual(strings2.GetValue(id)->First(), c_str1, __LINE__);
-    test.IsNotEqual(strings2.GetValue(++id)->First(), c_str2, __LINE__);
+    test.IsNotEqual(strings2.GetValueAt(id)->First(), c_str1, __LINE__);
+    test.IsNotEqual(strings2.GetValueAt(++id)->First(), c_str2, __LINE__);
 
     strings2.Reserve(2);
     storage = strings1.First();
@@ -659,8 +659,8 @@ static void TestHArray6(QTest &test) {
     test.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    test.IsEqual(strings2.GetValue(id)->First(), c_str1, __LINE__);
-    test.IsEqual(strings2.GetValue(++id)->First(), c_str2, __LINE__);
+    test.IsEqual(strings2.GetValueAt(id)->First(), c_str1, __LINE__);
+    test.IsEqual(strings2.GetValueAt(++id)->First(), c_str2, __LINE__);
 
     strings1 += Memory::Move(strings2);
     strings1.Resize(10);
@@ -679,8 +679,8 @@ static void TestHArray6(QTest &test) {
     test.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    test.IsEqual(strings2.GetValue(id)->First(), c_str1, __LINE__);
-    test.IsEqual(strings2.GetValue(++id)->First(), c_str2, __LINE__);
+    test.IsEqual(strings2.GetValueAt(id)->First(), c_str1, __LINE__);
+    test.IsEqual(strings2.GetValueAt(++id)->First(), c_str2, __LINE__);
 }
 
 static void TestHArray7(QTest &test) {
@@ -962,20 +962,20 @@ static void TestHArraySort(QTest &test) {
 
     strings.Sort();
 
-    test.IsNotNull(strings.GetValue(0), __LINE__);
-    test.IsEqual(*(strings.GetValue(0)), 2016U, __LINE__);
-    test.IsNotNull(strings.GetValue(1), __LINE__);
-    test.IsEqual(*(strings.GetValue(1)), 2017U, __LINE__);
-    test.IsNotNull(strings.GetValue(2), __LINE__);
-    test.IsEqual(*(strings.GetValue(2)), 2018U, __LINE__);
-    test.IsNotNull(strings.GetValue(3), __LINE__);
-    test.IsEqual(*(strings.GetValue(3)), 2019U, __LINE__);
-    test.IsNotNull(strings.GetValue(4), __LINE__);
-    test.IsEqual(*(strings.GetValue(4)), 2020U, __LINE__);
-    test.IsNotNull(strings.GetValue(5), __LINE__);
-    test.IsEqual(*(strings.GetValue(5)), 2021U, __LINE__);
-    test.IsNotNull(strings.GetValue(6), __LINE__);
-    test.IsEqual(*(strings.GetValue(6)), 2022U, __LINE__);
+    test.IsNotNull(strings.GetValueAt(0), __LINE__);
+    test.IsEqual(*(strings.GetValueAt(0)), 2016U, __LINE__);
+    test.IsNotNull(strings.GetValueAt(1), __LINE__);
+    test.IsEqual(*(strings.GetValueAt(1)), 2017U, __LINE__);
+    test.IsNotNull(strings.GetValueAt(2), __LINE__);
+    test.IsEqual(*(strings.GetValueAt(2)), 2018U, __LINE__);
+    test.IsNotNull(strings.GetValueAt(3), __LINE__);
+    test.IsEqual(*(strings.GetValueAt(3)), 2019U, __LINE__);
+    test.IsNotNull(strings.GetValueAt(4), __LINE__);
+    test.IsEqual(*(strings.GetValueAt(4)), 2020U, __LINE__);
+    test.IsNotNull(strings.GetValueAt(5), __LINE__);
+    test.IsEqual(*(strings.GetValueAt(5)), 2021U, __LINE__);
+    test.IsNotNull(strings.GetValueAt(6), __LINE__);
+    test.IsEqual(*(strings.GetValueAt(6)), 2022U, __LINE__);
 
     test.IsEqual(strings["2016"], 2016U, __LINE__);
     test.IsEqual(strings["2017"], 2017U, __LINE__);
