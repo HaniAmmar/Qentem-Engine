@@ -20,15 +20,67 @@
 
 namespace Qentem {
 
+/**
+ * @brief Number key utilities for Qentem hash tables.
+ *
+ * Provides static methods for hashing and comparing numeric keys in the context
+ * of hash table operations. Designed to be used as a KeyUtils policy for hash tables
+ * that use integral (or other numeric) types as keys.
+ *
+ * @tparam Key_T Numeric key type (e.g., int, unsigned, etc.). Must support equality comparison.
+ *
+ * Example usage:
+ *   using Table = HashTable<unsigned int, NumberKeyUtils_T<unsigned int>, ...>;
+ */
 template <typename Key_T>
 struct NumberKeyUtils_T {
+    /**
+     * @brief Computes a non-zero hash value for numeric keys.
+     *
+     * For numeric types, this function ensures that all keys—*even zero*—are hashed
+     * to a nonzero value, thus preserving the integrity of the hash table's
+     * empty-slot convention (zero indicates an empty slot).
+     *
+     * - For any key whose integer representation is nonzero, returns the value as-is.
+     * - For zero-valued keys:
+     *   - If the key type is narrower than the hash type, the bits are shifted up,
+     *     and the lowest bit is set to ensure a nonzero result.
+     *   - Otherwise, returns all bits set (~0) to avoid ambiguity with empty slots.
+     *
+     * @param key Numeric key to hash.
+     * @return Nonzero hash value for the given key.
+     */
     QENTEM_INLINE static SizeT Hash(const Key_T &key) noexcept {
-        // Simple integer hash: use key directly, or you may apply a better hash if needed
-        return static_cast<SizeT>(key);
+        constexpr SizeT32 key_size = sizeof(SizeT);
+        constexpr SizeT32 n_size   = sizeof(Key_T);
+
+        using QNumberTypeT = typename QNumberAutoTypeT<Key_T, key_size>::QNumberType_T;
+
+        auto        q_key = QNumberTypeT{key}.Natural;
+        const SizeT hash  = static_cast<SizeT>(q_key);
+
+        if (hash != 0) {
+            return hash;
+        }
+
+        if QENTEM_CONST_EXPRESSION (key_size > n_size) {
+            return static_cast<SizeT>(SizeT(q_key >> ((key_size - n_size) * 8U)) | SizeT{1});
+        } else {
+            return ~SizeT{0};
+        }
     }
 
-    QENTEM_INLINE static bool IsEqual(SizeT hash1, SizeT hash2, const Key_T &, const Key_T &) noexcept {
-        return (hash1 == hash2);
+    /**
+     * @brief Compares two numeric keys for equality.
+     *
+     * @param hash1 Hash value of the first key (unused).
+     * @param hash2 Hash value of the second key (unused).
+     * @param key1  The first numeric key.
+     * @param key2  The second numeric key.
+     * @return True if the keys are equal, false otherwise.
+     */
+    QENTEM_INLINE static bool IsEqual(SizeT, SizeT, const Key_T &key1, const Key_T &key2) noexcept {
+        return (key1 == key2);
     }
 };
 

@@ -1060,23 +1060,21 @@ static void TestHArraySort(QTest &test) {
     test.IsEqual(strings["2017"], 2022U, __LINE__);
 }
 
-using HashArrayNum = HArray<unsigned, unsigned>;
-
 static void TestHArrayNumeric(QTest &test) {
-    HashArrayNum numbers(8);
+    HArray<unsigned, unsigned> numbers(8);
 
     // Test insertions and lookups
-    numbers[10] = 100;
-    numbers[20] = 200;
-    numbers[30] = 300;
-    numbers[40] = 400;
+    numbers[0]  = 100U;
+    numbers[10] = 200U;
+    numbers[20] = 300U;
+    numbers[30] = 400U;
 
     test.IsEqual(numbers.Size(), 4U, __LINE__);
     test.IsTrue(numbers.Capacity() >= 4U, __LINE__);
-    test.IsEqual(numbers[10], 100U, __LINE__);
-    test.IsEqual(numbers[20], 200U, __LINE__);
-    test.IsEqual(numbers[30], 300U, __LINE__);
-    test.IsEqual(numbers[40], 400U, __LINE__);
+    test.IsEqual(numbers[0], 100U, __LINE__);
+    test.IsEqual(numbers[10], 200U, __LINE__);
+    test.IsEqual(numbers[20], 300U, __LINE__);
+    test.IsEqual(numbers[30], 400U, __LINE__);
 
     // Test updating values
     numbers[10] = 1234;
