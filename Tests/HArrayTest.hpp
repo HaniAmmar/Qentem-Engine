@@ -1060,6 +1060,42 @@ static void TestHArraySort(QTest &test) {
     test.IsEqual(strings["2017"], 2022U, __LINE__);
 }
 
+using HashArrayNum = HArray<unsigned, unsigned>;
+
+static void TestHArrayNumeric(QTest &test) {
+    HashArrayNum numbers(8);
+
+    // Test insertions and lookups
+    numbers[10] = 100;
+    numbers[20] = 200;
+    numbers[30] = 300;
+    numbers[40] = 400;
+
+    test.IsEqual(numbers.Size(), 4U, __LINE__);
+    test.IsTrue(numbers.Capacity() >= 4U, __LINE__);
+    test.IsEqual(numbers[10], 100U, __LINE__);
+    test.IsEqual(numbers[20], 200U, __LINE__);
+    test.IsEqual(numbers[30], 300U, __LINE__);
+    test.IsEqual(numbers[40], 400U, __LINE__);
+
+    // Test updating values
+    numbers[10] = 1234;
+    test.IsEqual(numbers.Size(), 4U, __LINE__);
+    test.IsEqual(numbers[10], 1234U, __LINE__);
+
+    // Test resizing/expanding
+    numbers[50] = 500;
+    numbers[60] = 600;
+    numbers[70] = 700;
+    numbers[80] = 800;
+    numbers[90] = 900;
+    test.IsEqual(numbers.Size(), 9U, __LINE__);
+    test.IsTrue(numbers.Capacity() >= 9U, __LINE__);
+
+    numbers.Remove(70);
+    test.IsEqual(numbers.Has(70), false, __LINE__);
+}
+
 static int RunHArrayTests() {
     QTest test{"HArray.hpp", __FILE__};
 
@@ -1076,6 +1112,7 @@ static int RunHArrayTests() {
     test.Test("HArray Test 9", TestHArray9);
     test.Test("HArray Test 10", TestHArray10);
     test.Test("HArray Sort Test", TestHArraySort);
+    test.Test("HArray Numeric Test", TestHArrayNumeric);
 
     return test.EndTests();
 }

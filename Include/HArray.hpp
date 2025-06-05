@@ -90,21 +90,20 @@ struct HAItem_T : public HTableItem_T<Key_T> {
 };
 
 /**
- * @brief Ordered associative array (hash table) for Qentem Engine.
+ * @brief Ordered, type-adaptive associative array (hash table) for Qentem Engine.
  *
- * HArray combines the features of an ordered array and a hash table. It preserves
- * insertion order and provides fast lookups by key, supporting both array-style
- * access by index and hash-style access by key. All storage is contiguous, and
- * capacity is managed internally with minimal allocations.
+ * HArrayBase combines the features of an ordered array and a hash table, preserving
+ * insertion order while enabling fast lookups by key. It adapts internally to the key type:
+ * string keys use an efficient string hashing policy, and number keys use direct hashing,
+ * with all storage provided in a single contiguous block and minimal allocations.
  *
- * This container is ideal for use cases requiring direct lookup and fast iteration,
- * such as symbol tables, configuration data, or high-performance scripting engines.
  *
- * @tparam Key_T   The key type (must provide .First() and .Length()).
+ * @tparam Key_T   The key type. Supports both string types (must provide .First() and .Length()) and
+ *                 plain integral types. The correct hash policy is selected automatically.
  * @tparam Value_T The value type to store for each key.
  */
 template <typename Key_T, typename Value_T>
-struct HArray : public StringHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
+struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
     /**
      * @brief Hash table item type storing key-value pairs.
      */
@@ -113,50 +112,16 @@ struct HArray : public StringHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
     /**
      * @brief The parent type (string-adapted hash table).
      */
-    using BaseT = StringHashTable<Key_T, HItem>;
-
-    /**
-     * @brief Character type for the key.
-     */
-    using Char_T = typename Key_T::CharType;
+    using BaseT = AutoHashTable<Key_T, HItem>;
 
     /**
      * @brief Inherit constructors from BaseT.
      */
     using BaseT::BaseT;
-
     using BaseT::find;
     using BaseT::Size;
     using BaseT::Storage;
     using BaseT::tryInsert;
-
-    /**
-     * @brief Gets (or inserts) a value by raw character key and length.
-     *
-     * Looks up the value associated with the given key; if not found,
-     * a new entry is inserted with default value.
-     *
-     * @param key    Pointer to the character array key.
-     * @param length Number of characters in the key.
-     * @return Reference to the value.
-     */
-    inline Value_T &Get(const Char_T *key, const SizeT length) {
-        HItem *item = tryInsert(key, length);
-        return item->Value;
-    }
-
-    /**
-     * @brief Array subscript operator by character key (null-terminated).
-     *
-     * Looks up or inserts a value for the given C-string key.
-     * Equivalent to Get(key, StringUtils::Count(key)).
-     *
-     * @param key Pointer to null-terminated character array.
-     * @return Reference to the value.
-     */
-    inline Value_T &operator[](const Char_T *key) {
-        return Get(key, StringUtils::Count(key));
-    }
 
     /**
      * @brief Gets (or inserts) a value by key object.
@@ -208,20 +173,6 @@ struct HArray : public StringHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      */
     inline Value_T &operator[](const Key_T &key) {
         return Get(key);
-    }
-
-    /**
-     * @brief Inserts or updates a value by raw character key.
-     *
-     * If the key exists, assigns the value. If not, inserts a new item.
-     *
-     * @param key    Pointer to character array key.
-     * @param length Number of characters in the key.
-     * @param value  Value to move into the entry.
-     */
-    inline void Insert(const Char_T *key, const SizeT length, Value_T &&value) {
-        HItem *item = tryInsert(key, length);
-        item->Value = Memory::Move(value);
     }
 
     /**
@@ -277,43 +228,6 @@ struct HArray : public StringHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
     }
 
     /**
-     * @brief Gets a pointer to the value for a given raw key, length, and precomputed hash.
-     *
-     * Performs a lookup using the provided key, length, and hash value.
-     * Returns nullptr if the key is not found.
-     *
-     * @param key    Pointer to the character array key.
-     * @param length Number of characters in the key.
-     * @param hash   Precomputed hash for the key.
-     * @return Pointer to the value, or nullptr if not found.
-     */
-    inline Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        if (Size() != 0) {
-            SizeT *index;
-            HItem *item = find(index, key, length, hash);
-
-            if (item != nullptr) {
-                return &(item->Value);
-            }
-        }
-        return nullptr;
-    }
-
-    /**
-     * @brief Gets a pointer to the value for a given raw key and length.
-     *
-     * Computes the hash internally and performs a lookup.
-     * Returns nullptr if the key is not found.
-     *
-     * @param key    Pointer to the character array key.
-     * @param length Number of characters in the key.
-     * @return Pointer to the value, or nullptr if not found.
-     */
-    inline Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
-        return GetValue(key, length, StringUtils::Hash(key, length));
-    }
-
-    /**
      * @brief Gets a pointer to the value for a given key object.
      *
      * Returns nullptr if the key is not found.
@@ -351,6 +265,168 @@ struct HArray : public StringHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
         return nullptr;
     }
 };
+
+/**
+ * @brief Specialized ordered hash-array for string keys in Qentem Engine.
+ *
+ * HArrayStrings is a type adapter for string-like keys, building on HArrayBase
+ * with policies and overloads optimized for string lookup. It preserves insertion
+ * order, allows fast hash-style and array-style access, and provides convenience
+ * overloads for C-string (null-terminated) keys as well as key objects.
+ *
+ * - Optimized for string keys: supports hashing and equality from character arrays.
+ * - Provides operator[] and Get/Insert methods for raw strings and key objects.
+ * - Automatically selected by HArray if the key type is recognized as a string type.
+ *
+ * @tparam Key_T   String key type (must provide CharType, .First(), .Length(), .IsEqual()).
+ * @tparam Value_T The value type stored for each key.
+ */
+template <typename Key_T, typename Value_T>
+struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
+    /**
+     * @brief Hash table item type storing key-value pairs.
+     */
+    using HItem = HAItem_T<Key_T, Value_T>;
+
+    /**
+     * @brief The parent type (string-adapted hash table).
+     */
+    using BaseT = HArrayBase<Key_T, Value_T>;
+    /**
+     * @brief Character type for the key.
+     */
+    using Char_T = typename Key_T::CharType;
+
+    /**
+     * @brief Inherit constructors from BaseT.
+     */
+    using BaseT::BaseT;
+    using BaseT::find;
+    using BaseT::Get;
+    using BaseT::GetValue;
+    using BaseT::Insert;
+    using BaseT::operator[];
+    using BaseT::Size;
+    using BaseT::Storage;
+    using BaseT::tryInsert;
+
+    /**
+     * @brief Gets (or inserts) a value by raw character key and length.
+     *
+     * Looks up the value associated with the given key; if not found,
+     * a new entry is inserted with default value.
+     *
+     * @param key    Pointer to the character array key.
+     * @param length Number of characters in the key.
+     * @return Reference to the value.
+     */
+    inline Value_T &Get(const Char_T *key, const SizeT length) {
+        HItem *item = tryInsert(key, length);
+        return item->Value;
+    }
+
+    /**
+     * @brief Array subscript operator by character key (null-terminated).
+     *
+     * Looks up or inserts a value for the given C-string key.
+     * Equivalent to Get(key, StringUtils::Count(key)).
+     *
+     * @param key Pointer to null-terminated character array.
+     * @return Reference to the value.
+     */
+    inline Value_T &operator[](const Char_T *key) {
+        return Get(key, StringUtils::Count(key));
+    }
+
+    /**
+     * @brief Inserts or updates a value by raw character key.
+     *
+     * If the key exists, assigns the value. If not, inserts a new item.
+     *
+     * @param key    Pointer to character array key.
+     * @param length Number of characters in the key.
+     * @param value  Value to move into the entry.
+     */
+    inline void Insert(const Char_T *key, const SizeT length, Value_T &&value) {
+        HItem *item = tryInsert(key, length);
+        item->Value = Memory::Move(value);
+    }
+
+    /**
+     * @brief Gets a pointer to the value for a given raw key, length, and precomputed hash.
+     *
+     * Performs a lookup using the provided key, length, and hash value.
+     * Returns nullptr if the key is not found.
+     *
+     * @param key    Pointer to the character array key.
+     * @param length Number of characters in the key.
+     * @param hash   Precomputed hash for the key.
+     * @return Pointer to the value, or nullptr if not found.
+     */
+    inline Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        if (Size() != 0) {
+            SizeT *index;
+            HItem *item = find(index, key, length, hash);
+
+            if (item != nullptr) {
+                return &(item->Value);
+            }
+        }
+        return nullptr;
+    }
+
+    /**
+     * @brief Gets a pointer to the value for a given raw key and length.
+     *
+     * Computes the hash internally and performs a lookup.
+     * Returns nullptr if the key is not found.
+     *
+     * @param key    Pointer to the character array key.
+     * @param length Number of characters in the key.
+     * @return Pointer to the value, or nullptr if not found.
+     */
+    inline Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
+        return GetValue(key, length, StringUtils::Hash(key, length));
+    }
+};
+
+/**
+ * @brief Type selector for HArray containers.
+ *
+ * HArraySelector chooses the correct HArray implementation based on the key type:
+ *  - If Key_T is a number type (as determined by Internal::IsNumber), use HArrayBase (fast numeric logic).
+ *  - Otherwise, use HArrayStrings (enables raw string pointer overloads).
+ *
+ * @tparam Key_T   The key type.
+ * @tparam Value_T The value type.
+ * @tparam IsNum   (Implementation detail) Whether the key is a number.
+ */
+template <typename Key_T, typename Value_T, bool = Internal::IsNumber<Key_T>::value>
+struct HArraySelector;
+
+// Specialization for non-number keys: string-oriented version.
+template <typename Key_T, typename Value_T>
+struct HArraySelector<Key_T, Value_T, false> {
+    using Type = HArrayStrings<Key_T, Value_T>;
+};
+
+// Specialization for number keys: base version (numeric optimized).
+template <typename Key_T, typename Value_T>
+struct HArraySelector<Key_T, Value_T, true> {
+    using Type = HArrayBase<Key_T, Value_T>;
+};
+
+/**
+ * @brief Ordered associative array that adapts to string or number keys.
+ *
+ * HArray automatically chooses the most efficient implementation for the key type,
+ * ensuring the best combination of performance and convenience, with a single API.
+ *
+ * @tparam Key_T   The key type (string or number).
+ * @tparam Value_T The value type.
+ */
+template <typename Key_T, typename Value_T>
+using HArray = typename HArraySelector<Key_T, Value_T>::Type;
 
 } // namespace Qentem
 
