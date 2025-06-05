@@ -98,8 +98,8 @@ struct HAItem_T : public HTableItem_T<Key_T> {
  * with all storage provided in a single contiguous block and minimal allocations.
  *
  *
- * @tparam Key_T   The key type. Supports both string types (must provide .First() and .Length()) and
- *                 plain integral types. The correct hash policy is selected automatically.
+ * @tparam Key_T   The key type. Supports both string types and plain integral types.
+ *                 The correct hash policy is selected automatically.
  * @tparam Value_T The value type to store for each key.
  */
 template <typename Key_T, typename Value_T>

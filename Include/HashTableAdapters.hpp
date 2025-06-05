@@ -399,90 +399,6 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     }
 };
 
-// -------------- Number Adapter ------------------
-/**
- * @brief Number-keyed hash table adapter for Qentem Engine.
- *
- * This adapter specializes the core HashTable for use with numeric keys.
- * It applies number hashing and comparison, and exposes all
- * generic hash table functionality for associative containers keyed by
- * integers or other fundamental number types.
- *
- * All hashing and equality logic is delegated to NumberKeyUtils_T,
- * ensuring optimal performance and correct semantics for number keys.
- *
- * @tparam NumberKey_T  The numeric key type (e.g., int, unsigned, etc).
- * @tparam HItem_T      The item type to store in the table.
- *
- * @see NumberKeyUtils_T
- * @see HashTable
- */
-template <typename NumberKey_T, typename HItem_T>
-struct NumberHashTable : public HashTable<NumberKey_T, NumberKeyUtils_T<NumberKey_T>, HItem_T> {
-    /**
-     * @brief Key utilities trait for string hashing and comparison.
-     */
-    using KeyUtilsT = NumberKeyUtils_T<NumberKey_T>;
-
-    /**
-     * @brief Base hash table type.
-     */
-    using BaseT = HashTable<NumberKey_T, KeyUtilsT, HItem_T>;
-
-    /**
-     * @brief Inherit all constructors from the base hash table.
-     */
-    using BaseT::BaseT;
-    // using BaseT::...; // c++17
-    // (Other 'using BaseT::...' lines follow in the full struct.)
-
-    using BaseT::ActualSize;
-    using BaseT::begin;
-    using BaseT::Capacity;
-    using BaseT::Clear;
-    using BaseT::Compress;
-    using BaseT::End;
-    using BaseT::end;
-    using BaseT::Expect;
-    using BaseT::First;
-    using BaseT::GetIndex;
-    using BaseT::GetItem;
-    using BaseT::GetKey;
-    using BaseT::Has;
-    using BaseT::Insert;
-    using BaseT::IsEmpty;
-    using BaseT::IsNotEmpty;
-    using BaseT::Last;
-    using BaseT::Remove;
-    using BaseT::RemoveIndex;
-    using BaseT::Rename;
-    using BaseT::Reserve;
-    using BaseT::Reset;
-    using BaseT::Resize;
-    using BaseT::Size;
-    using BaseT::Sort;
-    using BaseT::Storage;
-
-    using BaseT::allocate;
-    using BaseT::allocateOnly;
-    using BaseT::clearHashTable;
-    using BaseT::copyTable;
-    using BaseT::copyTableWithHash;
-    using BaseT::expand;
-    using BaseT::find;
-    using BaseT::generateHash;
-    using BaseT::getBase;
-    using BaseT::getHashTable;
-    using BaseT::hashAndFind;
-    using BaseT::insert;
-    using BaseT::remove;
-    using BaseT::resize;
-    using BaseT::setCapacity;
-    using BaseT::setHashTable;
-    using BaseT::setSize;
-    using BaseT::tryInsert;
-};
-
 /**
  * @brief Selects the appropriate hash table adapter (string or number) at compile time.
  *
@@ -517,7 +433,7 @@ struct HashTableSelector<Key_T, HItem_T, false> {
 template <typename Key_T, typename HItem_T>
 struct HashTableSelector<Key_T, HItem_T, true> {
     /// Type alias for number-keyed hash table.
-    using Type = NumberHashTable<Key_T, HItem_T>;
+    using Type = HashTable<Key_T, NumberKeyUtils_T<Key_T>, HItem_T>;
 };
 
 /**
