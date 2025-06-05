@@ -16,6 +16,7 @@
 
 #include "Internal.hpp"
 #include "HashTable.hpp"
+#include "QNumber.hpp"
 #include "StringUtils.hpp"
 
 namespace Qentem {
