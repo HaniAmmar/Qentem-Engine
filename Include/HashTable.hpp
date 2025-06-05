@@ -405,8 +405,13 @@ struct HashTable {
      * @return true if the key is found and index set; false otherwise.
      */
     inline bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
-        if (IsNotEmpty() && (find(index, key) != nullptr)) {
-            return true;
+        if (IsNotEmpty()) {
+            SizeT *hash_index;
+
+            if (find(hash_index, key) != nullptr) {
+                index = *hash_index;
+                return true;
+            }
         }
 
         return false; // Key not found or table is empty.
