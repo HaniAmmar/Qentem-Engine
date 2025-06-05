@@ -74,7 +74,7 @@ struct HLItem_T : public HTableItem_T<Key_T> {
  * @tparam Key_T The key type (must provide .First(), .Length(), and equality operators).
  */
 template <typename Key_T>
-struct HList : public StringHashTable<Key_T, HLItem_T<Key_T>> {
+struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>> {
     /**
      * @brief Hash table item type storing only the key.
      */
@@ -83,12 +83,7 @@ struct HList : public StringHashTable<Key_T, HLItem_T<Key_T>> {
     /**
      * @brief The parent type (string-adapted hash table for keys).
      */
-    using BaseT = StringHashTable<Key_T, HItem>;
-
-    /**
-     * @brief Character type for the key.
-     */
-    using Char_T = typename Key_T::CharType;
+    using BaseT = AutoHashTable<Key_T, HItem>;
 
     /**
      * @brief Inherit constructors from BaseT.
