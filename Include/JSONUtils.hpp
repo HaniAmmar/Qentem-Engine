@@ -305,7 +305,7 @@ struct JSONUtils {
 
                             if (str[offset] == '/') {
                                 // Inline comment: skip to end of line
-                                while ((++offset < end) && (str[offset] != '\n') && (str[offset] != '\r')) {
+                                while ((++offset < end) && (str[offset] != '\n')) {
                                 }
                             } else {
                                 // Block comment: skip to closing '*/' or EOF
