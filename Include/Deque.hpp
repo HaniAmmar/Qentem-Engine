@@ -567,13 +567,11 @@ struct Deque {
      * @complexity Amortized O(n) when growing (due to element moves); O(1) otherwise.
      */
     void expand(SizeT new_cap) {
-        constexpr SizeT32 type_size = sizeof(Type_T);
-
         // 1) Bulk‐copy, two-segment style to preserve order
         const SizeT head_to_end = (capacity_ - head());
-        const SizeT firstCount  = ((Size() < head_to_end) ? Size() : head_to_end);
+        const SizeT first_count = ((Size() < head_to_end) ? Size() : head_to_end);
         // Copy the wrapped remainder (if any)
-        const SizeT secondCount = (Size() - firstCount);
+        const SizeT second_count = (Size() - first_count);
 
         // 2) Capture old storage
         Type_T *old_storage = storage_;
@@ -582,10 +580,10 @@ struct Deque {
         allocate(new_cap);
 
         // Copy the first contiguous block
-        Memory::Copy(storage_, (old_storage + head()), (firstCount * type_size));
+        Memory::CopyTo(storage_, (old_storage + head()), first_count);
 
-        if (secondCount != 0) {
-            Memory::Copy((storage_ + firstCount), old_storage, (secondCount * type_size));
+        if (second_count != 0) {
+            Memory::CopyTo((storage_ + first_count), old_storage, second_count);
         }
 
         // 4) Clean up old buffer and reset head/index

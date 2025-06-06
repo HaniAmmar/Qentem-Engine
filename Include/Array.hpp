@@ -99,14 +99,13 @@ struct Array {
             setSize(src.Size());
             setCapacity(src.Capacity());
         } else {
-            constexpr SizeT32 type_size = sizeof(Type_T);
-            const SizeT       n_size    = (Size() + src.Size());
+            const SizeT n_size = (Size() + src.Size());
 
             if (n_size > Capacity()) {
                 expand(n_size);
             }
 
-            Memory::Copy((Storage() + Size()), src.Storage(), (src.Size() * type_size));
+            Memory::CopyTo((Storage() + Size()), src.Storage(), src.Size());
             Memory::Deallocate(src.Storage());
             setSize(n_size);
         }
@@ -365,13 +364,12 @@ struct Array {
     }
 
     void expand(SizeT new_capacity) {
-        constexpr SizeT32 type_size = sizeof(Type_T);
-        Type_T           *src       = Storage();
+        Type_T *src = Storage();
 
         setCapacity(new_capacity);
 
         Type_T *des = allocate();
-        Memory::Copy(des, src, (Size() * type_size));
+        Memory::CopyTo(des, src, Size());
         Memory::Deallocate(src);
     }
 

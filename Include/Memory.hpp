@@ -18,9 +18,20 @@
 
 namespace Qentem {
 namespace Memory {
+/////////////////////////////////////////////////////////////////////
+template <typename Type_T>
+static constexpr Type_T *ChangePointer(void *value) noexcept {
+    return (Type_T *)(value);
+}
+
+template <typename Type_T>
+static constexpr const Type_T *ChangePointer(const void *value) noexcept {
+    return (const Type_T *)(value);
+}
+/////////////////////////////////////////////////////////////////////
 // size = the number of bytes
 template <typename Number_T>
-inline static void SetToZero(void *pointer, Number_T size) noexcept {
+QENTEM_INLINE inline static void SetToZero(void *pointer, Number_T size) noexcept {
     Number_T offset = 0;
 
     // if (QentemConfig::IsSIMDEnabled) {
@@ -50,7 +61,7 @@ inline static void SetToZero(void *pointer, Number_T size) noexcept {
 }
 
 template <typename Type_T, typename Value_T>
-inline static void SetToValue(Type_T *src, Value_T value, SizeT size) noexcept {
+QENTEM_INLINE inline static void SetToValue(Type_T *src, Value_T value, SizeT size) noexcept {
     SizeT offset = 0;
 
     while (offset < size) {
@@ -61,11 +72,11 @@ inline static void SetToValue(Type_T *src, Value_T value, SizeT size) noexcept {
 
 // size = the number of bytes
 template <typename Number_T>
-QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T size) noexcept {
+QENTEM_INLINE inline static void Copy(void *to, const void *from, Number_T size) noexcept {
     Number_T offset = 0;
 
     // if (QentemConfig::IsSIMDEnabled) {
-    //     const Number_T m_size = (size >> Platform::SIMD::Shift);
+    // const Number_T m_size = (size >> Platform::SIMD::Shift);
 
     //     if (m_size != 0) {
     //         offset = m_size;
@@ -93,13 +104,47 @@ QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T size) noex
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_T>
-static constexpr Type_T *ChangePointer(void *value) noexcept {
-    return (Type_T *)(value);
-}
+QENTEM_INLINE inline static void CopyTo(Type_T *to, const Type_T *from, SizeT size) noexcept {
+    constexpr SizeT   type_size = sizeof(Type_T);
+    constexpr SizeT32 shift64   = 3U;
+    constexpr SizeT32 shift32   = 2U;
+    constexpr bool    is_mul8   = (type_size == ((type_size >> shift64) << shift64));
+    constexpr bool    is_mul4   = (type_size == ((type_size >> shift32) << shift32));
 
-template <typename Type_T>
-static constexpr const Type_T *ChangePointer(const void *value) noexcept {
-    return (const Type_T *)(value);
+    if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
+        SizeT          offset = 0;
+        SizeT64       *des64  = Memory::ChangePointer<SizeT64>(to);
+        const SizeT64 *src64  = Memory::ChangePointer<const SizeT64>(from);
+
+        size *= type_size >> shift64;
+
+        while (offset < size) {
+            des64[offset] = src64[offset];
+            ++offset;
+        }
+    } else if QENTEM_CONST_EXPRESSION (is_mul4) {
+        SizeT          offset = 0;
+        SizeT32       *des32  = Memory::ChangePointer<SizeT32>(to);
+        const SizeT32 *src32  = Memory::ChangePointer<const SizeT32>(from);
+
+        size *= type_size >> shift32;
+
+        while (offset < size) {
+            des32[offset] = src32[offset];
+            ++offset;
+        }
+    } else {
+        SizeT         offset = 0;
+        SizeT8       *des8   = Memory::ChangePointer<SizeT8>(to);
+        const SizeT8 *src8   = Memory::ChangePointer<const SizeT8>(from);
+
+        size *= type_size;
+
+        while (offset < size) {
+            des8[offset] = src8[offset];
+            ++offset;
+        }
+    }
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_T>
@@ -154,7 +199,7 @@ static constexpr typename ReferenceType<Type_T>::Type &&Move(Type_T &&value) noe
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_T>
-inline static void Swap(Type_T &item1, Type_T &item2) noexcept {
+QENTEM_INLINE inline static void Swap(Type_T &item1, Type_T &item2) noexcept {
     Type_T item = Move(item1);
     item1       = Move(item2);
     item2       = Move(item);
@@ -194,7 +239,7 @@ inline static void Sort(Type_T *arr, Number_T start, Number_T end) noexcept {
 }
 
 /////////////////////////////////////////////////////////////////////
-inline static SizeT AlignSize(SizeT n_size) noexcept {
+QENTEM_INLINE inline static SizeT AlignSize(SizeT n_size) noexcept {
     // Ensure scanned n_size is >= 2, so msb >= 1.
     SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size | SizeT{2}));
 
@@ -217,13 +262,13 @@ inline static Type_T *Allocate(SizeT size) {
 
 // Initializer
 template <typename Type_T>
-inline static void Initialize(Type_T *pointer) noexcept {
+QENTEM_INLINE inline static void Initialize(Type_T *pointer) noexcept {
     new (pointer) Type_T{};
 }
 
 // Range copy initializer
 template <typename Type_T>
-inline static void Initialize(Type_T *pointer, const Type_T *end) noexcept {
+QENTEM_INLINE inline static void Initialize(Type_T *pointer, const Type_T *end) noexcept {
     while (pointer < end) {
         new (pointer) Type_T{};
         ++pointer;
@@ -232,19 +277,19 @@ inline static void Initialize(Type_T *pointer, const Type_T *end) noexcept {
 
 // Move initializer
 template <typename Type_T>
-inline static void Initialize(Type_T *pointer, Type_T &&value) noexcept {
+QENTEM_INLINE inline static void Initialize(Type_T *pointer, Type_T &&value) noexcept {
     new (pointer) Type_T{Move(value)};
 }
 
 // Copy initializer
 template <typename Type_T>
-inline static void Initialize(Type_T *pointer, const Type_T &value) {
+QENTEM_INLINE inline static void Initialize(Type_T *pointer, const Type_T &value) {
     new (pointer) Type_T{value};
 }
 
 // Range copy initializer
 template <typename Type_T>
-inline static void Initialize(Type_T *pointer, const Type_T *end, const Type_T &value) {
+QENTEM_INLINE inline static void Initialize(Type_T *pointer, const Type_T *end, const Type_T &value) {
     while (pointer < end) {
         new (pointer) Type_T{value};
         ++pointer;
@@ -252,17 +297,17 @@ inline static void Initialize(Type_T *pointer, const Type_T *end, const Type_T &
 }
 
 template <typename Type_T, typename... Values_T>
-inline static void InitializeValues(Type_T *pointer, Values_T &&...values) noexcept {
+QENTEM_INLINE inline static void InitializeValues(Type_T *pointer, Values_T &&...values) noexcept {
     new (pointer) Type_T{Forward<Values_T>(values)...};
 }
 
 template <typename Type_T, typename... Values_T>
-inline static void InitializeValues(Type_T *pointer, const Values_T &...values) noexcept {
+QENTEM_INLINE inline static void InitializeValues(Type_T *pointer, const Values_T &...values) noexcept {
     new (pointer) Type_T{values...};
 }
 
 template <typename Type_T>
-inline static Type_T *AllocateInit() {
+QENTEM_INLINE inline static Type_T *AllocateInit() {
     Type_T *pointer = Allocate<Type_T>(1);
     Initialize(pointer);
     return pointer;
@@ -271,7 +316,7 @@ inline static Type_T *AllocateInit() {
 
 // Allocate and move
 template <typename Type_T, typename... Values_T>
-inline static Type_T *AllocateInit(Values_T &&...values) noexcept {
+QENTEM_INLINE inline static Type_T *AllocateInit(Values_T &&...values) noexcept {
     Type_T *pointer = Allocate<Type_T>(1);
     InitializeValues(pointer, Forward<Values_T>(values)...);
     return pointer;
@@ -279,7 +324,7 @@ inline static Type_T *AllocateInit(Values_T &&...values) noexcept {
 
 // Allocate and copy
 template <typename Type_T, typename... Values_T>
-inline static Type_T *AllocateInit(const Values_T &...values) {
+QENTEM_INLINE inline static Type_T *AllocateInit(const Values_T &...values) {
     Type_T *pointer = Allocate<Type_T>(1);
     InitializeValues(pointer, values...);
     return pointer;
@@ -296,14 +341,14 @@ inline static void Deallocate(void *pointer) noexcept {
 }
 
 template <typename Type_T>
-inline static void Dispose(Type_T *item) noexcept {
+QENTEM_INLINE inline static void Dispose(Type_T *item) noexcept {
     if (item != nullptr) {
         item->~Type_T();
     }
 }
 
 template <typename Type_T>
-inline static void Dispose(Type_T *item, const Type_T *end) noexcept {
+QENTEM_INLINE inline static void Dispose(Type_T *item, const Type_T *end) noexcept {
     while (item < end) {
         Dispose(item);
         ++item;

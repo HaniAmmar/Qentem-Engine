@@ -250,19 +250,19 @@ struct String {
 
     void Write(const Char_T *str, const SizeT length) {
         if ((str != nullptr) && (length != 0)) {
-            constexpr SizeT32 size    = sizeof(Char_T);
-            const SizeT       src_len = Length();
-            SizeT             new_len = (src_len + length + SizeT{1});
-            Char_T           *src     = Storage();
-            Char_T           *ns      = allocate(new_len);
+            const SizeT src_len = Length();
+            SizeT       new_len = (src_len + length + SizeT{1});
+            Char_T     *src     = Storage();
+            Char_T     *ns      = allocate(new_len);
 
-            Memory::Copy((ns + src_len), str, (length * size));
+            Memory::CopyTo((ns + src_len), str, length);
+
             --new_len;
             ns[new_len] = Char_T{0};
             setLength(new_len);
 
             if (src != nullptr) {
-                Memory::Copy(ns, src, (src_len * size));
+                Memory::CopyTo(ns, src, src_len);
                 Memory::Deallocate(src);
             }
         }
@@ -299,8 +299,6 @@ struct String {
     }
 
     inline void InsertAt(Char_T ch, SizeT index) {
-        constexpr SizeT size = sizeof(Char_T);
-
         if (index < Length()) {
             const SizeT new_length = (Length() + SizeT{1});
 
@@ -308,7 +306,7 @@ struct String {
 
             // 1. Copy prefix [0, index)
             if (index > 0) {
-                Memory::Copy(new_storage, Storage(), (index * size));
+                Memory::CopyTo(new_storage, Storage(), index);
             }
 
             // 2. Insert new char at 'index'
@@ -316,7 +314,7 @@ struct String {
 
             // 3. Copy suffix [index, length)
             if (index < Length()) {
-                Memory::Copy(new_storage + index + 1, (Storage() + index), ((Length() - index) * size));
+                Memory::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
             }
 
             // Clean up old storage and set new storage/capacity
@@ -409,29 +407,26 @@ struct String {
     }
 
     static String merge(const Char_T *str1, const SizeT len1, const Char_T *str2, const SizeT len2) {
-        constexpr SizeT32 size = sizeof(Char_T);
-        String            ns   = String{SizeT(len1 + len2)};
-        Char_T           *des  = ns.Storage();
+        String  ns  = String{SizeT(len1 + len2)};
+        Char_T *des = ns.Storage();
 
         if (len1 != 0) {
-            Memory::Copy(des, str1, (len1 * size));
+            Memory::CopyTo(des, str1, len1);
         }
 
         if (len2 != 0) {
-            Memory::Copy((des + len1), str2, (len2 * size));
+            Memory::CopyTo((des + len1), str2, len2);
         }
 
         return ns;
     }
 
     void expand(const SizeT new_length) {
-        constexpr SizeT32 size = sizeof(Char_T);
-
         Char_T *old_storage = Storage();
         Char_T *new_storage = allocate(new_length + SizeT{1});
 
         if (Length() != 0) {
-            Memory::Copy(new_storage, old_storage, (Length() * size));
+            Memory::CopyTo(new_storage, old_storage, Length());
         }
 
         deallocate();            // Free the old storage
@@ -439,11 +434,9 @@ struct String {
     }
 
     void copyString(const Char_T *str, const SizeT length) {
-        constexpr SizeT32 size = sizeof(Char_T);
-
         Char_T *ns = allocate(length + SizeT{1});
 
-        Memory::Copy(ns, str, (length * size));
+        Memory::CopyTo(ns, str, length);
 
         ns[length] = Char_T{0};
 

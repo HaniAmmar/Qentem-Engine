@@ -1250,8 +1250,6 @@ struct HashTable {
      * @param[in] src The source hash table to clone.
      */
     void copyTableWithHash(const HashTable &src) {
-        constexpr SizeT32 size = sizeof(SizeT);
-
         if (src.IsNotEmpty()) {
             setCapacity(src.Capacity());
 
@@ -1262,7 +1260,7 @@ struct HashTable {
             HItem_T       *storage  = Memory::ChangePointer<HItem_T>(ht + Capacity());
             SizeT          index{0};
 
-            Memory::Copy(ht, src_ht, (size * Capacity())); // Duplicate hash table slot array
+            Memory::CopyTo(ht, src_ht, Capacity()); // Duplicate hash table slot array
 
             do {
                 if (src_item->Hash != 0) {

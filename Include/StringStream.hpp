@@ -208,7 +208,7 @@ struct StringStream {
 
     inline void WriteAt(const SizeT index, const Char_T *str, const SizeT length) {
         if ((index + length) <= Length()) {
-            Memory::Copy((Storage() + index), str, (length * sizeof(Char_T)));
+            Memory::CopyTo((Storage() + index), str, length);
         }
     }
 
@@ -307,7 +307,6 @@ struct StringStream {
     }
 
     inline void InsertAt(Char_T ch, SizeT index) {
-        constexpr SizeT size = sizeof(Char_T);
         if (index < Length()) {
             const SizeT new_length = (Length() + SizeT{1});
 
@@ -332,7 +331,7 @@ struct StringStream {
 
                 // 1. Copy prefix [0, index)
                 if (index > 0) {
-                    Memory::Copy(new_storage, Storage(), (index * size));
+                    Memory::CopyTo(new_storage, Storage(), index);
                 }
 
                 // 2. Insert new char at 'index'
@@ -340,7 +339,7 @@ struct StringStream {
 
                 // 3. Copy suffix [index, length)
                 if (index < Length()) {
-                    Memory::Copy(new_storage + index + 1, (Storage() + index), ((Length() - index) * size));
+                    Memory::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
                 }
 
                 // Clean up old storage and set new storage/capacity
@@ -353,8 +352,6 @@ struct StringStream {
     }
 
     inline void ShiftRight(SizeT shift) {
-        constexpr SizeT size = sizeof(Char_T);
-
         if ((shift != 0) && IsNotEmpty()) {
             const SizeT old_length = Length();
             const SizeT new_length = (old_length + shift);
@@ -378,7 +375,7 @@ struct StringStream {
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length > 0) {
-                    Memory::Copy(new_storage + shift, Storage(), old_length * size);
+                    Memory::CopyTo(new_storage + shift, Storage(), old_length);
                 }
 
                 // Clean up, set new pointers
@@ -478,26 +475,24 @@ struct StringStream {
 
     inline void write(const Char_T *str, const SizeT length) {
         if (length != 0) {
-            constexpr SizeT size       = sizeof(Char_T);
-            const SizeT     new_length = (Length() + length);
+            const SizeT new_length = (Length() + length);
 
             if (Capacity() < new_length) {
                 expand(new_length);
             }
 
-            Memory::Copy((Storage() + Length()), str, (length * size));
+            Memory::CopyTo((Storage() + Length()), str, length);
 
             setLength(new_length);
         }
     }
 
     void expand(const SizeT new_capacity) {
-        constexpr SizeT size = sizeof(Char_T);
-        Char_T         *str  = Storage();
+        Char_T *str = Storage();
 
         allocate(new_capacity * ExpandFactor);
 
-        Memory::Copy(Storage(), str, (Length() * size));
+        Memory::CopyTo(Storage(), str, Length());
         Memory::Deallocate(str);
     }
 
