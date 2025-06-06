@@ -25,79 +25,78 @@
 #include "QCommon.hpp"
 
 namespace Qentem {
-namespace Unicode {
+struct Unicode {
+    template <typename, typename, SizeT32>
+    struct UnicodeToUTF;
 
-template <typename, typename, SizeT32>
-struct UnicodeToUTF;
+    /*
+     * ToUTF(0xC3D, stream);
+     * ToUTF(0x00A1, stream);
+     * ToUTF(0x08A7, stream);
+     * ToUTF(0x10A7B, stream);
+     */
 
-/*
- * ToUTF(0xC3D, stream);
- * ToUTF(0x00A1, stream);
- * ToUTF(0x08A7, stream);
- * ToUTF(0x10A7B, stream);
- */
+    /**
+     * Converts a Unicode code point (0x0000 - 0x10FFFF) to UTF-8/16/32 sequence
+     * based on the Char_T size. The input value is assumed valid; caller must ensure
+     * no invalid or surrogate code points are passed.
+     */
+    template <typename Char_T, typename Stream_T>
+    QENTEM_INLINE static void ToUTF(SizeT32 unicode, Stream_T &stream) {
+        UnicodeToUTF<Char_T, Stream_T, sizeof(Char_T)>::ToUTF(unicode, stream);
+    }
 
-/**
- * Converts a Unicode code point (0x0000 - 0x10FFFF) to UTF-8/16/32 sequence
- * based on the Char_T size. The input value is assumed valid; caller must ensure
- * no invalid or surrogate code points are passed.
- */
-template <typename Char_T, typename Stream_T>
-static void ToUTF(SizeT32 unicode, Stream_T &stream) {
-    UnicodeToUTF<Char_T, Stream_T, sizeof(Char_T)>::ToUTF(unicode, stream);
-}
-
-// UTF8
-template <typename Char_T, typename Stream_T>
-struct UnicodeToUTF<Char_T, Stream_T, 1U> {
-    static void ToUTF(SizeT32 unicode, Stream_T &stream) {
-        if (unicode < 0x80U) {
-            stream += Char_T(unicode);
-        } else {
-            if (unicode < 0x800U) {
-                stream += Char_T(0xC0U | (unicode >> 6U));
-            } else if (unicode < 0x10000U) {
-                stream += Char_T(0xE0U | (unicode >> 12U));
-                stream += Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
+    // UTF8
+    template <typename Char_T, typename Stream_T>
+    struct UnicodeToUTF<Char_T, Stream_T, 1U> {
+        static void ToUTF(SizeT32 unicode, Stream_T &stream) {
+            if (unicode < 0x80U) {
+                stream += Char_T(unicode);
             } else {
-                stream += Char_T(0xF0U | (unicode >> 18U));
-                stream += Char_T(0x80U | ((unicode >> 12U) & 0x3FU));
-                stream += Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
+                if (unicode < 0x800U) {
+                    stream += Char_T(0xC0U | (unicode >> 6U));
+                } else if (unicode < 0x10000U) {
+                    stream += Char_T(0xE0U | (unicode >> 12U));
+                    stream += Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
+                } else {
+                    stream += Char_T(0xF0U | (unicode >> 18U));
+                    stream += Char_T(0x80U | ((unicode >> 12U) & 0x3FU));
+                    stream += Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
+                }
+
+                stream += Char_T(0x80U | (unicode & 0x3FU));
             }
-
-            stream += Char_T(0x80U | (unicode & 0x3FU));
         }
-    }
-};
+    };
 
-// UTF16
-template <typename Char_T, typename Stream_T>
-struct UnicodeToUTF<Char_T, Stream_T, 2U> {
-    static void ToUTF(SizeT32 unicode, Stream_T &stream) {
-        if (unicode < 0x10000U) {
+    // UTF16
+    template <typename Char_T, typename Stream_T>
+    struct UnicodeToUTF<Char_T, Stream_T, 2U> {
+        static void ToUTF(SizeT32 unicode, Stream_T &stream) {
+            if (unicode < 0x10000U) {
+                stream += Char_T(unicode);
+            } else {
+                unicode -= 0x10000U;
+                stream += Char_T(0xD800U | (unicode >> 10U));
+                stream += Char_T(0xDC00U | (unicode & 0x3FFU));
+            }
+        }
+    };
+
+    // UTF32
+    template <typename Char_T, typename Stream_T>
+    struct UnicodeToUTF<Char_T, Stream_T, 4U> {
+        QENTEM_INLINE static void ToUTF(SizeT32 unicode, Stream_T &stream) {
+            // if (unicode > 0x10FFFFU || (unicode >= 0xD800U && unicode <= 0xDFFFU)) {
+            //     // Invalid code point: ignore or handle error
+            //     return;
+            // }
+
             stream += Char_T(unicode);
-        } else {
-            unicode -= 0x10000U;
-            stream += Char_T(0xD800U | (unicode >> 10U));
-            stream += Char_T(0xDC00U | (unicode & 0x3FFU));
         }
-    }
+    };
 };
 
-// UTF32
-template <typename Char_T, typename Stream_T>
-struct UnicodeToUTF<Char_T, Stream_T, 4U> {
-    static void ToUTF(SizeT32 unicode, Stream_T &stream) {
-        // if (unicode > 0x10FFFFU || (unicode >= 0xD800U && unicode <= 0xDFFFU)) {
-        //     // Invalid code point: ignore or handle error
-        //     return;
-        // }
-
-        stream += Char_T(unicode);
-    }
-};
-
-} // namespace Unicode
 } // namespace Qentem
 
 #endif
