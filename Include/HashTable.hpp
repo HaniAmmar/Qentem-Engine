@@ -935,7 +935,8 @@ struct HashTable {
      * @param[in]  hash  The precomputed hash value for this key.
      * @return Pointer to the found item if present, nullptr if not found.
      */
-    HItem_T *find(SizeT *&index, const Key_T &key, const SizeT hash) const noexcept {
+    template <typename KeyType_T>
+    HItem_T *find(SizeT *&index, const KeyType_T &key, const SizeT hash) const noexcept {
         SizeT *ht = getHashTable();
 
         // Storage area starts after hash table area.
@@ -948,7 +949,7 @@ struct HashTable {
             item = (storage + *index);
 
             // Check for hash and key equality using KeyUtils.
-            if (KeyUtils_T::IsEqual(hash, item->Hash, item->Key, key)) {
+            if (KeyUtils_T::IsEqual(hash, item->Hash, key, item->Key)) {
                 return item; // Match found!
             }
 

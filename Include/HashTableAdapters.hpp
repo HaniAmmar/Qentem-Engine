@@ -18,6 +18,7 @@
 #include "HashTable.hpp"
 #include "QNumber.hpp"
 #include "StringUtils.hpp"
+#include "StringView.hpp"
 
 namespace Qentem {
 
@@ -127,22 +128,6 @@ struct StringKeyUtils_T {
     }
 
     /**
-     * @brief Compares a key against a raw character array for equality.
-     *
-     * Checks both hash values and, if matching, performs character-wise equality.
-     *
-     * @param hash1 Hash value of the key.
-     * @param hash2 Hash value of the character array.
-     * @param key   The string key object.
-     * @param str   Pointer to the character array.
-     * @param length Number of characters to compare.
-     * @return True if both hashes and character contents match, false otherwise.
-     */
-    QENTEM_INLINE static bool IsEqual(SizeT hash1, SizeT hash2, const Key_T &key, const Char_T *str, SizeT length) {
-        return ((hash1 == hash2) && key.IsEqual(str, length));
-    }
-
-    /**
      * @brief Compares two string key objects for equality.
      *
      * Checks both hash values and, if matching, compares the keys.
@@ -153,8 +138,9 @@ struct StringKeyUtils_T {
      * @param key2  Second string key object.
      * @return True if both hashes and keys match, false otherwise.
      */
-    QENTEM_INLINE static bool IsEqual(SizeT hash1, SizeT hash2, const Key_T &key1, const Key_T &key2) {
-        return ((hash1 == hash2) && (key1 == key2));
+    template <typename KeyType_T>
+    QENTEM_INLINE static bool IsEqual(SizeT hash1, SizeT hash2, const KeyType_T &key1, const Key_T &key2) {
+        return ((hash1 == hash2) && key1.IsEqual(key2.First(), key2.Length()));
     }
 };
 
@@ -361,32 +347,13 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * or where a new item should be inserted if not found.
      *
      * @param[out] index Output reference to a pointer to the hash table slot; updated during lookup.
-     * @param key       Pointer to the character array representing the key to search for.
+     * @param str       Pointer to the character array representing the key to search for.
      * @param length    Number of characters in the key array.
      * @param hash      Precomputed hash value of the key.
      * @return Pointer to the found item, or nullptr if not found.
      */
-    HItem_T *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT *ht = getHashTable();
-
-        // Storage area starts after hash table area.
-        HItem_T *storage = Memory::ChangePointer<HItem_T>(ht + Capacity());
-        HItem_T *item;
-        // Compute index in hash table using base mask.
-        index = (ht + (hash & getBase()));
-
-        while (*index != Capacity()) { // While this slot is linked to a valid item...
-            item = (storage + *index);
-
-            // Check for hash and key equality using KeyUtils.
-            if (KeyUtilsT::IsEqual(hash, item->Hash, item->Key, key, length)) {
-                return item;
-            }
-
-            index = &(item->Next); // Follow the collision chain.
-        }
-
-        return nullptr; // Not found.
+    HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+        return find(index, StringView<Char_T>{str, length}, hash);
     }
 
     /**
