@@ -48,13 +48,13 @@ namespace Test {
 
 static int PrintResult(int passed, int failed) {
     if (failed == 0) {
-        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "All good. (", passed, ") tests",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), "\n\n");
+        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::PASS), "All good. (", passed, ") tests",
+                          TestOutput::GetColor(TestOutput::Colors::END), "\n\n");
         return 0;
     }
 
-    TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Not good!",
-                      TestOutPut::GetColor(TestOutPut::Colors::END), " ", failed, " out of ", (passed + failed),
+    TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ERROR), "Not good!",
+                      TestOutput::GetColor(TestOutput::Colors::END), " ", failed, " out of ", (passed + failed),
                       " failed.\n\n");
 
     return 1;
@@ -73,15 +73,15 @@ static void SelfTestLeak(QTest &test, char *&ptr) {
     test.IsNotEqual(u'a', u'a', 7);
     test.IsNotEqual(U'a', U'a', 6);
 
-    TestOutPut::Print(u"a");
-    TestOutPut::Print(U"a");
+    TestOutput::Print(u"a");
+    TestOutput::Print(U"a");
 }
 
 static void SelfTest() {
     std::wstringstream wss{};
-    TestOutPut::SetStreamCache(&wss);
+    TestOutput::SetStreamCache(&wss);
 
-    const bool is_colored = TestOutPut::IsColored();
+    const bool is_colored = TestOutput::IsColored();
 
     QTest test{"Test.hpp", __FILE__};
 
@@ -91,18 +91,18 @@ static void SelfTest() {
     test.Test("SelfTestLeak", SelfTestLeak, true, ptr);
     Qentem::MemoryRecord::PrintMemoryStatus();
     Memory::Deallocate(ptr);
-    MemoryRecord::ResetSubMemory();
-    TestOutPut::IsColored() = false;
+    MemoryRecord::ResetSubMemoryRecord();
+    TestOutput::IsColored() = false;
 
     test.EndTests();
 
-    if (test.IsContinueOnError()) {
+    if (test.ContinueOnErrorEnabled()) {
         PrintResult(10, 5);
         // const wchar_t *failed_message = L"Not good! 5 out of 15 failed.\n";
     }
 
-    TestOutPut::IsColored() = is_colored;
-    TestOutPut::SetStreamCache(nullptr);
+    TestOutput::IsColored() = is_colored;
+    TestOutput::SetStreamCache(nullptr);
 }
 
 static int RunTests() {

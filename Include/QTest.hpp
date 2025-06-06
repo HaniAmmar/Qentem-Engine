@@ -74,13 +74,13 @@ static std::wostream &operator<<(std::wostream &ss, const char32_t ch) {
 }
 #endif
 
-struct TestOutPut {
-    TestOutPut()                              = delete;
-    ~TestOutPut()                             = delete;
-    TestOutPut(TestOutPut &&)                 = delete;
-    TestOutPut(const TestOutPut &)            = delete;
-    TestOutPut &operator=(TestOutPut &&)      = delete;
-    TestOutPut &operator=(const TestOutPut &) = delete;
+struct TestOutput {
+    TestOutput()                              = delete;
+    ~TestOutput()                             = delete;
+    TestOutput(TestOutput &&)                 = delete;
+    TestOutput(const TestOutput &)            = delete;
+    TestOutput &operator=(TestOutput &&)      = delete;
+    TestOutput &operator=(const TestOutput &) = delete;
 
     template <typename... Values_T>
     inline static void Print(const Values_T &...values) {
@@ -179,14 +179,18 @@ struct MemoryRecord {
     MemoryRecord &operator=(MemoryRecord &&)      = delete;
     MemoryRecord &operator=(const MemoryRecord &) = delete;
 
-    inline static void ResetSubMemory() noexcept {
+    inline static void ResetMemoryRecord() noexcept {
+        getStorage() = MemoryRecordData{};
+    }
+
+    inline static void ResetSubMemoryRecord() noexcept {
         static MemoryRecordData &storage = getStorage();
 
         storage.subAllocations   = 0;
         storage.subDeallocations = 0;
     }
 
-    inline static SizeT CheckSubMemory() noexcept {
+    inline static SizeT CheckSubAllocationCount() noexcept {
         static const MemoryRecordData &storage = getStorage();
 
         return (storage.subAllocations - storage.subDeallocations);
@@ -229,22 +233,22 @@ struct MemoryRecord {
     QENTEM_NOINLINE static void PrintMemoryStatus() {
         static const MemoryRecordData &storage = getStorage();
 
-        TestOutPut::SetDoubleFormat();
+        TestOutput::SetDoubleFormat();
 
-        TestOutPut::Print("Memory: ", (double(storage.remainingSize) / 1024),
+        TestOutput::Print("Memory: ", (double(storage.remainingSize) / 1024),
                           " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
 
-        TestOutPut::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
+        TestOutput::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
 
         const SizeT remaining_allocations = (storage.allocations - storage.deallocations);
 
         if (remaining_allocations != 0) {
-            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
-                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_allocations,
+            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ERROR), "Leak detected",
+                              TestOutput::GetColor(TestOutput::Colors::END), ": ", remaining_allocations,
                               " remaining allocations.\n\n");
         }
 
-        TestOutPut::ResetDoubleFormat();
+        TestOutput::ResetDoubleFormat();
     }
 
   private:
@@ -267,15 +271,15 @@ struct QTest {
     }
 
     QENTEM_NOINLINE void PrintGroupName() const {
-        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
+        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TITLE), test_name_,
+                          TestOutput::GetColor(TestOutput::Colors::END), ":\n");
     }
 
     QENTEM_NOINLINE int EndTests() {
         if (!error_) {
-            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
-                              TestOutPut::GetColor(TestOutPut::Colors::PASS), " Passed all tests",
-                              TestOutPut::GetColor(TestOutPut::Colors::END), "\n\n");
+            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TITLE), test_name_,
+                              TestOutput::GetColor(TestOutput::Colors::PASS), " Passed all tests",
+                              TestOutput::GetColor(TestOutput::Colors::END), "\n\n");
             return 0;
         }
 
@@ -347,9 +351,9 @@ struct QTest {
     template <typename Value1_T, typename Value2_T>
     QENTEM_NOINLINE void PrintErrorMessage(bool equal, const Value1_T &value1, const Value2_T &value2,
                                            unsigned long line) {
-        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n');
-        TestOutPut::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
+        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ERROR), "Failed",
+                          TestOutput::GetColor(TestOutput::Colors::END), ": ", part_name_, '\n');
+        TestOutput::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
                           "`\n     Returned: `", value1, "`\n\n");
     }
 
@@ -361,59 +365,61 @@ struct QTest {
         return error_;
     }
 
-    inline bool IsContinueOnError() const noexcept {
+    inline bool ContinueOnErrorEnabled() const noexcept {
         return continue_on_error_;
     }
 
-    QENTEM_NOINLINE static void PrintInfo() {
-        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
+    QENTEM_NOINLINE static void PrintInfo(bool template_engine_info = true) {
+        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TITLE), "Configurations",
+                          TestOutput::GetColor(TestOutput::Colors::END), ":\n");
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
-            TestOutPut::Print("Arch: 64-bit\n");
+            TestOutput::Print("Arch: 64-bit\n");
         } else {
-            TestOutPut::Print("Arch: 32-bit\n");
+            TestOutput::Print("Arch: 32-bit\n");
         }
 
-        TestOutPut::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
+        TestOutput::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::IsBigEndian) {
-            TestOutPut::Print("Endianness: Big-Endian\n");
+            TestOutput::Print("Endianness: Big-Endian\n");
         } else {
-            TestOutPut::Print("Endianness: Little-Endian\n");
+            TestOutput::Print("Endianness: Little-Endian\n");
         }
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-        TestOutPut::Print("Advanced Vector Extensions: On\n");
+        TestOutput::Print("Advanced Vector Extensions: On\n");
 #endif
 
 #if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-        TestOutPut::Print("Streaming SIMD Extensions 2: On\n");
+        TestOutput::Print("Streaming SIMD Extensions 2: On\n");
 #endif
 
 #if defined(QENTEM_MSIMD128) && (QENTEM_MSIMD128 == 1)
-        TestOutPut::Print("WASM SIMD128: On\n");
+        TestOutput::Print("WASM SIMD128: On\n");
 #endif
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::AutoEscapeHTML) {
-            TestOutPut::Print("Auto Escape HTML: On\n");
+            if (template_engine_info) {
+                TestOutput::Print("Auto Escape HTML: On\n");
+            }
         }
 
-        TestOutPut::Print('\n');
+        TestOutput::Print('\n');
     }
 
   private:
     QENTEM_NOINLINE void afterTest(bool test_for_leaks) {
         if (!error_) {
-            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "Pass",
-                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n');
+            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::PASS), "Pass",
+                              TestOutput::GetColor(TestOutput::Colors::END), ": ", part_name_, '\n');
         }
 
         if (test_for_leaks) {
-            const SizeT remaining_allocations = MemoryRecord::CheckSubMemory();
-            MemoryRecord::ResetSubMemory();
+            const SizeT remaining_allocations = MemoryRecord::CheckSubAllocationCount();
+            MemoryRecord::ResetSubMemoryRecord();
 
             if (remaining_allocations != 0) {
-                TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
-                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_allocations,
+                TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ERROR), "Leak detected",
+                                  TestOutput::GetColor(TestOutput::Colors::END), ": ", remaining_allocations,
                                   " remaining allocations.\n");
             }
         }

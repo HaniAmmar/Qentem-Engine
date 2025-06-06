@@ -55,7 +55,7 @@ QENTEM_NOINLINE static void RealToStreamEqual(QTest &test, Stream_T &stream, Num
                                               Digit::RealFormatInfo format, const char *expected, unsigned long line) {
     Digit::NumberToString(stream, number, format);
 
-    if (!test.HasError() || test.IsContinueOnError()) {
+    if (!test.HasError() || test.ContinueOnErrorEnabled()) {
 #ifdef QENTEM_COMPARE_DIGIT_WITH_STL
         std::ostringstream out;
         out.precision(format.Precision);
@@ -77,7 +77,7 @@ QENTEM_NOINLINE static void RealToStreamEqualFixed(QTest &test, Stream_T &stream
                                                    const char *expected, unsigned long line) {
     Digit::NumberToString(stream, number, Digit::RealFormatInfo{precision, Digit::RealFormatType::Fixed});
 
-    if (!test.HasError() || test.IsContinueOnError()) {
+    if (!test.HasError() || test.ContinueOnErrorEnabled()) {
 #ifdef QENTEM_COMPARE_DIGIT_WITH_STL
         std::ostringstream out;
         out.precision(precision);
@@ -106,7 +106,7 @@ QENTEM_NOINLINE static void RealToStreamEqualSemiFixed(QTest &test, Stream_T &st
     stream.InsertNull();
     const StringView<char> str_number{(stream.First() + offset), SizeT(stream.Length() - offset)};
 
-    if (!test.HasError() || test.IsContinueOnError()) {
+    if (!test.HasError() || test.ContinueOnErrorEnabled()) {
         test.IsEqual(str_number, expected, line);
         stream.Clear();
     }
@@ -118,7 +118,7 @@ QENTEM_NOINLINE static bool StringToNumber(const QTest &test, Number_T &num, con
     SizeT       offset = 0;
     const SizeT length = StringUtils::Count(str);
 
-    if (!test.HasError() || test.IsContinueOnError()) {
+    if (!test.HasError() || test.ContinueOnErrorEnabled()) {
         switch (Digit::StringToNumber(number, str, offset, length)) {
             case QNumberType::Natural: {
                 num = Number_T(number.Natural);
