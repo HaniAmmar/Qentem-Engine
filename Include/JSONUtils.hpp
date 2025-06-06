@@ -294,7 +294,7 @@ struct JSONUtils {
                                 diff                       = (comment_end - comment_offset);
 
                                 // Shift tail to close up previous comment gap
-                                while (previous_comment < tmp) {
+                                while (previous_comment_end < tmp) {
                                     str[previous_comment] = str[previous_comment_end];
                                     ++previous_comment;
                                     ++previous_comment_end;
