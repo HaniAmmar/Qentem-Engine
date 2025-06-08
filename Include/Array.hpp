@@ -153,6 +153,28 @@ struct Array {
         ++index_;
     }
 
+    /**
+     * @brief Adopts (takes ownership of) a pre-allocated buffer and manages its lifetime.
+     *
+     * The Array takes responsibility for the provided memory block (pointer, capacity, and length).
+     * When the Array is destroyed or cleared, it will properly destroy and deallocate all elements.
+     *
+     * @warning The buffer must have been allocated with the appropriate allocator,
+     *          and must not be used elsewhere after being adopted.
+     * @param ptr   Pointer to the pre-allocated memory block.
+     * @param size  The current logical size (number of constructed elements).
+     * @param capacity   The capacity of the buffer (number of slots allocated).
+     */
+    void Adopt(Type_T *ptr, SizeT size, SizeT capacity) {
+        // Clean up any existing storage
+        Reset();
+
+        // Take ownership of the new buffer
+        setStorage(ptr);
+        setSize(size);
+        setCapacity(capacity);
+    }
+
     inline void Insert(Array &&src) {
         *this += Memory::Move(src);
     }
