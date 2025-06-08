@@ -297,12 +297,12 @@ struct Memory {
     }
 
     template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void InitializeValues(Type_T *pointer, Values_T &&...values) noexcept {
+    QENTEM_INLINE static void ConstructAt(Type_T *pointer, Values_T &&...values) noexcept {
         new (pointer) Type_T{Forward<Values_T>(values)...};
     }
 
     template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void InitializeValues(Type_T *pointer, const Values_T &...values) noexcept {
+    QENTEM_INLINE static void ConstructAt(Type_T *pointer, const Values_T &...values) noexcept {
         new (pointer) Type_T{values...};
     }
 
@@ -318,7 +318,7 @@ struct Memory {
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static Type_T *AllocateInit(Values_T &&...values) noexcept {
         Type_T *pointer = Allocate<Type_T>(1);
-        InitializeValues(pointer, Forward<Values_T>(values)...);
+        ConstructAt(pointer, Forward<Values_T>(values)...);
         return pointer;
     }
 
@@ -326,7 +326,7 @@ struct Memory {
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static Type_T *AllocateInit(const Values_T &...values) {
         Type_T *pointer = Allocate<Type_T>(1);
-        InitializeValues(pointer, values...);
+        ConstructAt(pointer, values...);
         return pointer;
         // return new Type_T{values...};
     }
