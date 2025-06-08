@@ -29,6 +29,47 @@ struct Memory {
         return (const Type_T *)(value);
     }
     /////////////////////////////////////////////////////////////////////
+    template <typename Type_T>
+    QENTEM_INLINE static void SetToZeroByType(Type_T *des, SizeT size = 1) noexcept {
+        constexpr SizeT   type_size = sizeof(Type_T);
+        constexpr SizeT32 shift64   = 3U;
+        constexpr SizeT32 shift32   = 2U;
+        constexpr bool    is_mul8   = (type_size == ((type_size >> shift64) << shift64));
+        constexpr bool    is_mul4   = (type_size == ((type_size >> shift32) << shift32));
+
+        if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
+            SizeT    offset = 0;
+            SizeT64 *des64  = Memory::ChangePointer<SizeT64>(des);
+
+            size *= type_size >> shift64;
+
+            while (offset < size) {
+                des64[offset] = SizeT64{0};
+                ++offset;
+            }
+        } else if QENTEM_CONST_EXPRESSION (is_mul4) {
+            SizeT    offset = 0;
+            SizeT32 *des32  = Memory::ChangePointer<SizeT32>(des);
+
+            size *= type_size >> shift32;
+
+            while (offset < size) {
+                des32[offset] = SizeT32{0};
+                ++offset;
+            }
+        } else {
+            SizeT   offset = 0;
+            SizeT8 *des8   = Memory::ChangePointer<SizeT8>(des);
+
+            size *= type_size;
+
+            while (offset < size) {
+                des8[offset] = SizeT8{0};
+                ++offset;
+            }
+        }
+    }
+
     // size = the number of bytes
     template <typename Number_T>
     QENTEM_INLINE static void SetToZero(void *pointer, Number_T size) noexcept {
