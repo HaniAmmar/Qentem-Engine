@@ -1064,34 +1064,124 @@ static void TestHArrayNumeric(QTest &test) {
     HArray<unsigned, unsigned> numbers(8);
 
     // Test insertions and lookups
-    numbers[0]  = 100U;
-    numbers[10] = 200U;
-    numbers[20] = 300U;
-    numbers[30] = 400U;
+    numbers[0U]  = 100U;
+    numbers[10U] = 200U;
+    numbers[20U] = 300U;
+    numbers[30U] = 400U;
 
-    test.IsEqual(numbers.Size(), 4U, __LINE__);
-    test.IsTrue(numbers.Capacity() >= 4U, __LINE__);
-    test.IsEqual(numbers[0], 100U, __LINE__);
-    test.IsEqual(numbers[10], 200U, __LINE__);
-    test.IsEqual(numbers[20], 300U, __LINE__);
-    test.IsEqual(numbers[30], 400U, __LINE__);
+    test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
+    test.IsTrue(numbers.Capacity() >= SizeT{4}, __LINE__);
+    test.IsEqual(numbers[0U], 100U, __LINE__);
+    test.IsEqual(numbers[10U], 200U, __LINE__);
+    test.IsEqual(numbers[20U], 300U, __LINE__);
+    test.IsEqual(numbers[30U], 400U, __LINE__);
 
     // Test updating values
-    numbers[10] = 1234;
-    test.IsEqual(numbers.Size(), 4U, __LINE__);
-    test.IsEqual(numbers[10], 1234U, __LINE__);
+    numbers[10U] = 1234U;
+    test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers[10U], 1234U, __LINE__);
 
     // Test resizing/expanding
-    numbers[50] = 500;
-    numbers[60] = 600;
-    numbers[70] = 700;
-    numbers[80] = 800;
-    numbers[90] = 900;
-    test.IsEqual(numbers.Size(), 9U, __LINE__);
-    test.IsTrue(numbers.Capacity() >= 9U, __LINE__);
+    numbers[50U] = 500U;
+    numbers[60U] = 600U;
+    numbers[70U] = 700U;
+    numbers[80U] = 800U;
+    numbers[90U] = 900U;
+    test.IsEqual(numbers.Size(), SizeT{9}, __LINE__);
+    test.IsTrue(numbers.Capacity() >= SizeT{9}, __LINE__);
 
-    numbers.Remove(70);
-    test.IsEqual(numbers.Has(70), false, __LINE__);
+    numbers.Remove(70U);
+    test.IsFalse(numbers.Has(70U), __LINE__);
+
+    test.IsEqual(numbers.Size(), SizeT{9}, __LINE__);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+
+    numbers.Remove(0U);
+    test.IsEqual(numbers.Size(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{7}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+
+    numbers.Remove(10U);
+    numbers.Remove(60U);
+    numbers.Remove(90U);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+
+    numbers.Remove(80U);
+
+    numbers.Reorder();
+
+    numbers.Remove(20U);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+
+    numbers.Remove(30U);
+    numbers.Remove(50U);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{0}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+
+    numbers[10U] = 100U;
+    numbers[20U] = 200U;
+    numbers[30U] = 300U;
+    numbers[40U] = 400U;
+
+    numbers.Remove(40U);
+
+    test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{3}, __LINE__);
+
+    numbers[40U] = 400U;
+    test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
+
+    numbers.Remove(10U);
+    numbers.Remove(40U);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{2}, __LINE__);
+
+    numbers[10U] = 100U;
+    numbers[40U] = 400U;
+
+    test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
+
+    numbers.Remove(10U);
+    numbers.Remove(20U);
+    numbers.Remove(30U);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{1}, __LINE__);
+
+    numbers.Clear();
+
+    numbers[10U] = 100U;
+    numbers[20U] = 200U;
+    numbers.Remove(10U);
+
+    numbers.Reorder();
+
+    test.IsEqual(numbers.Size(), SizeT{1}, __LINE__);
 }
 
 static int RunHArrayTests() {

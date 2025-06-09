@@ -632,6 +632,65 @@ struct HashTable {
     }
 
     /**
+     * @brief Reorders hash table items to ensure all live entries occupy contiguous slots at the start.
+     *
+     * Reorder() performs an in-place deep move of all non-deleted items (Hash != 0), shifting them
+     * forward so that indices [0, N) are densely packed with valid entries and all deleted slots are
+     * pushed to the end. The logical size is updated to match the number of live items.
+     *
+     * The hash table mapping is then reset and hash chains are regenerated to correspond to the
+     * new layout. Storage capacity is unchanged, but all item indices and positions may change.
+     *
+     * Usage:
+     *   Call after bulk deletions to ensure items are contiguous, iteration is efficient,
+     *   and no gaps exist in the storage array. Especially useful before exporting or enumerating all items.
+     *
+     * @warning
+     *   Any pointers or indices to items obtained before calling Reorder() will be invalid after this call.
+     *   Use with caution if external code relies on storage layout or indices.
+     */
+    void Reorder() {
+        HItem_T       *item      = Storage();            // Pointer to current slot to fill
+        HItem_T       *next_item = Storage() + SizeT{1}; // Pointer to next slot to scan ahead
+        const HItem_T *end       = End();                // One past the last logical item
+        SizeT          size      = 0;                    // Counter for live items
+
+        while (next_item < end) {
+            if (item->Hash == 0) {
+                // This slot is dead (tombstone): find the next live item to move here
+                do {
+                    if (next_item->Hash != 0) {
+                        // Found a live item: move it forward, zero out the vacated slot
+                        *item           = Memory::Move(*next_item);
+                        next_item->Hash = 0;
+
+                        ++size; // Count the moved live item
+                        break;
+                    }
+
+                    ++next_item; // Advance scan pointer until end or live found
+                } while (next_item < end);
+
+                ++item;
+                ++next_item;
+                continue;
+            }
+
+            // This slot was already live: count and advance
+            ++size;
+            ++item;
+            ++next_item;
+        }
+
+        setSize(size);
+
+        // Reset hash table mapping and rebuild chains to match the new layout
+        Memory::SetToValue(getHashTable(), Capacity(), Capacity());
+
+        generateHash();
+    }
+
+    /**
      * @brief Returns the number of active (non-deleted) items in the hash table.
      *
      * Iterates over the storage array and counts items whose hash value is not zero,
