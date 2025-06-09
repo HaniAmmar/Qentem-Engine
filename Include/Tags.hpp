@@ -21,11 +21,7 @@
 namespace Qentem {
 namespace Tags {
 
-struct MathTag;
-struct SuperVariableTag;
-struct InLineIfTag;
-struct LoopTag;
-struct IfTag;
+struct TagBit;
 //////////////////////
 enum struct TagType : SizeT8 {
     Variable      = 0, // {var:x}
@@ -36,6 +32,79 @@ enum struct TagType : SizeT8 {
     Loop          = 5, // <loop ...></loop>
     If            = 6, // <if case="..."></if>
     None          = 7,
+};
+
+// MathTag -------------------------------------------
+struct MathTag {
+    Array<QExpression> Expressions;
+    SizeT              Offset{0};
+    SizeT              EndOffset{0};
+};
+
+// SuperVariableTag -------------------------------------------
+struct SuperVariableTag {
+    Array<TagBit> SubTags;
+    VariableTag   Variable{};
+    SizeT         Offset{0};
+    SizeT         EndOffset{0};
+};
+
+// InLineIfTag -------------------------------------------
+struct InLineIfTag {
+    Array<QExpression> Case;
+    Array<TagBit>      SubTags;
+    SizeT              Offset{0};
+    SizeT16            Length{0};
+    SizeT16            TrueOffset{0};
+    SizeT16            TrueLength{0};
+    SizeT16            FalseOffset{0};
+    SizeT16            FalseLength{0};
+    SizeT8             TrueTagsStartID{0};
+    SizeT8             FalseTagsStartID{0};
+};
+
+// LoopTagOptions -------------------------------------------
+struct LoopTagOptions {
+    static constexpr SizeT8 None{0};
+    static constexpr SizeT8 SortAscend{2};
+    static constexpr SizeT8 SortDescend{4};
+};
+
+// LoopTagOptions -------------------------------------------
+struct LoopTag {
+    Array<TagBit> SubTags;
+    VariableTag   Set{};
+
+    const LoopTag *Parent{nullptr};
+
+    SizeT Offset{0};
+    SizeT EndOffset{0};
+
+    SizeT16 ContentOffset{0};
+
+    SizeT8 ValueOffset{0};
+    SizeT8 ValueLength{0};
+
+    SizeT8 GroupOffset{0};
+    SizeT8 GroupLength{0};
+
+    SizeT8 Options{0};
+    SizeT8 Level{0};
+};
+
+// IfTagCase --------------------------------------
+struct IfTagCase {
+    Array<QExpression> Case;
+    Array<TagBit>      SubTags;
+    SizeT              Offset{0};
+    SizeT              EndOffset{0};
+};
+
+// IfTag -------------------------------------------
+struct IfTag {
+    Array<IfTagCase> Cases;
+    SizeT            Offset{0};
+    SizeT            EndOffset{0};
 };
 
 struct TagBit {
@@ -258,79 +327,6 @@ struct TagBit {
   private:
     void   *storage_{};
     TagType type_{TagType::None};
-};
-
-// MathTag -------------------------------------------
-struct MathTag {
-    Array<QExpression> Expressions;
-    SizeT              Offset{0};
-    SizeT              EndOffset{0};
-};
-
-// SuperVariableTag -------------------------------------------
-struct SuperVariableTag {
-    Array<TagBit> SubTags;
-    VariableTag   Variable{};
-    SizeT         Offset{0};
-    SizeT         EndOffset{0};
-};
-
-// InLineIfTag -------------------------------------------
-struct InLineIfTag {
-    Array<QExpression> Case;
-    Array<TagBit>      SubTags;
-    SizeT              Offset{0};
-    SizeT16            Length{0};
-    SizeT16            TrueOffset{0};
-    SizeT16            TrueLength{0};
-    SizeT16            FalseOffset{0};
-    SizeT16            FalseLength{0};
-    SizeT8             TrueTagsStartID{0};
-    SizeT8             FalseTagsStartID{0};
-};
-
-// LoopTagOptions -------------------------------------------
-struct LoopTagOptions {
-    static constexpr SizeT8 None{0};
-    static constexpr SizeT8 SortAscend{2};
-    static constexpr SizeT8 SortDescend{4};
-};
-
-// LoopTagOptions -------------------------------------------
-struct LoopTag {
-    Array<TagBit> SubTags;
-    VariableTag   Set{};
-
-    const LoopTag *Parent{nullptr};
-
-    SizeT Offset{0};
-    SizeT EndOffset{0};
-
-    SizeT16 ContentOffset{0};
-
-    SizeT8 ValueOffset{0};
-    SizeT8 ValueLength{0};
-
-    SizeT8 GroupOffset{0};
-    SizeT8 GroupLength{0};
-
-    SizeT8 Options{0};
-    SizeT8 Level{0};
-};
-
-// IfTagCase --------------------------------------
-struct IfTagCase {
-    Array<QExpression> Case;
-    Array<TagBit>      SubTags;
-    SizeT              Offset{0};
-    SizeT              EndOffset{0};
-};
-
-// IfTag -------------------------------------------
-struct IfTag {
-    Array<IfTagCase> Cases;
-    SizeT            Offset{0};
-    SizeT            EndOffset{0};
 };
 
 template <typename, SizeT32>
