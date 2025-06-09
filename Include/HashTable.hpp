@@ -1013,12 +1013,12 @@ struct HashTable {
      * @return Pointer to the newly inserted item in storage.
      */
     HItem_T *insert(SizeT *index, HItem_T &&item) noexcept {
-        HItem_T *item_ptr = (Storage() + Size());         // Next available storage slot
-        *index            = Size();                       // Store 0-based index in hash table slot
-        ++index_;                                         // Increment count after using it
-        Memory::Initialize(item_ptr, Memory::Move(item)); // Move or copy-construct in place
+        HItem_T *item_ptr = (Storage() + Size()); // Next available storage slot
+        *index            = Size();               // Store 0-based index in hash table slot
+        ++index_;                                 // Increment count after using it
+        item.Next = Capacity();                   // End of collision chain
 
-        item_ptr->Next = Capacity(); // End of collision chain
+        Memory::Initialize(item_ptr, Memory::Move(item)); // Move or copy-construct in place
 
         return item_ptr;
     }
@@ -1034,7 +1034,6 @@ struct HashTable {
     HItem_T *insert(SizeT *index, const Key_T &key, const SizeT hash) noexcept {
         HItem_T item;
         item.Hash = hash;
-        item.Next = Capacity();
         item.Key  = key; // Copy key
 
         return insert(index, Memory::Move(item));
@@ -1051,7 +1050,6 @@ struct HashTable {
     HItem_T *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
         HItem_T item;
         item.Hash = hash;
-        item.Next = Capacity();
         item.Key  = Memory::Move(key); // Move key
 
         return insert(index, Memory::Move(item));
@@ -1132,8 +1130,8 @@ struct HashTable {
     void remove(SizeT *index, HItem_T *item) const noexcept {
         if (item != nullptr) {
             *index     = item->Next; // Unlink from hash chain
-            item->Next = Capacity(); // Clear item's hash chain
             item->Hash = 0;          // Mark as deleted
+            item->Next = Capacity(); // Clear item's hash chain
 
             item->Clear(); // Zero/reset user key/value fields
         }
@@ -1200,9 +1198,9 @@ struct HashTable {
 
                     // Re-link the hash table chains for the moved key
                     *right_index = *left_index;
+                    item->Hash   = to_hash;
                     *left_index  = item->Next;
                     item->Next   = Capacity();
-                    item->Hash   = to_hash;
 
                     return item;
                 }
