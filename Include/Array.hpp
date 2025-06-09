@@ -33,7 +33,7 @@ struct Array {
             Type_T *current = allocate();
 
             if (initialize) {
-                Memory::Initialize(current, (current + size));
+                Memory::InitializeRange(current, (current + size));
                 setSize(size);
             }
         }
@@ -232,7 +232,7 @@ struct Array {
             Type_T *current = allocate();
 
             if (initialize) {
-                Memory::Initialize(current, (current + size));
+                Memory::InitializeRange(current, (current + size));
                 setSize(size);
             }
         }
@@ -258,7 +258,7 @@ struct Array {
 
         if (new_size > Size()) {
             Type_T *current = Storage();
-            Memory::Initialize((current + Size()), (current + new_size));
+            Memory::InitializeRange((current + Size()), (current + new_size));
         }
 
         setSize(Capacity());

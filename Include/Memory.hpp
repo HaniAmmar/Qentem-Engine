@@ -301,75 +301,49 @@ struct Memory {
         return pointer;
     }
 
+    template <typename Type_T>
+    QENTEM_INLINE static Type_T *AllocateInit() {
+        Type_T *pointer = Allocate<Type_T>(1);
+        Initialize(pointer);
+        return pointer;
+    }
+
+    // Allocate
+    template <typename Type_T, typename... Values_T>
+    QENTEM_INLINE static Type_T *AllocateInit(Values_T &&...values) noexcept {
+        Type_T *pointer = Allocate<Type_T>(1);
+        Initialize(pointer, Forward<Values_T>(values)...);
+        return pointer;
+    }
+
     // Initializer
     template <typename Type_T>
     QENTEM_INLINE static void Initialize(Type_T *pointer) noexcept {
         new (pointer) Type_T{};
     }
 
-    // Range copy initializer
+    // Forward initializer
+    template <typename Type_T, typename... Values_T>
+    QENTEM_INLINE static void Initialize(Type_T *pointer, Values_T &&...values) noexcept {
+        new (pointer) Type_T{Forward<Values_T>(values)...};
+    }
+
+    // Range default initializer
     template <typename Type_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer, const Type_T *end) noexcept {
+    QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end) noexcept {
         while (pointer < end) {
             new (pointer) Type_T{};
             ++pointer;
         }
     }
 
-    // Move initializer
-    template <typename Type_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer, Type_T &&value) noexcept {
-        new (pointer) Type_T{Move(value)};
-    }
-
-    // Copy initializer
-    template <typename Type_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer, const Type_T &value) {
-        new (pointer) Type_T{value};
-    }
-
-    // Range copy initializer
-    template <typename Type_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer, const Type_T *end, const Type_T &value) {
+    // Range forward initializer
+    template <typename Type_T, typename... Values_T>
+    QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end, Values_T &&...values) {
         while (pointer < end) {
-            new (pointer) Type_T{value};
+            new (pointer) Type_T{Forward<Values_T>(values)...};
             ++pointer;
         }
-    }
-
-    template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void ConstructAt(Type_T *pointer, Values_T &&...values) noexcept {
-        new (pointer) Type_T{Forward<Values_T>(values)...};
-    }
-
-    template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void ConstructAt(Type_T *pointer, const Values_T &...values) noexcept {
-        new (pointer) Type_T{values...};
-    }
-
-    template <typename Type_T>
-    QENTEM_INLINE static Type_T *AllocateInit() {
-        Type_T *pointer = Allocate<Type_T>(1);
-        Initialize(pointer);
-        return pointer;
-        // return new Type_T{};
-    }
-
-    // Allocate and move
-    template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static Type_T *AllocateInit(Values_T &&...values) noexcept {
-        Type_T *pointer = Allocate<Type_T>(1);
-        ConstructAt(pointer, Forward<Values_T>(values)...);
-        return pointer;
-    }
-
-    // Allocate and copy
-    template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static Type_T *AllocateInit(const Values_T &...values) {
-        Type_T *pointer = Allocate<Type_T>(1);
-        ConstructAt(pointer, values...);
-        return pointer;
-        // return new Type_T{values...};
     }
 
     inline static void Deallocate(void *pointer) noexcept {

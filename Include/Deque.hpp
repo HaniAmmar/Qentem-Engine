@@ -394,7 +394,7 @@ struct Deque {
 
             // 3) Initialize contiguous range
             if (end <= Capacity()) {
-                Memory::Initialize((Storage() + start), (Storage() + end));
+                Memory::InitializeRange((Storage() + start), (Storage() + end));
             }
 
             // 4) Update logical size to include the new default-initialized elements
