@@ -18,7 +18,7 @@
 #ifndef QENTEM_TEMPLATE_H
 #define QENTEM_TEMPLATE_H
 
-#include "Finder.hpp"
+#include "PatternFinder.hpp"
 #include "Digit.hpp"
 #include "Tags.hpp"
 #include "StringView.hpp"
@@ -324,7 +324,7 @@ struct TemplateCore {
 
   private:
     static void parse(const Char_T *content, SizeT length, Array<TagBit> &tags_cache) {
-        Finder<Tags::List<Char_T>, Char_T, SizeT> finder{content, length};
+        PatternFinder<Tags::List<Char_T>, Char_T, SizeT> pattern_finder{content, length};
 
         Array<Array<TagBit> *> parent_storage{SizeT{8}};
         Array<TagBit>         *storage{&tags_cache};
@@ -333,9 +333,9 @@ struct TemplateCore {
         SizeT32 match;
         bool    is_child{false};
 
-        finder.NextSegment();
+        pattern_finder.NextSegment();
 
-        while ((match = finder.CurrentMatch()) != 0U) {
+        while ((match = pattern_finder.CurrentMatch()) != 0U) {
             switch (match) {
                 case TagPatterns::LineEndID: {
                     if (is_child && parent_storage.IsNotEmpty()) {
@@ -348,13 +348,13 @@ struct TemplateCore {
                         switch (tag_bit->GetType()) {
                             case TagType::SuperVariable: {
                                 SuperVariableTag &tag = tag_bit->GetSuperVariableTag();
-                                tag.EndOffset         = finder.GetOffset();
+                                tag.EndOffset         = pattern_finder.GetOffset();
                                 break;
                             }
 
                             case TagType::InLineIf: {
                                 InLineIfTag &tag        = tag_bit->GetInLineIfTag();
-                                const SizeT  end_offset = finder.GetOffset();
+                                const SizeT  end_offset = pattern_finder.GetOffset();
                                 const SizeT  true_offset =
                                     tag.TrueOffset; // See the end of 'case TagPatterns::InLineIfID:'
 
@@ -485,19 +485,20 @@ struct TemplateCore {
                         }
                     }
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
                     break;
                 }
 
                 case TagPatterns::VariableID: {
-                    const SizeT offset = finder.GetOffset();
+                    const SizeT offset = pattern_finder.GetOffset();
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
 
-                    if (finder.CurrentMatch() == TagPatterns::LineEndID) {
-                        const SizeT var_length = (((finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
-                                                  // Limit var length to 255 meter per second.;
-                                                  & SizeT{0xFF});
+                    if (pattern_finder.CurrentMatch() == TagPatterns::LineEndID) {
+                        const SizeT var_length =
+                            (((pattern_finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
+                             // Limit var length to 255 meter per second.;
+                             & SizeT{0xFF});
 
                         if (var_length != 0) {
                             VariableTag *tag = (storage->Insert(TagBit{})).MakeVariableTag();
@@ -507,21 +508,22 @@ struct TemplateCore {
                             checkLoopVariable(content, *tag, loop_tag);
                         }
 
-                        finder.NextSegment();
+                        pattern_finder.NextSegment();
                     }
 
                     break;
                 }
 
                 case TagPatterns::RawVariableID: {
-                    const SizeT offset = finder.GetOffset();
+                    const SizeT offset = pattern_finder.GetOffset();
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
 
-                    if (finder.CurrentMatch() == TagPatterns::LineEndID) {
-                        const SizeT var_length = (((finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
-                                                  // Limit var length to 255 meter per second.;
-                                                  & SizeT{0xFF});
+                    if (pattern_finder.CurrentMatch() == TagPatterns::LineEndID) {
+                        const SizeT var_length =
+                            (((pattern_finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
+                             // Limit var length to 255 meter per second.;
+                             & SizeT{0xFF});
 
                         if (var_length != 0) {
                             VariableTag *tag = (storage->Insert(TagBit{})).MakeRawVariableTag();
@@ -531,37 +533,37 @@ struct TemplateCore {
                             checkLoopVariable(content, *tag, loop_tag);
                         }
 
-                        finder.NextSegment();
+                        pattern_finder.NextSegment();
                     }
 
                     break;
                 }
 
                 case TagPatterns::MathID: {
-                    const SizeT offset = finder.GetOffset();
+                    const SizeT offset = pattern_finder.GetOffset();
                     SizeT       end_offset{0};
                     SizeT32     skip_var{0};
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
 
                     while (true) {
-                        match = finder.CurrentMatch();
+                        match = pattern_finder.CurrentMatch();
 
                         if ((match < TagPatterns::MathID) && (match != TagPatterns::LineEndID)) {
-                            finder.NextSegment();
-                            match = finder.CurrentMatch();
+                            pattern_finder.NextSegment();
+                            match = pattern_finder.CurrentMatch();
                             ++skip_var;
                         }
 
                         if (match == TagPatterns::LineEndID) {
                             if (skip_var != 0U) {
-                                finder.NextSegment();
+                                pattern_finder.NextSegment();
                                 --skip_var;
                                 continue;
                             }
 
-                            end_offset = finder.GetOffset();
-                            finder.NextSegment();
+                            end_offset = pattern_finder.GetOffset();
+                            pattern_finder.NextSegment();
                         }
 
                         break;
@@ -579,12 +581,12 @@ struct TemplateCore {
                 }
 
                 case TagPatterns::SuperVariableID: {
-                    SizeT       offset         = finder.GetOffset();
+                    SizeT       offset         = pattern_finder.GetOffset();
                     const SizeT svar_id_offset = offset;
                     const SizeT svar_offset    = (offset - TagPatterns::SuperVariablePrefixLength);
 
-                    finder.NextSegment();
-                    const SizeT end_offset = finder.GetOffset();
+                    pattern_finder.NextSegment();
+                    const SizeT end_offset = pattern_finder.GetOffset();
 
                     while ((offset < end_offset) && (content[offset] != TagPatterns::VariablesSeparatorChar)) {
                         ++offset;
@@ -609,11 +611,11 @@ struct TemplateCore {
                 }
 
                 case TagPatterns::InLineIfID: {
-                    SizeT       offset     = finder.GetOffset();
+                    SizeT       offset     = pattern_finder.GetOffset();
                     const SizeT iif_offset = (offset - TagPatterns::InLineIfPrefixLength);
 
-                    finder.NextSegment();
-                    SizeT end_offset = finder.GetOffset();
+                    pattern_finder.NextSegment();
+                    SizeT end_offset = pattern_finder.GetOffset();
 
                     while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
                         ++offset;
@@ -638,7 +640,7 @@ struct TemplateCore {
 
                             const SizeT case_offset = offset;
 
-                            while ((match = finder.CurrentMatch()) != 0U) {
+                            while ((match = pattern_finder.CurrentMatch()) != 0U) {
                                 while ((offset < end_offset) && (content[offset] != quote_char)) {
                                     ++offset;
                                 }
@@ -647,12 +649,12 @@ struct TemplateCore {
                                     break;
                                 }
 
-                                finder.NextSegment();
-                                match = finder.CurrentMatch();
+                                pattern_finder.NextSegment();
+                                match = pattern_finder.CurrentMatch();
 
                                 if (match == TagPatterns::LineEndID) {
-                                    finder.NextSegment();
-                                    end_offset = finder.GetOffset();
+                                    pattern_finder.NextSegment();
+                                    end_offset = pattern_finder.GetOffset();
                                     continue;
                                 }
 
@@ -679,11 +681,11 @@ struct TemplateCore {
                 }
 
                 case TagPatterns::LoopID: {
-                    SizeT       offset      = finder.GetOffset();
+                    SizeT       offset      = pattern_finder.GetOffset();
                     const SizeT loop_offset = (offset - TagPatterns::LoopPrefixLength);
 
-                    finder.NextSegment();
-                    const SizeT end_offset = finder.GetOffset();
+                    pattern_finder.NextSegment();
+                    const SizeT end_offset = pattern_finder.GetOffset();
 
                     while ((offset < end_offset) && (content[offset] != TagPatterns::MultiLineLastChar)) {
                         ++offset;
@@ -714,23 +716,23 @@ struct TemplateCore {
                         parent_storage.Drop(SizeT{1});
 
                         LoopTag &tag  = storage->Last()->GetLoopTag();
-                        tag.EndOffset = (finder.GetOffset() - TagPatterns::LoopSuffixLength);
+                        tag.EndOffset = (pattern_finder.GetOffset() - TagPatterns::LoopSuffixLength);
                         loop_tag      = tag.Parent;
                     }
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
                     break;
                 }
 
                 case TagPatterns::IfID: {
-                    SizeT       offset    = finder.GetOffset();
+                    SizeT       offset    = pattern_finder.GetOffset();
                     const SizeT if_offset = (offset - TagPatterns::IfPrefixLength);
                     SizeT       case_offset{0};
                     SizeT       case_end_offset{0};
 
                     parseIfCase(content, offset, length, case_offset, case_end_offset);
 
-                    finder.SetOffset(offset);
+                    pattern_finder.SetOffset(offset);
 
                     if (offset < length) {
                         IfTag *tag  = (storage->Insert(TagBit{})).MakeIfTag();
@@ -744,7 +746,7 @@ struct TemplateCore {
                         storage = &(if_case.SubTags);
                     }
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
                     break;
                 }
 
@@ -754,7 +756,7 @@ struct TemplateCore {
                         TagBit        *tag_bit = tmp->Last();
 
                         if (tag_bit->GetType() == TagType::If) {
-                            const SizeT offset = finder.GetOffset();
+                            const SizeT offset = pattern_finder.GetOffset();
                             IfTag      &tag    = tag_bit->GetIfTag();
 
                             tag.Cases.Last()->EndOffset = (offset - TagPatterns::IfSuffixLength);
@@ -765,7 +767,7 @@ struct TemplateCore {
                         }
                     }
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
                     break;
                 }
 
@@ -776,7 +778,7 @@ struct TemplateCore {
 
                         if (tag_bit->GetType() == TagType::If) {
                             IfTag &tag        = tag_bit->GetIfTag();
-                            SizeT  offset     = finder.GetOffset();
+                            SizeT  offset     = pattern_finder.GetOffset();
                             bool   is_if_else = false;
 
                             tag.Cases.Last()->EndOffset = (offset - TagPatterns::ElsePrefixLength);
@@ -798,8 +800,8 @@ struct TemplateCore {
                                 SizeT case_end_offset{0};
 
                                 parseIfCase(content, offset, length, case_offset, case_end_offset);
-                                finder.SetOffset(offset);
-                                finder.NextSegment();
+                                pattern_finder.SetOffset(offset);
+                                pattern_finder.NextSegment();
 
                                 if ((offset < length) && (case_end_offset != 0)) {
                                     if_case.Offset = offset;
@@ -812,8 +814,8 @@ struct TemplateCore {
                                 ++offset;
                                 if_case.Offset = offset;
                                 storage        = &(if_case.SubTags);
-                                finder.SetOffset(offset);
-                                finder.NextSegment();
+                                pattern_finder.SetOffset(offset);
+                                pattern_finder.NextSegment();
                                 break;
                             }
 
@@ -824,7 +826,7 @@ struct TemplateCore {
                         }
                     }
 
-                    finder.NextSegment();
+                    pattern_finder.NextSegment();
                     break;
                 }
 

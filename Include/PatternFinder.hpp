@@ -1,9 +1,9 @@
 /**
- * @file Finder.hpp
+ * @file PatternFinder.hpp
  * @brief Implements a high-performance, multi-pattern string finder for Qentem Engine.
  *
- * This header defines the Finder utility, which enables efficient searching for multiple
- * patterns or delimiters within a string in a single pass. Finder is optimized for
+ * This header defines the PatternFinder utility, which enables efficient searching for multiple
+ * patterns or delimiters within a string in a single pass. PatternFinder is optimized for
  * scenarios requiring simultaneous lookup of several substrings or tokens, making it
  * ideal for template parsing and fast text processing tasks.
  *
@@ -20,15 +20,15 @@
 namespace Qentem {
 
 template <typename WordsList_T, typename Char_T, typename Number_T>
-struct Finder {
-    Finder()                          = delete;
-    Finder(Finder &&)                 = delete;
-    Finder(const Finder &)            = delete;
-    Finder &operator=(Finder &&)      = delete;
-    Finder &operator=(const Finder &) = delete;
-    ~Finder()                         = default;
+struct PatternFinder {
+    PatternFinder()                                 = delete;
+    PatternFinder(PatternFinder &&)                 = delete;
+    PatternFinder(const PatternFinder &)            = delete;
+    PatternFinder &operator=(PatternFinder &&)      = delete;
+    PatternFinder &operator=(const PatternFinder &) = delete;
+    ~PatternFinder()                                = default;
 
-    Finder(const Char_T *content, Number_T length) noexcept : content_{content}, length_{length} {
+    PatternFinder(const Char_T *content, Number_T length) noexcept : content_{content}, length_{length} {
     }
 
     inline void NextSegment() noexcept {
