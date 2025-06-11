@@ -632,61 +632,50 @@ struct HashTable {
     }
 
     /**
-     * @brief Reorders hash table items to ensure all live entries occupy contiguous slots at the start.
+     * @brief Reorders hash table items so that all live entries occupy contiguous slots at the start.
      *
-     * Reorder() performs an in-place deep move of all non-deleted items (Hash != 0), shifting them
-     * forward so that indices [0, N) are densely packed with valid entries and all deleted slots are
-     * pushed to the end. The logical size is updated to match the number of live items.
+     * Reorder() performs an in-place compaction of all non-deleted items (`Hash != 0`), shifting them
+     * forward so that indices `[0, N)` form a dense block of valid entries and all deleted slots are
+     * pushed beyond the logical end. The logical size is updated to match the number of live items.
      *
-     * The hash table mapping is then reset and hash chains are regenerated to correspond to the
-     * new layout. Storage capacity is unchanged, but all item indices and positions may change.
+     * After compaction, the hash table's mapping is reset and hash chains are regenerated to match the
+     * new storage layout. Storage capacity is unchanged, but all item indices and pointers may change.
      *
-     * Usage:
-     *   Call after bulk deletions to ensure items are contiguous, iteration is efficient,
-     *   and no gaps exist in the storage array. Especially useful before exporting or enumerating all items.
+     * @usage
+     *   Call after bulk deletions to ensure items are contiguous and iteration is efficient, with no gaps
+     *   in the storage array. Especially recommended before exporting, serializing, or enumerating all items.
      *
      * @warning
      *   Any pointers or indices to items obtained before calling Reorder() will be invalid after this call.
      *   Use with caution if external code relies on storage layout or indices.
      */
     void Reorder() {
-        HItem_T       *item      = Storage();            // Pointer to current slot to fill
-        HItem_T       *next_item = Storage() + SizeT{1}; // Pointer to next slot to scan ahead
-        const HItem_T *end       = End();                // One past the last logical item
-        SizeT          size      = 0;                    // Counter for live items
+        HItem_T *storage = Storage(); // Pointer to start of item storage array
+        SizeT    index   = 0;         // Current scan position in the array
+        SizeT    size    = 0;         // Next position to place a live item (and final live count)
 
-        while (next_item < end) {
-            if (item->Hash == 0) {
-                // This slot is dead (tombstone): find the next live item to move here
-                do {
-                    if (next_item->Hash != 0) {
-                        // Found a live item: move it forward, zero out the vacated slot
-                        *item           = Memory::Move(*next_item);
-                        next_item->Hash = 0;
+        // Scan all current items in storage
+        while (index < Size()) {
+            // If current slot contains a live item
+            if (storage[index].Hash != 0) {
+                if (index != size) {
+                    HItem_T *item = (storage + index);
+                    storage[size] = Memory::Move(*item); // Move live item to compacted position
+                    item->Hash    = 0;                   // Mark old slot as dead/tombstone
+                }
 
-                        ++size; // Count the moved live item
-                        break;
-                    }
-
-                    ++next_item; // Advance scan pointer until end or live found
-                } while (next_item < end);
-
-                ++item;
-                ++next_item;
-                continue;
+                ++size; // Increment count of live items and next slot for compaction
             }
 
-            // This slot was already live: count and advance
-            ++size;
-            ++item;
-            ++next_item;
+            ++index; // Advance to next storage slot
         }
 
-        setSize(size);
+        setSize(size); // Update logical size to match number of live entries
 
-        // Reset hash table mapping and rebuild chains to match the new layout
+        // Reset all hash table slots to empty
         Memory::SetToValue(getHashTable(), Capacity(), Capacity());
 
+        // Rebuild hash table mapping to match new item layout
         generateHash();
     }
 
