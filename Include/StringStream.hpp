@@ -407,7 +407,11 @@ struct StringStream {
         return str;
     }
 
-    inline Char_T *Storage() const noexcept {
+    inline Char_T *Storage() noexcept {
+        return storage_;
+    }
+
+    inline const Char_T *Storage() const noexcept {
         return storage_;
     }
 
@@ -420,12 +424,20 @@ struct StringStream {
     }
 
     inline const Char_T *First() const noexcept {
-        return Storage();
+        return storage_;
     }
 
-    inline Char_T *Last() const noexcept {
+    inline Char_T *Last() noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Length() - SizeT{1}));
+        }
+
+        return nullptr;
+    }
+
+    inline const Char_T *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (First() + (Length() - SizeT{1}));
         }
 
         return nullptr;

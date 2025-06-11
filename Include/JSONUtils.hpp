@@ -21,11 +21,11 @@
 namespace Qentem {
 
 template <typename, SizeT32>
-struct JSONotationStrings;
+struct JSONLiterals_T;
 
 // char
 template <typename Char_T>
-struct JSONotationStrings<Char_T, 1U> {
+struct JSONLiterals_T<Char_T, 1U> {
     static constexpr const Char_T *FalseString = "false";
     static constexpr const Char_T *TrueString  = "true";
     static constexpr const Char_T *NullString  = "null";
@@ -33,7 +33,7 @@ struct JSONotationStrings<Char_T, 1U> {
 
 // char16_t
 template <typename Char_T>
-struct JSONotationStrings<Char_T, 2U> {
+struct JSONLiterals_T<Char_T, 2U> {
     static constexpr const Char_T *FalseString = u"false";
     static constexpr const Char_T *TrueString  = u"true";
     static constexpr const Char_T *NullString  = u"null";
@@ -41,7 +41,7 @@ struct JSONotationStrings<Char_T, 2U> {
 
 // char32_t
 template <typename Char_T>
-struct JSONotationStrings<Char_T, 4U> {
+struct JSONLiterals_T<Char_T, 4U> {
     static constexpr const Char_T *FalseString = U"false";
     static constexpr const Char_T *TrueString  = U"true";
     static constexpr const Char_T *NullString  = U"null";
@@ -49,7 +49,7 @@ struct JSONotationStrings<Char_T, 4U> {
 
 // wchar_t size = 4
 template <>
-struct JSONotationStrings<wchar_t, 4U> {
+struct JSONLiterals_T<wchar_t, 4U> {
     static constexpr const wchar_t *FalseString = L"false";
     static constexpr const wchar_t *TrueString  = L"true";
     static constexpr const wchar_t *NullString  = L"null";
@@ -57,7 +57,7 @@ struct JSONotationStrings<wchar_t, 4U> {
 
 // wchar_t size = 2
 template <>
-struct JSONotationStrings<wchar_t, 2U> {
+struct JSONLiterals_T<wchar_t, 2U> {
     static constexpr const wchar_t *FalseString = L"false";
     static constexpr const wchar_t *TrueString  = L"true";
     static constexpr const wchar_t *NullString  = L"null";
@@ -65,18 +65,18 @@ struct JSONotationStrings<wchar_t, 2U> {
 
 struct JSONUtils {
     template <typename>
-    struct Notation_T;
+    struct NotationConstants;
 
     template <typename Char_T, typename Stream_T>
     static SizeT UnEscape(const Char_T *content, SizeT length, Stream_T &stream) {
-        using JSONotation = Notation_T<Char_T>;
+        using NotationConstants = NotationConstants_T<Char_T>;
 
         SizeT offset  = 0;
         SizeT offset2 = 0;
 
         while (offset < length) {
             switch (content[offset]) {
-                case JSONotation::QuoteChar: {
+                case NotationConstants::QuoteChar: {
                     if (stream.IsNotEmpty()) {
                         stream.Write((content + offset2), (offset - offset2));
                     }
@@ -85,7 +85,7 @@ struct JSONUtils {
                     return offset;
                 }
 
-                case JSONotation::BSlashChar: {
+                case NotationConstants::BSlashChar: {
                     stream.Write((content + offset2), (offset - offset2));
 
                     ++offset;
@@ -94,40 +94,40 @@ struct JSONUtils {
                     const Char_T ch = content[offset];
 
                     switch (ch) {
-                        case JSONotation::QuoteChar:
-                        case JSONotation::BSlashChar:
-                        case JSONotation::SlashChar: {
+                        case NotationConstants::QuoteChar:
+                        case NotationConstants::BSlashChar:
+                        case NotationConstants::SlashChar: {
                             stream += ch;
                             break;
                         }
 
-                        case JSONotation::B_Char: {
-                            stream += JSONotation::BackSpaceControlChar;
+                        case NotationConstants::B_Char: {
+                            stream += NotationConstants::BackSpaceControlChar;
                             break;
                         }
 
-                        case JSONotation::T_Char: {
-                            stream += JSONotation::TabControlChar;
+                        case NotationConstants::T_Char: {
+                            stream += NotationConstants::TabControlChar;
                             break;
                         }
 
-                        case JSONotation::N_Char: {
-                            stream += JSONotation::LineControlChar;
+                        case NotationConstants::N_Char: {
+                            stream += NotationConstants::LineControlChar;
                             break;
                         }
 
-                        case JSONotation::F_Char: {
-                            stream += JSONotation::FormfeedControlChar;
+                        case NotationConstants::F_Char: {
+                            stream += NotationConstants::FormfeedControlChar;
                             break;
                         }
 
-                        case JSONotation::R_Char: {
-                            stream += JSONotation::CarriageControlChar;
+                        case NotationConstants::R_Char: {
+                            stream += NotationConstants::CarriageControlChar;
                             break;
                         }
 
-                        case JSONotation::CU_Char:
-                        case JSONotation::U_Char: {
+                        case NotationConstants::CU_Char:
+                        case NotationConstants::U_Char: {
                             ++offset;
 
                             if ((length - offset) > SizeT{3}) {
@@ -167,9 +167,9 @@ struct JSONUtils {
                     break;
                 }
 
-                case JSONotation::LineControlChar:
-                case JSONotation::TabControlChar:
-                case JSONotation::CarriageControlChar: {
+                case NotationConstants::LineControlChar:
+                case NotationConstants::TabControlChar:
+                case NotationConstants::CarriageControlChar: {
                     return 0;
                 }
 
@@ -189,7 +189,7 @@ struct JSONUtils {
 
     template <typename Char_T, typename Stream_T>
     static void Escape(const Char_T *content, SizeT length, Stream_T &stream) {
-        using JSONotation = Notation_T<Char_T>;
+        using NotationConstants = NotationConstants_T<Char_T>;
 
         SizeT offset  = 0;
         SizeT offset2 = 0;
@@ -198,12 +198,12 @@ struct JSONUtils {
             const Char_T ch = content[offset];
 
             switch (ch) {
-                case JSONotation::QuoteChar:
-                case JSONotation::BSlashChar:
-                case JSONotation::SlashChar: {
+                case NotationConstants::QuoteChar:
+                case NotationConstants::BSlashChar:
+                case NotationConstants::SlashChar: {
                     stream.Write((content + offset2), (offset - offset2));
 
-                    stream += JSONotation::BSlashChar;
+                    stream += NotationConstants::BSlashChar;
                     offset2 = offset;
                     ++offset2;
 
@@ -211,18 +211,18 @@ struct JSONUtils {
                     break;
                 }
 
-                case JSONotation::BackSpaceControlChar:
-                case JSONotation::TabControlChar:
-                case JSONotation::LineControlChar:
-                case JSONotation::FormfeedControlChar:
-                case JSONotation::CarriageControlChar: {
+                case NotationConstants::BackSpaceControlChar:
+                case NotationConstants::TabControlChar:
+                case NotationConstants::LineControlChar:
+                case NotationConstants::FormfeedControlChar:
+                case NotationConstants::CarriageControlChar: {
                     stream.Write((content + offset2), (offset - offset2));
 
-                    stream += JSONotation::BSlashChar;
+                    stream += NotationConstants::BSlashChar;
                     offset2 = offset;
                     ++offset2;
 
-                    stream += JSONotation::GetReplacementChar(SizeT32(ch));
+                    stream += NotationConstants::GetReplacementChar(SizeT32(ch));
                     break;
                 }
 
@@ -257,7 +257,7 @@ struct JSONUtils {
         SizeT offset         = 0;     // Current scan position
         SizeT comment_offset = 0;     // Start of current comment region to remove
         SizeT comment_end    = 0;     // End of current comment region to remove
-        SizeT diff           = 0;     // Tracks total bytes removed so far
+        SizeT total_removed  = 0;     // Tracks total bytes removed so far
         bool  inside_text    = false; // True if currently inside a string literal
 
         // Scan through the buffer
@@ -291,7 +291,7 @@ struct JSONUtils {
                             if (comment_end != 0) {
                                 SizeT previous_comment     = comment_offset;
                                 SizeT previous_comment_end = comment_end;
-                                diff                       = (comment_end - comment_offset);
+                                total_removed              = (comment_end - comment_offset);
 
                                 // Shift tail to close up previous comment gap
                                 while (previous_comment_end < tmp) {
@@ -301,7 +301,7 @@ struct JSONUtils {
                                 }
                             }
 
-                            comment_offset = (tmp - diff);
+                            comment_offset = (tmp - total_removed);
 
                             if (str[offset] == '/') {
                                 // Inline comment: skip to end of line
@@ -344,12 +344,14 @@ struct JSONUtils {
         string.StepBack(comment_end - comment_offset);
     }
 
+    /**
+     * @brief Holds all constant characters and canonical string literals used in JSON notation.
+     *
+     * Provides compile-time access to structural and escape characters for any character type.
+     * Delegates canonical "true", "false", and "null" strings to JSONLiterals_T.
+     */
     template <typename Char_T>
-    struct Notation_T {
-      private:
-        static constexpr SizeT32 size_ = sizeof(Char_T);
-
-      public:
+    struct NotationConstants_T {
         static constexpr Char_T QuoteChar    = '"';
         static constexpr Char_T CommaChar    = ',';
         static constexpr Char_T ColonChar    = ':';
@@ -369,8 +371,8 @@ struct JSONUtils {
         static constexpr Char_T FormfeedControlChar  = '\f';
         static constexpr Char_T CarriageControlChar  = '\r';
 
-        static Char_T GetReplacementChar(SizeT32 index) noexcept {
-            static constexpr Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
+        static constexpr Char_T GetReplacementChar(SizeT32 index) noexcept {
+            constexpr Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
 
             return ReplaceList[index];
         }
@@ -384,13 +386,13 @@ struct JSONUtils {
         static constexpr Char_T CU_Char = 'U';
 
         static constexpr SizeT         TrueStringLength = SizeT{4};
-        static constexpr const Char_T *TrueString       = &(JSONotationStrings<Char_T, size_>::TrueString[0]);
+        static constexpr const Char_T *TrueString       = &(JSONLiterals_T<Char_T, sizeof(Char_T)>::TrueString[0]);
 
         static constexpr SizeT         FalseStringLength = SizeT{5};
-        static constexpr const Char_T *FalseString       = &(JSONotationStrings<Char_T, size_>::FalseString[0]);
+        static constexpr const Char_T *FalseString       = &(JSONLiterals_T<Char_T, sizeof(Char_T)>::FalseString[0]);
 
         static constexpr SizeT         NullStringLength = SizeT{4};
-        static constexpr const Char_T *NullString       = &(JSONotationStrings<Char_T, size_>::NullString[0]);
+        static constexpr const Char_T *NullString       = &(JSONLiterals_T<Char_T, sizeof(Char_T)>::NullString[0]);
     };
 };
 

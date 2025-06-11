@@ -66,7 +66,7 @@ struct JSON {
         }
 
       private:
-        using notation = JSONUtils::Notation_T<Char_T>;
+        using NotationConstants = JSONUtils::NotationConstants_T<Char_T>;
 
         static ValueT parseObject(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
             using ObjectT = typename ValueT::ObjectT;
@@ -75,10 +75,10 @@ struct JSON {
 
             ValueT value{ValueType::Object};
 
-            if (content[offset] != notation::ECurlyChar) {
+            if (content[offset] != NotationConstants::ECurlyChar) {
                 ObjectT *obj = value.GetObject();
 
-                while (offset < end && (content[offset] == notation::QuoteChar)) {
+                while (offset < end && (content[offset] == NotationConstants::QuoteChar)) {
                     ++offset;
                     const Char_T *str = (content + offset);
                     SizeT         len = JSONUtils::UnEscape(str, end, stream);
@@ -95,7 +95,7 @@ struct JSON {
 
                         StringUtils::TrimLeft(content, offset, end);
 
-                        if (content[offset] == notation::ColonChar) {
+                        if (content[offset] == NotationConstants::ColonChar) {
                             ++offset;
                             StringUtils::TrimLeft(content, offset, end);
                             String<Char_T> key{str, len};
@@ -105,13 +105,13 @@ struct JSON {
                             if (offset < end) {
                                 const Char_T c = content[offset];
 
-                                if (c == notation::CommaChar) {
+                                if (c == NotationConstants::CommaChar) {
                                     ++offset;
                                     StringUtils::TrimLeft(content, offset, end);
                                     continue;
                                 }
 
-                                if (c == notation::ECurlyChar) {
+                                if (c == NotationConstants::ECurlyChar) {
                                     ++offset;
                                     return value;
                                 }
@@ -134,7 +134,7 @@ struct JSON {
 
             ValueT value{ValueType::Array};
 
-            if (content[offset] != notation::ESquareChar) {
+            if (content[offset] != NotationConstants::ESquareChar) {
                 Array<ValueT> *arr = value.GetArray();
 
                 while (offset < end) {
@@ -144,13 +144,13 @@ struct JSON {
                     if (offset < end) {
                         const Char_T ch = content[offset];
 
-                        if (ch == notation::CommaChar) {
+                        if (ch == NotationConstants::CommaChar) {
                             ++offset;
                             StringUtils::TrimLeft(content, offset, end);
                             continue;
                         }
 
-                        if (ch == notation::ESquareChar) {
+                        if (ch == NotationConstants::ESquareChar) {
                             ++offset;
                             return value;
                         }
@@ -168,17 +168,17 @@ struct JSON {
 
         static ValueT parseValue(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
             switch (content[offset]) {
-                case notation::SCurlyChar: {
+                case NotationConstants::SCurlyChar: {
                     ++offset;
                     return parseObject(stream, content, offset, end);
                 }
 
-                case notation::SSquareChar: {
+                case NotationConstants::SSquareChar: {
                     ++offset;
                     return parseArray(stream, content, offset, end);
                 }
 
-                case notation::QuoteChar: {
+                case NotationConstants::QuoteChar: {
                     ++offset;
 
                     const Char_T *str = (content + offset);
@@ -200,8 +200,8 @@ struct JSON {
                     break;
                 }
 
-                case notation::T_Char: {
-                    const Char_T *true_string = (notation::TrueString + 1U);
+                case NotationConstants::T_Char: {
+                    const Char_T *true_string = (NotationConstants::TrueString + 1U);
 
                     ++offset;
 
@@ -217,8 +217,8 @@ struct JSON {
                     break;
                 }
 
-                case notation::F_Char: {
-                    const Char_T *false_string = (notation::FalseString + 1U);
+                case NotationConstants::F_Char: {
+                    const Char_T *false_string = (NotationConstants::FalseString + 1U);
 
                     ++offset;
 
@@ -234,8 +234,8 @@ struct JSON {
                     break;
                 }
 
-                case notation::N_Char: {
-                    const Char_T *null_string = (notation::NullString + 1U);
+                case NotationConstants::N_Char: {
+                    const Char_T *null_string = (NotationConstants::NullString + 1U);
 
                     ++offset;
 

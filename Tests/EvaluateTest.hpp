@@ -40,7 +40,7 @@ QENTEM_NOINLINE static bool TestEvaluate(QNumber64 &number, const char *content,
     QExpression              result;
 
     if (temp.Evaluate(result, exprs, value)) {
-        number = result.Value.Number;
+        number = result.ExprValue.Number;
         return true;
     }
 

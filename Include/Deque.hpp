@@ -65,7 +65,7 @@ struct Deque {
      * @param src Source deque to move from.
      */
     Deque(Deque &&src) noexcept
-        : storage_{src.storage_}, index_{src.index_}, head_{src.head_}, pop_count_{src.pop_count_},
+        : storage_{src.storage_}, size_{src.size_}, head_{src.head_}, pop_count_{src.pop_count_},
           capacity_{src.capacity_} {
         src.clearStorage();
         src.setSize(0);
@@ -481,7 +481,7 @@ struct Deque {
     }
 
     SizeT Size() const noexcept {
-        return index_;
+        return size_;
     }
 
     /**
@@ -522,7 +522,7 @@ struct Deque {
     }
 
     inline void setSize(SizeT new_size) noexcept {
-        index_ = new_size;
+        size_ = new_size;
     }
 
     inline void setHead(SizeT new_head) noexcept {
@@ -612,7 +612,7 @@ struct Deque {
 
     // Underlying buffer pointer and indices
     Type_T *storage_{nullptr};
-    SizeT   index_{0};
+    SizeT   size_{0};
     SizeT   head_{0};
     SizeT   pop_count_{0};
     SizeT   capacity_{0};

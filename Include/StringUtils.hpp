@@ -156,7 +156,7 @@ struct StringUtils {
     }
 
     template <typename Char_T>
-    static SizeT Hash(const Char_T *key, SizeT length) noexcept {
+    static SizeT Hash(const Char_T *str, SizeT length) noexcept {
         constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
 
         SizeT hash   = SizeT{11};
@@ -164,14 +164,14 @@ struct StringUtils {
         SizeT offset = 0;
 
         while (offset < length) {
-            hash += SizeT(base * offset * SizeT(key[offset]));
+            hash += SizeT(base * offset * SizeT(str[offset]));
             base += offset;
 
             if (offset != length) {
                 hash *= (length ^ offset);
                 base += offset;
                 --length;
-                hash += SizeT(key[length]);
+                hash += SizeT(str[length]);
             }
 
             ++offset;

@@ -135,7 +135,7 @@ struct HashTable {
      * @param src HashTable to move from.
      */
     inline HashTable(HashTable &&src) noexcept
-        : hashTable_{src.hashTable_}, index_{src.index_}, capacity_{src.capacity_} {
+        : hashTable_{src.hashTable_}, size_{src.size_}, capacity_{src.capacity_} {
         src.setSize(0);
         src.setCapacity(0);
         src.clearHashTable();
@@ -333,10 +333,8 @@ struct HashTable {
      */
     inline bool Has(const Key_T &key) const noexcept {
         if (IsNotEmpty()) {
-            SizeT   *index;
-            HItem_T *item = find(index, key); // Look up item by key.
-
-            return (item != nullptr); // Return true if found, false if not.
+            SizeT index;
+            return (find(index, key) != nullptr); // Return true if found, false if not.
         }
 
         return false; // Table is empty.
@@ -348,8 +346,8 @@ struct HashTable {
      * @param index The array-style index to access.
      * @return Pointer to the key at the given index, or nullptr if index is invalid or empty.
      */
-    inline const Key_T *GetKey(const SizeT index) const noexcept {
-        const HItem_T *src = Storage();
+    inline const Key_T *GetKeyAt(const SizeT index) const noexcept {
+        const HItem_T *src = First();
 
         // Check bounds and ensure this slot is not deleted.
         if ((index < Size()) && ((src + index)->Hash != 0)) {
@@ -365,14 +363,19 @@ struct HashTable {
      * @param key The key to find.
      * @return Pointer to the found item, or nullptr if not found.
      */
+    inline HItem_T *GetItem(const Key_T &key) noexcept {
+        if (IsNotEmpty()) {
+            SizeT *index;
+            return find(index, key);
+        }
+
+        return nullptr; // Not found or table is empty.
+    }
+
     inline const HItem_T *GetItem(const Key_T &key) const noexcept {
         if (IsNotEmpty()) {
-            SizeT         *index;
-            const HItem_T *item = find(index, key);
-
-            if (item != nullptr) {
-                return item;
-            }
+            SizeT index;
+            return find(index, key);
         }
 
         return nullptr; // Not found or table is empty.
@@ -384,8 +387,25 @@ struct HashTable {
      * @param index The array-style index to access.
      * @return Pointer to the item at the given index, or nullptr if index is invalid or empty.
      */
-    inline const HItem_T *GetItem(const SizeT index) const noexcept {
-        const HItem_T *src = Storage();
+    inline HItem_T *GetItemAt(const SizeT index) noexcept {
+        HItem_T *src = Storage();
+
+        // Check bounds and ensure this slot is not deleted.
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
+            return (src + index);
+        }
+
+        return nullptr; // Not found or empty.
+    }
+
+    /**
+     * @brief Retrieves an item by its array index.
+     *
+     * @param index The array-style index to access.
+     * @return Const pointer to the item at the given index, or nullptr if index is invalid or empty.
+     */
+    inline const HItem_T *GetItemAt(const SizeT index) const noexcept {
+        const HItem_T *src = First();
 
         // Check bounds and ensure this slot is not deleted.
         if ((index < Size()) && ((src + index)->Hash != 0)) {
@@ -406,12 +426,8 @@ struct HashTable {
      */
     inline bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
         if (IsNotEmpty()) {
-            SizeT *hash_index;
-
-            if (find(hash_index, key) != nullptr) {
-                index = *hash_index;
-                return true;
-            }
+            find(index, key);
+            return (index != Capacity());
         }
 
         return false; // Key not found or table is empty.
@@ -424,7 +440,7 @@ struct HashTable {
      *
      * @param key The key to remove.
      */
-    inline void Remove(const Key_T &key) const noexcept {
+    inline void Remove(const Key_T &key) noexcept {
         remove(key); // Dispatch to private remove logic.
     }
 
@@ -435,7 +451,7 @@ struct HashTable {
      *
      * @param index The array-style index of the item to remove.
      */
-    inline void RemoveAt(const SizeT index) const noexcept {
+    inline void RemoveAt(const SizeT index) noexcept {
         // Only act if index is within bounds.
         if (index < Size()) {
             HItem_T *item = (Storage() + index);
@@ -478,7 +494,7 @@ struct HashTable {
      * @param to   The new key name (const lvalue).
      * @return true if renaming is successful; false otherwise.
      */
-    inline bool Rename(const Key_T &from, const Key_T &to) const {
+    inline bool Rename(const Key_T &from, const Key_T &to) {
         HItem_T *item = prepareRename(from, to); // Unlink and ready for new key
         if (item != nullptr) {
             item->Key = to; // Copy-assign new key
@@ -693,7 +709,7 @@ struct HashTable {
      * Used by Compress() and other memory management routines to optimize storage.
      */
     SizeT ActualSize() const noexcept {
-        const HItem_T *item = Storage();       // Pointer to start of item storage
+        const HItem_T *item = First();         // Pointer to start of item storage
         const HItem_T *end  = (item + Size()); // Pointer to end of logical array
         SizeT          size = 0;               // Live item counter
 
@@ -716,7 +732,7 @@ struct HashTable {
      * @return Number of items (live + logically deleted).
      */
     inline SizeT Size() const noexcept {
-        return index_;
+        return size_;
     }
 
     /**
@@ -739,8 +755,20 @@ struct HashTable {
      *
      * @return Pointer to the start of item storage.
      */
-    inline HItem_T *Storage() const noexcept {
+    inline HItem_T *Storage() noexcept {
         return Memory::ChangePointer<HItem_T>(getHashTable() + Capacity());
+    }
+
+    /**
+     * @brief Returns a pointer to the first storage slot.
+     *
+     * Converts the base hash table pointer to a pointer to the first
+     * HItem_T object in the underlying storage array.
+     *
+     * @return Const pointer to the start of item storage.
+     */
+    inline const HItem_T *Storage() const noexcept {
+        return Memory::ChangePointer<const HItem_T>(getHashTable() + Capacity());
     }
 
     /**
@@ -751,7 +779,7 @@ struct HashTable {
      * @return Pointer to the first item.
      */
     inline const HItem_T *First() const noexcept {
-        return Storage();
+        return Memory::ChangePointer<const HItem_T>(getHashTable() + Capacity());
     }
 
     /**
@@ -761,9 +789,23 @@ struct HashTable {
      *
      * @return Pointer to last item, or nullptr if empty.
      */
-    inline HItem_T *Last() const noexcept {
+    inline HItem_T *Last() noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - SizeT{1}));
+        }
+        return nullptr;
+    }
+
+    /**
+     * @brief Returns a pointer to the last valid item.
+     *
+     * Returns nullptr if the table is empty.
+     *
+     * @return Const pointer to last item, or nullptr if empty.
+     */
+    inline const HItem_T *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (First() + (Size() - SizeT{1}));
         }
         return nullptr;
     }
@@ -827,7 +869,6 @@ struct HashTable {
         return (Storage() + Size());
     }
 
-    //////////// Private ////////////
   protected:
     /**
      * @brief Returns the mask value for the hash table base.
@@ -901,7 +942,16 @@ struct HashTable {
      *
      * @return Pointer to the start of the hash table segment.
      */
-    inline SizeT *getHashTable() const noexcept {
+    inline SizeT *getHashTable() noexcept {
+        return hashTable_;
+    }
+
+    /**
+     * @brief Get const pointer to the internal hash table.
+     *
+     * @return Pointer to the start of the hash table segment.
+     */
+    inline const SizeT *getHashTable() const noexcept {
         return hashTable_;
     }
 
@@ -920,7 +970,7 @@ struct HashTable {
      * @param new_size New size to set.
      */
     inline void setSize(const SizeT new_size) noexcept {
-        index_ = new_size;
+        size_ = new_size;
     }
 
     /**
@@ -953,7 +1003,7 @@ struct HashTable {
             if (item->Hash != 0) {                                // Only copy live items
                 Memory::Initialize(storage, Memory::Move(*item)); // Move construct in new storage
                 ++storage;
-                ++index_; // Increment current count
+                ++size_; // Increment current count
             }
             ++item;
         }
@@ -975,16 +1025,18 @@ struct HashTable {
     /**
      * @brief Finds an item in the hash table by key and explicit hash value.
      *
-     * This function performs a lookup by walking the collision chain for the given hash.
-     * If a matching key is found (with the same hash and actual key match), the item pointer is returned.
+     * Performs a lookup by traversing the collision chain for the given hash value.
+     * If a matching key is found (matching both hash and actual key), returns a pointer to the item.
+     * Otherwise, updates the index pointer to where a new item could be inserted.
      *
-     * @param[out] index Pointer to the slot in the hash table chain where the item is found or would be inserted.
-     * @param[in]  key   The key to look up.
-     * @param[in]  hash  The precomputed hash value for this key.
-     * @return Pointer to the found item if present, nullptr if not found.
+     * @tparam KeyType_T  The type of key used for lookup.
+     * @param[out] index  Pointer to the slot in the hash table chain where the item is found or would be inserted.
+     * @param[in]  key    The key to look up.
+     * @param[in]  hash   The precomputed hash value for this key.
+     * @return Pointer to the found item if present; nullptr if not found.
      */
     template <typename KeyType_T>
-    HItem_T *find(SizeT *&index, const KeyType_T &key, const SizeT hash) const noexcept {
+    HItem_T *find(SizeT *&index, const KeyType_T &key, const SizeT hash) noexcept {
         SizeT *ht = getHashTable();
 
         // Storage area starts after hash table area.
@@ -993,7 +1045,8 @@ struct HashTable {
         // Compute index in hash table using base mask.
         index = (ht + (hash & getBase()));
 
-        while (*index != Capacity()) { // While this slot is linked to a valid item...
+        // Traverse the collision chain for this hash bucket.
+        while (*index != Capacity()) {
             item = (storage + *index);
 
             // Check for hash and key equality using KeyUtils.
@@ -1008,47 +1061,134 @@ struct HashTable {
     }
 
     /**
-     * @brief Find the item matching a given key, using the default hash computation.
+     * @brief Finds a const item in the hash table by key and explicit hash value.
      *
-     * Computes the hash for the given key, then performs a lookup in the hash table.
+     * Performs a const lookup by traversing the collision chain for the given hash value.
+     * If a matching key is found (matching both hash and actual key), sets out_index and returns a pointer to the item.
+     * Otherwise, sets out_index to Capacity() and returns nullptr.
      *
-     * @param[out] index Pointer to the slot in the hash table chain, updated to the location found (or null if not
-     * found).
-     * @param[in] key The key to look up.
-     * @return Pointer to the matching item if found, nullptr otherwise.
+     * @tparam KeyType_T   The type of key used for lookup.
+     * @param[out] out_index Output reference to the slot index where the item is found.
+     * @param[in]  key      The key to look up.
+     * @param[in]  hash     The precomputed hash value for this key.
+     * @return Const pointer to the found item if present; nullptr if not found.
      */
-    HItem_T *find(SizeT *&index, const Key_T &key) const noexcept {
+    template <typename KeyType_T>
+    const HItem_T *find(SizeT &out_index, const KeyType_T &key, const SizeT hash) const noexcept {
+        const SizeT *ht = getHashTable();
+
+        // Storage area starts after hash table area.
+        const HItem_T *storage = Memory::ChangePointer<HItem_T>(ht + Capacity());
+        const HItem_T *item;
+        // Compute index in hash table using base mask.
+        const SizeT *index = (ht + (hash & getBase()));
+
+        // Traverse the collision chain for this hash bucket.
+        while (*index != Capacity()) {
+            item = (storage + *index);
+
+            // Check for hash and key equality using KeyUtils.
+            if (KeyUtils_T::IsEqual(hash, item->Hash, key, item->Key)) {
+                out_index = *index;
+                return item; // Match found!
+            }
+
+            index = &(item->Next); // Follow the collision chain.
+        }
+
+        // Not found: set out_index to Capacity() to indicate failure.
+        out_index = Capacity();
+        return nullptr;
+    }
+
+    /**
+     * @brief Finds an item in the hash table matching a given key, using default hash computation.
+     *
+     * Computes the hash for the key, then performs a lookup in the hash table.
+     *
+     * @param[out] index Pointer to the slot in the hash table chain, updated to the location where the item is found,
+     *                   or where a new item would be inserted if not found.
+     * @param[in]  key   The key to look up.
+     * @return Pointer to the matching item if found; nullptr otherwise.
+     */
+    HItem_T *find(SizeT *&index, const Key_T &key) noexcept {
         // Delegate to the main find(), using the computed hash for this key
         return find(index, key, KeyUtils_T::Hash(key));
     }
 
     /**
-     * @brief Compute the hash for a given key and perform a lookup, also returning the hash.
+     * @brief Finds a const item in the hash table matching a given key, using default hash computation.
+     *
+     * Computes the hash for the key, then performs a const lookup in the hash table.
+     *
+     * @param[out] index Reference to the slot index in the hash table chain, updated to where the item is found
+     *                   or where it would be inserted if not found.
+     * @param[in]  key   The key to look up.
+     * @return Const pointer to the matching item if found; nullptr otherwise.
+     */
+    const HItem_T *find(SizeT &index, const Key_T &key) const noexcept {
+        // Delegate to the main find(), using the computed hash for this key
+        return find(index, key, KeyUtils_T::Hash(key));
+    }
+
+    /**
+     * @brief Finds an item in the table by an item reference (using its stored key and hash).
+     *
+     * Useful when you already have an item and wish to find its slot in the table,
+     * leveraging the item's existing key and hash.
+     *
+     * @param[out] index Pointer to the slot in the hash table chain.
+     * @param[in]  item  The item to search for (provides both key and hash).
+     * @return Pointer to the matching item if found; nullptr otherwise.
+     */
+    inline HItem_T *find(SizeT *&index, const HItem_T &item) noexcept {
+        // Lookup using the item's key and its precomputed hash value
+        return find(index, item.Key, item.Hash);
+    }
+
+    /**
+     * @brief Finds a const item in the table by an item reference (using its stored key and hash).
+     *
+     * Useful when you already have an item and wish to find its slot in the table,
+     * leveraging the item's existing key and hash.
+     *
+     * @param[out] index Reference to the slot in the hash table chain.
+     * @param[in]  item  The item to search for (provides both key and hash).
+     * @return Const pointer to the matching item if found; nullptr otherwise.
+     */
+    inline const HItem_T *find(SizeT &index, const HItem_T &item) const noexcept {
+        // Lookup using the item's key and its precomputed hash value
+        return find(index, item.Key, item.Hash);
+    }
+
+    /**
+     * @brief Computes the hash for a given key and performs a lookup, also returning the hash.
      *
      * This helper is used when the caller wants both the computed hash and the item pointer.
      *
      * @param[out] index Pointer to the slot in the hash table chain, updated by the search.
      * @param[in]  key   The key to look up.
      * @param[out] hash  The computed hash value for this key.
-     * @return Pointer to the matching item if found, nullptr otherwise.
+     * @return Pointer to the matching item if found; nullptr otherwise.
      */
-    HItem_T *hashAndFind(SizeT *&index, const Key_T &key, SizeT &hash) const noexcept {
+    HItem_T *hashAndFind(SizeT *&index, const Key_T &key, SizeT &hash) noexcept {
         hash = KeyUtils_T::Hash(key);  // Compute hash for the key
         return find(index, key, hash); // Lookup with explicit hash
     }
 
     /**
-     * @brief Find an item in the table by an item reference (using its stored key and hash).
+     * @brief Computes the hash for a given key and performs a lookup, also returning the hash.
      *
-     * This is useful when you already have an item and want to find its slot in the table.
+     * This helper is used when the caller wants both the computed hash and the item pointer.
      *
-     * @param[out] index Pointer to the slot in the hash table chain.
-     * @param[in] item   The item to search for (provides both key and hash).
-     * @return Pointer to the matching item if found, nullptr otherwise.
+     * @param[out] index Reference to the slot in the hash table chain, updated by the search.
+     * @param[in]  key   The key to look up.
+     * @param[out] hash  The computed hash value for this key.
+     * @return Const pointer to the matching item if found; nullptr otherwise.
      */
-    inline HItem_T *find(SizeT *&index, const HItem_T &item) const noexcept {
-        // Lookup using the item's key and its precomputed hash value
-        return find(index, item.Key, item.Hash);
+    const HItem_T *hashAndFind(SizeT &index, const Key_T &key, SizeT &hash) const noexcept {
+        hash = KeyUtils_T::Hash(key);  // Compute hash for the key
+        return find(index, key, hash); // Lookup with explicit hash
     }
 
     /**
@@ -1063,7 +1203,7 @@ struct HashTable {
     HItem_T *insert(SizeT *index, HItem_T &&item) noexcept {
         HItem_T *item_ptr = (Storage() + Size()); // Next available storage slot
         *index            = Size();               // Store 0-based index in hash table slot
-        ++index_;                                 // Increment count after using it
+        ++size_;                                  // Increment count after using it
         item.Next = Capacity();                   // End of collision chain
 
         Memory::Initialize(item_ptr, Memory::Move(item)); // Move or copy-construct in place
@@ -1175,7 +1315,7 @@ struct HashTable {
      * @param[in,out] index Pointer to the hash slot that points to this item.
      * @param[in,out] item  Pointer to the item to remove.
      */
-    void remove(SizeT *index, HItem_T *item) const noexcept {
+    void remove(SizeT *index, HItem_T *item) noexcept {
         if (item != nullptr) {
             *index     = item->Next; // Unlink from hash chain
             item->Hash = 0;          // Mark as deleted
@@ -1193,7 +1333,7 @@ struct HashTable {
      *
      * @param[in,out] item Pointer to the item to remove.
      */
-    void remove(HItem_T *item) const noexcept {
+    void remove(HItem_T *item) noexcept {
         if (IsNotEmpty()) {
             SizeT *index;
             find(index, *item); // Locate the slot for this item
@@ -1209,7 +1349,7 @@ struct HashTable {
      *
      * @param[in] key The key of the item to remove.
      */
-    void remove(const Key_T &key) const noexcept {
+    void remove(const Key_T &key) noexcept {
         if (IsNotEmpty()) {
             SizeT   *index;
             HItem_T *item = find(index, key); // Find by key
@@ -1228,7 +1368,7 @@ struct HashTable {
      * @param to   The destination key that must not already exist.
      * @return Pointer to the item if rename is possible and links are updated, nullptr otherwise.
      */
-    inline HItem_T *prepareRename(const Key_T &from, const Key_T &to) const {
+    inline HItem_T *prepareRename(const Key_T &from, const Key_T &to) {
         if (IsNotEmpty()) {
             SizeT *left_index;  // Pointer to the hash table slot for 'from'
             SizeT *right_index; // Pointer to the hash table slot for 'to'
@@ -1362,7 +1502,7 @@ struct HashTable {
     }
 
     SizeT *hashTable_{nullptr};
-    SizeT  index_{0};
+    SizeT  size_{0};
     SizeT  capacity_{0};
 };
 

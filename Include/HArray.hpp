@@ -118,7 +118,9 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @brief Inherit constructors from BaseT.
      */
     using BaseT::BaseT;
+    using BaseT::Capacity;
     using BaseT::find;
+    using BaseT::First;
     using BaseT::Size;
     using BaseT::Storage;
     using BaseT::tryInsert;
@@ -235,10 +237,31 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key The key object.
      * @return Pointer to the value, or nullptr if not found.
      */
-    inline Value_T *GetValue(const Key_T &key) const noexcept {
+    inline Value_T *GetValue(const Key_T &key) noexcept {
         if (Size() != 0) {
             SizeT *index;
             HItem *item = find(index, key);
+
+            if (item != nullptr) {
+                return &(item->Value);
+            }
+        }
+
+        return nullptr;
+    }
+
+    /**
+     * @brief Gets a const pointer to the value for a given key object.
+     *
+     * Returns nullptr if the key is not found.
+     *
+     * @param key The key object.
+     * @return Const pointer to the value, or nullptr if not found.
+     */
+    inline const Value_T *GetValue(const Key_T &key) const noexcept {
+        if (Size() != 0) {
+            SizeT        index;
+            const HItem *item = find(index, key);
 
             if (item != nullptr) {
                 return &(item->Value);
@@ -257,8 +280,27 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param index The item index.
      * @return Pointer to the value, or nullptr if not found.
      */
-    inline Value_T *GetValueAt(const SizeT index) const noexcept {
+    inline Value_T *GetValueAt(const SizeT index) noexcept {
         HItem *src = Storage();
+
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
+            return &((src + index)->Value);
+        }
+
+        return nullptr;
+    }
+
+    /**
+     * @brief Gets a const pointer to the value at the specified index.
+     *
+     * Index refers to the ordered position in the items array, not the hash table bucket.
+     * Returns nullptr if index is out of bounds or the entry is empty.
+     *
+     * @param index The item index.
+     * @return Const pointer to the value, or nullptr if not found.
+     */
+    inline const Value_T *GetValueAt(const SizeT index) const noexcept {
+        const HItem *src = First();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
             return &((src + index)->Value);
@@ -303,27 +345,31 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @brief Inherit constructors from BaseT.
      */
     using BaseT::BaseT;
-    using BaseT::find;
+
     using BaseT::Get;
     using BaseT::GetValue;
     using BaseT::Insert;
     using BaseT::operator[];
+    using BaseT::Capacity;
+    using BaseT::First;
     using BaseT::Size;
     using BaseT::Storage;
+
+    using BaseT::find;
     using BaseT::tryInsert;
 
     /**
      * @brief Gets (or inserts) a value by raw character key and length.
      *
-     * Looks up the value associated with the given key; if not found,
-     * a new entry is inserted with default value.
+     * Looks up the value associated with the given key. If the key is not found,
+     * a new entry is inserted with a default-constructed value, and a reference is returned.
      *
-     * @param key    Pointer to the character array key.
+     * @param str    Pointer to the character array key.
      * @param length Number of characters in the key.
-     * @return Reference to the value.
+     * @return Reference to the value associated with the key.
      */
-    inline Value_T &Get(const Char_T *key, const SizeT length) {
-        HItem *item = tryInsert(key, length);
+    inline Value_T &Get(const Char_T *str, const SizeT length) {
+        HItem *item = tryInsert(str, length);
         return item->Value;
     }
 
@@ -331,44 +377,46 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @brief Array subscript operator by character key (null-terminated).
      *
      * Looks up or inserts a value for the given C-string key.
-     * Equivalent to Get(key, StringUtils::Count(key)).
+     * Equivalent to Get(str, StringUtils::Count(str)).
+     * If the key does not exist, a new entry is inserted with a default-constructed value.
      *
-     * @param key Pointer to null-terminated character array.
-     * @return Reference to the value.
+     * @param str Pointer to null-terminated character array.
+     * @return Reference to the value associated with the key.
      */
-    inline Value_T &operator[](const Char_T *key) {
-        return Get(key, StringUtils::Count(key));
+    inline Value_T &operator[](const Char_T *str) {
+        return Get(str, StringUtils::Count(str));
     }
 
     /**
      * @brief Inserts or updates a value by raw character key.
      *
-     * If the key exists, assigns the value. If not, inserts a new item.
+     * If the key exists, assigns (overwrites) the value. If not, inserts a new item.
+     * The value is moved into the table entry.
      *
-     * @param key    Pointer to character array key.
+     * @param str    Pointer to character array key.
      * @param length Number of characters in the key.
      * @param value  Value to move into the entry.
      */
-    inline void Insert(const Char_T *key, const SizeT length, Value_T &&value) {
-        HItem *item = tryInsert(key, length);
-        item->Value = Memory::Move(value);
+    inline void Insert(const Char_T *str, const SizeT length, Value_T &&value) {
+        HItem *item = tryInsert(str, length); // Insert new or find existing entry by key
+        item->Value = Memory::Move(value);    // Move-assign value into the entry
     }
 
     /**
-     * @brief Gets a pointer to the value for a given raw key, length, and precomputed hash.
+     * @brief Looks up the value associated with the given key string, length, and precomputed hash.
      *
-     * Performs a lookup using the provided key, length, and hash value.
-     * Returns nullptr if the key is not found.
+     * Performs a lookup using the provided character key, length, and hash value.
+     * Returns nullptr if the key is not found or if the table is empty.
      *
-     * @param key    Pointer to the character array key.
-     * @param length Number of characters in the key.
-     * @param hash   Precomputed hash for the key.
-     * @return Pointer to the value, or nullptr if not found.
+     * @param str    Pointer to the character array key.
+     * @param length Length of the key string.
+     * @param hash   Precomputed hash value for the key.
+     * @return Pointer to the associated value if found; nullptr if not found or table is empty.
      */
-    inline Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+    inline Value_T *GetValue(const Char_T *str, const SizeT length, const SizeT hash) noexcept {
         if (Size() != 0) {
             SizeT *index;
-            HItem *item = find(index, key, length, hash);
+            HItem *item = find(index, str, length, hash);
 
             if (item != nullptr) {
                 return &(item->Value);
@@ -379,17 +427,60 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
     }
 
     /**
+     * @brief Looks up the value associated with the given key string, length, and precomputed hash.
+     *
+     * Performs a lookup using the provided character key, length, and hash value.
+     * Returns nullptr if the key is not found or if the table is empty.
+     *
+     * @param str   Pointer to the character array key.
+     * @param length Length of the key string.
+     * @param hash  Precomputed hash value for the key.
+     * @return Const pointer to the associated value if found, nullptr if not found or table is empty.
+     */
+    inline const Value_T *GetValue(const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+        // Only attempt lookup if the table contains at least one item
+        if (Size() != 0) {
+            // Find the index of the entry matching the key and hash
+            SizeT        index;
+            const HItem *item = find(index, str, length, hash);
+
+            // If a valid index was found (entry exists)
+            if (item != nullptr) {
+                // Return a pointer to the associated value
+                return &(item->Value);
+            }
+        }
+
+        // Return nullptr if not found or table is empty
+        return nullptr;
+    }
+
+    /**
      * @brief Gets a pointer to the value for a given raw key and length.
      *
-     * Computes the hash internally and performs a lookup.
+     * Computes the hash of the key internally and performs a lookup.
      * Returns nullptr if the key is not found.
      *
-     * @param key    Pointer to the character array key.
+     * @param str    Pointer to the character array key.
      * @param length Number of characters in the key.
-     * @return Pointer to the value, or nullptr if not found.
+     * @return Pointer to the value if found; nullptr if not found.
      */
-    inline Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
-        return GetValue(key, length, StringUtils::Hash(key, length));
+    inline Value_T *GetValue(const Char_T *str, const SizeT length) noexcept {
+        return GetValue(str, length, StringUtils::Hash(str, length));
+    }
+
+    /**
+     * @brief Gets a const pointer to the value for a given raw key and length.
+     *
+     * Computes the hash of the key internally and performs a lookup.
+     * Returns nullptr if the key is not found.
+     *
+     * @param str    Pointer to the character array key.
+     * @param length Number of characters in the key.
+     * @return Const pointer to the value if found; nullptr if not found.
+     */
+    inline const Value_T *GetValue(const Char_T *str, const SizeT length) const noexcept {
+        return GetValue(str, length, StringUtils::Hash(str, length));
     }
 };
 

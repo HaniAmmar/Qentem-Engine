@@ -241,7 +241,7 @@ struct TagBit {
         return tag;
     }
 
-    void Clear() const {
+    void Clear() {
         // Does not clear Type nor Storage.
         // Use before calling Make... the second time.
 
@@ -296,32 +296,56 @@ struct TagBit {
         Clear();
     }
 
-    inline VariableTag &GetVariableTag() const noexcept {
+    inline TagType GetType() const noexcept {
+        return type_;
+    }
+
+    inline const VariableTag &GetVariableTag() const noexcept {
+        return *(Memory::ChangePointer<const VariableTag>(storage_));
+    }
+
+    inline const MathTag &GetMathTag() const noexcept {
+        return *(Memory::ChangePointer<const MathTag>(storage_));
+    }
+
+    inline const SuperVariableTag &GetSuperVariableTag() const noexcept {
+        return *(Memory::ChangePointer<const SuperVariableTag>(storage_));
+    }
+
+    inline const InLineIfTag &GetInLineIfTag() const noexcept {
+        return *(Memory::ChangePointer<const InLineIfTag>(storage_));
+    }
+
+    inline const LoopTag &GetLoopTag() const noexcept {
+        return *(Memory::ChangePointer<const LoopTag>(storage_));
+    }
+
+    inline const IfTag &GetIfTag() const noexcept {
+        return *(Memory::ChangePointer<const IfTag>(storage_));
+    }
+
+    inline VariableTag &GetVariableTag() noexcept {
         return *(Memory::ChangePointer<VariableTag>(storage_));
     }
 
-    inline MathTag &GetMathTag() const noexcept {
+    inline MathTag &GetMathTag() noexcept {
         return *(Memory::ChangePointer<MathTag>(storage_));
     }
 
-    inline SuperVariableTag &GetSuperVariableTag() const noexcept {
+    inline SuperVariableTag &GetSuperVariableTag() noexcept {
         return *(Memory::ChangePointer<SuperVariableTag>(storage_));
     }
 
-    inline InLineIfTag &GetInLineIfTag() const noexcept {
+    inline InLineIfTag &GetInLineIfTag() noexcept {
         return *(Memory::ChangePointer<InLineIfTag>(storage_));
     }
 
-    inline LoopTag &GetLoopTag() const noexcept {
+    inline LoopTag &GetLoopTag() noexcept {
         return *(Memory::ChangePointer<LoopTag>(storage_));
     }
 
-    inline IfTag &GetIfTag() const noexcept {
+    inline IfTag &GetIfTag() noexcept {
         return *(Memory::ChangePointer<IfTag>(storage_));
-    }
-
-    inline TagType GetType() const noexcept {
-        return type_;
     }
 
   private:

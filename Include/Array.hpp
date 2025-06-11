@@ -22,7 +22,7 @@ template <typename Type_T>
 struct Array {
     Array() noexcept = default;
 
-    Array(Array &&src) noexcept : storage_{src.storage_}, index_{src.index_}, capacity_{src.capacity_} {
+    Array(Array &&src) noexcept : storage_{src.storage_}, size_{src.size_}, capacity_{src.capacity_} {
         src.clearStorage();
         src.setSize(0);
         src.setCapacity(0);
@@ -122,7 +122,7 @@ struct Array {
             expand(n_size);
         }
 
-        index_ += src.Size();
+        size_ += src.Size();
 
         Type_T       *storage  = Storage();
         const Type_T *src_item = src.First();
@@ -141,7 +141,7 @@ struct Array {
         }
 
         Memory::Initialize((Storage() + Size()), Memory::Move(item));
-        ++index_;
+        ++size_;
     }
 
     inline void operator+=(const Type_T &item) {
@@ -150,7 +150,7 @@ struct Array {
         }
 
         Memory::Initialize((Storage() + Size()), item);
-        ++index_;
+        ++size_;
     }
 
     /**
@@ -307,12 +307,16 @@ struct Array {
         }
     }
 
-    inline Type_T *Storage() const noexcept {
+    inline Type_T *Storage() noexcept {
+        return storage_;
+    }
+
+    inline const Type_T *Storage() const noexcept {
         return storage_;
     }
 
     inline SizeT Size() const noexcept {
-        return index_;
+        return size_;
     }
 
     inline SizeT Capacity() const noexcept {
@@ -320,12 +324,20 @@ struct Array {
     }
 
     inline const Type_T *First() const noexcept {
-        return Storage();
+        return storage_;
     }
 
-    inline Type_T *Last() const noexcept {
+    inline Type_T *Last() noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - SizeT{1}));
+        }
+
+        return nullptr;
+    }
+
+    inline const Type_T *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (First() + (Size() - SizeT{1}));
         }
 
         return nullptr;
@@ -378,7 +390,7 @@ struct Array {
     }
 
     void setSize(SizeT new_size) noexcept {
-        index_ = new_size;
+        size_ = new_size;
     }
 
     void setCapacity(SizeT new_capacity) noexcept {
@@ -408,7 +420,7 @@ struct Array {
     }
 
     Type_T *storage_{nullptr};
-    SizeT   index_{0};
+    SizeT   size_{0};
     SizeT   capacity_{0};
 };
 

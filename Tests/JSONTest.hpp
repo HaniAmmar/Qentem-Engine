@@ -1268,13 +1268,13 @@ static void TestParse4(QTest &test) {
 
     content = R"({"\""   :"x"       })";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    key_ptr = value.GetKey(0);
+    key_ptr = value.GetKeyAt(0);
     test.IsNotNull(key_ptr, __LINE__);
     test.IsTrue(StringUtils::IsEqual("\"", key_ptr->First(), value[0].Length()), __LINE__);
 
     content = R"({    "\n":   "\f"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    key_ptr = value.GetKey(0);
+    key_ptr = value.GetKeyAt(0);
     test.IsNotNull(key_ptr, __LINE__);
     test.IsTrue(StringUtils::IsEqual("\n", key_ptr->First(), value[0].Length()), __LINE__);
     test.IsTrue(StringUtils::IsEqual("\f", value[0].StringStorage(), value[0].Length()), __LINE__);
@@ -1289,13 +1289,13 @@ static void TestParse4(QTest &test) {
 
     content = R"({"\b\b":"x"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    key_ptr = value.GetKey(0);
+    key_ptr = value.GetKeyAt(0);
     test.IsNotNull(key_ptr, __LINE__);
     test.IsTrue(StringUtils::IsEqual("\b\b", key_ptr->First(), value[0].Length()), __LINE__);
 
     content = R"({"\\\\":"\"\""})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    key_ptr = value.GetKey(0);
+    key_ptr = value.GetKeyAt(0);
     test.IsNotNull(key_ptr, __LINE__);
     test.IsTrue(StringUtils::IsEqual(R"(\\)", key_ptr->First(), value[0].Length()), __LINE__);
     test.IsTrue(StringUtils::IsEqual(R"("")", value[0].StringStorage(), value[0].Length()), __LINE__);
@@ -1310,13 +1310,13 @@ static void TestParse4(QTest &test) {
 
     content = R"({"\\\\\\":"x"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    key_ptr = value.GetKey(0);
+    key_ptr = value.GetKeyAt(0);
     test.IsNotNull(key_ptr, __LINE__);
     test.IsTrue(StringUtils::IsEqual(R"(\\\)", key_ptr->First(), value[0].Length()), __LINE__);
 
     content = R"({"\/\/\/":"\n\n\n"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    key_ptr = value.GetKey(0);
+    key_ptr = value.GetKeyAt(0);
     test.IsNotNull(key_ptr, __LINE__);
     test.IsTrue(StringUtils::IsEqual("///", key_ptr->First(), value[0].Length()), __LINE__);
     test.IsTrue(StringUtils::IsEqual("\n\n\n", value[0].StringStorage(), value[0].Length()), __LINE__);
@@ -1343,7 +1343,7 @@ static void TestParse4(QTest &test) {
 
     content = R"({"\t\r\n\f\b\/\\\"":"\"\\\/\b\f\n\r\t"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    key_ptr = value.GetKey(0);
+    key_ptr = value.GetKeyAt(0);
     test.IsNotNull(key_ptr, __LINE__);
     test.IsTrue(StringUtils::IsEqual("\t\r\n\f\b/\\\"", key_ptr->First(), value[0].Length()), __LINE__);
     test.IsTrue(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(), value[0].Length()), __LINE__);

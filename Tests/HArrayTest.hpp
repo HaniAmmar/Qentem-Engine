@@ -168,29 +168,29 @@ static void TestHArray2(QTest &test) {
     test.IsEqual(numbers1["key6"], 60U, __LINE__);
     test.IsEqual(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
 
-    key = numbers1.GetKey(0);
+    key = numbers1.GetKeyAt(0);
     test.IsNotNull(key, __LINE__);
     test.IsTrue(key->IsEqual("key1", 4), __LINE__);
-    key = numbers1.GetKey(1);
+    key = numbers1.GetKeyAt(1);
     test.IsNotNull(key, __LINE__);
     test.IsTrue(key->IsEqual("key2", 4), __LINE__);
-    key = numbers1.GetKey(2);
+    key = numbers1.GetKeyAt(2);
     test.IsNotNull(key, __LINE__);
     test.IsTrue(key->IsEqual("key3", 4), __LINE__);
-    key = numbers1.GetKey(3);
+    key = numbers1.GetKeyAt(3);
     test.IsNotNull(key, __LINE__);
     test.IsTrue(key->IsEqual("key4", 4), __LINE__);
-    key = numbers1.GetKey(4);
+    key = numbers1.GetKeyAt(4);
     test.IsNotNull(key, __LINE__);
     test.IsTrue(key->IsEqual("key5", 4), __LINE__);
-    key = numbers1.GetKey(5);
+    key = numbers1.GetKeyAt(5);
     test.IsNotNull(key, __LINE__);
     test.IsTrue(key->IsEqual("key6", 4), __LINE__);
-    key = numbers1.GetKey(6);
+    key = numbers1.GetKeyAt(6);
     test.IsNotNull(key, __LINE__);
     test.IsTrue(key->IsEqual("ABCDEF0123456789ABCDEF0123456789", 32), __LINE__);
 
-    key   = numbers1.GetKey(6);
+    key   = numbers1.GetKeyAt(6);
     str_c = key->First();
     // Test expanding
     numbers1["key8"] = 80;
@@ -208,7 +208,7 @@ static void TestHArray2(QTest &test) {
     test.IsEqual(numbers1["key8"], 80U, __LINE__);
     test.IsEqual(numbers1["key9"], 90U, __LINE__);
 
-    const String<char> *key2 = numbers1.GetKey(6);
+    const String<char> *key2 = numbers1.GetKeyAt(6);
     test.IsNotEqual(key2, key, __LINE__);
     test.IsNotNull(key2, __LINE__);
     test.IsEqual(key2->First(), str_c, __LINE__);
@@ -222,8 +222,8 @@ static void TestHArray2(QTest &test) {
     test.IsTrue((numbers2.Capacity() >= 9), __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
     test.IsNotEqual(numbers2.First(), storage, __LINE__);
-    test.IsNotEqual(numbers1.GetKey(6), numbers2.GetKey(6), __LINE__);
-    test.IsNotEqual(numbers2.GetKey(6)->First(), str_c, __LINE__);
+    test.IsNotEqual(numbers1.GetKeyAt(6), numbers2.GetKeyAt(6), __LINE__);
+    test.IsNotEqual(numbers2.GetKeyAt(6)->First(), str_c, __LINE__);
 
     numbers2 = Memory::Move(numbers1);
     test.IsNull(numbers1.Storage(), __LINE__);
@@ -281,7 +281,7 @@ static void TestHArray3(QTest &test) {
     numbers2["key8"] = 80;
     numbers2["key9"] = 90;
 
-    key = numbers2.GetKey(5);
+    key = numbers2.GetKeyAt(5);
     test.IsNotNull(key, __LINE__);
     str_c = key->First();
 
@@ -301,8 +301,8 @@ static void TestHArray3(QTest &test) {
     test.IsEqual(numbers1["key7"], 70U, __LINE__);
     test.IsEqual(numbers1["key8"], 80U, __LINE__);
     test.IsEqual(numbers1["key9"], 90U, __LINE__);
-    test.IsEqual(numbers1.GetKey(5), key, __LINE__);
-    test.IsEqual(numbers1.GetKey(5)->First(), str_c, __LINE__);
+    test.IsEqual(numbers1.GetKeyAt(5), key, __LINE__);
+    test.IsEqual(numbers1.GetKeyAt(5)->First(), str_c, __LINE__);
 
     test.IsEqual(numbers2.Size(), 0U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 0U, __LINE__);
@@ -315,6 +315,7 @@ static void TestHArray4(QTest &test) {
     HashArray1     numbers3(3);
     const HAItem1 *storage;
     SizeT32       *value;
+    const SizeT32 *value2;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -453,6 +454,8 @@ static void TestHArray4(QTest &test) {
     test.IsEqual(numbers2["key9"], 900U, __LINE__);
     test.IsEqual(numbers2["key10"], 1000U, __LINE__);
 
+    test.IsTrue(numbers2.Has("key10"), __LINE__);
+
     // Addition of an empty array does nothing.
     numbers2 += HashArray1(10);
     test.IsEqual(numbers2.Size(), 10U, __LINE__);
@@ -460,7 +463,7 @@ static void TestHArray4(QTest &test) {
     numbers2.Resize(1);
     test.IsEqual(numbers2["key1"], 10U, __LINE__);
 
-    test.IsNull(numbers2.GetKey(1), __LINE__);
+    test.IsNull(numbers2.GetKeyAt(1), __LINE__);
 
     numbers1.Reset();
     numbers1[""] = 555;
@@ -476,9 +479,28 @@ static void TestHArray4(QTest &test) {
         key2 = key;
 
         numbers1.Insert(Memory::Move(key2), Memory::Move(i));
-        value = numbers1.GetValue(key);
+        value  = numbers1.GetValue(key);
+        value2 = numbers1.GetValue(key);
         test.IsNotNull(value, __LINE__);
         test.IsEqual(*value, i, __LINE__);
+        test.IsNotNull(value2, __LINE__);
+        test.IsEqual(*value2, i, __LINE__);
+
+        value  = numbers1.GetValue(key.First());
+        value2 = numbers1.GetValue(key.First());
+        test.IsNotNull(value, __LINE__);
+        test.IsEqual(*value, i, __LINE__);
+        test.IsNotNull(value2, __LINE__);
+        test.IsEqual(*value2, i, __LINE__);
+
+        value  = numbers1.GetValue(key.First(), key.Length());
+        value2 = numbers1.GetValue(key.First(), key.Length());
+        test.IsNotNull(value, __LINE__);
+        test.IsEqual(*value, i, __LINE__);
+        test.IsNotNull(value2, __LINE__);
+        test.IsEqual(*value2, i, __LINE__);
+
+        test.IsTrue(numbers1.Has(key), __LINE__);
     }
 }
 
@@ -619,12 +641,12 @@ static void TestHArray6(QTest &test) {
 
     test.IsEqual(strings1.Size(), 2U, __LINE__);
     test.IsNotNull(strings1.First(), __LINE__);
-    test.IsNotNull(strings1.GetKey(0), __LINE__);
-    test.IsEqual(strings1.GetKey(0)->First(), k_str1, __LINE__);
-    test.IsEqual(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
-    test.IsNotNull(strings1.GetKey(1), __LINE__);
-    test.IsEqual(strings1.GetKey(1)->First(), k_str2, __LINE__);
-    test.IsEqual(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings1.GetKeyAt(0), __LINE__);
+    test.IsEqual(strings1.GetKeyAt(0)->First(), k_str1, __LINE__);
+    test.IsEqual(*(strings1.GetKeyAt(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings1.GetKeyAt(1), __LINE__);
+    test.IsEqual(strings1.GetKeyAt(1)->First(), k_str2, __LINE__);
+    test.IsEqual(*(strings1.GetKeyAt(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
     test.IsEqual(strings1.GetValueAt(id)->First(), c_str1, __LINE__);
@@ -633,12 +655,12 @@ static void TestHArray6(QTest &test) {
     strings2 += strings1;
     test.IsEqual(strings2.Size(), 2U, __LINE__);
     test.IsNotNull(strings2.First(), __LINE__);
-    test.IsNotNull(strings2.GetKey(0), __LINE__);
-    test.IsNotEqual(strings2.GetKey(0)->First(), k_str1, __LINE__);
-    test.IsEqual(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
-    test.IsNotNull(strings2.GetKey(1), __LINE__);
-    test.IsNotEqual(strings2.GetKey(1)->First(), k_str2, __LINE__);
-    test.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings2.GetKeyAt(0), __LINE__);
+    test.IsNotEqual(strings2.GetKeyAt(0)->First(), k_str1, __LINE__);
+    test.IsEqual(*(strings2.GetKeyAt(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings2.GetKeyAt(1), __LINE__);
+    test.IsNotEqual(strings2.GetKeyAt(1)->First(), k_str2, __LINE__);
+    test.IsEqual(*(strings2.GetKeyAt(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
     test.IsNotEqual(strings2.GetValueAt(id)->First(), c_str1, __LINE__);
@@ -651,12 +673,12 @@ static void TestHArray6(QTest &test) {
     test.IsEqual(strings2.Capacity(), 2U, __LINE__);
     test.IsNotNull(strings2.First(), __LINE__);
     test.IsNotEqual(strings2.First(), storage, __LINE__);
-    test.IsNotNull(strings2.GetKey(0), __LINE__);
-    test.IsEqual(strings2.GetKey(0)->First(), k_str1, __LINE__);
-    test.IsEqual(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
-    test.IsNotNull(strings2.GetKey(1), __LINE__);
-    test.IsEqual(strings2.GetKey(1)->First(), k_str2, __LINE__);
-    test.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings2.GetKeyAt(0), __LINE__);
+    test.IsEqual(strings2.GetKeyAt(0)->First(), k_str1, __LINE__);
+    test.IsEqual(*(strings2.GetKeyAt(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings2.GetKeyAt(1), __LINE__);
+    test.IsEqual(strings2.GetKeyAt(1)->First(), k_str2, __LINE__);
+    test.IsEqual(*(strings2.GetKeyAt(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
     test.IsEqual(strings2.GetValueAt(id)->First(), c_str1, __LINE__);
@@ -671,12 +693,12 @@ static void TestHArray6(QTest &test) {
     test.IsEqual(strings2.Capacity(), 2U, __LINE__);
     test.IsNotNull(strings2.First(), __LINE__);
     test.IsNotEqual(strings2.First(), storage, __LINE__);
-    test.IsNotNull(strings2.GetKey(0), __LINE__);
-    test.IsEqual(strings2.GetKey(0)->First(), k_str1, __LINE__);
-    test.IsEqual(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
-    test.IsNotNull(strings2.GetKey(1), __LINE__);
-    test.IsEqual(strings2.GetKey(1)->First(), k_str2, __LINE__);
-    test.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings2.GetKeyAt(0), __LINE__);
+    test.IsEqual(strings2.GetKeyAt(0)->First(), k_str1, __LINE__);
+    test.IsEqual(*(strings2.GetKeyAt(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    test.IsNotNull(strings2.GetKeyAt(1), __LINE__);
+    test.IsEqual(strings2.GetKeyAt(1)->First(), k_str2, __LINE__);
+    test.IsEqual(*(strings2.GetKeyAt(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
     test.IsEqual(strings2.GetValueAt(id)->First(), c_str1, __LINE__);
@@ -700,7 +722,7 @@ static void TestHArray7(QTest &test) {
 
         Digit::NumberToString(key, z);
         numbers1.Remove(key);
-        test.IsNull(numbers1.GetKey(z), __LINE__);
+        test.IsNull(numbers1.GetKeyAt(z), __LINE__);
     }
 
     numbers1.Resize((id + 1));
@@ -720,7 +742,7 @@ static void TestHArray7(QTest &test) {
         Digit::NumberToString(key, id);
 
         numbers1.Remove(key);
-        test.IsNull(numbers1.GetKey(id), __LINE__);
+        test.IsNull(numbers1.GetKeyAt(id), __LINE__);
     } while (id > 0);
 
     numbers1.Resize((id + 1));
@@ -854,7 +876,7 @@ static void TestHArray9(QTest &test) {
         Digit::NumberToString(key, i);
 
         list[key] = i;
-        item      = list.GetItem(i);
+        item      = list.GetItemAt(i);
         item2     = list.GetItem(item->Key.First(), item->Key.Length(), item->Hash);
         value     = list.GetValue(item->Key.First(), item->Key.Length(), item->Hash);
 
@@ -872,7 +894,7 @@ static void TestHArray9(QTest &test) {
         test.IsNull(value, __LINE__);
     }
 
-    item = list.GetItem(id);
+    item = list.GetItemAt(id);
     test.IsNull(item, __LINE__);
 
     for (SizeT i = 0; i < id; i++) {

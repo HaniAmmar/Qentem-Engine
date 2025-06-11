@@ -197,7 +197,8 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::First;
     using BaseT::GetIndex;
     using BaseT::GetItem;
-    using BaseT::GetKey;
+    using BaseT::GetItemAt;
+    using BaseT::GetKeyAt;
     using BaseT::Has;
     using BaseT::Insert;
     using BaseT::IsEmpty;
@@ -238,26 +239,24 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * Convenience overload for inserting a key without constructing a key object.
      * If the key does not already exist, it will be created and initialized.
      *
-     * @param key    Pointer to the character array representing the key.
+     * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      */
-    inline void Insert(const Char_T *key, const SizeT length) {
-        tryInsert(key, length);
+    inline void Insert(const Char_T *str, const SizeT length) {
+        tryInsert(str, length);
     }
 
     /**
      * @brief Checks if a key, given as a raw character array, exists in the table.
      *
-     * @param key    Pointer to the character array to look up.
+     * @param str    Pointer to the character array to look up.
      * @param length Number of characters to use from the array.
      * @return True if the key is present in the table, false otherwise.
      */
-    inline bool Has(const Char_T *key, const SizeT length) const noexcept {
+    inline bool Has(const Char_T *str, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
-            SizeT   *index;
-            HItem_T *item = find(index, key, length);
-
-            return (item != nullptr);
+            SizeT index;
+            return (find(index, str, length) != nullptr);
         }
 
         return false;
@@ -266,19 +265,32 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     /**
      * @brief Finds an item by key (raw character array, hash specified).
      *
-     * @param key    Pointer to the character array representing the key.
+     * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      * @param hash   Hash value to use for the lookup.
      * @return Pointer to the item if found, nullptr otherwise.
      */
-    inline const HItem_T *GetItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+    inline HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) noexcept {
         if (IsNotEmpty()) {
-            SizeT         *index;
-            const HItem_T *item = find(index, key, length, hash);
+            SizeT *index;
+            return find(index, str, length, hash);
+        }
 
-            if (item != nullptr) {
-                return item;
-            }
+        return nullptr;
+    }
+
+    /**
+     * @brief Finds an item by key (raw character array, hash specified).
+     *
+     * @param str    Pointer to the character array representing the key.
+     * @param length Number of characters to use from the array.
+     * @param hash   Hash value to use for the lookup.
+     * @return Const pointer to the item if found, nullptr otherwise.
+     */
+    inline const HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+        if (IsNotEmpty()) {
+            SizeT index;
+            return find(index, str, length, hash);
         }
 
         return nullptr;
@@ -287,12 +299,23 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     /**
      * @brief Finds an item by key (raw character array, hash computed automatically).
      *
-     * @param key    Pointer to the character array representing the key.
+     * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      * @return Pointer to the item if found, nullptr otherwise.
      */
-    inline const HItem_T *GetItem(const Char_T *key, const SizeT length) const noexcept {
-        return GetItem(key, length, KeyUtilsT::Hash(key, length));
+    inline const HItem_T *GetItem(const Char_T *str, const SizeT length) noexcept {
+        return GetItem(str, length, KeyUtilsT::Hash(str, length));
+    }
+
+    /**
+     * @brief Finds an item by key (raw character array, hash computed automatically).
+     *
+     * @param str    Pointer to the character array representing the key.
+     * @param length Number of characters to use from the array.
+     * @return Const pointer to the item if found, nullptr otherwise.
+     */
+    inline const HItem_T *GetItem(const Char_T *str, const SizeT length) const noexcept {
+        return GetItem(str, length, KeyUtilsT::Hash(str, length));
     }
 
     /**
@@ -305,13 +328,8 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      */
     inline bool GetIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
-            SizeT *tmp;
-
-            if (find(tmp, str, length) != nullptr) {
-                index = *tmp;
-
-                return true;
-            }
+            find(index, str, length);
+            return (index != Capacity());
         }
 
         return false;
@@ -320,11 +338,11 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     /**
      * @brief Removes a key from the table, given as a raw character array.
      *
-     * @param key    Pointer to the character array representing the key.
+     * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      */
-    inline void Remove(const Char_T *key, SizeT length) const noexcept {
-        remove(key, length);
+    inline void Remove(const Char_T *str, SizeT length) noexcept {
+        remove(str, length);
     }
 
     /**
@@ -332,42 +350,74 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      *
      * Convenience overload; computes the length of the string automatically.
      *
-     * @param key Pointer to the null-terminated character array representing the key.
+     * @param str Pointer to the null-terminated character array representing the key.
      */
-    inline void Remove(const Char_T *key) const noexcept {
-        Remove(key, StringUtils::Count(key));
+    inline void Remove(const Char_T *str) noexcept {
+        Remove(str, StringUtils::Count(str));
     }
 
   protected:
     /**
      * @brief Finds an item in the hash table by a raw character key and hash value.
      *
-     * Performs a lookup in the hash table for an entry matching the given key and hash.
-     * Updates the index pointer to the position in the hash table or chain where the item was found,
+     * Performs a lookup for an entry matching the given key and hash value.
+     * Updates the index pointer to the hash table slot or chain position where the item was found,
      * or where a new item should be inserted if not found.
      *
-     * @param[out] index Output reference to a pointer to the hash table slot; updated during lookup.
-     * @param str       Pointer to the character array representing the key to search for.
-     * @param length    Number of characters in the key array.
-     * @param hash      Precomputed hash value of the key.
+     * @param[out] index  Output reference to a pointer to the hash table slot; updated during lookup.
+     * @param str         Pointer to the character array representing the key to search for.
+     * @param length      Number of characters in the key array.
+     * @param hash        Precomputed hash value of the key.
      * @return Pointer to the found item, or nullptr if not found.
+     *
+     * @note If the item is not found, @p index is set to the appropriate insertion point in the chain.
      */
-    HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+    HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length, const SizeT hash) noexcept {
+        return find(index, StringView<Char_T>{str, length}, hash);
+    }
+
+    /**
+     * @brief Finds a const item in the hash table by a raw character key and hash value.
+     *
+     * Performs a const lookup for an entry matching the given key and hash value.
+     * Updates the index reference to the slot or chain position found (or for insertion if not found).
+     *
+     * @param[out] index  Output reference to a slot index; updated during lookup.
+     * @param str         Pointer to the character array representing the key to search for.
+     * @param length      Number of characters in the key array.
+     * @param hash        Precomputed hash value of the key.
+     * @return Const pointer to the found item, or nullptr if not found.
+     */
+    const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
         return find(index, StringView<Char_T>{str, length}, hash);
     }
 
     /**
      * @brief Finds an item in the hash table by a raw character key (hash computed automatically).
      *
-     * Convenience overload; computes the hash from the key and length, then performs the lookup.
+     * A convenient overload: computes the hash from the provided key and length, then performs the lookup.
      *
      * @param[out] index Output reference to a pointer to the hash table slot; updated during lookup.
-     * @param key       Pointer to the character array representing the key to search for.
+     * @param str       Pointer to the character array representing the key to search for.
      * @param length    Number of characters in the key array.
      * @return Pointer to the found item, or nullptr if not found.
      */
-    inline HItem_T *find(SizeT *&index, const Char_T *key, const SizeT length) const noexcept {
-        return find(index, key, length, KeyUtilsT::Hash(key, length));
+    inline HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length) noexcept {
+        return find(index, str, length, KeyUtilsT::Hash(str, length));
+    }
+
+    /**
+     * @brief Finds a const item in the hash table by a raw character key (hash computed automatically).
+     *
+     * Computes the hash from the key and length, then performs a const lookup.
+     *
+     * @param[out] index Output reference to a slot index; updated during lookup.
+     * @param str       Pointer to the character array representing the key to search for.
+     * @param length    Number of characters in the key array.
+     * @return Const pointer to the found item, or nullptr if not found.
+     */
+    inline const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
+        return find(index, str, length, KeyUtilsT::Hash(str, length));
     }
 
     /**
@@ -379,21 +429,21 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      *
      * If the container is at capacity, triggers an expansion before insertion.
      *
-     * @param key    Pointer to the character array representing the key.
+     * @param str    Pointer to the character array representing the key.
      * @param length Number of characters in the key array.
      * @return Pointer to the found or newly inserted item.
      */
-    inline HItem_T *tryInsert(const Char_T *key, const SizeT length) noexcept {
+    inline HItem_T *tryInsert(const Char_T *str, const SizeT length) noexcept {
         if (Size() == Capacity()) {
             expand();
         }
 
-        const SizeT hash = KeyUtilsT::Hash(key, length);
+        const SizeT hash = KeyUtilsT::Hash(str, length);
         SizeT      *index;
-        HItem_T    *item = find(index, key, length, hash);
+        HItem_T    *item = find(index, str, length, hash);
 
         if (item == nullptr) {
-            item = insert(index, StringKey_T{key, length}, hash);
+            item = insert(index, StringKey_T{str, length}, hash);
             item->InitValue();
         }
 
@@ -406,13 +456,13 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * Finds and removes the item with the specified key (character pointer and length), if present.
      * If the table is empty or the key is not found, the function has no effect.
      *
-     * @param key    Pointer to the character array representing the key to remove.
+     * @param str    Pointer to the character array representing the key to remove.
      * @param length Number of characters in the key array.
      */
-    void remove(const Char_T *key, const SizeT length) const noexcept {
+    void remove(const Char_T *str, const SizeT length) noexcept {
         if (IsNotEmpty()) {
             SizeT   *index;
-            HItem_T *item = find(index, key, length);
+            HItem_T *item = find(index, str, length);
 
             remove(index, item);
         }

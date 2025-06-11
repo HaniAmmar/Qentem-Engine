@@ -59,10 +59,10 @@ static void TestEmptyValue(QTest &test) {
     test.IsNull(value1.GetValueAt(0), __LINE__);
     test.IsNull(value1.GetValueAt(10), __LINE__);
     test.IsNull(value1.GetValue("", 0), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
-    test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
+    test.IsFalse(value1.CopyKeyAt(ss_var, 0), __LINE__);
     test.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    test.IsNull(value1.GetKey(10), __LINE__);
+    test.IsNull(value1.GetKeyAt(10), __LINE__);
     test.IsNull(value1.GetObject(), __LINE__);
     test.IsNull(value1.GetArray(), __LINE__);
     test.IsNull(value1.GetString(), __LINE__);
@@ -112,8 +112,8 @@ static void TestTrueValue(QTest &test) {
     test.IsTrue(value1.Type() == ValueType::True, __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNull(value1.GetValue(0), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
-    test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
+    test.IsFalse(value1.CopyKeyAt(ss_var, 0), __LINE__);
     test.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
     test.IsTrue(StringUtils::IsEqual("true", c_str_var, c_str_len), __LINE__);
     test.IsNull(value1.GetObject(), __LINE__);
@@ -178,8 +178,8 @@ static void TestFalseValue(QTest &test) {
     test.IsTrue(value1.Type() == ValueType::False, __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNull(value1.GetValue(0), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
-    test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
+    test.IsFalse(value1.CopyKeyAt(ss_var, 0), __LINE__);
     test.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
     test.IsTrue(StringUtils::IsEqual("false", c_str_var, c_str_len), __LINE__);
     test.IsNull(value1.GetObject(), __LINE__);
@@ -244,8 +244,8 @@ static void TestNullValue(QTest &test) {
     test.IsTrue(value1.Type() == ValueType::Null, __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNull(value1.GetValue(0), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
-    test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
+    test.IsFalse(value1.CopyKeyAt(ss_var, 0), __LINE__);
     test.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
     test.IsTrue(StringUtils::IsEqual("null", c_str_var, c_str_len), __LINE__);
     test.IsNull(value1.GetObject(), __LINE__);
@@ -309,8 +309,8 @@ static void TestNumberValue1(QTest &test) {
     test.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNull(value1.GetValue(0), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
-    test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
+    test.IsFalse(value1.CopyKeyAt(ss_var, 0), __LINE__);
     test.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
     test.IsNull(value1.GetObject(), __LINE__);
     test.IsNull(value1.GetArray(), __LINE__);
@@ -735,8 +735,8 @@ static void TestStringValue(QTest &test) {
     test.IsEqual(value1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(value1.Length(), SizeT{34}, __LINE__);
     test.IsNull(value1.GetValue(0), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
-    test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
+    test.IsFalse(value1.CopyKeyAt(ss_var, 0), __LINE__);
     test.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
     test.IsTrue(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len), __LINE__);
     test.IsNull(value1.GetObject(), __LINE__);
@@ -868,8 +868,8 @@ static void TestArrayValue(QTest &test) {
     test.IsEqual(value1.Size(), 5U, __LINE__);
     test.IsNull(value1.GetValueAt(0), __LINE__);
     test.IsNull(value1.GetValueAt(4), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
-    test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
+    test.IsFalse(value1.CopyKeyAt(ss_var, 0), __LINE__);
     test.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
     test.IsNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -905,7 +905,7 @@ static void TestArrayValue(QTest &test) {
     test.IsEqual(value1.Size(), 10U, __LINE__);
     test.IsNull(value1.GetValueAt(0), __LINE__);
     test.IsNull(value1.GetValueAt(9), __LINE__);
-    test.IsNull(value1.GetKey(0), __LINE__);
+    test.IsNull(value1.GetKeyAt(0), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
     test.IsEqual(value1.GetArray()->First(), storage, __LINE__);
@@ -1093,10 +1093,10 @@ static void TestObjectValue1(QTest &test) {
     test.IsEqual(value1.Size(), 5U, __LINE__);
     test.IsNotNull(value1.GetValueAt(0), __LINE__);
     test.IsNotNull(value1.GetValueAt(4), __LINE__);
-    test.IsNotNull(value1.GetKey(0), __LINE__);
-    test.IsNotNull(value1.GetKey(4), __LINE__);
-    test.IsTrue(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    test.IsTrue(value1.CopyKeyByIndexTo(ss_var, 4), __LINE__);
+    test.IsNotNull(value1.GetKeyAt(0), __LINE__);
+    test.IsNotNull(value1.GetKeyAt(4), __LINE__);
+    test.IsTrue(value1.CopyKeyAt(ss_var, 0), __LINE__);
+    test.IsTrue(value1.CopyKeyAt(ss_var, 4), __LINE__);
     test.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -3426,19 +3426,19 @@ static void TestIndexOperator1(QTest &test) {
     test.IsEqual(value.GetValueAt(4)->GetNumber(), 400.0, __LINE__);
     test.IsEqual(value.GetValueAt(5)->GetNumber(), 500.0, __LINE__);
 
-    test.IsNotNull(value.GetKey(0), __LINE__);
-    test.IsNotNull(value.GetKey(1), __LINE__);
-    test.IsNotNull(value.GetKey(2), __LINE__);
-    test.IsNotNull(value.GetKey(3), __LINE__);
-    test.IsNotNull(value.GetKey(4), __LINE__);
-    test.IsNotNull(value.GetKey(5), __LINE__);
+    test.IsNotNull(value.GetKeyAt(0), __LINE__);
+    test.IsNotNull(value.GetKeyAt(1), __LINE__);
+    test.IsNotNull(value.GetKeyAt(2), __LINE__);
+    test.IsNotNull(value.GetKeyAt(3), __LINE__);
+    test.IsNotNull(value.GetKeyAt(4), __LINE__);
+    test.IsNotNull(value.GetKeyAt(5), __LINE__);
 
-    test.IsTrue(value.GetKey(0)->IsEqual("A", 1), __LINE__);
-    test.IsTrue(value.GetKey(1)->IsEqual("B", 1), __LINE__);
-    test.IsTrue(value.GetKey(2)->IsEqual("C", 1), __LINE__);
-    test.IsTrue(value.GetKey(3)->IsEqual("D", 1), __LINE__);
-    test.IsTrue(value.GetKey(4)->IsEqual("EFEFE", 5), __LINE__);
-    test.IsTrue(value.GetKey(5)->IsEqual("FGHIGKLM", 8), __LINE__);
+    test.IsTrue(value.GetKeyAt(0)->IsEqual("A", 1), __LINE__);
+    test.IsTrue(value.GetKeyAt(1)->IsEqual("B", 1), __LINE__);
+    test.IsTrue(value.GetKeyAt(2)->IsEqual("C", 1), __LINE__);
+    test.IsTrue(value.GetKeyAt(3)->IsEqual("D", 1), __LINE__);
+    test.IsTrue(value.GetKeyAt(4)->IsEqual("EFEFE", 5), __LINE__);
+    test.IsTrue(value.GetKeyAt(5)->IsEqual("FGHIGKLM", 8), __LINE__);
 
     test.IsNull(value.GetValueAt(6), __LINE__);
 
@@ -5411,12 +5411,12 @@ static void TestDeleteValue(QTest &test) {
     value["A"]  = false;
     value["bb"] = true;
     value.Remove("A");
-    test.IsNull(value.GetKey(0), __LINE__);
+    test.IsNull(value.GetKeyAt(0), __LINE__);
     test.IsNull(value.GetValueAt(0), __LINE__);
     test.IsEqual(value.Stringify(ss), R"({"bb":true})", __LINE__);
     ss.Clear();
     value.RemoveAt(1);
-    test.IsNull(value.GetKey(0), __LINE__);
+    test.IsNull(value.GetKeyAt(0), __LINE__);
     test.IsNull(value.GetValueAt(1), __LINE__);
     test.IsEqual(value.Stringify(ss), R"({})", __LINE__);
     ss.Clear();

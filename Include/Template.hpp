@@ -203,7 +203,7 @@ template <typename, typename, typename>
 struct TemplateCore;
 
 template <typename>
-struct QOperationSymbol_T;
+struct QOperationSymbols_T;
 
 struct Template {
     Template()                            = delete;
@@ -1087,17 +1087,17 @@ struct TemplateCore {
         if (tag.Expressions.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
             switch (result.Type) {
                 case ExpressionType::NaturalNumber: {
-                    Digit::NumberToString(*stream_, result.Value.Number.Natural);
+                    Digit::NumberToString(*stream_, result.ExprValue.Number.Natural);
                     break;
                 }
 
                 case ExpressionType::IntegerNumber: {
-                    Digit::NumberToString(*stream_, result.Value.Number.Integer);
+                    Digit::NumberToString(*stream_, result.ExprValue.Number.Integer);
                     break;
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit::NumberToString(*stream_, result.Value.Number.Real,
+                    Digit::NumberToString(*stream_, result.ExprValue.Number.Real,
                                           {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT});
                     break;
                 }
@@ -1274,7 +1274,7 @@ struct TemplateCore {
             if (loop_set->IsObject()) {
                 while (loop_index < loop_size) {
                     LoopItem &item = loops_items_->Storage()[tag.Level];
-                    loop_set->SetValueAndKey(loop_index, item.Value, item.Key);
+                    loop_set->SetValueAndKeyAt(loop_index, item.Value, item.Key);
 
                     if (item.Value != nullptr) {
                         render(s_tag, s_end, content_offset, tag.EndOffset);
@@ -1413,16 +1413,16 @@ struct TemplateCore {
     bool GetExpressionValue(QExpression &result, const QExpression *expr, const QOperation operation) const noexcept {
         switch (expr->Type) {
             case ExpressionType::SubOperation: {
-                const QExpression *sub_expr = expr->SubExpressions.First();
+                const QExpression *sub_expr = expr->SubExprs.First();
                 return evaluate(result, sub_expr, QOperation::NoOp);
             }
 
             case ExpressionType::Variable: {
                 if ((operation != QOperation::Equal) && (operation != QOperation::NotEqual)) {
-                    const Value_T *val = getValue(expr->Variable);
+                    const Value_T *val = getValue(expr->VariableTag);
 
                     if (val != nullptr) {
-                        switch (val->SetNumber(result.Value.Number)) {
+                        switch (val->SetNumber(result.ExprValue.Number)) {
                             case QNumberType::Natural: {
                                 result.Type = ExpressionType::NaturalNumber;
                                 return true;
@@ -1449,8 +1449,8 @@ struct TemplateCore {
                     //  {if case="value[some_string]" true=", value[some_string]"} or
                     // <if case="value[some_string]"><span>value[some_string]-value[another_string]</span></if>
                     if ((operation == QOperation::NoOp) && (expr->Operation == QOperation::NoOp)) {
-                        result.Value.Number = SizeT64((val != nullptr) && val->IsString() && (val->Length() != 0));
-                        result.Type         = ExpressionType::NaturalNumber;
+                        result.ExprValue.Number = SizeT64((val != nullptr) && val->IsString() && (val->Length() != 0));
+                        result.Type             = ExpressionType::NaturalNumber;
                         return true;
                     }
 
@@ -1464,8 +1464,8 @@ struct TemplateCore {
             }
         }
 
-        result.Value = expr->Value;
-        result.Type  = expr->Type;
+        result.ExprValue = expr->ExprValue;
+        result.Type      = expr->Type;
         return true;
     }
 
@@ -1476,8 +1476,8 @@ struct TemplateCore {
             }
 
             case QOperation::Remainder: { // %
-                left.Value.Number.Integer = (left % right);
-                left.Type                 = ExpressionType::IntegerNumber;
+                left.ExprValue.Number.Integer = (left % right);
+                left.Type                     = ExpressionType::IntegerNumber;
                 break;
             }
 
@@ -1516,38 +1516,38 @@ struct TemplateCore {
             }
 
             case QOperation::Less: { // <
-                left.Value.Number.Natural = SizeT64(left < right);
-                left.Type                 = ExpressionType::NaturalNumber;
+                left.ExprValue.Number.Natural = SizeT64(left < right);
+                left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::LessOrEqual: { // <=
-                left.Value.Number.Natural = SizeT64(left <= right);
-                left.Type                 = ExpressionType::NaturalNumber;
+                left.ExprValue.Number.Natural = SizeT64(left <= right);
+                left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Greater: { // >
-                left.Value.Number.Natural = SizeT64(left > right);
-                left.Type                 = ExpressionType::NaturalNumber;
+                left.ExprValue.Number.Natural = SizeT64(left > right);
+                left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::GreaterOrEqual: { // >=
-                left.Value.Number.Natural = SizeT64(left >= right);
-                left.Type                 = ExpressionType::NaturalNumber;
+                left.ExprValue.Number.Natural = SizeT64(left >= right);
+                left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::And: { // &&
-                left.Value.Number.Natural = SizeT64((left > 0U) && (right > 0U));
-                left.Type                 = ExpressionType::NaturalNumber;
+                left.ExprValue.Number.Natural = SizeT64((left > 0U) && (right > 0U));
+                left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Or: { // ||
-                left.Value.Number.Natural = SizeT64((left > 0U) || (right > 0U));
-                left.Type                 = ExpressionType::NaturalNumber;
+                left.ExprValue.Number.Natural = SizeT64((left > 0U) || (right > 0U));
+                left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
@@ -1561,7 +1561,7 @@ struct TemplateCore {
 
             case QOperation::NotEqual: { // !=
                 if (isEqual(left, right)) {
-                    left.Value.Number.Natural = (left.Value.Number.Natural ^ 1ULL);
+                    left.ExprValue.Number.Natural = (left.ExprValue.Number.Natural ^ 1ULL);
                     break;
                 }
 
@@ -1595,13 +1595,13 @@ struct TemplateCore {
             }
 
             case ExpressionType::Variable: {
-                left_value = getValue(left.Variable);
+                left_value = getValue(left.VariableTag);
 
                 if (left_value != nullptr) {
                     if (left_value->GetNumberType() != QNumberType::NotANumber) {
                         left_is_a_number = true;
 
-                        switch (left_value->SetNumber(left.Value.Number)) {
+                        switch (left_value->SetNumber(left.ExprValue.Number)) {
                             case QNumberType::Natural: {
                                 left.Type = ExpressionType::NaturalNumber;
                                 break;
@@ -1631,8 +1631,8 @@ struct TemplateCore {
             }
 
             default: {
-                left_content = (content_ + left.Value.Offset);
-                left_length  = left.Value.Length;
+                left_content = (content_ + left.ExprValue.Offset);
+                left_length  = left.ExprValue.Length;
             }
         }
 
@@ -1645,13 +1645,13 @@ struct TemplateCore {
             }
 
             case ExpressionType::Variable: {
-                right_value = getValue(right.Variable);
+                right_value = getValue(right.VariableTag);
 
                 if (right_value != nullptr) {
                     if (right_value->GetNumberType() != QNumberType::NotANumber) {
                         right_is_a_number = true;
 
-                        switch (right_value->SetNumber(right.Value.Number)) {
+                        switch (right_value->SetNumber(right.ExprValue.Number)) {
                             case QNumberType::Natural: {
                                 right.Type = ExpressionType::NaturalNumber;
                                 break;
@@ -1681,8 +1681,8 @@ struct TemplateCore {
             }
 
             default: {
-                right_content     = (content_ + right.Value.Offset);
-                right_length      = right.Value.Length;
+                right_content     = (content_ + right.ExprValue.Offset);
+                right_length      = right.ExprValue.Length;
                 right_is_a_number = false;
             }
         }
@@ -1690,7 +1690,7 @@ struct TemplateCore {
         if (left_is_a_number || right_is_a_number) {
             if (!left_is_a_number) {
                 if (left_value != nullptr) {
-                    switch (left_value->SetNumber(left.Value.Number)) {
+                    switch (left_value->SetNumber(left.ExprValue.Number)) {
                         case QNumberType::Natural: {
                             left.Type = ExpressionType::NaturalNumber;
                             break;
@@ -1717,7 +1717,7 @@ struct TemplateCore {
 
             if (!right_is_a_number) {
                 if (right_value != nullptr) {
-                    switch (right_value->SetNumber(right.Value.Number)) {
+                    switch (right_value->SetNumber(right.ExprValue.Number)) {
                         case QNumberType::Natural: {
                             right.Type = ExpressionType::NaturalNumber;
                             break;
@@ -1742,12 +1742,12 @@ struct TemplateCore {
                 }
             }
 
-            left.Value.Number.Natural = SizeT64(left == right);
-            left.Type                 = ExpressionType::NaturalNumber;
+            left.ExprValue.Number.Natural = SizeT64(left == right);
+            left.Type                     = ExpressionType::NaturalNumber;
             return true;
         }
 
-        left.Value.Number.Natural =
+        left.ExprValue.Number.Natural =
             ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
         left.Type = ExpressionType::NaturalNumber;
 
@@ -1788,21 +1788,21 @@ struct TemplateCore {
 
     static bool parseValue(QExpressions &exprs, const QOperation oper, const QOperation last_oper,
                            const Char_T *content, SizeT offset, SizeT end_offset, const LoopTag *loop_tag) {
-        using QOperationSymbol = QOperationSymbol_T<Char_T>;
+        using QOperationSymbols = QOperationSymbols_T<Char_T>;
 
         StringUtils::TrimLeft(content, offset, end_offset);
         StringUtils::TrimRight(content, offset, end_offset);
 
         if (offset < end_offset) {
             switch (content[offset]) {
-                case QOperationSymbol::ParenthesesStart: {
+                case QOperationSymbols::ParenthesesStart: {
                     ++offset;     // Drop (
                     --end_offset; // Drop )
 
                     if ((last_oper != oper) || (oper != QOperation::NoOp)) {
                         const QExpression &expr =
                             exprs.Insert(QExpression{parseExpressions(content, offset, end_offset, loop_tag), oper});
-                        return (expr.SubExpressions.Size() != 0);
+                        return (expr.SubExprs.Size() != 0);
                     }
 
                     // The entire expression is inside (...)
@@ -1810,16 +1810,16 @@ struct TemplateCore {
                     return (exprs.Size() != 0);
                 }
 
-                case QOperationSymbol::BracketStart: {
+                case QOperationSymbols::BracketStart: {
                     if ((end_offset - offset) > TagPatterns::VariableFullLength) {
                         end_offset -= TagPatterns::InLineSuffixLength;
 
                         if (content[end_offset] == TagPatterns::InLineLastChar) {
                             offset += TagPatterns::VariablePrefixLength;
-                            QExpression &expr    = exprs.Insert(QExpression{ExpressionType::Variable, oper});
-                            expr.Variable.Offset = offset;
-                            expr.Variable.Length = SizeT16(end_offset - offset);
-                            checkLoopVariable(content, expr.Variable, loop_tag);
+                            QExpression &expr       = exprs.Insert(QExpression{ExpressionType::Variable, oper});
+                            expr.VariableTag.Offset = offset;
+                            expr.VariableTag.Length = SizeT16(end_offset - offset);
+                            checkLoopVariable(content, expr.VariableTag, loop_tag);
                             return true;
                         }
                     }
@@ -1832,7 +1832,8 @@ struct TemplateCore {
                     QExpression expr;
                     expr.Operation = oper;
 
-                    const QNumberType n_type = Digit::StringToNumber(expr.Value.Number, content, offset, end_offset);
+                    const QNumberType n_type =
+                        Digit::StringToNumber(expr.ExprValue.Number, content, offset, end_offset);
 
                     if ((n_type != QNumberType::NotANumber) && (offset == end_offset)) {
                         switch (n_type) {
@@ -1860,9 +1861,9 @@ struct TemplateCore {
                             return false;
                         }
 
-                        expr.Value.Offset = original_offset;
-                        expr.Value.Length = (end_offset - original_offset);
-                        expr.Type         = ExpressionType::NotANumber;
+                        expr.ExprValue.Offset = original_offset;
+                        expr.ExprValue.Length = (end_offset - original_offset);
+                        expr.Type             = ExpressionType::NotANumber;
                     }
 
                     exprs += Memory::Move(expr);
@@ -1876,59 +1877,59 @@ struct TemplateCore {
     }
 
     static QOperation getOperation(const Char_T *content, SizeT &offset, const SizeT end_offset) noexcept {
-        using QOperationSymbol = QOperationSymbol_T<Char_T>;
+        using QOperationSymbols = QOperationSymbols_T<Char_T>;
 
         while (offset < end_offset) {
             switch (content[offset]) {
-                case QOperationSymbol::OrExp: { // ||
-                    if (content[(offset + 1)] == QOperationSymbol::OrExp) {
+                case QOperationSymbols::OrExp: { // ||
+                    if (content[(offset + 1)] == QOperationSymbols::OrExp) {
                         return QOperation::Or;
                     }
 
                     return QOperation::BitwiseOr;
                 }
 
-                case QOperationSymbol::AndExp: { // &&
-                    if (content[(offset + 1)] == QOperationSymbol::AndExp) {
+                case QOperationSymbols::AndExp: { // &&
+                    if (content[(offset + 1)] == QOperationSymbols::AndExp) {
                         return QOperation::And;
                     }
 
                     return QOperation::BitwiseAnd;
                 }
 
-                case QOperationSymbol::GreaterExp: { // > or >=
-                    if (content[(offset + 1)] == QOperationSymbol::EqualExp) {
+                case QOperationSymbols::GreaterExp: { // > or >=
+                    if (content[(offset + 1)] == QOperationSymbols::EqualExp) {
                         return QOperation::GreaterOrEqual;
                     }
 
                     return QOperation::Greater;
                 }
 
-                case QOperationSymbol::LessExp: { // < or <=
-                    if (content[(offset + 1)] == QOperationSymbol::EqualExp) {
+                case QOperationSymbols::LessExp: { // < or <=
+                    if (content[(offset + 1)] == QOperationSymbols::EqualExp) {
                         return QOperation::LessOrEqual;
                     }
 
                     return QOperation::Less;
                 }
 
-                case QOperationSymbol::NotExp: { // !=
-                    if (content[(offset + 1)] == QOperationSymbol::EqualExp) {
+                case QOperationSymbols::NotExp: { // !=
+                    if (content[(offset + 1)] == QOperationSymbols::EqualExp) {
                         return QOperation::NotEqual;
                     }
 
                     return QOperation::Error;
                 }
 
-                case QOperationSymbol::EqualExp: { // ==
-                    if (content[(offset + 1)] == QOperationSymbol::EqualExp) {
+                case QOperationSymbols::EqualExp: { // ==
+                    if (content[(offset + 1)] == QOperationSymbols::EqualExp) {
                         return QOperation::Equal;
                     }
 
                     return QOperation::Error;
                 }
 
-                case QOperationSymbol::SubtractExp: {
+                case QOperationSymbols::SubtractExp: {
                     if (isExpression(content, offset)) {
                         return QOperation::Subtraction;
                     }
@@ -1936,7 +1937,7 @@ struct TemplateCore {
                     break;
                 }
 
-                case QOperationSymbol::AddExp: {
+                case QOperationSymbols::AddExp: {
                     if (isExpression(content, offset)) {
                         return QOperation::Addition;
                     }
@@ -1944,34 +1945,34 @@ struct TemplateCore {
                     break;
                 }
 
-                case QOperationSymbol::DivideExp: {
+                case QOperationSymbols::DivideExp: {
                     return QOperation::Division;
                 }
 
-                case QOperationSymbol::MultipleExp: {
+                case QOperationSymbols::MultipleExp: {
                     return QOperation::Multiplication;
                 }
 
-                case QOperationSymbol::RemainderExp: {
+                case QOperationSymbols::RemainderExp: {
                     return QOperation::Remainder;
                 }
 
-                case QOperationSymbol::ExponentExp: {
+                case QOperationSymbols::ExponentExp: {
                     return QOperation::Exponent;
                 }
 
-                case QOperationSymbol::ParenthesesStart: {
+                case QOperationSymbols::ParenthesesStart: {
                     ++offset;
                     SizeT32 skip{0U};
 
                     while (offset < end_offset) {
-                        if (content[offset] == QOperationSymbol::ParenthesesEnd) {
+                        if (content[offset] == QOperationSymbols::ParenthesesEnd) {
                             if (skip == 0U) {
                                 break;
                             }
 
                             --skip;
-                        } else if (content[offset] == QOperationSymbol::ParenthesesStart) {
+                        } else if (content[offset] == QOperationSymbols::ParenthesesStart) {
                             ++skip;
                         }
 
@@ -1985,10 +1986,10 @@ struct TemplateCore {
                     return QOperation::Error;
                 }
 
-                case QOperationSymbol::BracketStart: {
+                case QOperationSymbols::BracketStart: {
                     do {
                         ++offset;
-                    } while ((offset < end_offset) && (content[offset] != QOperationSymbol::BracketEnd));
+                    } while ((offset < end_offset) && (content[offset] != QOperationSymbols::BracketEnd));
 
                     if (offset < end_offset) {
                         continue;
@@ -2009,18 +2010,18 @@ struct TemplateCore {
     }
 
     static bool isExpression(const Char_T *content, SizeT offset) noexcept {
-        using QOperationSymbol = QOperationSymbol_T<Char_T>;
+        using QOperationSymbols = QOperationSymbols_T<Char_T>;
 
         while (offset != 0) {
             --offset;
 
             switch (content[offset]) {
-                case QOperationSymbol::SpaceChar: {
+                case QOperationSymbols::SpaceChar: {
                     break;
                 }
 
-                case QOperationSymbol::ParenthesesEnd:
-                case QOperationSymbol::BracketEnd: {
+                case QOperationSymbols::ParenthesesEnd:
+                case QOperationSymbols::BracketEnd: {
                     // (...) and {} are numbers.
                     return true;
                 }

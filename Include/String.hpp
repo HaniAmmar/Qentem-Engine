@@ -225,25 +225,6 @@ struct String {
         return str;
     }
 
-    inline SizeT Length() const noexcept {
-        return length_;
-    }
-
-    inline void SetLength(SizeT length) {
-        if (Length() < length) {
-            expand(length);
-        }
-
-        if (Length() != 0) {
-            Storage()[length] = Char_T{0};
-            setLength(length); // Update internal length
-        }
-    }
-
-    inline Char_T *Storage() const noexcept {
-        return storage_;
-    }
-
     static String Merge(const String &src1, const String &src2) {
         return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
     }
@@ -322,6 +303,29 @@ struct String {
             setStorage(new_storage);
             setLength(new_length);
         }
+    }
+
+    inline SizeT Length() const noexcept {
+        return length_;
+    }
+
+    inline void SetLength(SizeT length) {
+        if (Length() < length) {
+            expand(length);
+        }
+
+        if (Length() != 0) {
+            Storage()[length] = Char_T{0};
+            setLength(length); // Update internal length
+        }
+    }
+
+    inline Char_T *Storage() noexcept {
+        return storage_;
+    }
+
+    inline const Char_T *Storage() const noexcept {
+        return storage_;
     }
 
     inline const Char_T *First() const noexcept {

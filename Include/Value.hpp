@@ -38,8 +38,8 @@ enum struct ValueType : SizeT8 {
 ///////////////////////////////////////////////
 template <typename Char_T>
 struct Value {
-    using JSONNotation = JSONUtils::Notation_T<Char_T>;
-    using VItem        = HAItem_T<String<Char_T>, Value>;
+    using NotationConstants = JSONUtils::NotationConstants_T<Char_T>;
+    using VItem             = HAItem_T<String<Char_T>, Value>;
 
     using ObjectT     = HArray<String<Char_T>, Value>;
     using ArrayT      = Array<Value>;
@@ -531,13 +531,13 @@ struct Value {
         return out;
     }
 
-    inline Value &operator[](const Char_T *key) {
+    inline Value &operator[](const Char_T *str) {
         if (!isObject()) {
             reset();
             setTypeToObject();
         }
 
-        return (object_[key]);
+        return (object_[str]);
     }
 
     inline Value &operator[](const StringViewT &key) {
@@ -601,14 +601,14 @@ struct Value {
         return (*this)[SizeT(index)];
     }
 
-    // Will insert the key if it does not exist.
-    inline Value &Get(const Char_T *key, SizeT length) {
+    // Will insert the str if it does not exist.
+    inline Value &Get(const Char_T *str, SizeT length) {
         if (!isObject()) {
             reset();
             setTypeToObject();
         }
 
-        return (object_.Get(key, length));
+        return (object_.Get(str, length));
     }
 
     inline Value &Get(const StringViewT &key) {
@@ -893,7 +893,7 @@ struct Value {
         }
 
         if (isArray() && val.isArray()) {
-            Value       *src_val = val.array_.Storage();
+            const Value *src_val = val.array_.First();
             const Value *end     = val.array_.End();
 
             while (src_val < end) {
@@ -1120,7 +1120,7 @@ struct Value {
         return 0;
     }
 
-    Value *GetValueAt(SizeT index) const noexcept {
+    Value *GetValueAt(SizeT index) noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 Value *val = object_.GetValueAt(index);
@@ -1144,6 +1144,39 @@ struct Value {
                 return nullptr;
             }
 
+                // case ValueType::ValuePtr: {
+                //     return value_->GetValueAt(index);
+                // }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    const Value *GetValueAt(SizeT index) const noexcept {
+        switch (Type()) {
+            case ValueType::Object: {
+                const Value *val = object_.GetValueAt(index);
+
+                if ((val != nullptr) && (!(val->isUndefined()))) {
+                    return val;
+                }
+
+                return nullptr;
+            }
+
+            case ValueType::Array: {
+                if (index < array_.Size()) {
+                    const Value *val = (array_.Storage() + index);
+
+                    if (!(val->isUndefined())) {
+                        return val;
+                    }
+                }
+
+                return nullptr;
+            }
+
             case ValueType::ValuePtr: {
                 return value_->GetValueAt(index);
             }
@@ -1153,10 +1186,10 @@ struct Value {
         }
     }
 
-    Value *GetValue(const Char_T *key, SizeT length) const noexcept {
+    Value *GetValue(const Char_T *str, SizeT length) noexcept {
         switch (Type()) {
             case ValueType::Object: {
-                Value *val = object_.GetValue(key, length);
+                Value *val = object_.GetValue(str, length);
 
                 if ((val != nullptr) && !(val->isUndefined())) {
                     return val;
@@ -1167,7 +1200,7 @@ struct Value {
 
             case ValueType::Array: {
                 SizeT index;
-                Digit::FastStringToNumber(index, key, length);
+                Digit::FastStringToNumber(index, str, length);
 
                 if (index < array_.Size()) {
                     Value *val = (array_.Storage() + index);
@@ -1180,8 +1213,44 @@ struct Value {
                 return nullptr;
             }
 
+                // case ValueType::ValuePtr: {
+                //     return value_->GetValue(str, length);
+                // }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    const Value *GetValue(const Char_T *str, SizeT length) const noexcept {
+        switch (Type()) {
+            case ValueType::Object: {
+                const Value *val = object_.GetValue(str, length);
+
+                if ((val != nullptr) && !(val->isUndefined())) {
+                    return val;
+                }
+
+                return nullptr;
+            }
+
+            case ValueType::Array: {
+                SizeT index;
+                Digit::FastStringToNumber(index, str, length);
+
+                if (index < array_.Size()) {
+                    const Value *val = (array_.Storage() + index);
+
+                    if (!(val->isUndefined())) {
+                        return val;
+                    }
+                }
+
+                return nullptr;
+            }
+
             case ValueType::ValuePtr: {
-                return value_->GetValue(key, length);
+                return value_->GetValue(str, length);
             }
 
             default:
@@ -1189,7 +1258,11 @@ struct Value {
         }
     }
 
-    Value *GetValue(const StringViewT &key) const noexcept {
+    Value *GetValue(const StringViewT &key) noexcept {
+        return GetValue(key.First(), key.Length());
+    }
+
+    const Value *GetValue(const StringViewT &key) const noexcept {
         return GetValue(key.First(), key.Length());
     }
 
@@ -1241,7 +1314,32 @@ struct Value {
         }
     }
 
-    Value *Last() const {
+    Value *Last() {
+        switch (Type()) {
+            case ValueType::Object: {
+                VItem *item = object_.Last();
+
+                if (item != nullptr) {
+                    return &(item->Value);
+                }
+
+                return nullptr;
+            }
+
+            case ValueType::Array: {
+                return array_.Last();
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->Last();
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    const Value *Last() const {
         switch (Type()) {
             case ValueType::Object: {
                 VItem *item = object_.Last();
@@ -1289,15 +1387,15 @@ struct Value {
         }
     }
 
-    const StringT *GetKey(SizeT index) const noexcept {
+    const StringT *GetKeyAt(SizeT index) const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            return (object_.GetKey(index));
+            return (object_.GetKeyAt(index));
         }
 
         if (type == ValueType::ValuePtr) {
-            return (value_->GetKey(index));
+            return (value_->GetKeyAt(index));
         }
 
         return nullptr;
@@ -1413,11 +1511,11 @@ struct Value {
 
     // To get a pointer to a key and its length.
     template <typename Number_T>
-    bool SetKeyCharAndLength(SizeT index, const Char_T *&key, Number_T &length) const noexcept {
-        const StringT *val = GetKey(index);
+    bool SetKeyCharAndLengthAt(SizeT index, const Char_T *&str, Number_T &length) const noexcept {
+        const StringT *val = GetKeyAt(index);
 
         if (val != nullptr) {
-            key    = val->First();
+            str    = val->First();
             length = Number_T(val->Length());
             return true;
         }
@@ -1426,7 +1524,7 @@ struct Value {
     }
 
     template <typename Number_T>
-    void SetValueKeyLength(SizeT index, const Value *&value, const Char_T *&key, Number_T &length) const noexcept {
+    void SetKeyCharAndLengthAt(SizeT index, const Value *&value, const Char_T *&str, Number_T &length) const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -1436,19 +1534,19 @@ struct Value {
 
             if ((item != nullptr) && !(item->Value.isUndefined())) {
                 value  = &(item->Value);
-                key    = item->Key.First();
+                str    = item->Key.First();
                 length = Number_T(item->Key.Length());
             }
         } else if (type == ValueType::ValuePtr) {
-            value_->SetValueKeyLength(index, value, key, length);
+            value_->SetKeyCharAndLengthAt(index, value, str, length);
         }
     }
 
-    void SetValueAndKey(SizeT index, const Value *&value, StringViewT &key) const noexcept {
+    void SetValueAndKeyAt(SizeT index, const Value *&value, StringViewT &key) const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            const VItem *item = object_.GetItem(index);
+            const VItem *item = object_.GetItemAt(index);
 
             value = nullptr;
 
@@ -1457,40 +1555,40 @@ struct Value {
                 key   = StringViewT{item->Key.First(), item->Key.Length()};
             }
         } else if (type == ValueType::ValuePtr) {
-            value_->SetValueAndKey(index, value, key);
+            value_->SetValueAndKeyAt(index, value, key);
         }
     }
 
     // To get a pointer to a string value and its length.
     template <typename Number_T>
-    bool SetCharAndLength(const Char_T *&key, Number_T &length) const noexcept {
+    bool SetCharAndLength(const Char_T *&str, Number_T &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
-                key    = string_.First();
+                str    = string_.First();
                 length = Number_T{string_.Length()};
                 return true;
             }
 
             case ValueType::True: {
-                key    = JSONNotation::TrueString;
-                length = JSONNotation::TrueStringLength;
+                str    = NotationConstants::TrueString;
+                length = NotationConstants::TrueStringLength;
                 return true;
             }
 
             case ValueType::False: {
-                key    = JSONNotation::FalseString;
-                length = JSONNotation::FalseStringLength;
+                str    = NotationConstants::FalseString;
+                length = NotationConstants::FalseStringLength;
                 return true;
             }
 
             case ValueType::Null: {
-                key    = JSONNotation::NullString;
-                length = JSONNotation::NullStringLength;
+                str    = NotationConstants::NullString;
+                length = NotationConstants::NullStringLength;
                 return true;
             }
 
             case ValueType::ValuePtr: {
-                return value_->SetCharAndLength(key, length);
+                return value_->SetCharAndLength(str, length);
             }
 
             default: {
@@ -1533,17 +1631,17 @@ struct Value {
             }
 
             case ValueType::True: {
-                stream.Write(JSONNotation::TrueString, JSONNotation::TrueStringLength);
+                stream.Write(NotationConstants::TrueString, NotationConstants::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                stream.Write(JSONNotation::FalseString, JSONNotation::FalseStringLength);
+                stream.Write(NotationConstants::FalseString, NotationConstants::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Write(JSONNotation::NullString, JSONNotation::NullStringLength);
+                stream.Write(NotationConstants::NullString, NotationConstants::NullStringLength);
                 break;
             }
 
@@ -1560,11 +1658,11 @@ struct Value {
     }
 
     template <typename StringStream_T>
-    bool CopyKeyByIndexTo(StringStream_T &stream, SizeT index) const {
+    bool CopyKeyAt(StringStream_T &stream, SizeT index) const {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            const StringT *key = object_.GetKey(index);
+            const StringT *key = object_.GetKeyAt(index);
 
             if (key != nullptr) {
                 stream += *key;
@@ -1574,7 +1672,7 @@ struct Value {
         }
 
         if (type == ValueType::ValuePtr) {
-            return value_->CopyKeyByIndexTo(stream, index);
+            return value_->CopyKeyAt(stream, index);
         }
 
         return false;
@@ -1727,12 +1825,12 @@ struct Value {
             }
 
             case ValueType::String: {
-                if (string_.IsEqual(JSONNotation::TrueString, JSONNotation::TrueStringLength)) {
+                if (string_.IsEqual(NotationConstants::TrueString, NotationConstants::TrueStringLength)) {
                     value = true;
                     return true;
                 }
 
-                if (string_.IsEqual(JSONNotation::FalseString, JSONNotation::FalseStringLength)) {
+                if (string_.IsEqual(NotationConstants::FalseString, NotationConstants::FalseStringLength)) {
                     value = false;
                     return true;
                 }
@@ -1745,21 +1843,21 @@ struct Value {
         return false;
     }
 
-    inline void Remove(const Char_T *key, SizeT length) const noexcept {
+    inline void Remove(const Char_T *str, SizeT length) noexcept {
         if (isObject()) {
-            object_.Remove(key, length);
+            object_.Remove(str, length);
         }
     }
 
-    inline void Remove(const StringT &key) const noexcept {
-        Remove(key.First(), string_.Length());
+    inline void Remove(const StringT &key) noexcept {
+        Remove(key.First(), key.Length());
     }
 
-    inline void Remove(const Char_T *key) const noexcept {
-        Remove(key, StringUtils::Count(key));
+    inline void Remove(const Char_T *str) noexcept {
+        Remove(str, StringUtils::Count(str));
     }
 
-    void RemoveAt(SizeT index) const noexcept {
+    void RemoveAt(SizeT index) noexcept {
         if (isObject()) {
             object_.RemoveAt(index);
         } else if (isArray() && (index < array_.Size())) {
@@ -1768,7 +1866,7 @@ struct Value {
     }
 
     template <typename Number_T>
-    inline void RemoveAt(Number_T index) const noexcept {
+    inline void RemoveAt(Number_T index) noexcept {
         RemoveAt(SizeT(index));
     }
 
@@ -1841,7 +1939,7 @@ struct Value {
         return type_;
     }
 
-    bool GroupBy(Value &groupedValue, const Char_T *key, const SizeT length) const {
+    bool GroupBy(Value &groupedValue, const Char_T *key_str, const SizeT length) const {
         const ValueType type = Type();
 
         if (type == ValueType::Array) {
@@ -1855,7 +1953,8 @@ struct Value {
             groupedValue.reset();
             groupedValue.setTypeToObject();
 
-            if ((item_ != nullptr) && item_->isObject() && item_->object_.GetIndex(grouped_key_index, key, length)) {
+            if ((item_ != nullptr) && item_->isObject() &&
+                item_->object_.GetIndex(grouped_key_index, key_str, length)) {
                 const Value *end = array_.End();
 
                 while (item_ != end) {
@@ -1900,14 +1999,14 @@ struct Value {
                 return true;
             }
         } else if (type == ValueType::ValuePtr) {
-            return value_->GroupBy(groupedValue, key, length);
+            return value_->GroupBy(groupedValue, key_str, length);
         }
 
         return false;
     }
 
-    bool GroupBy(Value &groupedValue, const Char_T *key) const {
-        return GroupBy(groupedValue, key, StringUtils::Count(key));
+    bool GroupBy(Value &groupedValue, const Char_T *str) const {
+        return GroupBy(groupedValue, str, StringUtils::Count(str));
     }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
@@ -1956,20 +2055,20 @@ struct Value {
   private:
     template <typename Stream_T>
     static void stringifyObject(const ObjectT &obj, Stream_T &stream, SizeT32 precision) {
-        stream += JSONNotation::SCurlyChar;
+        stream += NotationConstants::SCurlyChar;
 
         const VItem *h_item = obj.First();
         const VItem *end    = (h_item + obj.Size());
 
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.isUndefined())) {
-                stream += JSONNotation::QuoteChar;
+                stream += NotationConstants::QuoteChar;
                 JSONUtils::Escape(h_item->Key.First(), h_item->Key.Length(), stream);
-                stream += JSONNotation::QuoteChar;
-                stream += JSONNotation::ColonChar;
+                stream += NotationConstants::QuoteChar;
+                stream += NotationConstants::ColonChar;
 
                 stringifyValue(h_item->Value, stream, precision);
-                stream += JSONNotation::CommaChar;
+                stream += NotationConstants::CommaChar;
             }
 
             ++h_item;
@@ -1977,16 +2076,16 @@ struct Value {
 
         Char_T *last = stream.Last();
 
-        if ((last != nullptr) && (*last == JSONNotation::CommaChar)) {
-            *last = JSONNotation::ECurlyChar;
+        if ((last != nullptr) && (*last == NotationConstants::CommaChar)) {
+            *last = NotationConstants::ECurlyChar;
         } else {
-            stream += JSONNotation::ECurlyChar;
+            stream += NotationConstants::ECurlyChar;
         }
     }
 
     template <typename Stream_T>
     static void stringifyArray(const ArrayT &arr, Stream_T &stream, SizeT32 precision) {
-        stream += JSONNotation::SSquareChar;
+        stream += NotationConstants::SSquareChar;
 
         const Value *item = arr.First();
         const Value *end  = arr.End();
@@ -1994,7 +2093,7 @@ struct Value {
         while (item != end) {
             if (!(item->isUndefined())) {
                 stringifyValue(*item, stream, precision);
-                stream += JSONNotation::CommaChar;
+                stream += NotationConstants::CommaChar;
             }
 
             ++item;
@@ -2002,10 +2101,10 @@ struct Value {
 
         Char_T *last = stream.Last();
 
-        if ((last != nullptr) && (*last == JSONNotation::CommaChar)) {
-            *last = JSONNotation::ESquareChar;
+        if ((last != nullptr) && (*last == NotationConstants::CommaChar)) {
+            *last = NotationConstants::ESquareChar;
         } else {
-            stream += JSONNotation::ESquareChar;
+            stream += NotationConstants::ESquareChar;
         }
     }
 
@@ -2023,9 +2122,9 @@ struct Value {
             }
 
             case ValueType::String: {
-                stream += JSONNotation::QuoteChar;
+                stream += NotationConstants::QuoteChar;
                 JSONUtils::Escape(val.string_.First(), val.string_.Length(), stream);
-                stream += JSONNotation::QuoteChar;
+                stream += NotationConstants::QuoteChar;
                 break;
             }
 
@@ -2045,17 +2144,17 @@ struct Value {
             }
 
             case ValueType::False: {
-                stream.Write(JSONNotation::FalseString, JSONNotation::FalseStringLength);
+                stream.Write(NotationConstants::FalseString, NotationConstants::FalseStringLength);
                 break;
             }
 
             case ValueType::True: {
-                stream.Write(JSONNotation::TrueString, JSONNotation::TrueStringLength);
+                stream.Write(NotationConstants::TrueString, NotationConstants::TrueStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Write(JSONNotation::NullString, JSONNotation::NullStringLength);
+                stream.Write(NotationConstants::NullString, NotationConstants::NullStringLength);
                 break;
             }
 
@@ -2109,7 +2208,7 @@ struct Value {
         return (Type() == ValueType::Null);
     }
 
-    inline void isPtrValue() noexcept {
+    inline bool isPtrValue() const noexcept {
         return (Type() == ValueType::ValuePtr);
     }
 
