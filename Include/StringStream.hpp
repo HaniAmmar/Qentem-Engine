@@ -263,6 +263,11 @@ struct StringStream {
         return StringView<Char_T>{First(), Length()};
     }
 
+    // Without NULL terminator
+    StringView<Char_T> View() const noexcept {
+        return StringView<Char_T>{First(), Length()};
+    }
+
     String<Char_T> GetString() {
         if (Capacity() > Length()) {
             const SizeT length  = Length(); // Detach() resets the length.
