@@ -1087,6 +1087,7 @@ static void TestHArrayNumeric(QTest &test) {
     numbers[70U] = 700U;
     numbers[80U] = 800U;
     numbers[90U] = 900U;
+
     test.IsEqual(numbers.Size(), SizeT{9}, __LINE__);
     test.IsTrue(numbers.Capacity() >= SizeT{9}, __LINE__);
 
@@ -1137,6 +1138,8 @@ static void TestHArrayNumeric(QTest &test) {
     test.IsEqual(numbers.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
 
+    numbers.Clear();
+
     numbers[10U] = 100U;
     numbers[20U] = 200U;
     numbers[30U] = 300U;
@@ -1182,6 +1185,18 @@ static void TestHArrayNumeric(QTest &test) {
     numbers.Reorder();
 
     test.IsEqual(numbers.Size(), SizeT{1}, __LINE__);
+
+    numbers.Clear();
+    numbers.Reorder();
+    test.IsEqual(numbers.Size(), SizeT{0}, __LINE__);
+
+    numbers[10U] = 100U;
+    numbers[20U] = 200U;
+    numbers[30U] = 300U;
+    numbers[40U] = 400U;
+
+    numbers.Reorder();
+    test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
 }
 
 static int RunHArrayTests() {
