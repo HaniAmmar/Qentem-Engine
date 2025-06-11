@@ -148,6 +148,23 @@ struct StringView {
         return length_;
     }
 
+    QENTEM_CONST_EXPRESSION void RemovePrefix(SizeT count) noexcept {
+        if (count > Length()) {
+            count = Length();
+        }
+
+        setStorage(First() + count);
+        setLength(Length() - count);
+    }
+
+    QENTEM_CONST_EXPRESSION void RemoveSuffix(SizeT count) noexcept {
+        if (count > Length()) {
+            count = Length();
+        }
+
+        setLength(Length() - count);
+    }
+
     inline const Char_T *First() const noexcept {
         return storage_;
     }
