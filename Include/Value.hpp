@@ -1330,9 +1330,9 @@ struct Value {
                 return array_.Last();
             }
 
-            case ValueType::ValuePtr: {
-                return value_->Last();
-            }
+                // case ValueType::ValuePtr: {
+                //     return value_->Last();
+                // }
 
             default:
                 return nullptr;
