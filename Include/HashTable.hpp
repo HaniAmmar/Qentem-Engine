@@ -916,7 +916,7 @@ struct HashTable {
         constexpr SizeT32 size     = sizeof(SizeT);                 // Size of one hash entry
         constexpr SizeT   size_sum = SizeT{size + sizeof(HItem_T)}; // Total size per entry
 
-        capacity = Memory::AlignSize(capacity); // Align to power-of-two or platform needs
+        capacity = Memory::AlignToPow2(capacity); // Align to power-of-two or platform needs
 
         setCapacity(capacity); // Record new capacity
 

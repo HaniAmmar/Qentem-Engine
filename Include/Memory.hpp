@@ -280,7 +280,7 @@ struct Memory {
     }
 
     /////////////////////////////////////////////////////////////////////
-    QENTEM_INLINE static SizeT AlignSize(SizeT n_size) noexcept {
+    QENTEM_INLINE static SizeT AlignToPow2(SizeT n_size) noexcept {
         // Ensure scanned n_size is >= 2, so msb >= 1.
         SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size | SizeT{2}));
 

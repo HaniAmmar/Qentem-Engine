@@ -411,9 +411,9 @@ struct Deque {
      * and frees the excess memory.
      */
     void Compress() {
-        const SizeT n_size = Memory::AlignSize(Size());
+        const SizeT n_size = Memory::AlignToPow2(Size());
 
-        if (Memory::AlignSize(n_size) < Capacity()) {
+        if (Memory::AlignToPow2(n_size) < Capacity()) {
             Resize(n_size);
         }
     }
@@ -425,7 +425,7 @@ struct Deque {
      * and then allocates a new buffer of power-of-two capacity ≥ `cap`.
      *
      * @param cap Minimum number of elements the new buffer should hold.
-     * @post Size() == 0 and Capacity() == AlignSize(cap)
+     * @post Size() == 0 and Capacity() == AlignToPow2(cap)
      */
     void Reserve(SizeT cap) {
         // Clear and deallocate the old buffer
@@ -549,7 +549,7 @@ struct Deque {
      * @brief Allocates a buffer of power-of-two capacity >= new_cap.
      */
     void allocate(SizeT new_cap) {
-        setCapacity(Memory::AlignSize(new_cap));
+        setCapacity(Memory::AlignToPow2(new_cap));
         setStorage(Memory::Allocate<Type_T>(Capacity()));
         setPopCount(0);
     }

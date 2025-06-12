@@ -332,7 +332,7 @@ struct StringStream {
             } else {
                 // Not enough capacity: allocate a bigger buffer and copy in 3 steps.
                 SizeT   new_capacity = (new_length * ExpandFactor);
-                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignSize(new_capacity));
+                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignToPow2(new_capacity));
 
                 // 1. Copy prefix [0, index)
                 if (index > 0) {
@@ -376,7 +376,7 @@ struct StringStream {
             } else {
                 // Not enough capacity: allocate, then copy with the shift.
                 SizeT   new_capacity = (new_length * ExpandFactor);
-                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignSize(new_capacity));
+                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignToPow2(new_capacity));
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length > 0) {
@@ -514,7 +514,7 @@ struct StringStream {
     }
 
     void allocate(SizeT size) {
-        size = Memory::AlignSize(size);
+        size = Memory::AlignToPow2(size);
 
         setStorage(Memory::Allocate<Char_T>(size));
 
