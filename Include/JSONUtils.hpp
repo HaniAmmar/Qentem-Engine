@@ -371,8 +371,8 @@ struct JSONUtils {
         static constexpr Char_T FormfeedControlChar  = '\f';
         static constexpr Char_T CarriageControlChar  = '\r';
 
-        static constexpr Char_T GetReplacementChar(SizeT32 index) noexcept {
-            constexpr Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
+        static Char_T GetReplacementChar(SizeT32 index) noexcept {
+            static const Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
 
             return ReplaceList[index];
         }
