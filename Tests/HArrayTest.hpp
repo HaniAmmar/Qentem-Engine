@@ -74,7 +74,7 @@ static void TestHArray1(QTest &test) {
 
     numbers2.Resize(4);
     test.IsEqual(numbers2.Size(), 0U, __LINE__);
-    test.IsTrue(numbers2.Capacity() >= 4U, __LINE__);
+    test.IsEqual(numbers2.Capacity(), 4U, __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
 
     numbers2.Resize(5);
@@ -84,7 +84,7 @@ static void TestHArray1(QTest &test) {
 
     numbers2.Resize(2);
     test.IsEqual(numbers2.Size(), 0U, __LINE__);
-    test.IsTrue(numbers2.Capacity() >= 2U, __LINE__);
+    test.IsEqual(numbers2.Capacity(), 2U, __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
 
     numbers1.Reserve(0);
@@ -103,7 +103,7 @@ static void TestHArray1(QTest &test) {
 }
 
 static void TestHArray2(QTest &test) {
-    HashArray1          numbers1(8);
+    HashArray1          numbers1{};
     HashArray1          numbers2;
     const String<char> *key;
     const char         *str_c;
@@ -111,33 +111,32 @@ static void TestHArray2(QTest &test) {
 
     numbers1["key1"] = 1;
     test.IsEqual(numbers1.Size(), 1U, __LINE__);
-    test.IsTrue(numbers1.Capacity() >= 8U, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 2U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1.End(), (numbers1.First() + 1), __LINE__);
     test.IsEqual(numbers1["key1"], 1U, __LINE__);
 
-    const SizeT cap  = numbers1.Capacity();
     numbers1["key1"] = 20;
     test.IsEqual(numbers1.Size(), 1U, __LINE__);
-    test.IsEqual(numbers1.Capacity(), cap, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 2U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1["key1"], 20U, __LINE__);
 
     numbers1["key1"] = 300;
     test.IsEqual(numbers1.Size(), 1U, __LINE__);
-    test.IsEqual(numbers1.Capacity(), cap, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 2U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1["key1"], 300U, __LINE__);
 
     numbers1["key1"] = 4000;
     test.IsEqual(numbers1.Size(), 1U, __LINE__);
-    test.IsEqual(numbers1.Capacity(), cap, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 2U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1["key1"], 4000U, __LINE__);
 
     numbers1["key1"] = 10000;
     test.IsEqual(numbers1.Size(), 1U, __LINE__);
-    test.IsEqual(numbers1.Capacity(), cap, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 2U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1["key1"], 10000U, __LINE__);
 
@@ -158,7 +157,7 @@ static void TestHArray2(QTest &test) {
     numbers1["ABCDEF0123456789ABCDEF0123456789"] = 70;
 
     test.IsEqual(numbers1.Size(), 7U, __LINE__);
-    test.IsEqual(numbers1.Capacity(), cap, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 8U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1["key1"], 10U, __LINE__);
     test.IsEqual(numbers1["key2"], 20U, __LINE__);
@@ -1121,16 +1120,16 @@ static void TestHArrayNumeric(QTest &test) {
     numbers.Reorder();
 
     test.IsEqual(numbers.Size(), SizeT{8}, __LINE__);
-    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{16}, __LINE__);
 
     numbers.Remove(0U);
     test.IsEqual(numbers.Size(), SizeT{8}, __LINE__);
-    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{16}, __LINE__);
 
     numbers.Reorder();
 
     test.IsEqual(numbers.Size(), SizeT{7}, __LINE__);
-    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{16}, __LINE__);
 
     numbers.Remove(10U);
     numbers.Remove(60U);
@@ -1139,7 +1138,7 @@ static void TestHArrayNumeric(QTest &test) {
     numbers.Reorder();
 
     test.IsEqual(numbers.Size(), SizeT{4}, __LINE__);
-    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{16}, __LINE__);
 
     numbers.Remove(80U);
 
@@ -1150,7 +1149,7 @@ static void TestHArrayNumeric(QTest &test) {
     numbers.Reorder();
 
     test.IsEqual(numbers.Size(), SizeT{2}, __LINE__);
-    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{16}, __LINE__);
 
     numbers.Remove(30U);
     numbers.Remove(50U);
@@ -1158,7 +1157,7 @@ static void TestHArrayNumeric(QTest &test) {
     numbers.Reorder();
 
     test.IsEqual(numbers.Size(), SizeT{0}, __LINE__);
-    test.IsEqual(numbers.Capacity(), SizeT{32}, __LINE__);
+    test.IsEqual(numbers.Capacity(), SizeT{16}, __LINE__);
 
     numbers.Clear();
 

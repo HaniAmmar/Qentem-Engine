@@ -916,7 +916,7 @@ struct HashTable {
         constexpr SizeT32 size     = sizeof(SizeT);                 // Size of one hash entry
         constexpr SizeT   size_sum = SizeT{size + sizeof(HItem_T)}; // Total size per entry
 
-        capacity = Memory::AlignToPow2(capacity); // Align to power-of-two or platform needs
+        capacity = Memory::AlignToPow2(capacity); // Align to power-of-two
 
         setCapacity(capacity); // Record new capacity
 
@@ -1014,12 +1014,9 @@ struct HashTable {
 
     /**
      * @brief Double the capacity of the table, growing it to the next aligned power of two.
-     *
-     * Uses bitwise OR with 2 to ensure the growth never gets "stuck" at 1 or 2, and then multiplies by 2.
-     * This ensures a minimum growth factor and helps avoid edge-case underallocations.
      */
     inline void expand() {
-        resize((Capacity() | SizeT{2}) * SizeT{2});
+        resize(Capacity() * SizeT{2});
     }
 
     /**
