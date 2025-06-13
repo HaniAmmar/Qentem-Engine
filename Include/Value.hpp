@@ -152,6 +152,10 @@ struct Value {
         setTypeToString();
     }
 
+    inline explicit Value(const Char_T *str) : string_{str} {
+        setTypeToString();
+    }
+
     inline explicit Value(const Char_T *str, SizeT length) : string_{str, length} {
         setTypeToString();
     }
