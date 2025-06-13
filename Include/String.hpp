@@ -286,7 +286,7 @@ struct String {
             Char_T *new_storage = Memory::Allocate<Char_T>(new_length);
 
             // 1. Copy prefix [0, index)
-            if (index > 0) {
+            if (index != 0) {
                 Memory::CopyTo(new_storage, Storage(), index);
             }
 

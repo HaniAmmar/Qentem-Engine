@@ -335,7 +335,7 @@ struct StringStream {
                 Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignToPow2(new_capacity));
 
                 // 1. Copy prefix [0, index)
-                if (index > 0) {
+                if (index != 0) {
                     Memory::CopyTo(new_storage, Storage(), index);
                 }
 
@@ -366,7 +366,7 @@ struct StringStream {
                 Char_T *data = Storage();
                 SizeT   i    = old_length;
 
-                while (i > 0) {
+                while (i != 0) {
                     data[i + (shift - SizeT{1})] = data[i - SizeT{1}];
 
                     --i;
@@ -379,7 +379,7 @@ struct StringStream {
                 Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignToPow2(new_capacity));
 
                 // 2. Copy old data to the right position in new storage
-                if (old_length > 0) {
+                if (old_length != 0) {
                     Memory::CopyTo(new_storage + shift, Storage(), old_length);
                 }
 

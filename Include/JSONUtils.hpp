@@ -275,7 +275,7 @@ struct JSONUtils {
                     // Handle string literals: check for escaped quote
                     SizeT escapes = 0;
 
-                    while ((tmp > 0) && (str[--tmp] == '\\')) {
+                    while ((tmp != 0) && (str[--tmp] == '\\')) {
                         ++escapes;
                     }
 

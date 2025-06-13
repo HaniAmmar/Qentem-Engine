@@ -347,7 +347,7 @@ struct Deque {
                 const SizeT count = (Size() - new_size);
                 const SizeT end   = (start + count);
 
-                if (count > 0) {
+                if (count != 0) {
                     if (end <= Capacity()) {
                         Memory::Dispose((Storage() + start), (Storage() + end));
                     } else {
@@ -592,7 +592,7 @@ struct Deque {
     }
 
     void clear() noexcept {
-        if (Size() > 0) {
+        if (Size() != 0) {
             if ((head() + Size()) <= Capacity()) {
                 Memory::Dispose(Storage() + head(), Storage() + head() + Size());
             } else {

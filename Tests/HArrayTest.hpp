@@ -742,7 +742,7 @@ static void TestHArray7(QTest &test) {
 
         numbers1.Remove(key);
         test.IsNull(numbers1.GetKeyAt(id), __LINE__);
-    } while (id > 0);
+    } while (id != 0);
 
     numbers1.Resize((id + 1));
     test.IsEqual(numbers1.Size(), 0U, __LINE__);
@@ -835,7 +835,7 @@ static void TestHArray8(QTest &test) {
         key2 += "-k";
 
         test.IsTrue(list.Rename(key2, key1), __LINE__);
-    } while (j > 0);
+    } while (j != 0);
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key1("k-");

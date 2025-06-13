@@ -217,7 +217,7 @@ struct BigInt {
             N_Number_T num{0};
 
             // Loop through limbs from high to low, combining bits
-            while (index > 0) {
+            while (index != 0) {
                 num |= storage_[index];
                 num <<= BitWidth();
                 --index;
@@ -506,7 +506,7 @@ struct BigInt {
             }
             // Otherwise, trim trailing zero limbs if any
             else if (index >= index_) {
-                while ((index_ > 0) && (storage_[index_] == 0)) {
+                while ((index_ != 0) && (storage_[index_] == 0)) {
                     --index_;
                 }
             }
@@ -569,7 +569,7 @@ struct BigInt {
         }
 
         // Update the number of used limbs if highest limb is now zero
-        index_ -= SizeT32((index_ > 0) && (storage_[index_] == 0));
+        index_ -= SizeT32((index_ != 0) && (storage_[index_] == 0));
 
         // Return the final remainder
         return remainder;
