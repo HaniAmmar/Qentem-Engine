@@ -245,49 +245,51 @@ struct TagBit {
         // Does not clear Type nor Storage.
         // Use before calling Make... the second time.
 
-        switch (GetType()) {
-            case TagType::Variable:
-            case TagType::RawVariable: {
-                Memory::Deallocate(&GetVariableTag());
-                break;
-            }
+        if (storage_ != nullptr) {
+            switch (GetType()) {
+                case TagType::Variable:
+                case TagType::RawVariable: {
+                    Memory::Deallocate(&GetVariableTag());
+                    break;
+                }
 
-            case TagType::Math: {
-                MathTag *ptr = &GetMathTag();
-                Memory::Dispose(ptr);
-                Memory::Deallocate(ptr);
-                break;
-            }
+                case TagType::Math: {
+                    MathTag *ptr = &GetMathTag();
+                    Memory::Dispose(ptr);
+                    Memory::Deallocate(ptr);
+                    break;
+                }
 
-            case TagType::SuperVariable: {
-                SuperVariableTag *ptr = &GetSuperVariableTag();
-                Memory::Dispose(ptr);
-                Memory::Deallocate(ptr);
-                break;
-            }
+                case TagType::SuperVariable: {
+                    SuperVariableTag *ptr = &GetSuperVariableTag();
+                    Memory::Dispose(ptr);
+                    Memory::Deallocate(ptr);
+                    break;
+                }
 
-            case TagType::InLineIf: {
-                InLineIfTag *ptr = &GetInLineIfTag();
-                Memory::Dispose(ptr);
-                Memory::Deallocate(ptr);
-                break;
-            }
+                case TagType::InLineIf: {
+                    InLineIfTag *ptr = &GetInLineIfTag();
+                    Memory::Dispose(ptr);
+                    Memory::Deallocate(ptr);
+                    break;
+                }
 
-            case TagType::Loop: {
-                LoopTag *ptr = &GetLoopTag();
-                Memory::Dispose(ptr);
-                Memory::Deallocate(ptr);
-                break;
-            }
+                case TagType::Loop: {
+                    LoopTag *ptr = &GetLoopTag();
+                    Memory::Dispose(ptr);
+                    Memory::Deallocate(ptr);
+                    break;
+                }
 
-            case TagType::If: {
-                IfTag *ptr = &GetIfTag();
-                Memory::Dispose(ptr);
-                Memory::Deallocate(ptr);
-                break;
-            }
+                case TagType::If: {
+                    IfTag *ptr = &GetIfTag();
+                    Memory::Dispose(ptr);
+                    Memory::Deallocate(ptr);
+                    break;
+                }
 
-            default: {
+                default: {
+                }
             }
         }
     }

@@ -47,8 +47,10 @@ struct Array {
     }
 
     ~Array() {
-        Memory::Dispose(Storage(), End());
-        Memory::Deallocate(Storage());
+        if (Storage() != nullptr) {
+            Memory::Dispose(Storage(), End());
+            Memory::Deallocate(Storage());
+        }
     }
 
     Array &operator=(Array &&src) noexcept {
@@ -64,9 +66,11 @@ struct Array {
             src.setSize(0);
             src.setCapacity(0);
 
-            // Just in case the copied array is not a child array, do this last.
-            Memory::Dispose(storage, (storage + size));
-            Memory::Deallocate(storage);
+            if (storage != nullptr) {
+                // Just in case the copied array is not a child array, do this last.
+                Memory::Dispose(storage, (storage + size));
+                Memory::Deallocate(storage);
+            }
         }
 
         return *this;
@@ -85,9 +89,11 @@ struct Array {
                 copyArray(src);
             }
 
-            // Just in case the copied array is not a child array.
-            Memory::Dispose(storage, (storage + size));
-            Memory::Deallocate(storage);
+            if (storage != nullptr) {
+                // Just in case the copied array is not a child array, do this last.
+                Memory::Dispose(storage, (storage + size));
+                Memory::Deallocate(storage);
+            }
         }
 
         return *this;
@@ -403,8 +409,11 @@ struct Array {
         setCapacity(new_capacity);
 
         Type_T *des = allocate();
-        Memory::CopyTo(des, src, Size());
-        Memory::Deallocate(src);
+
+        if (src != nullptr) {
+            Memory::CopyTo(des, src, Size());
+            Memory::Deallocate(src);
+        }
     }
 
     void copyArray(const Array &src) {

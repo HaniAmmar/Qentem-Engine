@@ -156,8 +156,11 @@ struct HashTable {
     inline ~HashTable() {
         SizeT   *hashTable = getHashTable();
         HItem_T *storage   = Storage();
-        Memory::Dispose(storage, (storage + Size()));
-        Memory::Deallocate(hashTable);
+
+        if (hashTable != nullptr) {
+            Memory::Dispose(storage, (storage + Size()));
+            Memory::Deallocate(hashTable);
+        }
     }
 
     /**
@@ -186,9 +189,11 @@ struct HashTable {
             src.setSize(0);
             src.setCapacity(0);
 
-            // Dispose of the old memory (after transfer, in case of derived/child arrays).
-            Memory::Dispose(storage, (storage + size));
-            Memory::Deallocate(ht);
+            if (ht != nullptr) {
+                // Dispose of the old memory (after transfer, in case of derived/child arrays).
+                Memory::Dispose(storage, (storage + size));
+                Memory::Deallocate(ht);
+            }
         }
 
         return *this;
@@ -218,9 +223,11 @@ struct HashTable {
             // Deep copy all items and hash table layout from src.
             copyTable(src);
 
-            // Dispose old storage (after copy, in case of overlap in derived arrays).
-            Memory::Dispose(storage, (storage + size));
-            Memory::Deallocate(ht);
+            if (ht != nullptr) {
+                // Dispose of the old memory (after transfer, in case of derived/child arrays).
+                Memory::Dispose(storage, (storage + size));
+                Memory::Deallocate(ht);
+            }
         }
 
         return *this;
