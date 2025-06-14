@@ -301,51 +301,51 @@ struct TagBit {
     }
 
     inline const VariableTag &GetVariableTag() const noexcept {
-        return *(Memory::ChangePointer<const VariableTag>(storage_));
+        return *(Memory::CastPointer<const VariableTag>(storage_));
     }
 
     inline const MathTag &GetMathTag() const noexcept {
-        return *(Memory::ChangePointer<const MathTag>(storage_));
+        return *(Memory::CastPointer<const MathTag>(storage_));
     }
 
     inline const SuperVariableTag &GetSuperVariableTag() const noexcept {
-        return *(Memory::ChangePointer<const SuperVariableTag>(storage_));
+        return *(Memory::CastPointer<const SuperVariableTag>(storage_));
     }
 
     inline const InLineIfTag &GetInLineIfTag() const noexcept {
-        return *(Memory::ChangePointer<const InLineIfTag>(storage_));
+        return *(Memory::CastPointer<const InLineIfTag>(storage_));
     }
 
     inline const LoopTag &GetLoopTag() const noexcept {
-        return *(Memory::ChangePointer<const LoopTag>(storage_));
+        return *(Memory::CastPointer<const LoopTag>(storage_));
     }
 
     inline const IfTag &GetIfTag() const noexcept {
-        return *(Memory::ChangePointer<const IfTag>(storage_));
+        return *(Memory::CastPointer<const IfTag>(storage_));
     }
 
     inline VariableTag &GetVariableTag() noexcept {
-        return *(Memory::ChangePointer<VariableTag>(storage_));
+        return *(Memory::CastPointer<VariableTag>(storage_));
     }
 
     inline MathTag &GetMathTag() noexcept {
-        return *(Memory::ChangePointer<MathTag>(storage_));
+        return *(Memory::CastPointer<MathTag>(storage_));
     }
 
     inline SuperVariableTag &GetSuperVariableTag() noexcept {
-        return *(Memory::ChangePointer<SuperVariableTag>(storage_));
+        return *(Memory::CastPointer<SuperVariableTag>(storage_));
     }
 
     inline InLineIfTag &GetInLineIfTag() noexcept {
-        return *(Memory::ChangePointer<InLineIfTag>(storage_));
+        return *(Memory::CastPointer<InLineIfTag>(storage_));
     }
 
     inline LoopTag &GetLoopTag() noexcept {
-        return *(Memory::ChangePointer<LoopTag>(storage_));
+        return *(Memory::CastPointer<LoopTag>(storage_));
     }
 
     inline IfTag &GetIfTag() noexcept {
-        return *(Memory::ChangePointer<IfTag>(storage_));
+        return *(Memory::CastPointer<IfTag>(storage_));
     }
 
   private:

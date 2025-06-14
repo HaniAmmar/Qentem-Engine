@@ -756,7 +756,7 @@ struct HashTable {
      * @return Pointer to the start of item storage.
      */
     inline HItem_T *Storage() noexcept {
-        return Memory::ChangePointer<HItem_T>(getHashTable() + Capacity());
+        return Memory::CastPointer<HItem_T>(getHashTable() + Capacity());
     }
 
     /**
@@ -768,7 +768,7 @@ struct HashTable {
      * @return Const pointer to the start of item storage.
      */
     inline const HItem_T *Storage() const noexcept {
-        return Memory::ChangePointer<const HItem_T>(getHashTable() + Capacity());
+        return Memory::CastPointer<const HItem_T>(getHashTable() + Capacity());
     }
 
     /**
@@ -779,7 +779,7 @@ struct HashTable {
      * @return Pointer to the first item.
      */
     inline const HItem_T *First() const noexcept {
-        return Memory::ChangePointer<const HItem_T>(getHashTable() + Capacity());
+        return Memory::CastPointer<const HItem_T>(getHashTable() + Capacity());
     }
 
     /**
@@ -899,7 +899,7 @@ struct HashTable {
         Memory::SetToValue(ht, Capacity(), Capacity());
 
         // Item storage comes directly after hash table in memory.
-        return Memory::ChangePointer<HItem_T>(ht + Capacity());
+        return Memory::CastPointer<HItem_T>(ht + Capacity());
     }
 
     /**
@@ -921,7 +921,7 @@ struct HashTable {
         setCapacity(capacity); // Record new capacity
 
         // Allocate a single block for [hash table][items]
-        SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>(size_sum * capacity));
+        SizeT *ht = Memory::CastPointer<SizeT>(Memory::Allocate<char>(size_sum * capacity));
 
         setHashTable(ht); // Set hash table pointer
 
@@ -1037,7 +1037,7 @@ struct HashTable {
         SizeT *ht = getHashTable();
 
         // Storage area starts after hash table area.
-        HItem_T *storage = Memory::ChangePointer<HItem_T>(ht + Capacity());
+        HItem_T *storage = Memory::CastPointer<HItem_T>(ht + Capacity());
         HItem_T *item;
         // Compute index in hash table using base mask.
         index = (ht + (hash & getBase()));
@@ -1075,7 +1075,7 @@ struct HashTable {
         const SizeT *ht = getHashTable();
 
         // Storage area starts after hash table area.
-        const HItem_T *storage = Memory::ChangePointer<HItem_T>(ht + Capacity());
+        const HItem_T *storage = Memory::CastPointer<HItem_T>(ht + Capacity());
         const HItem_T *item;
         // Compute index in hash table using base mask.
         const SizeT *index = (ht + (hash & getBase()));
@@ -1441,7 +1441,7 @@ struct HashTable {
             const HItem_T *src_end  = (src_item + src.Size());
             const SizeT   *src_ht   = src.getHashTable();
             SizeT         *ht       = allocateOnly(Capacity());
-            HItem_T       *storage  = Memory::ChangePointer<HItem_T>(ht + Capacity());
+            HItem_T       *storage  = Memory::CastPointer<HItem_T>(ht + Capacity());
             SizeT          index{0};
 
             Memory::CopyTo(ht, src_ht, Capacity()); // Duplicate hash table slot array

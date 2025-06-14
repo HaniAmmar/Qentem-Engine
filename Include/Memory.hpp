@@ -20,12 +20,12 @@ namespace Qentem {
 struct Memory {
     /////////////////////////////////////////////////////////////////////
     template <typename Type_T>
-    QENTEM_INLINE static constexpr Type_T *ChangePointer(void *value) noexcept {
+    QENTEM_INLINE static constexpr Type_T *CastPointer(void *value) noexcept {
         return (Type_T *)(value);
     }
 
     template <typename Type_T>
-    QENTEM_INLINE static constexpr const Type_T *ChangePointer(const void *value) noexcept {
+    QENTEM_INLINE static constexpr const Type_T *CastPointer(const void *value) noexcept {
         return (const Type_T *)(value);
     }
     /////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ struct Memory {
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
             SizeT    offset = 0;
-            SizeT64 *des64  = Memory::ChangePointer<SizeT64>(des);
+            SizeT64 *des64  = Memory::CastPointer<SizeT64>(des);
 
             size *= type_size >> shift64;
 
@@ -49,7 +49,7 @@ struct Memory {
             }
         } else if QENTEM_CONST_EXPRESSION (is_mul4) {
             SizeT    offset = 0;
-            SizeT32 *des32  = Memory::ChangePointer<SizeT32>(des);
+            SizeT32 *des32  = Memory::CastPointer<SizeT32>(des);
 
             size *= type_size >> shift32;
 
@@ -59,7 +59,7 @@ struct Memory {
             }
         } else {
             SizeT   offset = 0;
-            SizeT8 *des8   = Memory::ChangePointer<SizeT8>(des);
+            SizeT8 *des8   = Memory::CastPointer<SizeT8>(des);
 
             size *= type_size;
 
@@ -154,8 +154,8 @@ struct Memory {
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
             SizeT          offset = 0;
-            SizeT64       *des64  = Memory::ChangePointer<SizeT64>(to);
-            const SizeT64 *src64  = Memory::ChangePointer<const SizeT64>(from);
+            SizeT64       *des64  = Memory::CastPointer<SizeT64>(to);
+            const SizeT64 *src64  = Memory::CastPointer<const SizeT64>(from);
 
             size *= type_size >> shift64;
 
@@ -165,8 +165,8 @@ struct Memory {
             }
         } else if QENTEM_CONST_EXPRESSION (is_mul4) {
             SizeT          offset = 0;
-            SizeT32       *des32  = Memory::ChangePointer<SizeT32>(to);
-            const SizeT32 *src32  = Memory::ChangePointer<const SizeT32>(from);
+            SizeT32       *des32  = Memory::CastPointer<SizeT32>(to);
+            const SizeT32 *src32  = Memory::CastPointer<const SizeT32>(from);
 
             size *= type_size >> shift32;
 
@@ -176,8 +176,8 @@ struct Memory {
             }
         } else {
             SizeT         offset = 0;
-            SizeT8       *des8   = Memory::ChangePointer<SizeT8>(to);
-            const SizeT8 *src8   = Memory::ChangePointer<const SizeT8>(from);
+            SizeT8       *des8   = Memory::CastPointer<SizeT8>(to);
+            const SizeT8 *src8   = Memory::CastPointer<const SizeT8>(from);
 
             size *= type_size;
 
@@ -292,7 +292,7 @@ struct Memory {
     /////////////////////////////////////////////////////////////////////
     template <typename Type_T>
     inline static Type_T *Allocate(SizeT size) {
-        Type_T *pointer = ChangePointer<Type_T>(::operator new(SystemIntType(size * sizeof(Type_T))));
+        Type_T *pointer = CastPointer<Type_T>(::operator new(SystemIntType(size * sizeof(Type_T))));
 
 #ifdef QENTEM_Q_TEST_H
         MemoryRecord::AddAllocation(pointer);
