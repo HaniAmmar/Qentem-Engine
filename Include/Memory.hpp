@@ -302,6 +302,34 @@ struct Memory {
     }
 
     template <typename Type_T>
+    inline static Type_T *AllocateAligned(SystemIntType size, SystemIntType alignment = alignof(Type_T)) {
+        constexpr SystemIntType type_size = sizeof(Type_T);
+        using PtrCast                     = PtrCast_T<Type_T>;
+
+        // // alignment must be a power of two and at least sizeof(void*)
+        // if (alignment < type_size) {
+        //     alignment = type_size;
+        // }
+
+        // Overallocate to ensure we can align and store the real pointer just before the aligned pointer
+        char *raw = CastPointer<char>(::operator new((size * type_size) + alignment + (type_size - SystemIntType{1})));
+
+#ifdef QENTEM_Q_TEST_H
+        MemoryRecord::AddAllocation(raw);
+#endif
+
+        PtrCast pc;
+        // Align the address after the space for the real pointer
+        pc.Pointer = CastPointer<Type_T>(raw);
+        pc.Number += type_size;
+        pc.Number = (pc.Number + alignment - SystemIntType{1}) & ~(SystemIntType(alignment) - SystemIntType{1});
+
+        // Store the original pointer just before the aligned pointer
+        CastPointer<void *>(pc.Pointer)[-1] = raw;
+        return pc.Pointer;
+    }
+
+    template <typename Type_T>
     QENTEM_INLINE static Type_T *AllocateInit() {
         Type_T *pointer = Allocate<Type_T>(1);
         Initialize(pointer);
@@ -324,6 +352,18 @@ struct Memory {
         }
 #endif
         ::operator delete(pointer);
+    }
+
+    template <typename Type_T>
+    inline static void DeallocateAligned(Type_T *pointer) {
+        if (pointer != nullptr) {
+            void *raw = CastPointer<void *>(pointer)[-1];
+
+#ifdef QENTEM_Q_TEST_H
+            MemoryRecord::RemoveAllocation(raw);
+#endif
+            ::operator delete(raw);
+        }
     }
 
     // Initializer
