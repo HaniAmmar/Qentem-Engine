@@ -316,6 +316,16 @@ struct Memory {
         return pointer;
     }
 
+    template <typename Type_T>
+    inline static void Deallocate(Type_T *pointer) noexcept {
+#ifdef QENTEM_Q_TEST_H
+        if (pointer != nullptr) {
+            MemoryRecord::RemoveAllocation(pointer);
+        }
+#endif
+        ::operator delete(pointer);
+    }
+
     // Initializer
     template <typename Type_T>
     QENTEM_INLINE static void Initialize(Type_T *pointer) noexcept {
@@ -344,15 +354,6 @@ struct Memory {
             new (pointer) Type_T{Forward<Values_T>(values)...};
             ++pointer;
         }
-    }
-
-    inline static void Deallocate(void *pointer) noexcept {
-#ifdef QENTEM_Q_TEST_H
-        if (pointer != nullptr) {
-            MemoryRecord::RemoveAllocation(pointer);
-        }
-#endif
-        ::operator delete(pointer);
     }
 
     template <typename Type_T>
