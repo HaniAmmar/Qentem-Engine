@@ -55,6 +55,12 @@ using SizeT          = QENTEM_SIZE_T;
 using SystemIntType  = SystemIntType_All::NumberType;
 using SystemIntTypeI = SystemIntType_All::NumberTypeI;
 ///////////////////////////////////////////////
+template <typename Type_T>
+union PtrCast_T {
+    Type_T       *Pointer;
+    SystemIntType Number;
+};
+///////////////////////////////////////////////
 #ifndef QENTEM_ENABLE_FLOAT_16
 // Requires c++23
 #define QENTEM_ENABLE_FLOAT_16 0
