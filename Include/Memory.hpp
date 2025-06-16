@@ -16,6 +16,16 @@
 
 #include "Platform.hpp"
 
+#ifndef QENTEM_ALLOCATE
+#if defined(_MSC_VER)
+#define QENTEM_ALLOCATE(size) malloc(size)
+#define QENTEM_DEALLOCATE(ptr) free(ptr)
+#else
+#define QENTEM_ALLOCATE(size) __builtin_malloc(size)
+#define QENTEM_DEALLOCATE(ptr) __builtin_free(ptr)
+#endif
+#endif
+
 namespace Qentem {
 struct Memory {
     /////////////////////////////////////////////////////////////////////
@@ -245,7 +255,7 @@ struct Memory {
         item1       = Move(item2);
         item2       = Move(item);
     }
-
+    /////////////////////////////////////////////////////////////////////
     template <bool Ascend_T, typename Type_T, typename Number_T>
     inline static void Sort(Type_T *arr, Number_T start, Number_T end) noexcept {
         if (start != end) {
@@ -278,7 +288,6 @@ struct Memory {
             Sort<Ascend_T>(arr, index, end);
         }
     }
-
     /////////////////////////////////////////////////////////////////////
     QENTEM_INLINE static SizeT AlignToPow2(SizeT n_size) noexcept {
         // Ensure scanned n_size is >= 2, so msb >= 1.
@@ -292,7 +301,7 @@ struct Memory {
     /////////////////////////////////////////////////////////////////////
     template <typename Type_T>
     inline static Type_T *Allocate(SizeT size) {
-        Type_T *pointer = CastPointer<Type_T>(::operator new(SystemIntType(size * sizeof(Type_T))));
+        Type_T *pointer = CastPointer<Type_T>(QENTEM_ALLOCATE(SystemIntType(size * sizeof(Type_T))));
 
 #ifdef QENTEM_Q_TEST_H
         MemoryRecord::AddAllocation(pointer);
@@ -312,7 +321,7 @@ struct Memory {
         // }
 
         // Overallocate to ensure we can align and store the real pointer just before the aligned pointer
-        char *raw = CastPointer<char>(::operator new((size * type_size) + alignment + (type_size - SystemIntType{1})));
+        char *raw = CastPointer<char>(QENTEM_ALLOCATE((size * type_size) + alignment + (type_size - SystemIntType{1})));
 
 #ifdef QENTEM_Q_TEST_H
         MemoryRecord::AddAllocation(raw);
@@ -351,7 +360,7 @@ struct Memory {
             MemoryRecord::RemoveAllocation(pointer);
         }
 #endif
-        ::operator delete(pointer);
+        QENTEM_DEALLOCATE(pointer);
     }
 
     template <typename Type_T>
@@ -362,36 +371,37 @@ struct Memory {
 #ifdef QENTEM_Q_TEST_H
             MemoryRecord::RemoveAllocation(raw);
 #endif
-            ::operator delete(raw);
+            QENTEM_DEALLOCATE(raw);
         }
     }
 
     // Initializer
     template <typename Type_T>
     QENTEM_INLINE static void Initialize(Type_T *pointer) noexcept {
-        new (pointer) Type_T{};
-    }
-
-    // Forward initializer
-    template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer, Values_T &&...values) noexcept {
-        new (pointer) Type_T{Forward<Values_T>(values)...};
+        SetToZeroByType(pointer);
+        ::new (pointer) Type_T{};
     }
 
     // Range default initializer
     template <typename Type_T>
     QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end) noexcept {
         while (pointer < end) {
-            new (pointer) Type_T{};
+            ::new (pointer) Type_T{};
             ++pointer;
         }
+    }
+
+    // Forward initializer
+    template <typename Type_T, typename... Values_T>
+    QENTEM_INLINE static void Initialize(Type_T *pointer, Values_T &&...values) noexcept {
+        ::new (pointer) Type_T{Forward<Values_T>(values)...};
     }
 
     // Range forward initializer
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end, Values_T &&...values) {
         while (pointer < end) {
-            new (pointer) Type_T{Forward<Values_T>(values)...};
+            ::new (pointer) Type_T{Forward<Values_T>(values)...};
             ++pointer;
         }
     }
