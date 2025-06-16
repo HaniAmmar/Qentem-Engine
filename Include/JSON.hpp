@@ -54,8 +54,8 @@ struct JSON {
             if (length != 0) {
                 SizeT offset = 0;
                 StringUtils::TrimLeft(content, offset, length);
-                ValueT value = parseValue(stream, content, offset, length);
-                StringUtils::TrimLeft(content, offset, length);
+                ValueT value{parseValue(stream, content, offset, length)};
+                StringUtils::TrimRight(content, offset, length);
 
                 if (offset == length) {
                     return value;
