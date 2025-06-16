@@ -27,27 +27,27 @@ Qentem Engine is a C++ library offering high-performance template rendering and 
 
 ### General
 
-* Header-only, cross-platform, and fully self-contained—STL-free, no external dependencies.
-* High-performance numeric parsing and formatting (FPU-free).
-* Supports 32-bit and 64-bit systems; little-endian and big-endian architectures.
-* Exception-free design—no try, catch, or throw.
-* Full Unicode support: UTF-8, UTF-16, UTF-32.
-* Low memory footprint—ideal for resource-constrained environments.
-* No global mutable state; suitable for multi-threaded use with separate objects.
+-   Header-only, cross-platform, and fully self-contained—STL-free, no external dependencies.
+-   High-performance numeric parsing and formatting (FPU-free).
+-   Supports 32-bit and 64-bit systems; little-endian and big-endian architectures.
+-   Exception-free design—no try, catch, or throw.
+-   Full Unicode support: UTF-8, UTF-16, UTF-32.
+-   Low memory footprint—ideal for resource-constrained environments.
+-   No global mutable state; suitable for multi-threaded use with separate objects.
 
 ### Template Rendering
 
-* Ultra-fast and lightweight template rendering.
-* Safe expression evaluation with automatic HTML escaping (enabled by default).
-* Raw variable output (no escaping) when needed.
-* Nested loops with support for data sorting and grouping.
-* Conditional expressions with support for nesting and inline evaluation.
-* Fast and secure arithmetic evaluation.
+-   Ultra-fast and lightweight template rendering.
+-   Safe expression evaluation with automatic HTML escaping (enabled by default).
+-   Raw variable output (no escaping) when needed.
+-   Nested loops with support for data sorting and grouping.
+-   Conditional expressions with support for nesting and inline evaluation.
+-   Fast and secure arithmetic evaluation.
 
 ### JSON
 
-* Fast and efficient parsing and serialization.
-* Supports merging, sorting, and grouping of values.
+-   Fast and efficient parsing and serialization.
+-   Supports merging, sorting, and grouping of values.
 
 ## Requirements
 
@@ -174,7 +174,7 @@ int main() {
     // Unpack all the values and merge them into v_arr.
     v_arr.Merge(JSON::Parse(R"([100,200,300])"));
 
-    std::cout << v_arr.Stringify() << '\n';
+    std::cout << v_arr << '\n';
     /* Output:
         [
             "text",
@@ -209,7 +209,7 @@ int main() {
     // Replace any value with the same key, or add it if it does not exist.
     v_obj += JSON::Parse(R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})");
 
-    std::cout << v_obj.Stringify() << '\n';
+    std::cout << v_obj << '\n';
     /* Output:
        {
             "key0": "text",
@@ -249,12 +249,12 @@ int main() {
 
     v_arr.Sort(); // Ascending
 
-    std::cout << v_arr.Stringify() << '\n';
+    std::cout << v_arr << '\n';
     // Output: [1,2,3,4,5,6,7]
 
     v_arr.Sort(false); // Descending
 
-    std::cout << v_arr.Stringify() << '\n';
+    std::cout << v_arr << '\n';
     // Output: [7,6,5,4,3,2,1]
 
     ///////////////////////////////////////////
@@ -274,7 +274,7 @@ int main() {
     Value v_arr2;
     if (v_arr.GroupBy(v_arr2, "year")) {
         v_arr2.Sort();
-        std::cout << v_arr2.Stringify() << '\n';
+        std::cout << v_arr2 << '\n';
     }
 
     /* Output:
@@ -326,6 +326,7 @@ The test suite includes over 23k lines of code, more than five times the size of
     ```
 
 -   make
+
     ```shell
     make test
     ```
