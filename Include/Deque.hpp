@@ -56,8 +56,8 @@ struct Deque {
      * @brief Constructs with an initial capacity (rounded to power-of-two).
      * @param cap Minimum number of elements to support without resizing.
      */
-    explicit Deque(SizeT cap) {
-        allocate(cap);
+    explicit Deque(SizeT capacity) {
+        allocate(capacity);
     }
 
     /**
@@ -533,8 +533,8 @@ struct Deque {
         pop_count_ = new_pop_count;
     }
 
-    inline void setCapacity(SizeT new_cap) noexcept {
-        capacity_ = new_cap;
+    inline void setCapacity(SizeT new_capacity) noexcept {
+        capacity_ = new_capacity;
     }
 
     void setStorage(Type_T *ptr) noexcept {
@@ -546,27 +546,27 @@ struct Deque {
     }
 
     /**
-     * @brief Allocates a buffer of power-of-two capacity >= new_cap.
+     * @brief Allocates a buffer of power-of-two capacity >= new_capacity.
      */
-    void allocate(SizeT new_cap) {
-        setCapacity(Memory::AlignToPow2(new_cap));
+    void allocate(SizeT capacity) {
+        setCapacity(Memory::AlignToPow2(capacity));
         setStorage(Memory::Allocate<Type_T>(Capacity()));
         setPopCount(0);
     }
 
     /**
-     * @brief Ensures the internal buffer has capacity ≥ new_cap while preserving existing elements.
+     * @brief Ensures the internal buffer has capacity ≥ new_capacity while preserving existing elements.
      *
-     * When new_cap is greater than the current capacity, this method:
-     *   1. Allocates a new power-of-two buffer of size ≥ new_cap.
+     * When new_capacity is greater than the current capacity, this method:
+     *   1. Allocates a new power-of-two buffer of size ≥ new_capacity.
      *   2. Moves existing elements in-order from the old buffer to the new one.
      *   3. Deallocates the old buffer and resets head to 0.
      *   4. Leaves the logical size unchanged.
      *
-     * @param new_cap Desired minimum capacity for the deque's buffer.
+     * @param new_capacity Desired minimum capacity for the deque's buffer.
      * @complexity Amortized O(n) when growing (due to element moves); O(1) otherwise.
      */
-    void expand(SizeT new_cap) {
+    void expand(SizeT new_capacity) {
         // 1) Bulk‐copy, two-segment style to preserve order
         const SizeT head_to_end = (capacity_ - head());
         const SizeT first_count = ((Size() < head_to_end) ? Size() : head_to_end);
@@ -577,7 +577,7 @@ struct Deque {
         Type_T *old_storage = storage_;
 
         // 3) Allocate new buffer (updates storage_, capacity_)
-        allocate(new_cap);
+        allocate(new_capacity);
 
         // Copy the first contiguous block
         Memory::CopyTo(storage_, (old_storage + head()), first_count);

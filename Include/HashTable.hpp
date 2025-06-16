@@ -121,9 +121,9 @@ struct HashTable {
      *
      * @param size Initial capacity (number of items).
      */
-    explicit HashTable(const SizeT size) {
-        if (size != 0) {
-            allocate(size);
+    explicit HashTable(const SizeT capacity) {
+        if (capacity != 0) {
+            allocate(capacity);
         }
     }
 

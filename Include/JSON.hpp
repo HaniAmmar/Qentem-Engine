@@ -78,7 +78,7 @@ struct JSON {
             if (content[offset] != NotationConstants::ECurlyChar) {
                 ObjectT *obj = value.GetObject();
 
-                while (offset < end && (content[offset] == NotationConstants::QuoteChar)) {
+                while ((offset < end) && (content[offset] == NotationConstants::QuoteChar)) {
                     ++offset;
                     const Char_T *str = (content + offset);
                     SizeT         len = JSONUtils::UnEscape(str, end, stream);

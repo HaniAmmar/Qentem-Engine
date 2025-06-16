@@ -34,9 +34,9 @@ struct StringStream {
         Memory::Deallocate(Storage());
     }
 
-    inline explicit StringStream(SizeT size) {
-        if (size != 0) {
-            allocate(size);
+    inline explicit StringStream(SizeT capacity) {
+        if (capacity != 0) {
+            allocate(capacity);
         }
     }
 
@@ -513,12 +513,12 @@ struct StringStream {
         Memory::Deallocate(str);
     }
 
-    void allocate(SizeT size) {
-        size = Memory::AlignToPow2(size);
+    void allocate(SizeT capacity) {
+        capacity = Memory::AlignToPow2(capacity);
 
-        setStorage(Memory::Allocate<Char_T>(size));
+        setStorage(Memory::Allocate<Char_T>(capacity));
 
-        setCapacity(size);
+        setCapacity(capacity);
     }
 
     Char_T *storage_{nullptr};

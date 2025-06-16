@@ -28,13 +28,13 @@ struct Array {
         src.setCapacity(0);
     }
 
-    explicit Array(SizeT size, bool initialize = false) : capacity_{size} {
-        if (size != 0) {
+    explicit Array(SizeT capacity, bool initialize = false) : capacity_{capacity} {
+        if (capacity != 0) {
             Type_T *current = allocate();
 
             if (initialize) {
-                Memory::InitializeRange(current, (current + size));
-                setSize(size);
+                Memory::InitializeRange(current, (current + capacity));
+                setSize(capacity);
             }
         }
     }
