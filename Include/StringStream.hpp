@@ -103,7 +103,7 @@ struct StringStream {
         const SizeT new_length = (Length() + SizeT{1});
 
         if (Capacity() == Length()) {
-            expand(new_length);
+            expand(new_length * ExpandFactor);
         }
 
         Storage()[Length()] = one_char;
@@ -233,9 +233,7 @@ struct StringStream {
             expand(length);
         }
 
-        if (Capacity() != 0) {
-            setLength(length);
-        }
+        setLength(length);
     }
 
     inline void Clear() noexcept {
@@ -331,8 +329,8 @@ struct StringStream {
                 setLength(new_length);
             } else {
                 // Not enough capacity: allocate a bigger buffer and copy in 3 steps.
-                SizeT   new_capacity = (new_length * ExpandFactor);
-                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignToPow2(new_capacity));
+                SizeT   new_capacity = Memory::AlignToPow2(new_length);
+                Char_T *new_storage  = Memory::Allocate<Char_T>(new_capacity);
 
                 // 1. Copy prefix [0, index)
                 if (index != 0) {
@@ -375,8 +373,8 @@ struct StringStream {
                 setLength(new_length);
             } else {
                 // Not enough capacity: allocate, then copy with the shift.
-                SizeT   new_capacity = (new_length * ExpandFactor);
-                Char_T *new_storage  = Memory::Allocate<Char_T>(Memory::AlignToPow2(new_capacity));
+                SizeT   new_capacity = Memory::AlignToPow2(new_length);
+                Char_T *new_storage  = Memory::Allocate<Char_T>(new_capacity);
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length != 0) {
@@ -495,7 +493,7 @@ struct StringStream {
             const SizeT new_length = (Length() + length);
 
             if (Capacity() < new_length) {
-                expand(new_length);
+                expand(new_length * ExpandFactor);
             }
 
             Memory::CopyTo((Storage() + Length()), str, length);
@@ -507,7 +505,7 @@ struct StringStream {
     void expand(const SizeT new_capacity) {
         Char_T *str = Storage();
 
-        allocate(new_capacity * ExpandFactor);
+        allocate(new_capacity);
 
         Memory::CopyTo(Storage(), str, Length());
         Memory::Deallocate(str);
