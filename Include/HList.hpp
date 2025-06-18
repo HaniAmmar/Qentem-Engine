@@ -53,13 +53,13 @@ struct HLItem_T : public HTableItem_T<Key_T> {
      *
      * @param Unused Source item.
      */
-    constexpr void CopyValue(HLItem_T const &) {
+    QENTEM_INLINE const void CopyValue(HLItem_T const &) const {
     }
 
     /**
      * @brief No-op initialization for key-only items (required for interface).
      */
-    constexpr void InitValue() {
+    QENTEM_INLINE const void InitValue() const {
     }
 };
 
@@ -89,6 +89,29 @@ struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>> {
      * @brief Inherit constructors from BaseT.
      */
     using BaseT::BaseT;
+    using BaseT::tryInsert;
+
+    /**
+     * @brief Array subscript operator by moved key object.
+     *
+     * Moves the key into the container if not present.
+     *
+     * @param key The key object to move.
+     */
+    inline void operator[](Key_T &&key) {
+        tryInsert(Memory::Move(key));
+    }
+
+    /**
+     * @brief Array subscript operator by key object.
+     *
+     * Looks up or inserts a value for the given key.
+     *
+     * @param key The key object.
+     */
+    inline void operator[](const Key_T &key) {
+        tryInsert(key);
+    }
 };
 
 } // namespace Qentem
