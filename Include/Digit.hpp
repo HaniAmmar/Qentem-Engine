@@ -733,11 +733,7 @@ struct Digit {
             Number_T mantissa = (number & Info_T::MantissaMask);
 
             if ((mantissa != 0) || (bias != 0)) {
-                if (bias != 0) {
-                    mantissa |= Info_T::LeadingBit;
-                } else {
-                    mantissa <<= 1U;
-                }
+                (bias != 0) ? (mantissa |= Info_T::LeadingBit) : (mantissa <<= 1U);
 
                 BigIntSys b_int{mantissa};
                 /////////////////////////////////////
@@ -779,11 +775,10 @@ struct Digit {
 
                     if (is_positive_exp) {
                         fraction_length -= positive_exp;
+                        needed = format.Precision;
 
-                        if (fixed) {
-                            needed = format.Precision;
-                        } else {
-                            needed = (format.Precision - digits);
+                        if (!fixed) {
+                            needed -= digits;
                         }
                     } else {
                         fraction_length += positive_exp;
