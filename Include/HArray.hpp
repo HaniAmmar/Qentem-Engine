@@ -174,7 +174,8 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @return Reference to the value.
      */
     inline Value_T &operator[](const Key_T &key) {
-        return Get(key);
+        HItem *item = tryInsert(key);
+        return item->Value;
     }
 
     /**
