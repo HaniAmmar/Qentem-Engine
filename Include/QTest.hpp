@@ -180,24 +180,24 @@ struct MemoryRecord {
     MemoryRecord &operator=(const MemoryRecord &) = delete;
 
     inline static void ResetMemoryRecord() noexcept {
-        getStorage() = MemoryRecordData{};
+        GetRecord() = MemoryRecordData{};
     }
 
     inline static void ResetSubMemoryRecord() noexcept {
-        static MemoryRecordData &storage = getStorage();
+        static MemoryRecordData &storage = GetRecord();
 
         storage.subAllocations   = 0;
         storage.subDeallocations = 0;
     }
 
     inline static SizeT CheckSubAllocationCount() noexcept {
-        static const MemoryRecordData &storage = getStorage();
+        static const MemoryRecordData &storage = GetRecord();
 
         return (storage.subAllocations - storage.subDeallocations);
     }
 
     inline static void AddAllocation(void *pointer) noexcept {
-        static MemoryRecordData &storage = getStorage();
+        static MemoryRecordData &storage = GetRecord();
 
         ++(storage.allocations);
         ++(storage.subAllocations);
@@ -216,7 +216,7 @@ struct MemoryRecord {
     }
 
     QENTEM_NOINLINE static void RemoveAllocation(void *pointer) noexcept {
-        static MemoryRecordData &storage = getStorage();
+        static MemoryRecordData &storage = GetRecord();
 
         ++(storage.deallocations);
         ++(storage.subDeallocations);
@@ -231,7 +231,7 @@ struct MemoryRecord {
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
-        static const MemoryRecordData &storage = getStorage();
+        static const MemoryRecordData &storage = GetRecord();
 
         TestOutput::SetDoubleFormat();
 
@@ -251,8 +251,20 @@ struct MemoryRecord {
         TestOutput::ResetDoubleFormat();
     }
 
-  private:
-    static MemoryRecordData &getStorage() noexcept {
+    QENTEM_NOINLINE static void PrintMemoryRecord() {
+        static const MemoryRecordData &storage = GetRecord();
+
+        TestOutput::SetDoubleFormat();
+
+        TestOutput::Print("Memory: ", (double(storage.remainingSize) / 1024),
+                          " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
+
+        TestOutput::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
+
+        TestOutput::ResetDoubleFormat();
+    }
+
+    static MemoryRecordData &GetRecord() noexcept {
         static MemoryRecordData data{};
 
         return data;
