@@ -18,11 +18,15 @@
 
 #ifndef QENTEM_ALLOCATE
 #if defined(_MSC_VER)
-#define QENTEM_ALLOCATE(size) malloc(size)
-#define QENTEM_DEALLOCATE(ptr) free(ptr)
+#define QENTEM_ALLOCATE(size) ::operator new(size)
+#define QENTEM_DEALLOCATE(ptr) ::operator delete(ptr)
+#define QENTEM_RAW_ALLOCATE(size) malloc(size)
+#define QENTEM_RAW_DEALLOCATE(ptr) free(ptr)
 #else
-#define QENTEM_ALLOCATE(size) __builtin_malloc(size)
-#define QENTEM_DEALLOCATE(ptr) __builtin_free(ptr)
+#define QENTEM_ALLOCATE(size) ::operator new(size)
+#define QENTEM_DEALLOCATE(ptr) ::operator delete(ptr)
+#define QENTEM_RAW_ALLOCATE(size) __builtin_malloc(size)
+#define QENTEM_RAW_DEALLOCATE(ptr) __builtin_free(ptr)
 #endif
 #endif
 
@@ -321,7 +325,8 @@ struct Memory {
         // }
 
         // Overallocate to ensure we can align and store the real pointer just before the aligned pointer
-        char *raw = CastPointer<char>(QENTEM_ALLOCATE((size * type_size) + alignment + (type_size - SystemIntType{1})));
+        char *raw =
+            CastPointer<char>(QENTEM_RAW_ALLOCATE((size * type_size) + alignment + (type_size - SystemIntType{1})));
 
 #ifdef QENTEM_Q_TEST_H
         MemoryRecord::AddAllocation(raw);
@@ -371,7 +376,7 @@ struct Memory {
 #ifdef QENTEM_Q_TEST_H
             MemoryRecord::RemoveAllocation(raw);
 #endif
-            QENTEM_DEALLOCATE(raw);
+            QENTEM_RAW_DEALLOCATE(raw);
         }
     }
 
