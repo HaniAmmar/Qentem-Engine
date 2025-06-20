@@ -31,19 +31,13 @@ struct StringView {
         src.clearLength();
     }
 
-    QENTEM_CONST_EXPRESSION StringView(const StringView &src) {
-        setStorage(src.First());
-        setLength(src.Length());
+    QENTEM_CONST_EXPRESSION StringView(const StringView &src) noexcept : storage_{src.First()}, length_{src.Length()} {
     }
 
-    QENTEM_CONST_EXPRESSION StringView(const Char_T *str, SizeT length) {
-        setStorage(str);
-        setLength(length);
+    QENTEM_CONST_EXPRESSION StringView(const Char_T *str, SizeT length) noexcept : storage_{str}, length_{length} {
     }
 
-    QENTEM_CONST_EXPRESSION StringView(const Char_T *str) {
-        setStorage(str);
-        setLength(StringUtils::Count(str));
+    QENTEM_CONST_EXPRESSION StringView(const Char_T *str) noexcept : storage_{str}, length_{StringUtils::Count(str)} {
     }
 
     QENTEM_CONST_EXPRESSION StringView &operator=(StringView &&src) noexcept {
