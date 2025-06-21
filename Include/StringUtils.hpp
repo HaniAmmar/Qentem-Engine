@@ -45,6 +45,18 @@ struct StringUtils {
     }
 
     template <typename Char_T, typename Number_T>
+    inline static void Reverse(Char_T *str, Number_T start, Number_T length) noexcept {
+        while (start < length) {
+            const Char_T tmp = str[start];
+
+            --length;
+            str[start]  = str[length];
+            str[length] = tmp;
+            ++start;
+        }
+    }
+
+    template <typename Char_T, typename Number_T>
     static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
         using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
 

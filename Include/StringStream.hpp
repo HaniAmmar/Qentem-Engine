@@ -296,17 +296,8 @@ struct StringStream {
         }
     }
 
-    inline void Reverse(SizeT index = 0) noexcept {
-        SizeT end = Length();
-
-        while (index < end) {
-            const Char_T tmp = Storage()[index];
-
-            --end;
-            Storage()[index] = Storage()[end];
-            Storage()[end]   = tmp;
-            ++index;
-        }
+    inline void Reverse(SizeT start = 0) noexcept {
+        StringUtils::Reverse(Storage(), start, Length());
     }
 
     inline void InsertAt(Char_T ch, SizeT index) {

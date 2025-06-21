@@ -265,18 +265,8 @@ struct String {
         }
     }
 
-    inline void Reverse(SizeT index = 0) noexcept {
-        SizeT   end = Length();
-        Char_T *str = Storage();
-
-        while (index < end) {
-            const Char_T tmp = str[index];
-
-            --end;
-            str[index] = str[end];
-            str[end]   = tmp;
-            ++index;
-        }
+    inline void Reverse(SizeT start = 0) noexcept {
+        StringUtils::Reverse(Storage(), start, Length());
     }
 
     inline void InsertAt(Char_T ch, SizeT index) {
