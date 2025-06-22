@@ -16,6 +16,30 @@
 
 namespace Qentem {
 
+///////////////////////////////////////////////
+template <unsigned>
+struct Size64BitLong {};
+
+template <>
+struct Size64BitLong<8U> {
+// 64-bit
+#ifdef _MSC_VER
+    using SizeT64  = unsigned long long;
+    using SizeT64I = long long;
+#else
+    using SizeT64  = unsigned long;
+    using SizeT64I = long;
+#endif
+};
+
+template <>
+struct Size64BitLong<4U> {
+    // 32-bit
+    using SizeT64  = unsigned long long;
+    using SizeT64I = long long;
+};
+///////////////////////////////////////////////
+
 using NullType = decltype(nullptr);
 using SizeT8   = unsigned char;
 using SizeT8I  = signed char;
@@ -23,13 +47,8 @@ using SizeT16  = unsigned short;
 using SizeT16I = short;
 using SizeT32  = unsigned int;
 using SizeT32I = int;
-#ifdef _MSC_VER
-using SizeT64  = unsigned long long;
-using SizeT64I = long long;
-#else
-using SizeT64  = unsigned long;
-using SizeT64I = long;
-#endif
+using SizeT64  = Size64BitLong<sizeof(void *)>::SizeT64;
+using SizeT64I = Size64BitLong<sizeof(void *)>::SizeT64I;
 ///////////////////////////////////////////////
 template <SizeT32>
 struct SystemIntTypeT {};
