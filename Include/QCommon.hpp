@@ -23,8 +23,13 @@ using SizeT16  = unsigned short;
 using SizeT16I = short;
 using SizeT32  = unsigned int;
 using SizeT32I = int;
+#ifdef _MSC_VER
 using SizeT64  = unsigned long long;
 using SizeT64I = long long;
+#else
+using SizeT64  = unsigned long;
+using SizeT64I = long;
+#endif
 ///////////////////////////////////////////////
 template <SizeT32>
 struct SystemIntTypeT {};
