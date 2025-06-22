@@ -159,7 +159,7 @@ struct ToCharsHelper {
             Digit::NumberToString(stream, number);
         }
 
-        static void Write(Stream_T &stream, short int *number) {
+        static void Write(Stream_T &stream, const short int *number) {
             Writer<Stream_T, void>::Write(stream, number);
         }
     };
