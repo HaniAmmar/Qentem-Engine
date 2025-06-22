@@ -68,7 +68,7 @@ struct ToCharsHelper {
         }
 
         static void Write(Stream_T &stream, const bool *b) {
-            *b ? stream.Write("true", SizeT{4}) : stream.Write("false", SizeT{5});
+            Writer<Stream_T, void>::Write(stream, b);
         }
     };
 
