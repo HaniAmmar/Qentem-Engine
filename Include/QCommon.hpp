@@ -18,11 +18,15 @@ namespace Qentem {
 
 ///////////////////////////////////////////////
 template <unsigned>
-struct Size64BitLong {};
+struct SystemIntDefs {};
 
 template <>
-struct Size64BitLong<8U> {
-// 64-bit
+struct SystemIntDefs<8U> {
+    // 64-bit
+
+    using SizeT32  = unsigned int;
+    using SizeT32I = int;
+
 #ifdef _MSC_VER
     using SizeT64  = unsigned long long;
     using SizeT64I = long long;
@@ -33,8 +37,10 @@ struct Size64BitLong<8U> {
 };
 
 template <>
-struct Size64BitLong<4U> {
+struct SystemIntDefs<4U> {
     // 32-bit
+    using SizeT32  = unsigned int;
+    using SizeT32I = int;
     using SizeT64  = unsigned long long;
     using SizeT64I = long long;
 };
@@ -45,10 +51,10 @@ using SizeT8   = unsigned char;
 using SizeT8I  = signed char;
 using SizeT16  = unsigned short;
 using SizeT16I = short;
-using SizeT32  = unsigned int;
-using SizeT32I = int;
-using SizeT64  = Size64BitLong<sizeof(void *)>::SizeT64;
-using SizeT64I = Size64BitLong<sizeof(void *)>::SizeT64I;
+using SizeT32  = SystemIntDefs<sizeof(void *)>::SizeT32;
+using SizeT32I = SystemIntDefs<sizeof(void *)>::SizeT32I;
+using SizeT64  = SystemIntDefs<sizeof(void *)>::SizeT64;
+using SizeT64I = SystemIntDefs<sizeof(void *)>::SizeT64I;
 ///////////////////////////////////////////////
 template <SizeT32>
 struct SystemIntTypeT {};
