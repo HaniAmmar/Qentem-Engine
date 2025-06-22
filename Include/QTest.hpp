@@ -16,18 +16,6 @@
 #define QENTEM_Q_TEST_H
 
 #include "QCommon.hpp"
-
-#ifndef QENTEM_ALLOCATE
-template <typename Type_T>
-void *operator new(Qentem::SystemIntType, Type_T *ptr) noexcept {
-    return ptr;
-}
-#define QENTEM_ALLOCATE(size) ::malloc(size)
-#define QENTEM_DEALLOCATE(ptr) ::free(ptr)
-#define QENTEM_RAW_ALLOCATE(size) ::malloc(size)
-#define QENTEM_RAW_DEALLOCATE(ptr) ::free(ptr)
-#endif // QENTEM_ALLOCATE
-
 #include "ToCharsHelper.hpp"
 
 #if defined(__APPLE__)
@@ -39,6 +27,23 @@ void *operator new(Qentem::SystemIntType, Type_T *ptr) noexcept {
 #endif
 
 #include <stdio.h>
+
+#ifndef QENTEM_ALLOCATE
+#define QENTEM_ALLOCATE(size) ::malloc(size)
+#define QENTEM_DEALLOCATE(ptr) ::free(ptr)
+#define QENTEM_RAW_ALLOCATE(size) ::malloc(size)
+#define QENTEM_RAW_DEALLOCATE(ptr) ::free(ptr)
+
+template <typename Type_T>
+void *operator new(Qentem::SystemIntType, Type_T *ptr) noexcept {
+    return ptr;
+}
+
+template <typename Type_T>
+void operator delete(void *, Type_T *) noexcept {
+    // No-op: required to match placement new
+}
+#endif // QENTEM_ALLOCATE
 
 namespace Qentem {
 
