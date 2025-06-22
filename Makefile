@@ -1,6 +1,6 @@
 # Choose your compiler
 CXX         := c++
-CXXFLAGS    := -std=c++11 -O0 -Wall -IInclude
+CXXFLAGS    := -std=c++11 -O0 -Wall -fno-exceptions -flto=auto -fno-rtti -fno-threadsafe-statics -nostdlib++ -IInclude
 BUILD_DIR   := Build
 TEST_SRC    := Tests/Test.cpp
 TEST_BIN    := $(BUILD_DIR)/QTest.bin

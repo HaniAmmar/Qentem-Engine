@@ -1,13 +1,29 @@
-cmake_minimum_required(VERSION 3.5)
-project(Qentem_Engine CXX)
+cmake_minimum_required(VERSION 3.10)
+
+project(Qentem_Engine LANGUAGES CXX)
+
+# Set C++ standard globally
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Include path for headers
 include_directories("Include")
+
+# Enable CTest integration
 enable_testing()
 
 if(MSVC)
-    add_compile_options(/W4 /D QENTEM_SSE2=1)
+    add_compile_options(/W4)
 else()
-    add_compile_options(-Wall -Wextra -fno-exceptions -march=native)
+    add_compile_options(
+        -Wall
+        -fno-exceptions
+        -flto=auto
+        -fno-rtti
+        -fno-threadsafe-statics
+        -nostdlib++
+    )
     option(ENABLE_COVERAGE "Enable Coverage for gcc/clang" FALSE)
     option(ENABLE_AVX2 "Enable AVX2" FALSE)
     option(ENABLE_SSE2 "Enable SSE2" TRUE)
