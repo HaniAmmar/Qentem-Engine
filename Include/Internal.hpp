@@ -3,7 +3,7 @@
  * @brief Internal type traits for Qentem Engine containers.
  *
  * This header defines compile-time type traits and helpers used internally by
- * Qentem containers and adapters. Notably, it provides the IsNumber<T> trait,
+ * Qentem containers and adapters. Notably, it provides the IsNumber<Type_T> trait,
  * which can be used in template metaprogramming to detect and specialize
  * behavior for numeric types (integral and floating-point).
  *
@@ -21,7 +21,73 @@
 namespace Qentem {
 namespace Internal {
 
-template <typename T>
+template <typename Type_T>
+struct RemoveCV {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveCV<const Type_T> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveCV<volatile Type_T> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveCV<const volatile Type_T> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveReference {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveReference<Type_T &> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveReference<Type_T &&> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemovePointer {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemovePointer<Type_T *> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveExtent {
+    using Type = Type_T;
+};
+
+template <typename Type_T, unsigned int N>
+struct RemoveExtent<Type_T[N]> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct RemoveExtent<Type_T[]> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct Decay {
+    using Type = typename RemoveCV<
+        typename RemoveReference<typename RemovePointer<typename RemoveExtent<Type_T>::Type>::Type>::Type>::Type;
+};
+
+template <typename Type_T>
 struct IsNumber {
     static constexpr bool value = false;
 };
