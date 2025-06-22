@@ -15,8 +15,8 @@
 #ifndef QENTEM_Q_TEST_H
 #define QENTEM_Q_TEST_H
 
-#include <iostream>
-#include <sstream>
+#include "QCommon.hpp"
+#include "ToCharsHelper.hpp"
 
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
@@ -26,53 +26,211 @@
 #include <malloc.h>
 #endif
 
-#include "QCommon.hpp"
+#include <stdio.h>
+#include <new>
 
 namespace Qentem {
 
-#if (defined(_MSVC_LANG) && (_MSVC_LANG > 201703L)) || (defined(__cplusplus) && (__cplusplus > 201703L))
-QENTEM_MAYBE_UNUSED
-static std::wostream &operator<<(std::wostream &ss, const char16_t *str) {
-    if (str != nullptr) {
-        while (*str != char16_t{'\0'}) {
-            // it's fine for PrintErrorMessage().
-            ss << char(*str);
-            ++str;
+struct SimpleStringStream {
+    using CharType = char;
+    static constexpr SizeT ExpandFactor{4};
+
+    SimpleStringStream() = default;
+
+    ~SimpleStringStream() {
+        ::operator delete(Storage());
+    }
+
+    SimpleStringStream(SimpleStringStream &&)                 = delete;
+    SimpleStringStream(const SimpleStringStream &)            = delete;
+    SimpleStringStream &operator=(SimpleStringStream &&)      = delete;
+    SimpleStringStream &operator=(const SimpleStringStream &) = delete;
+
+    inline explicit SimpleStringStream(SizeT capacity) {
+        if (capacity != 0) {
+            allocate(capacity);
         }
     }
 
-    return ss;
-}
+    inline void operator+=(char one_char) {
+        const SizeT new_length = (Length() + SizeT{1});
 
-QENTEM_MAYBE_UNUSED
-static std::wostream &operator<<(std::wostream &ss, const char16_t ch) {
-    // it's fine for PrintErrorMessage().
-    ss << char(ch);
+        if (Capacity() == Length()) {
+            expand(new_length * ExpandFactor);
+        }
 
-    return ss;
-}
+        Storage()[Length()] = one_char;
+        setLength(new_length);
+    }
 
-QENTEM_MAYBE_UNUSED
-static std::wostream &operator<<(std::wostream &ss, const char32_t *str) {
-    if (str != nullptr) {
-        while (*str != char16_t{'\0'}) {
-            // it's fine for PrintErrorMessage().
-            ss << char(*str);
-            ++str;
+    inline void Write(const char *str, const SizeT length) {
+        write(str, length);
+    }
+
+    // template <SizeT Length_T>
+    // inline void operator<<(const char (&str)[Length_T]) noexcept {
+    //     Write(str, Length_T - 1);
+    // }
+
+    inline void operator<<(const char *str) {
+        Write(str, StringUtils::Count(str));
+    }
+
+    inline void operator<<(char one_char) {
+        this->operator+=(one_char);
+    }
+
+    inline void Clear() noexcept {
+        setLength(0);
+    }
+
+    inline void StepBack(const SizeT length) noexcept {
+        if (length <= Length()) {
+            length_ -= length;
         }
     }
 
-    return ss;
-}
+    inline char *Storage() noexcept {
+        return storage_;
+    }
 
-QENTEM_MAYBE_UNUSED
-static std::wostream &operator<<(std::wostream &ss, const char32_t ch) {
-    // it's fine for PrintErrorMessage().
-    ss << char(ch);
+    inline const char *Storage() const noexcept {
+        return storage_;
+    }
 
-    return ss;
-}
-#endif
+    inline const char *First() const noexcept {
+        return storage_;
+    }
+
+    inline char *Last() noexcept {
+        if (Capacity() != 0) {
+            return (Storage() + (Length() - SizeT{1}));
+        }
+
+        return nullptr;
+    }
+
+    inline const char *Last() const noexcept {
+        if (Capacity() != 0) {
+            return (Storage() + (Length() - SizeT{1}));
+        }
+
+        return nullptr;
+    }
+
+    inline SizeT Length() const noexcept {
+        return length_;
+    }
+
+    inline SizeT Capacity() const noexcept {
+        return capacity_;
+    }
+
+    inline void Reverse(SizeT start = 0) noexcept {
+        StringUtils::Reverse(Storage(), start, Length());
+    }
+
+    inline void InsertAt(char ch, SizeT index) {
+        if (index < Length()) {
+            const SizeT new_length = (Length() + SizeT{1});
+
+            if (new_length <= Capacity()) {
+                char *data = Storage();
+                SizeT i    = Length();
+
+                while (i > index) {
+                    data[i] = data[i - SizeT{1}];
+                    --i;
+                }
+
+                data[index] = ch;
+                setLength(new_length);
+            } else {
+                char *new_storage = static_cast<char *>(::operator new(new_length));
+
+                SizeT i = 0;
+                while (i < index) {
+                    new_storage[i] = Storage()[i];
+                    ++i;
+                }
+
+                new_storage[index] = ch;
+
+                SizeT j = index;
+                while (j < Length()) {
+                    new_storage[j + 1] = Storage()[j];
+                    ++j;
+                }
+
+                ::operator delete(Storage());
+                setStorage(new_storage);
+                setCapacity(new_length);
+                setLength(new_length);
+            }
+        }
+    }
+
+  private:
+    void setStorage(char *new_storage) noexcept {
+        storage_ = new_storage;
+    }
+
+    void clearStorage() noexcept {
+        setStorage(nullptr);
+    }
+
+    void setLength(const SizeT new_length) noexcept {
+        length_ = new_length;
+    }
+
+    void setCapacity(const SizeT new_capacity) noexcept {
+        capacity_ = new_capacity;
+    }
+
+    inline void write(const char *str, const SizeT length) {
+        if (length != 0) {
+            const SizeT new_length = (Length() + length);
+
+            if (Capacity() < new_length) {
+                expand(new_length * ExpandFactor);
+            }
+
+            char *des    = (Storage() + Length());
+            SizeT offset = 0;
+
+            while (offset < length) {
+                des[offset] = str[offset];
+                ++offset;
+            }
+
+            setLength(new_length);
+        }
+    }
+
+    void expand(const SizeT new_capacity) {
+        char *str = Storage();
+
+        allocate(new_capacity);
+
+        SizeT offset = 0;
+
+        while (offset < Length()) {
+            Storage()[offset] = str[offset];
+            ++offset;
+        }
+
+        ::operator delete(str);
+    }
+
+    void allocate(SizeT capacity) {
+        setStorage(static_cast<char *>(::operator new(capacity)));
+        setCapacity(capacity);
+    }
+
+    char *storage_{nullptr};
+    SizeT length_{0};
+    SizeT capacity_{0};
+};
 
 struct TestOutput {
     TestOutput()                              = delete;
@@ -82,27 +240,13 @@ struct TestOutput {
     TestOutput &operator=(TestOutput &&)      = delete;
     TestOutput &operator=(const TestOutput &) = delete;
 
-    template <typename... Values_T>
-    inline static void Print(const Values_T &...values) {
-        if (GetStreamCache() == nullptr) {
-#if __cplusplus > 201402L
-            (std::wcout << ... << values);
-#else
-            const int dummy[sizeof...(Values_T)] = {(std::wcout << values, 0)...};
-            (void)dummy;
-#endif
-
-        } else {
-#if __cplusplus > 201402L
-            ((*GetStreamCache()) << ... << values);
-#else
-            const int dummy[sizeof...(Values_T)] = {((*GetStreamCache()) << values, 0)...};
-            (void)dummy;
-#endif
-        }
-    }
-
     enum struct Colors : SizeT8 { TITLE, ERROR, PASS, END };
+
+    static bool &IsColored() noexcept {
+        static bool isColored{true};
+
+        return isColored;
+    }
 
     QENTEM_NOINLINE static const char *GetColor(Colors color) noexcept {
         if (IsColored()) {
@@ -121,44 +265,60 @@ struct TestOutput {
         return "";
     }
 
-    static void SetStreamCache(std::wstringstream *wss) noexcept {
-        GetStreamCache() = wss;
-    }
+    template <typename... Values_T>
+    inline static void Print(const Values_T &...values) {
+        SimpleStringStream &ss = GetStreamCache();
 
-    static void SetDoubleFormat() noexcept {
-        std::wstringstream *wss = GetStreamCache();
+#if __cplusplus > 201402L
+        (ToCharsHelper::Write(ss, values), ...);
+#else
+        const int dummy[sizeof...(Values_T)] = {(ToCharsHelper::Write(ss, values), 0)...};
+        (void)dummy;
+#endif
 
-        if (wss == nullptr) {
-            std::wcout << std::fixed;
-            std::wcout.precision(2);
-        } else {
-            *wss << std::fixed;
-            wss->precision(2);
+        if (IsEnableOutput()) {
+            fwrite(ss.First(), 1, ss.Length(), stdout);
+            ss.Clear();
         }
     }
 
-    static void ResetDoubleFormat() noexcept {
-        std::wstringstream *wss = GetStreamCache();
-
-        if (wss == nullptr) {
-            std::wcout << std::defaultfloat;
-            std::wcout.precision(6);
-        } else {
-            *wss << std::defaultfloat;
-            wss->precision(6);
-        }
+    static void Flush() noexcept {
+        fflush(stdout);
     }
 
-    static bool &IsColored() noexcept {
-        static bool isColored{true};
-
-        return isColored;
+    static void Clear() noexcept {
+        GetStreamCache().Clear();
     }
 
-    static std::wstringstream *&GetStreamCache() noexcept {
-        static std::wstringstream *wss{nullptr};
+    static void DisableOutput() noexcept {
+        getEnableOutput() = false;
+    }
 
-        return wss;
+    static void EnableOutput() noexcept {
+        getEnableOutput() = true;
+    }
+
+    static bool IsEnableOutput() noexcept {
+        return getEnableOutput();
+    }
+
+    // static void SetDoubleFormat() noexcept {
+    // }
+
+    // static void ResetDoubleFormat() noexcept {
+    // }
+
+    static SimpleStringStream &GetStreamCache() noexcept {
+        static SimpleStringStream ss{1024};
+
+        return ss;
+    }
+
+  private:
+    static bool &getEnableOutput() noexcept {
+        static bool enable_output_ = true;
+
+        return enable_output_;
     }
 };
 
@@ -233,7 +393,7 @@ struct MemoryRecord {
     QENTEM_NOINLINE static void PrintMemoryStatus() {
         static const MemoryRecordData &storage = GetRecord();
 
-        TestOutput::SetDoubleFormat();
+        // TestOutput::SetDoubleFormat();
 
         TestOutput::Print("Memory: ", (double(storage.remainingSize) / 1024),
                           " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
@@ -248,20 +408,20 @@ struct MemoryRecord {
                               " remaining allocations.\n\n");
         }
 
-        TestOutput::ResetDoubleFormat();
+        // TestOutput::ResetDoubleFormat();
     }
 
     QENTEM_NOINLINE static void PrintMemoryRecord() {
         static const MemoryRecordData &storage = GetRecord();
 
-        TestOutput::SetDoubleFormat();
+        // TestOutput::SetDoubleFormat();
 
         TestOutput::Print("Memory: ", (double(storage.remainingSize) / 1024),
                           " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
 
         TestOutput::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
 
-        TestOutput::ResetDoubleFormat();
+        // TestOutput::ResetDoubleFormat();
     }
 
     static MemoryRecordData &GetRecord() noexcept {
