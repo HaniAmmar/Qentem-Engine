@@ -29,10 +29,17 @@
 #include <stdio.h>
 
 #ifndef QENTEM_ALLOCATE
-#define QENTEM_ALLOCATE(size) ::malloc(size)
-#define QENTEM_DEALLOCATE(ptr) ::free(ptr)
-#define QENTEM_RAW_ALLOCATE(size) ::malloc(size)
-#define QENTEM_RAW_DEALLOCATE(ptr) ::free(ptr)
+#if defined(_MSC_VER)
+#define QENTEM_ALLOCATE(size) malloc(size)
+#define QENTEM_DEALLOCATE(ptr) free(ptr)
+#define QENTEM_RAW_ALLOCATE(size) malloc(size)
+#define QENTEM_RAW_DEALLOCATE(ptr) free(ptr)
+#else
+#define QENTEM_ALLOCATE(size) __builtin_malloc(size)
+#define QENTEM_DEALLOCATE(ptr) __builtin_malloc(ptr)
+#define QENTEM_RAW_ALLOCATE(size) __builtin_malloc(size)
+#define QENTEM_RAW_DEALLOCATE(ptr) __builtin_free(ptr)
+#endif
 
 template <typename Type_T>
 void *operator new(Qentem::SystemIntType, Type_T *ptr) noexcept {
