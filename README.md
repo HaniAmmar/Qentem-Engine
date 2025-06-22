@@ -53,8 +53,6 @@ Qentem Engine is a C++ library offering high-performance template rendering and 
 
 A C++11 or later compiler.
 
-_Note_: `iostream` is currently used in tests.
-
 ## Embedded / Microcontroller Support
 
 Qentem Engine’s modular, STL-free architecture enables it to run effectively on embedded systems and microcontroller platforms with limited resources. The core modules—including template rendering, JSON parsing, and custom containers—have been successfully tested on ESP32 and are suitable for use in Arduino-style or bare-metal C++ projects. All components are designed without exceptions, threading, or OS-specific dependencies, making them well-suited to single-threaded, minimal environments. Qentem Engine does not provide file or stream I/O code for embedded targets.
