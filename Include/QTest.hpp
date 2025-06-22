@@ -36,7 +36,7 @@
 #define QENTEM_RAW_DEALLOCATE(ptr) free(ptr)
 #else
 #define QENTEM_ALLOCATE(size) __builtin_malloc(size)
-#define QENTEM_DEALLOCATE(ptr) __builtin_malloc(ptr)
+#define QENTEM_DEALLOCATE(ptr) __builtin_free(ptr)
 #define QENTEM_RAW_ALLOCATE(size) __builtin_malloc(size)
 #define QENTEM_RAW_DEALLOCATE(ptr) __builtin_free(ptr)
 #endif
