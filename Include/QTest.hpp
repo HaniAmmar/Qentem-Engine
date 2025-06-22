@@ -16,6 +16,18 @@
 #define QENTEM_Q_TEST_H
 
 #include "QCommon.hpp"
+
+#ifndef QENTEM_ALLOCATE
+template <typename Type_T>
+void *operator new(Qentem::SystemIntType, Type_T *ptr) noexcept {
+    return ptr;
+}
+#define QENTEM_ALLOCATE(size) ::malloc(size)
+#define QENTEM_DEALLOCATE(ptr) ::free(ptr)
+#define QENTEM_RAW_ALLOCATE(size) ::malloc(size)
+#define QENTEM_RAW_DEALLOCATE(ptr) ::free(ptr)
+#endif // QENTEM_ALLOCATE
+
 #include "ToCharsHelper.hpp"
 
 #if defined(__APPLE__)
@@ -27,7 +39,6 @@
 #endif
 
 #include <stdio.h>
-#include <new>
 
 namespace Qentem {
 
@@ -38,7 +49,7 @@ struct SimpleStringStream {
     SimpleStringStream() = default;
 
     ~SimpleStringStream() {
-        ::operator delete(Storage());
+        QENTEM_DEALLOCATE(Storage());
     }
 
     SimpleStringStream(SimpleStringStream &&)                 = delete;
@@ -146,7 +157,7 @@ struct SimpleStringStream {
                 data[index] = ch;
                 setLength(new_length);
             } else {
-                char *new_storage = static_cast<char *>(::operator new(new_length));
+                char *new_storage = static_cast<char *>(QENTEM_ALLOCATE(new_length));
 
                 SizeT i = 0;
                 while (i < index) {
@@ -162,7 +173,7 @@ struct SimpleStringStream {
                     ++j;
                 }
 
-                ::operator delete(Storage());
+                QENTEM_DEALLOCATE(Storage());
                 setStorage(new_storage);
                 setCapacity(new_length);
                 setLength(new_length);
@@ -219,11 +230,11 @@ struct SimpleStringStream {
             ++offset;
         }
 
-        ::operator delete(str);
+        QENTEM_DEALLOCATE(str);
     }
 
     void allocate(SizeT capacity) {
-        setStorage(static_cast<char *>(::operator new(capacity)));
+        setStorage(static_cast<char *>(QENTEM_ALLOCATE(capacity)));
         setCapacity(capacity);
     }
 
