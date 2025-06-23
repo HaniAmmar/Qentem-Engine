@@ -153,6 +153,14 @@ struct SimpleStringStream {
         StringUtils::Reverse(Storage(), start, Length());
     }
 
+    void InsertNull() {
+        if (Capacity() == Length()) {
+            expand(Length() + SizeT{1});
+        }
+
+        Storage()[Length()] = char{0};
+    }
+
     inline void InsertAt(char ch, SizeT index) {
         if (index < Length()) {
             const SizeT new_length = (Length() + SizeT{1});
