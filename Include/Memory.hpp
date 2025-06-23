@@ -383,7 +383,6 @@ struct Memory {
     // Initializer
     template <typename Type_T>
     QENTEM_INLINE static void Initialize(Type_T *pointer) noexcept {
-        SetToZeroByType(pointer);
         ::new (pointer) Type_T{};
     }
 
