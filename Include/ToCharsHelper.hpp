@@ -34,9 +34,15 @@ struct ToCharsHelper {
     template <typename Stream_T, typename Value_T>
     struct CharConverter_T;
 
-    template <typename Stream_T, typename Value_T>
-    QENTEM_INLINE static void Write(Stream_T &stream, const Value_T &value) {
-        Writer<Stream_T, typename Internal::Decay<Value_T>::Type>::Write(stream, value);
+    template <typename Stream_T, typename... Values_T>
+    inline static void Write(Stream_T &stream, const Values_T &...values) {
+#if __cplusplus > 201402L
+        (Writer<Stream_T, typename Internal::Decay<Values_T>::Type>::Write(stream, values), ...);
+#else
+        const int dummy[sizeof...(Values_T)] = {
+            (Writer<Stream_T, typename Internal::Decay<Values_T>::Type>::Write(stream, values), 0)...};
+        (void)dummy;
+#endif
     }
 
     template <typename Stream_T, typename Value_T>

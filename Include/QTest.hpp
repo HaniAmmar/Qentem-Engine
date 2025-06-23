@@ -299,13 +299,7 @@ struct TestOutput {
     template <typename... Values_T>
     inline static void Print(const Values_T &...values) {
         SimpleStringStream &ss = GetStreamCache();
-
-#if __cplusplus > 201402L
-        (ToCharsHelper::Write(ss, values), ...);
-#else
-        const int dummy[sizeof...(Values_T)] = {(ToCharsHelper::Write(ss, values), 0)...};
-        (void)dummy;
-#endif
+        ToCharsHelper::Write(ss, values...);
 
         if (IsEnableOutput()) {
             fwrite(ss.First(), 1, ss.Length(), stdout);
