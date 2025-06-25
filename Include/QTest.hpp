@@ -15,8 +15,11 @@
 #ifndef QENTEM_Q_TEST_H
 #define QENTEM_Q_TEST_H
 
-#include "QCommon.hpp"
 #include "ToCharsHelper.hpp"
+
+#include <stdio.h>
+#include <stdlib.h>
+// #include <mutex>
 
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
@@ -25,8 +28,6 @@
 #else
 #include <malloc.h>
 #endif
-
-#include <stdio.h>
 
 #ifndef QENTEM_ALLOCATE
 #if defined(_MSC_VER)
@@ -301,7 +302,7 @@ struct TestOutput {
         SimpleStringStream &ss = GetStreamCache();
         ToCharsHelper::Write(ss, values...);
 
-        if (IsEnableOutput()) {
+        if (IsOutputEnabled()) {
             fwrite(ss.First(), 1, ss.Length(), stdout);
             ss.Clear();
         }
@@ -316,15 +317,15 @@ struct TestOutput {
     }
 
     static void DisableOutput() noexcept {
-        getEnableOutput() = false;
+        getOutputEnabledRef() = false;
     }
 
     static void EnableOutput() noexcept {
-        getEnableOutput() = true;
+        getOutputEnabledRef() = true;
     }
 
-    static bool IsEnableOutput() noexcept {
-        return getEnableOutput();
+    static bool IsOutputEnabled() noexcept {
+        return getOutputEnabledRef();
     }
 
     // static void SetDoubleFormat() noexcept {
@@ -340,7 +341,7 @@ struct TestOutput {
     }
 
   private:
-    static bool &getEnableOutput() noexcept {
+    static bool &getOutputEnabledRef() noexcept {
         static bool enable_output_ = true;
 
         return enable_output_;
@@ -384,6 +385,7 @@ struct MemoryRecord {
     inline static void AddAllocation(void *pointer) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
+        // std::lock_guard<std::mutex> lock(mutex_);
         ++(storage.allocations);
         ++(storage.subAllocations);
 
@@ -403,6 +405,7 @@ struct MemoryRecord {
     QENTEM_NOINLINE static void RemoveAllocation(void *pointer) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
+        // std::lock_guard<std::mutex> lock(mutex_);
         ++(storage.deallocations);
         ++(storage.subDeallocations);
 
@@ -454,6 +457,8 @@ struct MemoryRecord {
 
         return data;
     }
+
+    // inline static std::mutex mutex_;
 };
 
 struct QTest {
