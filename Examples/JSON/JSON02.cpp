@@ -41,7 +41,7 @@ int main() {
 /* Block at end */
 )jsonc";
 
-    JSONUtils::StripComments(ss);
+    StringUtils::StripComments(ss.Storage(), ss.Length());
     Value<char> val1 = JSON::Parse(ss.First(), ss.Length());
 
     std::cout << "Parsed polluted_json_1:\n" << val1.Stringify() << "\n\n";
@@ -88,7 +88,7 @@ int main() {
 /* Block at EOF */
 )jsonc";
 
-    JSONUtils::StripComments(ss);
+    StringUtils::StripComments(ss.Storage(), ss.Length());
     Value<char> val2 = JSON::Parse(ss.First(), ss.Length());
 
     std::cout << "Parsed polluted_json_2:\n" << val2.Stringify() << "\n\n";
