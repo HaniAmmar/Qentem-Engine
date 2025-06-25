@@ -1817,7 +1817,7 @@ static void TestStripComments(QTest &test) {
     StringStream<char> out;
 
     in = R"([1,2,3,4,5,6,7,8,9,10])";
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,4,5,6,7,8,9,10])", __LINE__);
     out.Clear();
@@ -1827,8 +1827,9 @@ static void TestStripComments(QTest &test) {
     3,4,5,6,7,8,9,10]
     )";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
+
     test.IsEqual(value.Stringify(out), R"([1,3,4,5,6,7,8,9,10])", __LINE__);
     out.Clear();
 
@@ -1839,7 +1840,7 @@ static void TestStripComments(QTest &test) {
     ,8,9,10]
     )";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,3,4,5,6,8,9,10])", __LINE__);
     out.Clear();
@@ -1853,35 +1854,35 @@ static void TestStripComments(QTest &test) {
     ]
     )";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,3,4,5,6,8,9])", __LINE__);
     out.Clear();
 
     in = R"(["//"])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/\/"])", __LINE__);
     out.Clear();
 
     in = R"(["//", "//"])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/\/","\/\/"])", __LINE__);
     out.Clear();
 
     in = R"(["//\"", "//\\"])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/\/\"","\/\/\\"])", __LINE__);
     out.Clear();
 
     in = R"(["//\\\"", "//\\"])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/\/\\\"","\/\/\\"])", __LINE__);
     out.Clear();
@@ -1893,63 +1894,63 @@ static void TestStripComments(QTest &test) {
     ]
     )";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,"\/\/","\/\/3",4,5,"6\/\/",8,9])", __LINE__);
     out.Clear();
 
     in = R"([1,2,3/*,4,5,6*/,7,8,9])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
 
     in = R"([1,2,3/*,4,5,6*/,7/*ooo*/,8,9])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
 
     in = R"([1/*ooo*/,2,3,7,8/*ooo*/,9])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
 
     in = R"(/*ooo*/[1,2,3,7,8,9])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
 
     in = R"([1,2,3,7,8,9]/*ooo*/)";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
 
     in = R"(/*ooo*/[1,2,3,7,8,9]/*ooo*/)";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
 
     in = R"([/*o*/1,/*o*/2,/*o*/3,7,8,9])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
 
     in = R"(/*ooo*/[1,/*ooo*/2,/*ooo*/3,/*ooo*/7,8,9]/*ooo*/)";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,9])", __LINE__);
     out.Clear();
@@ -1962,65 +1963,65 @@ static void TestStripComments(QTest &test) {
     10]
     /*ooo*/)";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3,7,8,10])", __LINE__);
     out.Clear();
 
     in = R"(["/*A*/"])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/*A*\/"])", __LINE__);
     out.Clear();
 
     in = R"(["/*A*/"/*ggg*/])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/*A*\/"])", __LINE__);
     out.Clear();
 
     in = R"(["B/*"/*A*/])";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["B\/*"])", __LINE__);
     out.Clear();
 
     in = R"([1, 2, 3] /* unterminated)";
 
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"([1,2,3])", __LINE__);
     out.Clear();
 
     in = R"([1, 2, 3 /* unterminated)";
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsTrue(value.IsUndefined(), __LINE__);
     out.Clear();
 
     in = R"([1, // first\n // second\n 2])";
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsTrue(value.IsUndefined(), __LINE__);
     out.Clear();
 
     in = R"(// just a comment)";
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsTrue(value.IsUndefined(), __LINE__);
     out.Clear();
 
     in = R"(/* just a block comment */)";
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsTrue(value.IsUndefined(), __LINE__);
     out.Clear();
 
     in = R"(["//", /*foo*/ 1, 2, "//"])";
-    JSONUtils::StripComments(in);
+    JSONUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/\/",1,2,"\/\/"])", __LINE__);
     out.Clear();
