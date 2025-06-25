@@ -291,6 +291,95 @@ struct StringUtils {
             stream.Write(str, length);
         }
     }
+
+    /**
+     * @brief Replaces C/C++ style inline (`//`) and block (`/ * ... * /`) comments with whitespace,
+     *        preserving string literals and original buffer structure.
+     *
+     * This function operates directly on a raw character buffer, scanning it in-place and replacing
+     * all comment content with space (`' '`) or newline (`'\n'`). The goal is to preserve the text's
+     * structure, line count, and character offsets without allocating memory or altering length.
+     *
+     * String literals are preserved, including escaped quotes (e.g., `\"`), and comments within
+     * them are ignored. Block comments that are unterminated at the end of the buffer are masked
+     * until the buffer’s end without throwing errors or escaping bounds.
+     *
+     * @tparam Char_T Character type (typically `char` or `wchar_t`).
+     * @param str     Pointer to the character buffer.
+     * @param length  Total length of the buffer to scan.
+     */
+    template <typename Char_T>
+    static void StripComments(Char_T *str, SizeT length) {
+        SizeT offset      = 0;     // Current scan position
+        bool  inside_text = false; // True if currently inside a string literal
+
+        // Scan through the buffer
+        while (offset < length) {
+            // Advance to the next possible comment or quote character
+            while ((offset < length) && (str[offset] != '/') && (str[offset] != '"')) {
+                ++offset;
+            }
+
+            SizeT tmp = offset;
+            ++offset; // Move past the found '/' or '"' for analysis
+
+            if (offset < length) {
+                if (str[tmp] == '"') {
+                    // Handle string literals: check for escaped quote
+                    SizeT escapes = 0;
+
+                    while ((tmp != 0) && (str[--tmp] == '\\')) {
+                        ++escapes;
+                    }
+
+                    // Toggle inside_text only if quote is not escaped
+                    if (((escapes & SizeT{1}) == 0)) {
+                        inside_text = !inside_text;
+                    }
+                } else if (!inside_text) {
+                    // Only consider comments outside of string literals
+                    if (offset != length) {
+                        if ((str[offset] == '/') || (str[offset] == '*')) {
+                            str[offset - SizeT{1}] = ' ';
+
+                            if (str[offset] == '/') {
+                                str[offset] = ' ';
+                                // Inline comment: skip to end of line
+                                while ((++offset < length) && (str[offset] != '\n')) {
+                                    str[offset] = ' ';
+                                }
+                            } else {
+                                str[offset] = ' ';
+
+                                // Block comment: skip to closing '*/' or EOF
+                                while (true) {
+                                    while ((++offset < length) && (str[offset] != '*')) {
+                                        if (str[offset] != '\n') { // preserve newlines
+                                            str[offset] = ' ';
+                                        }
+                                    }
+
+                                    if (offset < length) {
+                                        str[offset] = ' ';
+                                        ++offset;
+
+                                        if ((offset < length) && (str[offset] == '/')) {
+                                            str[offset] = ' ';
+                                            break;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                }
+
+                                ++offset; // Move past '/'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 };
 
 // char
