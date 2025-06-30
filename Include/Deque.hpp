@@ -15,7 +15,7 @@
  *         logical = absolute - PopCount();
  *
  * Because pop_count_ is reset to zero whenever the underlying storage moves
- * (in allocate(), expand(), or reset()), all biased indices stay consistent
+ * (in allocate(), resize(), or reset()), all biased indices stay consistent
  * without needing any full rebuild of stored mappings. This pattern yields
  * true O(1) insertion, eviction, and index lookup in dynamic table scenarios.
  *
@@ -107,7 +107,7 @@ struct Deque {
      */
     void operator+=(Type_T &&item) {
         if (IsFull()) {
-            expand(capacity_ * SizeT{2});
+            resize(capacity_ * SizeT{2});
         }
 
         Memory::Initialize((Storage() + tail()), Memory::Move(item));
@@ -125,7 +125,7 @@ struct Deque {
      */
     inline void operator+=(const Type_T &item) {
         if (IsFull()) {
-            expand(capacity_ * SizeT{2});
+            resize(capacity_ * SizeT{2});
         }
 
         Memory::Initialize((Storage() + tail()), item);
@@ -185,7 +185,7 @@ struct Deque {
             Memory::Dispose(First());
 
             setHead((head() + SizeT{1}) & (Capacity() - SizeT{1}));
-            setSize(Size() - SizeT{1});
+            --size_;
             ++pop_count_;
         }
     }
@@ -204,7 +204,7 @@ struct Deque {
             // Destroy the very last element in place
             Memory::Dispose(Last());
             // Decrement logical size
-            setSize(Size() - SizeT{1});
+            --size_;
         }
     }
 
@@ -213,7 +213,7 @@ struct Deque {
      *
      * Returns a direct pointer to the element at the front without
      * removing it. If the deque is empty, returns nullptr. The pointer remains
-     * valid until the deque is modified (e.g., by insertion, removal, or expand).
+     * valid until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -231,7 +231,7 @@ struct Deque {
      *
      * Returns a direct, mutable pointer to the element at the front without
      * removing it. If the deque is empty, returns nullptr. The pointer remains
-     * valid until the deque is modified (e.g., by insertion, removal, or expand).
+     * valid until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -249,7 +249,7 @@ struct Deque {
      *
      * Returns a direct pointer to the back of the deque without removing it.
      * If the deque is empty, returns nullptr. The pointer remains valid
-     * until the deque is modified (e.g., via push, pop, or expand).
+     * until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -267,7 +267,7 @@ struct Deque {
      *
      * Returns a direct, mutable pointer to the back of the deque without removing it.
      * If the deque is empty, returns nullptr. The pointer remains valid
-     * until the deque is modified (e.g., via push, pop, or expand).
+     *until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
      * @note noexcept: no heap allocations or exceptions are thrown.
@@ -328,7 +328,7 @@ struct Deque {
         SizeT needed = (additional + Size());
 
         if (needed > Capacity()) {
-            expand(needed);
+            resize(needed);
         }
     }
 
@@ -360,7 +360,7 @@ struct Deque {
                 setSize(new_size);
             }
 
-            expand(new_size);
+            resize(new_size);
         } else {
             // Completely clear and deallocate
             Reset();
@@ -413,7 +413,7 @@ struct Deque {
     void Compress() {
         const SizeT n_size = Memory::AlignToPow2(Size());
 
-        if (Memory::AlignToPow2(n_size) < Capacity()) {
+        if (n_size < Capacity()) {
             Resize(n_size);
         }
     }
@@ -566,7 +566,7 @@ struct Deque {
      * @param new_capacity Desired minimum capacity for the deque's buffer.
      * @complexity Amortized O(n) when growing (due to element moves); O(1) otherwise.
      */
-    void expand(SizeT new_capacity) {
+    void resize(SizeT new_capacity) {
         // 1) Bulk‐copy, two-segment style to preserve order
         const SizeT head_to_end = (capacity_ - head());
         const SizeT first_count = ((Size() < head_to_end) ? Size() : head_to_end);
