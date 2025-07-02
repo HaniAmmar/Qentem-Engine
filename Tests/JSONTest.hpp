@@ -248,7 +248,12 @@ static void TestParse1(QTest &test) {
     content = R"([null,null])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsEqual(value.Stringify(stream), R"([null,null])", __LINE__);
-    stream.Clear();
+}
+
+static void TestParse2(QTest &test) {
+    Value<char>        value;
+    StringStream<char> stream;
+    const char        *content;
 
     content = R"([456.5,null])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
@@ -471,7 +476,7 @@ static void TestParse1(QTest &test) {
     stream.Clear();
 }
 
-static void TestParse2(QTest &test) {
+static void TestParse3(QTest &test) {
     Value<char>        value;
     StringStream<char> stream;
     const char        *content;
@@ -674,7 +679,12 @@ static void TestParse2(QTest &test) {
     content = R"({"t":{         },"A":null})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsEqual(value.Stringify(stream), R"({"t":{},"A":null})", __LINE__);
-    stream.Clear();
+}
+
+static void TestParse4(QTest &test) {
+    Value<char>        value;
+    StringStream<char> stream;
+    const char        *content;
 
     content = R"({"e":true,"A":"A"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
@@ -870,10 +880,9 @@ static void TestParse2(QTest &test) {
     content = R"({"a":{"c":"{}"},"b":{"d":"{}"}})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsEqual(value.Stringify(stream), R"({"a":{"c":"{}"},"b":{"d":"{}"}})", __LINE__);
-    stream.Clear();
 }
 
-static void TestParse3(QTest &test) {
+static void TestParse5(QTest &test) {
     Value<char>        value;
     StringStream<char> stream;
     const char        *content;
@@ -1071,7 +1080,12 @@ static void TestParse3(QTest &test) {
     content = R"(["\\"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsEqual(value.Stringify(stream), R"(["\\"])", __LINE__);
-    stream.Clear();
+}
+
+static void TestParse6(QTest &test) {
+    Value<char>        value;
+    StringStream<char> stream;
+    const char        *content;
 
     content = R"(["a\\"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
@@ -1249,10 +1263,9 @@ static void TestParse3(QTest &test) {
     content = R"([0xAAAA, 0xFFFFFFFFFFFFFFFF, 0Xabcdef])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsEqual(value.Stringify(), R"([43690,18446744073709551615,11259375])", __LINE__);
-    stream.Clear();
 }
 
-static void TestParse4(QTest &test) {
+static void TestParse7(QTest &test) {
     Value<char>         value;
     StringStream<char>  stream;
     const String<char> *key_ptr;
@@ -1373,7 +1386,7 @@ static void TestParse4(QTest &test) {
     test.IsTrue(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ", value[0].StringStorage(), value[0].Length()), __LINE__);
 }
 
-static void TestParse5(QTest &test) {
+static void TestParse8(QTest &test) {
     Value<char>        value;
     StringStream<char> stream;
     const char        *content;
@@ -1615,7 +1628,7 @@ static void TestParse5(QTest &test) {
     test.IsTrue(value.IsUndefined(), __LINE__);
 }
 
-static void TestParse6(QTest &test) {
+static void TestParse9(QTest &test) {
     Value<char>        value;
     StringStream<char> stream;
     const char        *content;
@@ -2024,7 +2037,6 @@ static void TestStripComments(QTest &test) {
     StringUtils::StripComments(in.Storage(), in.Length());
     value = JSON::Parse(out, in.First(), in.Length());
     test.IsEqual(value.Stringify(out), R"(["\/\/",1,2,"\/\/"])", __LINE__);
-    out.Clear();
 }
 
 static int RunJSONTests() {
@@ -2038,6 +2050,9 @@ static int RunJSONTests() {
     test.Test("Parse Test 4", TestParse4);
     test.Test("Parse Test 5", TestParse5);
     test.Test("Parse Test 6", TestParse6);
+    test.Test("Parse Test 7", TestParse7);
+    test.Test("Parse Test 8", TestParse8);
+    test.Test("Parse Test 9", TestParse9);
     test.Test("StripComments Test 1", TestStripComments<StringStream<char>>);
     test.Test("StripComments Test 2", TestStripComments<String<char>>);
 

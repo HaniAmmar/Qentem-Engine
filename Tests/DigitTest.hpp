@@ -50,8 +50,8 @@ QENTEM_NOINLINE static void IntToStreamEqual(QTest &test, StringStream<char> &st
     stream.Clear();
 }
 
-template <typename Stream_T, typename Number_T>
-QENTEM_NOINLINE static void RealToStreamEqual(QTest &test, Stream_T &stream, Number_T number,
+template <typename Number_T>
+QENTEM_NOINLINE static void RealToStreamEqual(QTest &test, StringStream<char> &stream, Number_T number,
                                               Digit::RealFormatInfo format, const char *expected, unsigned long line) {
     Digit::NumberToString(stream, number, format);
 
@@ -72,9 +72,9 @@ QENTEM_NOINLINE static void RealToStreamEqual(QTest &test, Stream_T &stream, Num
     }
 }
 
-template <typename Stream_T, typename Number_T>
-QENTEM_NOINLINE static void RealToStreamEqualFixed(QTest &test, Stream_T &stream, Number_T number, SizeT32 precision,
-                                                   const char *expected, unsigned long line) {
+template <typename Number_T>
+QENTEM_NOINLINE static void RealToStreamEqualFixed(QTest &test, StringStream<char> &stream, Number_T number,
+                                                   SizeT32 precision, const char *expected, unsigned long line) {
     Digit::NumberToString(stream, number, Digit::RealFormatInfo{precision, Digit::RealFormatType::Fixed});
 
     if (!test.HasError() || test.ContinueOnErrorEnabled()) {
@@ -95,8 +95,8 @@ QENTEM_NOINLINE static void RealToStreamEqualFixed(QTest &test, Stream_T &stream
     }
 }
 
-template <typename Stream_T, typename Number_T>
-QENTEM_NOINLINE static void RealToStreamEqualSemiFixed(QTest &test, Stream_T &stream, Number_T number,
+template <typename Number_T>
+QENTEM_NOINLINE static void RealToStreamEqualSemiFixed(QTest &test, StringStream<char> &stream, Number_T number,
                                                        SizeT32 precision, const char *expected, unsigned long line) {
     constexpr SizeT offset{10};
 
@@ -2227,8 +2227,7 @@ static void TestHexStringToNumber2(QTest &test) {
     test.IsEqual(number, 9838263505853157649ULL, __LINE__);
 }
 
-template <typename Stream_T>
-static void TestIntToString1(QTest &test, Stream_T &stream) {
+static void TestIntToString1(QTest &test, StringStream<char> &stream) {
     IntToStreamEqual(test, stream, char{100}, "100", __LINE__);
     IntToStreamEqual(test, stream, SizeT8{255}, "255", __LINE__);
     IntToStreamEqual(test, stream, SizeT8I(-100), "-100", __LINE__);
@@ -2256,8 +2255,7 @@ static void TestIntToString1(QTest &test, Stream_T &stream) {
     IntToStreamEqual(test, stream, 18446744073709551615ULL, "18446744073709551615", __LINE__);
 }
 
-template <typename Stream_T>
-static void TestDoubleToString1(QTest &test, Stream_T &stream) {
+static void TestDoubleToString1(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -0.0, 6U, "-0", __LINE__);
     RealToStreamEqual(test, stream, 0.0, 6U, "0", __LINE__);
 
@@ -2424,7 +2422,9 @@ static void TestDoubleToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 9007199254740992.0, 6U, "9.0072e+15", __LINE__);
     RealToStreamEqual(test, stream, 18014398509481984.0, 6U, "1.80144e+16", __LINE__);
     RealToStreamEqual(test, stream, 36028797018963968.0, 6U, "3.60288e+16", __LINE__);
+}
 
+static void TestDoubleToString2(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 0.9000000000000006, 6U, "0.9", __LINE__);
 
     RealToStreamEqual(test, stream, 9.999999999999999, 6U, "10", __LINE__);
@@ -2584,7 +2584,9 @@ static void TestDoubleToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 0.7765625, 6U, "0.776563", __LINE__);
     RealToStreamEqual(test, stream, 0.8765625, 6U, "0.876563", __LINE__);
     RealToStreamEqual(test, stream, 0.9765625, 6U, "0.976562", __LINE__);
+}
 
+static void TestDoubleToString3(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 2.165625, 6U, "2.16562", __LINE__);
     RealToStreamEqual(test, stream, 2.265625, 6U, "2.26562", __LINE__);
     RealToStreamEqual(test, stream, 2.365625, 6U, "2.36563", __LINE__);
@@ -2744,6 +2746,9 @@ static void TestDoubleToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 1.0055, 6U, "1.0055", __LINE__);
     RealToStreamEqual(test, stream, 1.005999, 6U, "1.006", __LINE__);
     RealToStreamEqual(test, stream, 1.009999, 6U, "1.01", __LINE__);
+}
+
+static void TestDoubleToString4(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 0.00055, 6U, "0.00055", __LINE__);
     RealToStreamEqual(test, stream, 1.00055, 6U, "1.00055", __LINE__);
     RealToStreamEqual(test, stream, 0.50009, 6U, "0.50009", __LINE__);
@@ -2911,8 +2916,7 @@ static void TestDoubleToString1(QTest &test, Stream_T &stream) {
                       "340282366920938463463374607431768211456", __LINE__);
 }
 
-template <typename Stream_T>
-static void TestDoubleToString2(QTest &test, Stream_T &stream) {
+static void TestDoubleToString5(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -0.0, 15U, "-0", __LINE__);
     RealToStreamEqual(test, stream, 0.0, 15U, "0", __LINE__);
 
@@ -3068,7 +3072,9 @@ static void TestDoubleToString2(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 36028797018963968.0, 15U, "3.6028797018964e+16", __LINE__);
 
     RealToStreamEqual(test, stream, 0.9000000000000006, 15U, "0.900000000000001", __LINE__);
+}
 
+static void TestDoubleToString6(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 9.999999999999999, 15U, "10", __LINE__);
     RealToStreamEqual(test, stream, 1999999.0, 15U, "1999999", __LINE__);
     RealToStreamEqual(test, stream, 9999999999999999.0, 15U, "1e+16", __LINE__);
@@ -3225,7 +3231,9 @@ static void TestDoubleToString2(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 0.7765625, 15U, "0.7765625", __LINE__);
     RealToStreamEqual(test, stream, 0.8765625, 15U, "0.8765625", __LINE__);
     RealToStreamEqual(test, stream, 0.9765625, 15U, "0.9765625", __LINE__);
+}
 
+static void TestDoubleToString7(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 2.165625, 15U, "2.165625", __LINE__);
     RealToStreamEqual(test, stream, 2.265625, 15U, "2.265625", __LINE__);
     RealToStreamEqual(test, stream, 2.365625, 15U, "2.365625", __LINE__);
@@ -3388,8 +3396,7 @@ static void TestDoubleToString2(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 8.005, 15U, "8.005", __LINE__);
 }
 
-template <typename Stream_T>
-static void TestDoubleToString3(QTest &test, Stream_T &stream) {
+static void TestDoubleToString8(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -1.0, 6U, "-1", __LINE__);
 
     RealToStreamEqual(test, stream, 70.0, 6U, "70", __LINE__);
@@ -3456,8 +3463,7 @@ static void TestDoubleToString3(QTest &test, Stream_T &stream) {
         __LINE__);
 }
 
-template <typename Stream_T>
-static void TestDoubleToStringSemiFixed(QTest &test, Stream_T &stream) {
+static void TestDoubleToStringSemiFixed(QTest &test, StringStream<char> &stream) {
     RealToStreamEqualSemiFixed(test, stream, -0.0, 6U, "-0", __LINE__);
     RealToStreamEqualSemiFixed(test, stream, 0.0, 6U, "0", __LINE__);
 
@@ -3936,8 +3942,7 @@ static void TestDoubleToStringSemiFixed(QTest &test, Stream_T &stream) {
     RealToStreamEqualSemiFixed(test, stream, 0.186264514923095703125, 21U, "0.186264514923095703125", __LINE__);
 }
 
-template <typename Stream_T>
-static void TestDoubleToStringFixed(QTest &test, Stream_T &stream) {
+static void TestDoubleToStringFixed(QTest &test, StringStream<char> &stream) {
     RealToStreamEqualFixed(test, stream, -0.0, 6U, "-0.000000", __LINE__);
     RealToStreamEqualFixed(test, stream, 0.0, 6U, "0.000000", __LINE__);
 
@@ -4419,8 +4424,7 @@ static void TestDoubleToStringFixed(QTest &test, Stream_T &stream) {
     RealToStreamEqualFixed(test, stream, 0.186264514923095703125, 21U, "0.186264514923095703125", __LINE__);
 }
 
-template <typename Stream_T>
-static void TestFloatToString1(QTest &test, Stream_T &stream) {
+static void TestFloatToString1(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -0.0F, 6U, "-0", __LINE__);
     RealToStreamEqual(test, stream, 0.0F, 6U, "0", __LINE__);
 
@@ -4548,7 +4552,9 @@ static void TestFloatToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 1.0000000000001F, 6U, "1", __LINE__);
     RealToStreamEqual(test, stream, 1.00000000000001F, 6U, "1", __LINE__);
     RealToStreamEqual(test, stream, 1.000000000000001F, 6U, "1", __LINE__);
+}
 
+static void TestFloatToString2(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 0.1000000000000006F, 6U, "0.1", __LINE__);
     RealToStreamEqual(test, stream, 0.000000000000011F, 6U, "1.1e-14", __LINE__);
 
@@ -4676,7 +4682,9 @@ static void TestFloatToString1(QTest &test, Stream_T &stream) {
                       __LINE__);
     RealToStreamEqual(test, stream, -3.40282347e+38F, 39U, "-340282346638528859811704183484516925440", __LINE__);
     RealToStreamEqual(test, stream, -3.40282347e+38F, 38U, "-3.4028234663852885981170418348451692544e+38", __LINE__);
+}
 
+static void TestFloatToString3(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -854534.5F, 6U, "-854534", __LINE__);
     RealToStreamEqual(test, stream, -854534.05F, 6U, "-854534", __LINE__);
     RealToStreamEqual(test, stream, 854534.5F, 6U, "854534", __LINE__);
@@ -4811,7 +4819,9 @@ static void TestFloatToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 0.7450580596923828125F, 6U, "0.745058", __LINE__);
     RealToStreamEqual(test, stream, 0.37252902984619140625F, 6U, "0.372529", __LINE__);
     RealToStreamEqual(test, stream, 0.186264514923095703125F, 6U, "0.186265", __LINE__);
+}
 
+static void TestFloatToString4(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 1.12345F, 6U, "1.12345", __LINE__);
     RealToStreamEqual(test, stream, 1.953674F, 6U, "1.95367", __LINE__);
     RealToStreamEqual(test, stream, 1.0953674F, 6U, "1.09537", __LINE__);
@@ -4950,8 +4960,7 @@ static void TestFloatToString1(QTest &test, Stream_T &stream) {
                       __LINE__);
 }
 
-template <typename Stream_T>
-static void TestFloatToString2(QTest &test, Stream_T &stream) {
+static void TestFloatToString5(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -1.0F, 6U, "-1", __LINE__);
 
     RealToStreamEqual(test, stream, 70.0F, 6U, "70", __LINE__);
@@ -5008,8 +5017,6 @@ static void TestFloatToString2(QTest &test, Stream_T &stream) {
 }
 
 static int RunDigitTests() {
-    using SStream = StringStream<char>;
-
     QTest test{"Digit.hpp", __FILE__};
 
     // test.ContinueOnError(true);
@@ -5026,18 +5033,27 @@ static int RunDigitTests() {
     test.Test("HexStringToNumber Test 1", TestHexStringToNumber1);
     test.Test("HexStringToNumber Test 2", TestHexStringToNumber2);
 
-    SStream stream{8};
+    StringStream<char> stream{512};
 
-    test.Test("IntToString Test 1", TestIntToString1<SStream>, false, stream);
+    test.Test("IntToString Test 1", TestIntToString1, false, stream);
 
-    test.Test("DoubleToString Test 1", TestDoubleToString1<SStream>, false, stream);
-    test.Test("DoubleToString Test 2", TestDoubleToString2<SStream>, false, stream);
-    test.Test("DoubleToString Test 3", TestDoubleToString3<SStream>, false, stream);
-    test.Test("DoubleToStringSemiFixed Test 3", TestDoubleToStringSemiFixed<SStream>, false, stream);
-    test.Test("DoubleToStringFixed Test 3", TestDoubleToStringFixed<SStream>, false, stream);
+    test.Test("DoubleToString Test 1", TestDoubleToString1, false, stream);
+    test.Test("DoubleToString Test 2", TestDoubleToString2, false, stream);
+    test.Test("DoubleToString Test 3", TestDoubleToString3, false, stream);
+    test.Test("DoubleToString Test 4", TestDoubleToString4, false, stream);
+    test.Test("DoubleToString Test 5", TestDoubleToString5, false, stream);
+    test.Test("DoubleToString Test 6", TestDoubleToString6, false, stream);
+    test.Test("DoubleToString Test 7", TestDoubleToString7, false, stream);
+    test.Test("DoubleToString Test 8", TestDoubleToString8, false, stream);
 
-    test.Test("FloatToString Test 1", TestFloatToString1<SStream>, false, stream);
-    test.Test("FloatToString Test 2", TestFloatToString2<SStream>, false, stream);
+    test.Test("DoubleToStringSemiFixed Test 3", TestDoubleToStringSemiFixed, false, stream);
+    test.Test("DoubleToStringFixed Test 3", TestDoubleToStringFixed, false, stream);
+
+    test.Test("FloatToString Test 1", TestFloatToString1, false, stream);
+    test.Test("FloatToString Test 2", TestFloatToString2, false, stream);
+    test.Test("FloatToString Test 3", TestFloatToString3, false, stream);
+    test.Test("FloatToString Test 4", TestFloatToString4, false, stream);
+    test.Test("FloatToString Test 5", TestFloatToString5, false, stream);
 
     return test.EndTests();
 }
