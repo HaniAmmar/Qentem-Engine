@@ -81,7 +81,7 @@ struct ToCharsHelper {
     template <typename Stream_T>
     struct Writer<Stream_T, char> {
         static void Write(Stream_T &stream, char ch) {
-            stream += ch;
+            stream.Write(ch);
         }
 
         static void Write(Stream_T &stream, const char *str) {
@@ -92,7 +92,7 @@ struct ToCharsHelper {
     template <typename Stream_T>
     struct Writer<Stream_T, unsigned char> {
         static void Write(Stream_T &stream, unsigned char ch) {
-            stream += static_cast<char>(ch);
+            stream.Write(static_cast<char>(ch));
         }
 
         static void Write(Stream_T &stream, const unsigned char *str) {
@@ -279,14 +279,14 @@ struct ToCharsHelper {
     template <typename Stream_T>
     struct CharConverter_T<Stream_T, char> {
         static void Convert(Stream_T &stream, char ch) {
-            stream += ch;
+            stream.Write(ch);
         }
     };
 
     template <typename Stream_T>
     struct CharConverter_T<Stream_T, unsigned char> {
         static void Convert(Stream_T &stream, unsigned char ch) {
-            stream += static_cast<char>(ch);
+            stream.Write(static_cast<char>(ch));
         }
     };
 

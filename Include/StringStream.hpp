@@ -99,15 +99,8 @@ struct StringStream {
         return *this;
     }
 
-    inline void operator+=(const Char_T one_char) {
-        const SizeT new_length = (Length() + SizeT{1});
-
-        if (Capacity() == Length()) {
-            expand(new_length * ExpandFactor);
-        }
-
-        Storage()[Length()] = one_char;
-        setLength(new_length);
+    inline void operator+=(Char_T ch) {
+        Write(ch);
     }
 
     inline void operator+=(const StringStream<Char_T> &stream) {
@@ -155,7 +148,7 @@ struct StringStream {
     }
 
     inline friend StringStream &operator<<(StringStream &out, Char_T ch) {
-        out += ch;
+        out.Write(ch);
         return out;
     }
 
@@ -200,6 +193,17 @@ struct StringStream {
 
     inline bool operator!=(const Char_T *str) const noexcept {
         return (!(*this == str));
+    }
+
+    inline void Write(Char_T ch) {
+        const SizeT new_length = (Length() + SizeT{1});
+
+        if (Capacity() == Length()) {
+            expand(new_length * ExpandFactor);
+        }
+
+        Storage()[Length()] = ch;
+        setLength(new_length);
     }
 
     inline void Write(const Char_T *str, const SizeT length) {

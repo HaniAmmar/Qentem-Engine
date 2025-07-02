@@ -18,6 +18,7 @@
 #include "QNumber.hpp"
 #include "BigInt.hpp"
 #include "DigitUtils.hpp"
+#include "StringUtils.hpp"
 
 namespace Qentem {
 /*
@@ -76,7 +77,7 @@ struct Digit {
             if (!IsUnsigned<Number_T>()) {
                 if (number < 0) {
                     qn.Integer = -qn.Integer;
-                    stream += DigitUtils::DigitChar::Negative;
+                    stream.Write(DigitUtils::DigitChar::Negative);
                 }
             }
 
@@ -727,7 +728,7 @@ struct Digit {
 
         if (bias != Info_T::ExponentMask) {
             if ((number & Info_T::SignMask) != 0) {
-                stream += DigitUtils::DigitChar::Negative;
+                stream.Write(DigitUtils::DigitChar::Negative);
             }
 
             Number_T mantissa = (number & Info_T::MantissaMask);
@@ -862,10 +863,10 @@ struct Digit {
                 }
 
             } else {
-                stream += DigitUtils::DigitChar::Zero;
+                stream.Write(DigitUtils::DigitChar::Zero);
 
                 if (format.Type == RealFormatType::Fixed) {
-                    stream += DigitUtils::DigitChar::Dot;
+                    stream.Write(DigitUtils::DigitChar::Dot);
                     insertZerosLarge(stream, format.Precision);
                 }
             }
@@ -876,7 +877,7 @@ struct Digit {
 
             if ((number & Info_T::MantissaMask) == 0) {
                 if ((number & Info_T::SignMask) != 0) {
-                    stream += DigitUtils::DigitChar::Negative;
+                    stream.Write(DigitUtils::DigitChar::Negative);
                 }
 
                 stream.Write(DigitString::Infinity, DigitString::InfinityLength);
@@ -888,12 +889,12 @@ struct Digit {
 
     template <typename Stream_T>
     static void insertPowerOfTen(Stream_T &stream, SizeT power_of_ten, bool positive) {
-        stream += DigitUtils::DigitChar::E;
-        stream += (positive ? DigitUtils::DigitChar::Positive : DigitUtils::DigitChar::Negative);
+        stream.Write(DigitUtils::DigitChar::E);
+        stream.Write(positive ? DigitUtils::DigitChar::Positive : DigitUtils::DigitChar::Negative);
 
         if (power_of_ten < SizeT{10}) {
             // e+01,e+09
-            stream += DigitUtils::DigitChar::Zero;
+            stream.Write(DigitUtils::DigitChar::Zero);
         }
 
         NumberToString(stream, power_of_ten);
@@ -1056,16 +1057,16 @@ struct Digit {
                 if (!power_increased) {
                     if (diff < SizeT{4}) {
                         insertZeros(stream, diff);
-                        stream += DigitUtils::DigitChar::Dot;
-                        stream += DigitUtils::DigitChar::Zero;
+                        stream.Write(DigitUtils::DigitChar::Dot);
+                        stream.Write(DigitUtils::DigitChar::Zero);
                     } else {
                         power = diff;
                         ++power;
                     }
                 } else if ((diff != 0) && (diff < SizeT{5})) {
                     insertZeros(stream, (diff - SizeT{1}));
-                    stream += DigitUtils::DigitChar::Dot;
-                    stream += DigitUtils::DigitChar::Zero;
+                    stream.Write(DigitUtils::DigitChar::Dot);
+                    stream.Write(DigitUtils::DigitChar::Zero);
                 } else {
                     power = diff;
                 }
@@ -1093,7 +1094,8 @@ struct Digit {
             }
         }
 
-        stream.Reverse(started_at);
+        StringUtils::Reverse(stream.Storage(), started_at, stream.Length());
+
         stream.StepBack(index - started_at);
 
         if (power != 0) {
@@ -1140,11 +1142,11 @@ struct Digit {
 
                             diff -= SizeT32(power_increased);
                             insertZerosLarge(stream, diff);
-                            stream += DigitUtils::DigitChar::Dot;
-                            stream += DigitUtils::DigitChar::Zero;
+                            stream.Write(DigitUtils::DigitChar::Dot);
+                            stream.Write(DigitUtils::DigitChar::Zero);
                         } else if (!power_increased) {
-                            stream += DigitUtils::DigitChar::Dot;
-                            stream += DigitUtils::DigitChar::Zero;
+                            stream.Write(DigitUtils::DigitChar::Dot);
+                            stream.Write(DigitUtils::DigitChar::Zero);
                         }
                     } else {
                         --index;
@@ -1178,13 +1180,13 @@ struct Digit {
             }
         }
 
-        stream.Reverse(started_at);
+        StringUtils::Reverse(stream.Storage(), started_at, stream.Length());
         stream.StepBack(index - started_at);
 
         if QENTEM_CONST_EXPRESSION (Fixed_T) {
             if ((dot_index == index) || ((stream.Length() - started_at) == SizeT{1}) ||
                 (!fraction_only && power_increased)) {
-                stream += DigitUtils::DigitChar::Dot;
+                stream.Write(DigitUtils::DigitChar::Dot);
                 insertZerosLarge(stream, precision);
             } else if (fraction_only) {
                 insertZerosLarge(

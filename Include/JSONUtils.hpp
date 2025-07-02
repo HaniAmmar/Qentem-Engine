@@ -97,32 +97,32 @@ struct JSONUtils {
                         case NotationConstants::QuoteChar:
                         case NotationConstants::BSlashChar:
                         case NotationConstants::SlashChar: {
-                            stream += ch;
+                            stream.Write(ch);
                             break;
                         }
 
                         case NotationConstants::B_Char: {
-                            stream += NotationConstants::BackSpaceControlChar;
+                            stream.Write(NotationConstants::BackSpaceControlChar);
                             break;
                         }
 
                         case NotationConstants::T_Char: {
-                            stream += NotationConstants::TabControlChar;
+                            stream.Write(NotationConstants::TabControlChar);
                             break;
                         }
 
                         case NotationConstants::N_Char: {
-                            stream += NotationConstants::LineControlChar;
+                            stream.Write(NotationConstants::LineControlChar);
                             break;
                         }
 
                         case NotationConstants::F_Char: {
-                            stream += NotationConstants::FormfeedControlChar;
+                            stream.Write(NotationConstants::FormfeedControlChar);
                             break;
                         }
 
                         case NotationConstants::R_Char: {
-                            stream += NotationConstants::CarriageControlChar;
+                            stream.Write(NotationConstants::CarriageControlChar);
                             break;
                         }
 
@@ -203,11 +203,11 @@ struct JSONUtils {
                 case NotationConstants::SlashChar: {
                     stream.Write((content + offset2), (offset - offset2));
 
-                    stream += NotationConstants::BSlashChar;
+                    stream.Write(NotationConstants::BSlashChar);
                     offset2 = offset;
                     ++offset2;
 
-                    stream += ch;
+                    stream.Write(ch);
                     break;
                 }
 
@@ -218,11 +218,11 @@ struct JSONUtils {
                 case NotationConstants::CarriageControlChar: {
                     stream.Write((content + offset2), (offset - offset2));
 
-                    stream += NotationConstants::BSlashChar;
+                    stream.Write(NotationConstants::BSlashChar);
                     offset2 = offset;
                     ++offset2;
 
-                    stream += NotationConstants::GetReplacementChar(SizeT32(ch));
+                    stream.Write(NotationConstants::GetReplacementChar(SizeT32(ch)));
                     break;
                 }
 

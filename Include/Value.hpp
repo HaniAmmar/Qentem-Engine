@@ -1669,7 +1669,7 @@ struct Value {
             const StringT *key = object_.GetKeyAt(index);
 
             if (key != nullptr) {
-                stream += *key;
+                stream.Write(key->First(), key->Length());
             }
 
             return true;
@@ -2059,20 +2059,20 @@ struct Value {
   private:
     template <typename Stream_T>
     static void stringifyObject(const ObjectT &obj, Stream_T &stream, SizeT32 precision) {
-        stream += NotationConstants::SCurlyChar;
+        stream.Write(NotationConstants::SCurlyChar);
 
         const VItem *h_item = obj.First();
         const VItem *end    = (h_item + obj.Size());
 
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.isUndefined())) {
-                stream += NotationConstants::QuoteChar;
+                stream.Write(NotationConstants::QuoteChar);
                 JSONUtils::Escape(h_item->Key.First(), h_item->Key.Length(), stream);
-                stream += NotationConstants::QuoteChar;
-                stream += NotationConstants::ColonChar;
+                stream.Write(NotationConstants::QuoteChar);
+                stream.Write(NotationConstants::ColonChar);
 
                 stringifyValue(h_item->Value, stream, precision);
-                stream += NotationConstants::CommaChar;
+                stream.Write(NotationConstants::CommaChar);
             }
 
             ++h_item;
@@ -2083,13 +2083,13 @@ struct Value {
         if ((last != nullptr) && (*last == NotationConstants::CommaChar)) {
             *last = NotationConstants::ECurlyChar;
         } else {
-            stream += NotationConstants::ECurlyChar;
+            stream.Write(NotationConstants::ECurlyChar);
         }
     }
 
     template <typename Stream_T>
     static void stringifyArray(const ArrayT &arr, Stream_T &stream, SizeT32 precision) {
-        stream += NotationConstants::SSquareChar;
+        stream.Write(NotationConstants::SSquareChar);
 
         const Value *item = arr.First();
         const Value *end  = arr.End();
@@ -2097,7 +2097,7 @@ struct Value {
         while (item != end) {
             if (!(item->isUndefined())) {
                 stringifyValue(*item, stream, precision);
-                stream += NotationConstants::CommaChar;
+                stream.Write(NotationConstants::CommaChar);
             }
 
             ++item;
@@ -2108,7 +2108,7 @@ struct Value {
         if ((last != nullptr) && (*last == NotationConstants::CommaChar)) {
             *last = NotationConstants::ESquareChar;
         } else {
-            stream += NotationConstants::ESquareChar;
+            stream.Write(NotationConstants::ESquareChar);
         }
     }
 
@@ -2126,9 +2126,9 @@ struct Value {
             }
 
             case ValueType::String: {
-                stream += NotationConstants::QuoteChar;
+                stream.Write(NotationConstants::QuoteChar);
                 JSONUtils::Escape(val.string_.First(), val.string_.Length(), stream);
-                stream += NotationConstants::QuoteChar;
+                stream.Write(NotationConstants::QuoteChar);
                 break;
             }
 

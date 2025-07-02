@@ -104,14 +104,14 @@ struct String {
         return *this;
     }
 
-    String &operator+=(const Char_T *str) {
-        Write(str, StringUtils::Count(str));
-        return *this;
-    }
-
     String &operator+=(const Char_T ch) {
         Write(&ch, SizeT{1});
 
+        return *this;
+    }
+
+    String &operator+=(const Char_T *str) {
+        Write(str, StringUtils::Count(str));
         return *this;
     }
 
@@ -227,6 +227,10 @@ struct String {
 
     static String Merge(const String &src1, const String &src2) {
         return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
+    }
+
+    void Write(const Char_T ch) {
+        Write(&ch, SizeT{1});
     }
 
     void Write(const Char_T *str, const SizeT length) {

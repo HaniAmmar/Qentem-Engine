@@ -57,14 +57,9 @@ namespace Qentem {
 
 struct SimpleStringStream {
     using CharType = char;
-    static constexpr SizeT ExpandFactor{4};
+    static constexpr SizeT ExpandFactor{2};
 
-    SimpleStringStream() = default;
-
-    ~SimpleStringStream() {
-        QENTEM_DEALLOCATE(Storage());
-    }
-
+    SimpleStringStream()                                      = default;
     SimpleStringStream(SimpleStringStream &&)                 = delete;
     SimpleStringStream(const SimpleStringStream &)            = delete;
     SimpleStringStream &operator=(SimpleStringStream &&)      = delete;
@@ -76,36 +71,51 @@ struct SimpleStringStream {
         }
     }
 
-    inline void operator+=(char one_char) {
+    ~SimpleStringStream() {
+        QENTEM_DEALLOCATE(Storage());
+    }
+
+    inline void Write(char ch) {
         const SizeT new_length = (Length() + SizeT{1});
 
         if (Capacity() == Length()) {
             expand(new_length * ExpandFactor);
         }
 
-        Storage()[Length()] = one_char;
-        setLength(new_length);
+        Storage()[Length()] = ch;
+        length_             = new_length;
     }
 
     inline void Write(const char *str, const SizeT length) {
-        write(str, length);
+        if (length != 0) {
+            const SizeT new_length = (Length() + length);
+
+            if (Capacity() < new_length) {
+                expand(new_length * ExpandFactor);
+            }
+
+            char *des    = (Storage() + Length());
+            SizeT offset = 0;
+
+            while (offset < length) {
+                des[offset] = str[offset];
+                ++offset;
+            }
+
+            length_ = new_length;
+        }
     }
 
-    // template <SizeT Length_T>
-    // inline void operator<<(const char (&str)[Length_T]) noexcept {
-    //     Write(str, Length_T - 1);
-    // }
+    inline void operator<<(char ch) {
+        Write(ch);
+    }
 
     inline void operator<<(const char *str) {
         Write(str, StringUtils::Count(str));
     }
 
-    inline void operator<<(char one_char) {
-        this->operator+=(one_char);
-    }
-
     inline void Clear() noexcept {
-        setLength(0);
+        length_ = 0;
     }
 
     inline void StepBack(const SizeT length) noexcept {
@@ -150,10 +160,6 @@ struct SimpleStringStream {
         return capacity_;
     }
 
-    inline void Reverse(SizeT start = 0) noexcept {
-        StringUtils::Reverse(Storage(), start, Length());
-    }
-
     void InsertNull() {
         if (Capacity() == Length()) {
             expand(Length() + SizeT{1});
@@ -176,7 +182,7 @@ struct SimpleStringStream {
                 }
 
                 data[index] = ch;
-                setLength(new_length);
+                length_     = new_length;
             } else {
                 char *new_storage = static_cast<char *>(QENTEM_ALLOCATE(new_length));
 
@@ -195,50 +201,14 @@ struct SimpleStringStream {
                 }
 
                 QENTEM_DEALLOCATE(Storage());
-                setStorage(new_storage);
-                setCapacity(new_length);
-                setLength(new_length);
+                storage_  = new_storage;
+                capacity_ = new_length;
+                length_   = new_length;
             }
         }
     }
 
   private:
-    void setStorage(char *new_storage) noexcept {
-        storage_ = new_storage;
-    }
-
-    void clearStorage() noexcept {
-        setStorage(nullptr);
-    }
-
-    void setLength(const SizeT new_length) noexcept {
-        length_ = new_length;
-    }
-
-    void setCapacity(const SizeT new_capacity) noexcept {
-        capacity_ = new_capacity;
-    }
-
-    inline void write(const char *str, const SizeT length) {
-        if (length != 0) {
-            const SizeT new_length = (Length() + length);
-
-            if (Capacity() < new_length) {
-                expand(new_length * ExpandFactor);
-            }
-
-            char *des    = (Storage() + Length());
-            SizeT offset = 0;
-
-            while (offset < length) {
-                des[offset] = str[offset];
-                ++offset;
-            }
-
-            setLength(new_length);
-        }
-    }
-
     void expand(const SizeT new_capacity) {
         char *str = Storage();
 
@@ -255,8 +225,8 @@ struct SimpleStringStream {
     }
 
     void allocate(SizeT capacity) {
-        setStorage(static_cast<char *>(QENTEM_ALLOCATE(capacity)));
-        setCapacity(capacity);
+        storage_  = static_cast<char *>(QENTEM_ALLOCATE(capacity));
+        capacity_ = capacity;
     }
 
     char *storage_{nullptr};

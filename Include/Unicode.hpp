@@ -51,20 +51,20 @@ struct Unicode {
     struct UnicodeToUTF<Char_T, Stream_T, 1U> {
         static void ToUTF(SizeT32 unicode, Stream_T &stream) {
             if (unicode < 0x80U) {
-                stream += Char_T(unicode);
+                stream.Write(Char_T(unicode));
             } else {
                 if (unicode < 0x800U) {
-                    stream += Char_T(0xC0U | (unicode >> 6U));
+                    stream.Write(Char_T(0xC0U | (unicode >> 6U)));
                 } else if (unicode < 0x10000U) {
-                    stream += Char_T(0xE0U | (unicode >> 12U));
-                    stream += Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
+                    stream.Write(Char_T(0xE0U | (unicode >> 12U)));
+                    stream.Write(Char_T(0x80U | ((unicode >> 6U) & 0x3FU)));
                 } else {
-                    stream += Char_T(0xF0U | (unicode >> 18U));
-                    stream += Char_T(0x80U | ((unicode >> 12U) & 0x3FU));
-                    stream += Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
+                    stream.Write(Char_T(0xF0U | (unicode >> 18U)));
+                    stream.Write(Char_T(0x80U | ((unicode >> 12U) & 0x3FU)));
+                    stream.Write(Char_T(0x80U | ((unicode >> 6U) & 0x3FU)));
                 }
 
-                stream += Char_T(0x80U | (unicode & 0x3FU));
+                stream.Write(Char_T(0x80U | (unicode & 0x3FU)));
             }
         }
     };
@@ -74,11 +74,11 @@ struct Unicode {
     struct UnicodeToUTF<Char_T, Stream_T, 2U> {
         static void ToUTF(SizeT32 unicode, Stream_T &stream) {
             if (unicode < 0x10000U) {
-                stream += Char_T(unicode);
+                stream.Write(Char_T(unicode));
             } else {
                 unicode -= 0x10000U;
-                stream += Char_T(0xD800U | (unicode >> 10U));
-                stream += Char_T(0xDC00U | (unicode & 0x3FFU));
+                stream.Write(Char_T(0xD800U | (unicode >> 10U)));
+                stream.Write(Char_T(0xDC00U | (unicode & 0x3FFU)));
             }
         }
     };
@@ -92,7 +92,7 @@ struct Unicode {
             //     return;
             // }
 
-            stream += Char_T(unicode);
+            stream.Write(Char_T(unicode));
         }
     };
 };
