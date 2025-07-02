@@ -32,17 +32,6 @@
 
 namespace Qentem {
 struct Memory {
-    /////////////////////////////////////////////////////////////////////
-    template <typename Type_T>
-    QENTEM_INLINE static constexpr Type_T *CastPointer(void *value) noexcept {
-        return (Type_T *)(value);
-    }
-
-    template <typename Type_T>
-    QENTEM_INLINE static constexpr const Type_T *CastPointer(const void *value) noexcept {
-        return (const Type_T *)(value);
-    }
-    /////////////////////////////////////////////////////////////////////
     template <typename Type_T>
     QENTEM_INLINE static void SetToZeroByType(Type_T *des, SizeT size = 1) noexcept {
         constexpr SizeT   type_size = sizeof(Type_T);
@@ -53,7 +42,7 @@ struct Memory {
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
             SizeT    offset = 0;
-            SizeT64 *des64  = Memory::CastPointer<SizeT64>(des);
+            SizeT64 *des64  = reinterpret_cast<SizeT64 *>(des);
 
             size *= type_size >> shift64;
 
@@ -63,7 +52,7 @@ struct Memory {
             }
         } else if QENTEM_CONST_EXPRESSION (is_mul4) {
             SizeT    offset = 0;
-            SizeT32 *des32  = Memory::CastPointer<SizeT32>(des);
+            SizeT32 *des32  = reinterpret_cast<SizeT32 *>(des);
 
             size *= type_size >> shift32;
 
@@ -73,7 +62,7 @@ struct Memory {
             }
         } else {
             SizeT   offset = 0;
-            SizeT8 *des8   = Memory::CastPointer<SizeT8>(des);
+            SizeT8 *des8   = reinterpret_cast<SizeT8 *>(des);
 
             size *= type_size;
 
@@ -168,8 +157,8 @@ struct Memory {
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
             SizeT          offset = 0;
-            SizeT64       *des64  = Memory::CastPointer<SizeT64>(to);
-            const SizeT64 *src64  = Memory::CastPointer<const SizeT64>(from);
+            SizeT64       *des64  = reinterpret_cast<SizeT64 *>(to);
+            const SizeT64 *src64  = reinterpret_cast<const SizeT64 *>(from);
 
             size *= type_size >> shift64;
 
@@ -179,8 +168,8 @@ struct Memory {
             }
         } else if QENTEM_CONST_EXPRESSION (is_mul4) {
             SizeT          offset = 0;
-            SizeT32       *des32  = Memory::CastPointer<SizeT32>(to);
-            const SizeT32 *src32  = Memory::CastPointer<const SizeT32>(from);
+            SizeT32       *des32  = reinterpret_cast<SizeT32 *>(to);
+            const SizeT32 *src32  = reinterpret_cast<const SizeT32 *>(from);
 
             size *= type_size >> shift32;
 
@@ -190,8 +179,8 @@ struct Memory {
             }
         } else {
             SizeT         offset = 0;
-            SizeT8       *des8   = Memory::CastPointer<SizeT8>(to);
-            const SizeT8 *src8   = Memory::CastPointer<const SizeT8>(from);
+            SizeT8       *des8   = reinterpret_cast<SizeT8 *>(to);
+            const SizeT8 *src8   = reinterpret_cast<const SizeT8 *>(from);
 
             size *= type_size;
 
@@ -304,8 +293,38 @@ struct Memory {
     }
     /////////////////////////////////////////////////////////////////////
     template <typename Type_T>
+    inline static Type_T *AllocateAligned(SystemIntType count, SystemIntType alignment = alignof(Type_T)) noexcept {
+        // constexpr SystemIntType min_align = alignof(void *);
+        // alignment                         = (alignment < min_align) ? min_align : alignment;
+
+        --alignment;
+        SystemIntType padding = (alignment + sizeof(void *));
+
+        void *raw = QENTEM_RAW_ALLOCATE((sizeof(Type_T) * count) + padding);
+
+#ifdef QENTEM_Q_TEST_H
+        MemoryRecord::AddAllocation(raw);
+#endif
+        void *aligned = reinterpret_cast<void *>((reinterpret_cast<SystemIntType>(raw) + sizeof(void *) + alignment) &
+                                                 ~(alignment));
+
+        *(reinterpret_cast<void **>(aligned) - 1) = raw;
+        return static_cast<Type_T *>(aligned);
+    }
+
+    inline static void DeallocateAligned(void *ptr) noexcept {
+        if (ptr != nullptr) {
+            void *raw = (reinterpret_cast<void **>(ptr))[-1];
+#ifdef QENTEM_Q_TEST_H
+            MemoryRecord::RemoveAllocation(raw);
+#endif
+            QENTEM_RAW_DEALLOCATE(raw);
+        }
+    }
+
+    template <typename Type_T>
     inline static Type_T *Allocate(SizeT size) {
-        Type_T *pointer = CastPointer<Type_T>(QENTEM_ALLOCATE(SystemIntType(size * sizeof(Type_T))));
+        Type_T *pointer = reinterpret_cast<Type_T *>(QENTEM_ALLOCATE(SystemIntType(size * sizeof(Type_T))));
 
 #ifdef QENTEM_Q_TEST_H
         MemoryRecord::AddAllocation(pointer);
@@ -315,32 +334,14 @@ struct Memory {
     }
 
     template <typename Type_T>
-    inline static Type_T *AllocateAligned(SystemIntType size, SystemIntType alignment = alignof(Type_T)) {
-        constexpr SystemIntType type_size = sizeof(Type_T);
-        using PtrCast                     = PtrCast_T<Type_T>;
-
-        // // alignment must be a power of two and at least sizeof(void*)
-        // if (alignment < type_size) {
-        //     alignment = type_size;
-        // }
-
-        // Overallocate to ensure we can align and store the real pointer just before the aligned pointer
-        char *raw =
-            CastPointer<char>(QENTEM_RAW_ALLOCATE((size * type_size) + alignment + (type_size - SystemIntType{1})));
-
+    inline static void Deallocate(Type_T *pointer) noexcept {
 #ifdef QENTEM_Q_TEST_H
-        MemoryRecord::AddAllocation(raw);
+        if (pointer != nullptr) {
+            MemoryRecord::RemoveAllocation(pointer);
+        }
 #endif
 
-        PtrCast pc;
-        // Align the address after the space for the real pointer
-        pc.Pointer = CastPointer<Type_T>(raw);
-        pc.Number += type_size;
-        pc.Number = (pc.Number + alignment - SystemIntType{1}) & ~(SystemIntType(alignment) - SystemIntType{1});
-
-        // Store the original pointer just before the aligned pointer
-        CastPointer<void *>(pc.Pointer)[-1] = raw;
-        return pc.Pointer;
+        QENTEM_DEALLOCATE(pointer);
     }
 
     template <typename Type_T>
@@ -356,28 +357,6 @@ struct Memory {
         Type_T *pointer = Allocate<Type_T>(1);
         Initialize(pointer, Forward<Values_T>(values)...);
         return pointer;
-    }
-
-    template <typename Type_T>
-    inline static void Deallocate(Type_T *pointer) noexcept {
-#ifdef QENTEM_Q_TEST_H
-        if (pointer != nullptr) {
-            MemoryRecord::RemoveAllocation(pointer);
-        }
-#endif
-        QENTEM_DEALLOCATE(pointer);
-    }
-
-    template <typename Type_T>
-    inline static void DeallocateAligned(Type_T *pointer) {
-        if (pointer != nullptr) {
-            void *raw = CastPointer<void *>(pointer)[-1];
-
-#ifdef QENTEM_Q_TEST_H
-            MemoryRecord::RemoveAllocation(raw);
-#endif
-            QENTEM_RAW_DEALLOCATE(raw);
-        }
     }
 
     // Initializer
