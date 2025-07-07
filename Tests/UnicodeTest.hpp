@@ -306,12 +306,11 @@ static void TestToUTF32(QTest &test) {
 
 // static void convertTo4Hex(SizeT code) {
 //     if (code < 0x10000U) {
-//         std::cout << "\\u" << decToHex(code) << '\n';
+//         TestOutput::Print("\\u", decToHex(code), '\n');
 //     } else {
 //         code -= 0x10000U;
-//         std::cout << "\n\\u" << decToHex(0xD800U | (code >> 10U)).First();
-//         std::cout << "\\u" << decToHex(0xDC00U | (code & 0x3FFU)).First()
-//                   << '\n';
+//         TestOutput::Print("\n\\u", decToHex(0xD800U | (code >> 10U)).First(), "\\u",
+//                           decToHex(0xDC00U | (code & 0x3FFU)).First(), '\n');
 //     }
 // }
 

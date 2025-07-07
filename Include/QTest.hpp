@@ -19,7 +19,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-// #include <mutex>
 
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
@@ -355,7 +354,6 @@ struct MemoryRecord {
     inline static void AddAllocation(void *pointer) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
-        // std::lock_guard<std::mutex> lock(mutex_);
         ++(storage.allocations);
         ++(storage.subAllocations);
 
@@ -375,7 +373,6 @@ struct MemoryRecord {
     QENTEM_NOINLINE static void RemoveAllocation(void *pointer) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
-        // std::lock_guard<std::mutex> lock(mutex_);
         ++(storage.deallocations);
         ++(storage.subDeallocations);
 
@@ -427,8 +424,6 @@ struct MemoryRecord {
 
         return data;
     }
-
-    // inline static std::mutex mutex_;
 };
 
 struct QTest {

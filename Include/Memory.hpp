@@ -314,7 +314,7 @@ struct Memory {
 
     inline static void DeallocateAligned(void *ptr) noexcept {
         if (ptr != nullptr) {
-            void *raw = (reinterpret_cast<void **>(ptr))[-1];
+            void *raw = (static_cast<void **>(ptr))[-1];
 #ifdef QENTEM_Q_TEST_H
             MemoryRecord::RemoveAllocation(raw);
 #endif
@@ -324,7 +324,7 @@ struct Memory {
 
     template <typename Type_T>
     inline static Type_T *Allocate(SizeT size) {
-        Type_T *pointer = reinterpret_cast<Type_T *>(QENTEM_ALLOCATE(SystemIntType(size * sizeof(Type_T))));
+        Type_T *pointer = static_cast<Type_T *>(QENTEM_ALLOCATE(SystemIntType(size * sizeof(Type_T))));
 
 #ifdef QENTEM_Q_TEST_H
         MemoryRecord::AddAllocation(pointer);
