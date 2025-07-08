@@ -368,17 +368,17 @@ struct Platform {
 #endif // _MSC_VER
     ///////////////////////////////////////
     template <typename, typename, SizeT32>
-    struct SMIDCompare_T {};
+    struct SIMDCompare_T {};
 
     template <typename Char_T, typename SIMDValue>
-    inline static constexpr Platform::SIMD::Number_T SMIDCompare(const SIMDValue &val1,
+    inline static constexpr Platform::SIMD::Number_T SIMDCompare(const SIMDValue &val1,
                                                                  const SIMDValue &val2) noexcept {
-        return SMIDCompare_T<Char_T, SIMDValue, sizeof(Char_T)>::Compare(val1, val2);
+        return SIMDCompare_T<Char_T, SIMDValue, sizeof(Char_T)>::Compare(val1, val2);
     }
 
     // char
     template <typename Char_T, typename SIMDValue>
-    struct SMIDCompare_T<Char_T, SIMDValue, 1U> {
+    struct SIMDCompare_T<Char_T, SIMDValue, 1U> {
         inline static constexpr Platform::SIMD::Number_T Compare(const SIMDValue &val1,
                                                                  const SIMDValue &val2) noexcept {
             return Platform::SIMD::Compare8Bit(val1, val2);
@@ -387,7 +387,7 @@ struct Platform {
 
     // char16
     template <typename Char_T, typename SIMDValue>
-    struct SMIDCompare_T<Char_T, SIMDValue, 2U> {
+    struct SIMDCompare_T<Char_T, SIMDValue, 2U> {
         inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
             Platform::SIMD::Number_T bits16 = Platform::SIMD::Compare16Bit(val1, val2);
             Platform::SIMD::Number_T bits   = 0;
@@ -411,7 +411,7 @@ struct Platform {
 
     // char32_t
     template <typename Char_T, typename SIMDValue>
-    struct SMIDCompare_T<Char_T, SIMDValue, 4U> {
+    struct SIMDCompare_T<Char_T, SIMDValue, 4U> {
         inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
             Platform::SIMD::Number_T bits32 = Platform::SIMD::Compare32Bit(val1, val2);
             Platform::SIMD::Number_T bits   = 0;
@@ -436,16 +436,16 @@ struct Platform {
     //////////////////////////////////
 
     template <typename, SizeT32>
-    struct SMIDSetToOne_T {};
+    struct SIMDSetToOne_T {};
 
     template <typename Char_T>
-    inline static constexpr Platform::SIMD::VAR_T SMIDSetToOne(const Char_T value) noexcept {
-        return SMIDSetToOne_T<Char_T, sizeof(Char_T)>::Set(value);
+    inline static constexpr Platform::SIMD::VAR_T SIMDSetToOne(const Char_T value) noexcept {
+        return SIMDSetToOne_T<Char_T, sizeof(Char_T)>::Set(value);
     }
 
     // char
     template <typename Char_T>
-    struct SMIDSetToOne_T<Char_T, 1U> {
+    struct SIMDSetToOne_T<Char_T, 1U> {
         inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
             return Platform::SIMD::SetToOne8Bit(value);
         }
@@ -453,7 +453,7 @@ struct Platform {
 
     // char16
     template <typename Char_T>
-    struct SMIDSetToOne_T<Char_T, 2U> {
+    struct SIMDSetToOne_T<Char_T, 2U> {
         inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
             return Platform::SIMD::SetToOne16Bit(short(value));
         }
@@ -461,14 +461,14 @@ struct Platform {
 
     // char32_t
     template <typename Char_T>
-    struct SMIDSetToOne_T<Char_T, 4U> {
+    struct SIMDSetToOne_T<Char_T, 4U> {
         inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
             return Platform::SIMD::SetToOne32Bit(int(value));
         }
     };
 
     template <typename Char_T, typename Number_T>
-    inline static constexpr Number_T SMIDNextOffset() noexcept {
+    inline static constexpr Number_T SIMDNextOffset() noexcept {
         return (Platform::SIMD::Size / sizeof(Char_T));
     }
 };
