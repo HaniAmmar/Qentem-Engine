@@ -16,6 +16,7 @@
 #define QENTEM_Q_TEST_H
 
 #include "ToCharsHelper.hpp"
+#include "LiteStream.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,185 +55,6 @@ void operator delete(void *, Type_T *) noexcept {
 
 namespace Qentem {
 
-struct SimpleStringStream {
-    using CharType = char;
-    static constexpr SizeT ExpandFactor{2};
-
-    SimpleStringStream()                                      = default;
-    SimpleStringStream(SimpleStringStream &&)                 = delete;
-    SimpleStringStream(const SimpleStringStream &)            = delete;
-    SimpleStringStream &operator=(SimpleStringStream &&)      = delete;
-    SimpleStringStream &operator=(const SimpleStringStream &) = delete;
-
-    inline explicit SimpleStringStream(SizeT capacity) {
-        if (capacity != 0) {
-            allocate(capacity);
-        }
-    }
-
-    ~SimpleStringStream() {
-        QENTEM_DEALLOCATE(Storage());
-    }
-
-    inline void Write(char ch) {
-        const SizeT new_length = (Length() + SizeT{1});
-
-        if (Capacity() == Length()) {
-            expand(new_length * ExpandFactor);
-        }
-
-        Storage()[Length()] = ch;
-        length_             = new_length;
-    }
-
-    inline void Write(const char *str, const SizeT length) {
-        if (length != 0) {
-            const SizeT new_length = (Length() + length);
-
-            if (Capacity() < new_length) {
-                expand(new_length * ExpandFactor);
-            }
-
-            char *des    = (Storage() + Length());
-            SizeT offset = 0;
-
-            while (offset < length) {
-                des[offset] = str[offset];
-                ++offset;
-            }
-
-            length_ = new_length;
-        }
-    }
-
-    inline void operator<<(char ch) {
-        Write(ch);
-    }
-
-    inline void operator<<(const char *str) {
-        Write(str, StringUtils::Count(str));
-    }
-
-    inline void Clear() noexcept {
-        length_ = 0;
-    }
-
-    inline void StepBack(const SizeT length) noexcept {
-        if (length <= Length()) {
-            length_ -= length;
-        }
-    }
-
-    inline char *Storage() noexcept {
-        return storage_;
-    }
-
-    inline const char *Storage() const noexcept {
-        return storage_;
-    }
-
-    inline const char *First() const noexcept {
-        return storage_;
-    }
-
-    inline char *Last() noexcept {
-        if (Capacity() != 0) {
-            return (Storage() + (Length() - SizeT{1}));
-        }
-
-        return nullptr;
-    }
-
-    inline const char *Last() const noexcept {
-        if (Capacity() != 0) {
-            return (Storage() + (Length() - SizeT{1}));
-        }
-
-        return nullptr;
-    }
-
-    inline SizeT Length() const noexcept {
-        return length_;
-    }
-
-    inline SizeT Capacity() const noexcept {
-        return capacity_;
-    }
-
-    void InsertNull() {
-        if (Capacity() == Length()) {
-            expand(Length() + SizeT{1});
-        }
-
-        Storage()[Length()] = char{0};
-    }
-
-    inline void InsertAt(char ch, SizeT index) {
-        if (index < Length()) {
-            const SizeT new_length = (Length() + SizeT{1});
-
-            if (new_length <= Capacity()) {
-                char *data = Storage();
-                SizeT i    = Length();
-
-                while (i > index) {
-                    data[i] = data[i - SizeT{1}];
-                    --i;
-                }
-
-                data[index] = ch;
-                length_     = new_length;
-            } else {
-                char *new_storage = static_cast<char *>(QENTEM_ALLOCATE(new_length));
-
-                SizeT i = 0;
-                while (i < index) {
-                    new_storage[i] = Storage()[i];
-                    ++i;
-                }
-
-                new_storage[index] = ch;
-
-                SizeT j = index;
-                while (j < Length()) {
-                    new_storage[j + 1] = Storage()[j];
-                    ++j;
-                }
-
-                QENTEM_DEALLOCATE(Storage());
-                storage_  = new_storage;
-                capacity_ = new_length;
-                length_   = new_length;
-            }
-        }
-    }
-
-  private:
-    void expand(const SizeT new_capacity) {
-        char *str = Storage();
-
-        allocate(new_capacity);
-
-        SizeT offset = 0;
-
-        while (offset < Length()) {
-            Storage()[offset] = str[offset];
-            ++offset;
-        }
-
-        QENTEM_DEALLOCATE(str);
-    }
-
-    void allocate(SizeT capacity) {
-        storage_  = static_cast<char *>(QENTEM_ALLOCATE(capacity));
-        capacity_ = capacity;
-    }
-
-    char *storage_{nullptr};
-    SizeT length_{0};
-    SizeT capacity_{0};
-};
-
 struct TestOutput {
     TestOutput()                              = delete;
     ~TestOutput()                             = delete;
@@ -268,7 +90,7 @@ struct TestOutput {
 
     template <typename... Values_T>
     inline static void Print(const Values_T &...values) {
-        SimpleStringStream &ss = GetStreamCache();
+        LiteStream &ss = GetStreamCache();
         ToCharsHelper::Write(ss, values...);
 
         if (IsOutputEnabled()) {
@@ -303,8 +125,8 @@ struct TestOutput {
     // static void ResetDoubleFormat() noexcept {
     // }
 
-    static SimpleStringStream &GetStreamCache() noexcept {
-        static SimpleStringStream ss{1024};
+    static LiteStream &GetStreamCache() noexcept {
+        static LiteStream ss{1024};
 
         return ss;
     }
