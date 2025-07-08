@@ -1866,7 +1866,7 @@ struct TemplateCore {
                         expr.Type             = ExpressionType::NotANumber;
                     }
 
-                    exprs += Memory::Move(expr);
+                    exprs += QUtility::Move(expr);
 
                     return true;
                 }

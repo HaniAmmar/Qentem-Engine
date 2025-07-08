@@ -124,7 +124,7 @@ static void TestDeque1(QTest &test) {
     test.IsNotNull(numbers1.First(), __LINE__);
 
     storage  = numbers1.First();
-    numbers2 = Memory::Move(numbers1);
+    numbers2 = QUtility::Move(numbers1);
     test.IsEqual(numbers2.Size(), SizeT{16}, __LINE__);
     test.IsEqual(numbers2.Capacity(), SizeT{16}, __LINE__);
     test.IsEqual(numbers2.First(), storage, __LINE__);
@@ -134,7 +134,7 @@ static void TestDeque1(QTest &test) {
     test.IsEqual(numbers1.Capacity(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
 
-    numbers1 = Deque<SizeT>(Memory::Move(numbers2));
+    numbers1 = Deque<SizeT>(QUtility::Move(numbers2));
     test.IsEqual(numbers1.Size(), SizeT{16}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{16}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -776,11 +776,11 @@ static void TestDeque4(QTest &test) {
     const char *str1_cstr = str1.First();
     const char *str2_cstr = str2.First();
 
-    strings += Memory::Move(str1);
+    strings += QUtility::Move(str1);
 
     test.IsEqual(strings.Storage()[0].First(), str1_cstr, __LINE__);
 
-    strings.Insert(Memory::Move(str2));
+    strings.Insert(QUtility::Move(str2));
     test.IsEqual(strings.Storage()[1].First(), str2_cstr, __LINE__);
 
     strings += str1;

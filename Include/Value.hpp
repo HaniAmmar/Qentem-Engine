@@ -74,17 +74,17 @@ struct Value {
     Value(Value &&val) noexcept {
         switch (val.Type()) {
             case ValueType::Object: {
-                object_ = Memory::Move(val.object_);
+                object_ = QUtility::Move(val.object_);
                 break;
             }
 
             case ValueType::Array: {
-                array_ = Memory::Move(val.array_);
+                array_ = QUtility::Move(val.array_);
                 break;
             }
 
             case ValueType::String: {
-                string_ = Memory::Move(val.string_);
+                string_ = QUtility::Move(val.string_);
                 break;
             }
 
@@ -124,15 +124,15 @@ struct Value {
         setType(type);
     }
 
-    inline explicit Value(ObjectT &&obj) noexcept : object_{Memory::Move(obj)} {
+    inline explicit Value(ObjectT &&obj) noexcept : object_{QUtility::Move(obj)} {
         setTypeToObject();
     }
 
-    inline explicit Value(ArrayT &&arr) noexcept : array_{Memory::Move(arr)} {
+    inline explicit Value(ArrayT &&arr) noexcept : array_{QUtility::Move(arr)} {
         setTypeToArray();
     }
 
-    inline explicit Value(StringT &&str) noexcept : string_{Memory::Move(str)} {
+    inline explicit Value(StringT &&str) noexcept : string_{QUtility::Move(str)} {
         setTypeToString();
     }
 
@@ -211,17 +211,17 @@ struct Value {
 
             switch (type) {
                 case ValueType::Object: {
-                    object_ = Memory::Move(val.object_);
+                    object_ = QUtility::Move(val.object_);
                     break;
                 }
 
                 case ValueType::Array: {
-                    array_ = Memory::Move(val.array_);
+                    array_ = QUtility::Move(val.array_);
                     break;
                 }
 
                 case ValueType::String: {
-                    string_ = Memory::Move(val.string_);
+                    string_ = QUtility::Move(val.string_);
                     break;
                 }
 
@@ -254,7 +254,7 @@ struct Value {
 
     Value &operator=(ObjectT &&obj) noexcept {
         reset();
-        object_ = Memory::Move(obj);
+        object_ = QUtility::Move(obj);
         setTypeToObject();
 
         return *this;
@@ -264,7 +264,7 @@ struct Value {
         ObjectT n_obj{obj};
 
         reset();
-        object_ = Memory::Move(n_obj);
+        object_ = QUtility::Move(n_obj);
         setTypeToObject();
 
         return *this;
@@ -272,7 +272,7 @@ struct Value {
 
     Value &operator=(ArrayT &&arr) noexcept {
         reset();
-        array_ = Memory::Move(arr);
+        array_ = QUtility::Move(arr);
         setTypeToArray();
 
         return *this;
@@ -282,7 +282,7 @@ struct Value {
         ArrayT n_arr{arr};
 
         reset();
-        array_ = Memory::Move(n_arr);
+        array_ = QUtility::Move(n_arr);
         setTypeToArray();
 
         return *this;
@@ -290,7 +290,7 @@ struct Value {
 
     Value &operator=(StringT &&str) noexcept {
         reset();
-        string_ = Memory::Move(str);
+        string_ = QUtility::Move(str);
         setTypeToString();
 
         return *this;
@@ -300,7 +300,7 @@ struct Value {
         StringT n_str{str};
 
         reset();
-        string_ = Memory::Move(n_str);
+        string_ = QUtility::Move(n_str);
         setTypeToString();
 
         return *this;
@@ -311,7 +311,7 @@ struct Value {
             StringT n_str{*str};
 
             reset();
-            string_ = Memory::Move(n_str);
+            string_ = QUtility::Move(n_str);
             setTypeToString();
         }
 
@@ -323,7 +323,7 @@ struct Value {
             StringT n_str{*str};
 
             reset();
-            string_ = Memory::Move(n_str);
+            string_ = QUtility::Move(n_str);
             setTypeToString();
         }
 
@@ -334,7 +334,7 @@ struct Value {
         StringT str{str_v.First(), str_v.Length()};
 
         reset();
-        string_ = Memory::Move(str);
+        string_ = QUtility::Move(str);
         setTypeToString();
 
         return *this;
@@ -408,7 +408,7 @@ struct Value {
 
     inline void operator+=(Value &&val) {
         if (isObject() && val.isObject()) {
-            object_ += Memory::Move(val.object_);
+            object_ += QUtility::Move(val.object_);
             val.setTypeToUndefined();
         } else {
             if (!isArray()) {
@@ -416,7 +416,7 @@ struct Value {
                 setTypeToArray();
             }
 
-            array_ += Memory::Move(val);
+            array_ += QUtility::Move(val);
         }
     }
 
@@ -443,19 +443,19 @@ struct Value {
         Value val;
         val.SetPointerToValue(val_ptr);
 
-        array_ += Memory::Move(val);
+        array_ += QUtility::Move(val);
     }
 
     inline void operator+=(ObjectT &&obj) {
         if (isObject()) {
-            object_ += Memory::Move(obj);
+            object_ += QUtility::Move(obj);
         } else {
             if (!isArray()) {
                 reset();
                 setTypeToArray();
             }
 
-            array_ += Value{Memory::Move(obj)};
+            array_ += Value{QUtility::Move(obj)};
         }
     }
 
@@ -470,9 +470,9 @@ struct Value {
         }
 
         if (arr.Size() != 0) {
-            array_ += Memory::Move(arr);
+            array_ += QUtility::Move(arr);
         } else {
-            array_ += Value{Memory::Move(arr)};
+            array_ += Value{QUtility::Move(arr)};
         }
     }
 
@@ -486,7 +486,7 @@ struct Value {
             setTypeToArray();
         }
 
-        array_ += Value{Memory::Move(str)};
+        array_ += Value{QUtility::Move(str)};
     }
 
     inline void operator+=(const StringT &str) {
@@ -559,7 +559,7 @@ struct Value {
             setTypeToObject();
         }
 
-        return (object_[Memory::Move(key)]);
+        return (object_[QUtility::Move(key)]);
     }
 
     inline Value &operator[](const StringT &key) {
@@ -630,7 +630,7 @@ struct Value {
             setTypeToObject();
         }
 
-        object_.Insert(key.First(), key.Length(), Memory::Move(val));
+        object_.Insert(key.First(), key.Length(), QUtility::Move(val));
     }
 
     inline bool operator<(const Value &val) const noexcept {
@@ -879,13 +879,13 @@ struct Value {
 
             while (src_val < end) {
                 if (!(src_val->isUndefined())) {
-                    array_ += Memory::Move(*src_val);
+                    array_ += QUtility::Move(*src_val);
                 }
 
                 ++src_val;
             }
         } else if (isObject() && val.isObject()) {
-            object_ += Memory::Move(val.object_);
+            object_ += QUtility::Move(val.object_);
         }
 
         val.Reset();
@@ -1904,13 +1904,13 @@ struct Value {
 
                 do {
                     if (!(src_val->isUndefined())) {
-                        new_array += Memory::Move(*src_val);
+                        new_array += QUtility::Move(*src_val);
                     }
 
                     ++src_val;
                 } while (src_val < src_end);
 
-                array_ = Memory::Move(new_array);
+                array_ = QUtility::Move(new_array);
             }
 
             src_val = array_.Storage();
@@ -1991,7 +1991,7 @@ struct Value {
                             return false;
                         }
 
-                        groupedValue.object_.Get(str, str_len) += Memory::Move(new_sub_obj);
+                        groupedValue.object_.Get(str, str_len) += QUtility::Move(new_sub_obj);
 
                         ++item_;
                         continue;

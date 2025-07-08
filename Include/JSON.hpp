@@ -99,7 +99,7 @@ struct JSON {
                             ++offset;
                             StringUtils::TrimLeft(content, offset, end);
                             String<Char_T> key{str, len};
-                            obj->Insert(Memory::Move(key), parseValue(stream, content, offset, end));
+                            obj->Insert(QUtility::Move(key), parseValue(stream, content, offset, end));
                             StringUtils::TrimLeft(content, offset, end);
 
                             if (offset < end) {

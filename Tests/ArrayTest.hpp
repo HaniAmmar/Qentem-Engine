@@ -129,7 +129,7 @@ static void TestArray1(QTest &test) {
     test.IsNotNull(numbers2.First(), __LINE__);
     test.IsNotEqual(numbers2.First(), storage, __LINE__);
 
-    numbers2 = Memory::Move(numbers1);
+    numbers2 = QUtility::Move(numbers1);
     test.IsEqual(numbers2.Size(), 16U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 16U, __LINE__);
     test.IsEqual(numbers2.First(), storage, __LINE__);
@@ -147,7 +147,7 @@ static void TestArray1(QTest &test) {
     test.IsNotEqual(numbers1.First(), storage, __LINE__);
 
     storage  = numbers2.First();
-    numbers1 = Array<SizeT>(Memory::Move(numbers2));
+    numbers1 = Array<SizeT>(QUtility::Move(numbers2));
     test.IsEqual(numbers1.Size(), 16U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 16U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -175,7 +175,7 @@ static void TestArray1(QTest &test) {
     test.IsNotEqual(numbers1.First(), storage, __LINE__);
 
     storage = numbers1.First();
-    numbers1 += Memory::Move(numbers2);
+    numbers1 += QUtility::Move(numbers2);
     test.IsEqual(numbers1.Size(), 13U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 13U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -187,14 +187,14 @@ static void TestArray1(QTest &test) {
     numbers2.ResizeWithDefaultInit(5);
     numbers1.Resize(18);
     storage = numbers1.First();
-    numbers1 += Memory::Move(numbers2);
+    numbers1 += QUtility::Move(numbers2);
     test.IsEqual(numbers1.Size(), 18U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 18U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1.First(), storage, __LINE__);
 
     storage = numbers1.First();
-    numbers2 += Memory::Move(numbers1);
+    numbers2 += QUtility::Move(numbers1);
     test.IsEqual(numbers2.Size(), 18U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 18U, __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
@@ -245,7 +245,7 @@ static void TestArray2(QTest &test) {
     test.IsNotNull(numbers3.First(), __LINE__);
 
     storage = numbers1.First();
-    numbers2.Insert(Memory::Move(numbers1));
+    numbers2.Insert(QUtility::Move(numbers1));
     test.IsEqual(numbers2.Size(), 12U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 12U, __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
@@ -311,11 +311,11 @@ static void TestArray3(QTest &test) {
     const char *str1_cstr = str1.First();
     const char *str2_cstr = str2.First();
 
-    strings += Memory::Move(str1);
+    strings += QUtility::Move(str1);
 
     test.IsEqual(strings.Storage()[0].First(), str1_cstr, __LINE__);
 
-    strings.Insert(Memory::Move(str2));
+    strings.Insert(QUtility::Move(str2));
     test.IsEqual(strings.Storage()[1].First(), str2_cstr, __LINE__);
 
     strings += str1;
@@ -391,8 +391,8 @@ static void TestArray4(QTest &test) {
     const char *str1_cstr = str1.First();
     const char *str2_cstr = str2.First();
 
-    strings1 += Memory::Move(str1);
-    strings1 += Memory::Move(str2);
+    strings1 += QUtility::Move(str1);
+    strings1 += QUtility::Move(str2);
 
     strings2 += strings1;
     String<char> *storage2 = strings2.Storage();
@@ -403,7 +403,7 @@ static void TestArray4(QTest &test) {
     test.IsNotEqual(storage2[1].First(), str2_cstr, __LINE__);
 
     strings2.Reserve(2);
-    strings2 += Memory::Move(strings1);
+    strings2 += QUtility::Move(strings1);
     storage2 = strings2.Storage();
 
     test.IsEqual(strings2.Size(), 2U, __LINE__);

@@ -224,7 +224,7 @@ static void TestHArray2(QTest &test) {
     test.IsNotEqual(numbers1.GetKeyAt(6), numbers2.GetKeyAt(6), __LINE__);
     test.IsNotEqual(numbers2.GetKeyAt(6)->First(), str_c, __LINE__);
 
-    numbers2 = Memory::Move(numbers1);
+    numbers2 = QUtility::Move(numbers1);
     test.IsNull(numbers1.Storage(), __LINE__);
     test.IsEqual(numbers1.Size(), 0U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 0U, __LINE__);
@@ -285,7 +285,7 @@ static void TestHArray3(QTest &test) {
     str_c = key->First();
 
     storage  = numbers2.First();
-    numbers1 = Memory::Move(numbers2);
+    numbers1 = QUtility::Move(numbers2);
 
     test.IsEqual(numbers1.Size(), 9U, __LINE__);
     test.IsTrue((numbers1.Capacity() >= 9), __LINE__);
@@ -434,7 +434,7 @@ static void TestHArray4(QTest &test) {
     numbers3 = numbers1; // Backup
 
     storage = numbers1.First();
-    numbers2 += Memory::Move(numbers1);
+    numbers2 += QUtility::Move(numbers1);
     test.IsEqual(numbers1.Size(), 0U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 0U, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
@@ -477,7 +477,7 @@ static void TestHArray4(QTest &test) {
         Digit::NumberToString(key, i);
         key2 = key;
 
-        numbers1.Insert(Memory::Move(key2), Memory::Move(i));
+        numbers1.Insert(QUtility::Move(key2), QUtility::Move(i));
         value  = numbers1.GetValue(key);
         value2 = numbers1.GetValue(key);
         test.IsNotNull(value, __LINE__);
@@ -635,8 +635,8 @@ static void TestHArray6(QTest &test) {
     const char *c_str1 = str1.First();
     const char *c_str2 = str2.First();
 
-    strings1[Memory::Move(key1)] = Memory::Move(str1);
-    strings1[Memory::Move(key2)] = Memory::Move(str2);
+    strings1[QUtility::Move(key1)] = QUtility::Move(str1);
+    strings1[QUtility::Move(key2)] = QUtility::Move(str2);
 
     test.IsEqual(strings1.Size(), 2U, __LINE__);
     test.IsNotNull(strings1.First(), __LINE__);
@@ -667,7 +667,7 @@ static void TestHArray6(QTest &test) {
 
     strings2.Reserve(2);
     storage = strings1.First();
-    strings2 += Memory::Move(strings1);
+    strings2 += QUtility::Move(strings1);
     test.IsEqual(strings2.Size(), 2U, __LINE__);
     test.IsEqual(strings2.Capacity(), 2U, __LINE__);
     test.IsNotNull(strings2.First(), __LINE__);
@@ -683,11 +683,11 @@ static void TestHArray6(QTest &test) {
     test.IsEqual(strings2.GetValueAt(id)->First(), c_str1, __LINE__);
     test.IsEqual(strings2.GetValueAt(++id)->First(), c_str2, __LINE__);
 
-    strings1 += Memory::Move(strings2);
+    strings1 += QUtility::Move(strings2);
     strings1.Resize(10);
     storage = strings1.First();
     strings2.Reset();
-    strings2 += Memory::Move(strings1);
+    strings2 += QUtility::Move(strings1);
     test.IsEqual(strings2.Size(), 2U, __LINE__);
     test.IsEqual(strings2.Capacity(), 2U, __LINE__);
     test.IsNotNull(strings2.First(), __LINE__);

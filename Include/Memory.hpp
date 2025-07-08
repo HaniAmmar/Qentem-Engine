@@ -192,63 +192,6 @@ struct Memory {
         }
     }
     /////////////////////////////////////////////////////////////////////
-
-    template <typename Type_T>
-    static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &value) noexcept {
-        return (Type_T &&)(value);
-    }
-
-    template <typename Type_T>
-    static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &&value) noexcept {
-        static_assert(!QTraits::IsLValueReference<Type_T>::Value, "Forward<T>(x): Cannot forward an lvalue as rvalue.");
-        return (Type_T &&)(value);
-    }
-
-    template <typename Type_T>
-    static constexpr typename QTraits::ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
-        return (typename QTraits::ReferenceType<Type_T>::Type &&)(value);
-    }
-    /////////////////////////////////////////////////////////////////////
-    template <typename Type_T>
-    QENTEM_INLINE static void Swap(Type_T &item1, Type_T &item2) noexcept {
-        Type_T item = Move(item1);
-        item1       = Move(item2);
-        item2       = Move(item);
-    }
-    /////////////////////////////////////////////////////////////////////
-    template <bool Ascend_T, typename Type_T, typename Number_T>
-    inline static void Sort(Type_T *arr, Number_T start, Number_T end) noexcept {
-        if (start != end) {
-            Type_T  &item   = arr[start];
-            Number_T index  = start;
-            Number_T offset = (start + Number_T{1});
-
-            while (offset < end) {
-                if (Ascend_T) {
-                    if (arr[offset] < item) {
-                        ++index;
-                        Swap(arr[index], arr[offset]);
-                    }
-                } else {
-                    if (arr[offset] > item) {
-                        ++index;
-                        Swap(arr[index], arr[offset]);
-                    }
-                }
-
-                ++offset;
-            }
-
-            if (index != start) {
-                Swap(arr[index], arr[start]);
-            }
-
-            Sort<Ascend_T>(arr, start, index);
-            ++index;
-            Sort<Ascend_T>(arr, index, end);
-        }
-    }
-    /////////////////////////////////////////////////////////////////////
     QENTEM_INLINE static SizeT AlignToPow2(SizeT n_size) noexcept {
         // Ensure scanned n_size is >= 2, so msb >= 1.
         SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size | SizeT{2}));
@@ -322,7 +265,7 @@ struct Memory {
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static Type_T *AllocateInit(Values_T &&...values) noexcept {
         Type_T *pointer = Allocate<Type_T>(1);
-        Initialize(pointer, Forward<Values_T>(values)...);
+        Initialize(pointer, QUtility::Forward<Values_T>(values)...);
         return pointer;
     }
 
@@ -344,14 +287,14 @@ struct Memory {
     // Forward initializer
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static void Initialize(Type_T *pointer, Values_T &&...values) noexcept {
-        ::new (pointer) Type_T{Forward<Values_T>(values)...};
+        ::new (pointer) Type_T{QUtility::Forward<Values_T>(values)...};
     }
 
     // Range forward initializer
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end, Values_T &&...values) {
         while (pointer < end) {
-            ::new (pointer) Type_T{Forward<Values_T>(values)...};
+            ::new (pointer) Type_T{QUtility::Forward<Values_T>(values)...};
             ++pointer;
         }
     }

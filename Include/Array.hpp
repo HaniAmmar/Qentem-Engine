@@ -146,7 +146,7 @@ struct Array {
             expand((Capacity() | SizeT{1}) * SizeT{2});
         }
 
-        Memory::Initialize((Storage() + Size()), Memory::Move(item));
+        Memory::Initialize((Storage() + Size()), QUtility::Move(item));
         ++size_;
     }
 
@@ -182,7 +182,7 @@ struct Array {
     }
 
     inline void Insert(Array &&src) {
-        *this += Memory::Move(src);
+        *this += QUtility::Move(src);
     }
 
     inline void Insert(const Array &src) {
@@ -192,7 +192,7 @@ struct Array {
     inline Type_T &Insert(Type_T &&item) {
         const SizeT size = Size();
 
-        *this += Memory::Move(item);
+        *this += QUtility::Move(item);
 
         return Storage()[size];
     }
@@ -279,15 +279,15 @@ struct Array {
     }
 
     void Swap(Type_T &item1, Type_T &item2) noexcept {
-        Memory::Swap(item1, item2);
+        QUtility::Swap(item1, item2);
     }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(bool ascend = true) noexcept {
         if (ascend) {
-            Memory::Sort<true>(Storage(), SizeT{0}, Size());
+            QUtility::Sort<true>(Storage(), SizeT{0}, Size());
         } else {
-            Memory::Sort<false>(Storage(), SizeT{0}, Size());
+            QUtility::Sort<false>(Storage(), SizeT{0}, Size());
         }
     }
 

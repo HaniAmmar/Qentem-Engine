@@ -145,12 +145,12 @@ static void TestTrueValue(QTest &test) {
     test.IsTrue(value2.IsTrue(), __LINE__);
 
     value2.Reset();
-    value2 = Memory::Move(value1);
+    value2 = QUtility::Move(value1);
     test.IsTrue(value1.IsUndefined(), __LINE__);
     test.IsTrue(value2.IsTrue(), __LINE__);
 
     value1 = true;
-    ValueC value3{Memory::Move(value1)};
+    ValueC value3{QUtility::Move(value1)};
     test.IsTrue(value1.IsUndefined(), __LINE__);
 
     test.IsTrue(value3.IsTrue(), __LINE__);
@@ -211,12 +211,12 @@ static void TestFalseValue(QTest &test) {
     test.IsTrue(value2.IsFalse(), __LINE__);
 
     value2.Reset();
-    value2 = Memory::Move(value1);
+    value2 = QUtility::Move(value1);
     test.IsTrue(value1.IsUndefined(), __LINE__);
     test.IsTrue(value2.IsFalse(), __LINE__);
 
     value1 = false;
-    ValueC value3(Memory::Move(value1));
+    ValueC value3(QUtility::Move(value1));
     test.IsTrue(value1.IsUndefined(), __LINE__);
 
     test.IsTrue(value3.IsFalse(), __LINE__);
@@ -277,12 +277,12 @@ static void TestNullValue(QTest &test) {
     test.IsTrue(value2.IsNull(), __LINE__);
 
     value2.Reset();
-    value2 = Memory::Move(value1);
+    value2 = QUtility::Move(value1);
     test.IsTrue(value1.IsUndefined(), __LINE__);
     test.IsTrue(value2.IsNull(), __LINE__);
 
     value1 = nullptr;
-    ValueC value3(Memory::Move(value1));
+    ValueC value3(QUtility::Move(value1));
     test.IsTrue(value1.IsUndefined(), __LINE__);
 
     test.IsTrue(value3.IsNull(), __LINE__);
@@ -352,7 +352,7 @@ static void TestNumberValue1(QTest &test) {
     test.IsEqual(value1.GetNumber(), 10.0, __LINE__);
 
     value2.Reset();
-    value2 = Memory::Move(value1);
+    value2 = QUtility::Move(value1);
     test.IsTrue(value1.IsUndefined(), __LINE__);
     test.IsEqual(value2.GetNumber(), 10.0, __LINE__);
 
@@ -802,7 +802,7 @@ static void TestStringValue(QTest &test) {
     test.IsEqual(ss_var, "true", __LINE__);
 
     value2.Reset();
-    value2 = Memory::Move(value1);
+    value2 = QUtility::Move(value1);
     ss_var.Clear();
     test.IsTrue(value2.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "true", __LINE__);
@@ -810,7 +810,7 @@ static void TestStringValue(QTest &test) {
     test.IsTrue(value1.IsUndefined(), __LINE__);
 
     value1 = "false";
-    ValueC value3(Memory::Move(value1));
+    ValueC value3(QUtility::Move(value1));
     test.IsEqual(value3.Length(), 5U, __LINE__);
     ss_var.Clear();
     test.IsTrue(value3.CopyValueTo(ss_var), __LINE__);
@@ -898,8 +898,8 @@ static void TestArrayValue(QTest &test) {
     VArray arr_var2;
     arr_var2.ResizeWithDefaultInit(10);
 
-    value1 = Memory::Move(arr_var); // Move
-    value2 = Memory::Move(arr_var2);
+    value1 = QUtility::Move(arr_var); // Move
+    value2 = QUtility::Move(arr_var2);
     value2 = value1;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 10U, __LINE__);
@@ -917,7 +917,7 @@ static void TestArrayValue(QTest &test) {
     arr_var.Reset();
     arr_var.ResizeWithDefaultInit(7);
     storage = arr_var.First();
-    value1  = Memory::Move(arr_var);
+    value1  = QUtility::Move(arr_var);
 
     value2 = ValueC{value1};
     test.IsTrue(value2.IsArray(), __LINE__);
@@ -931,7 +931,7 @@ static void TestArrayValue(QTest &test) {
     test.IsEqual(value1.GetArray()->First(), storage, __LINE__);
 
     value2.Reset();
-    value2 = Memory::Move(value1);
+    value2 = QUtility::Move(value1);
     test.IsNotNull(value2.GetArray(), __LINE__);
     test.IsEqual(value2.GetArray()->First(), storage, __LINE__);
 
@@ -940,9 +940,9 @@ static void TestArrayValue(QTest &test) {
     arr_var.Reset();
     arr_var.ResizeWithDefaultInit(7);
     storage = arr_var.First();
-    value1  = Memory::Move(arr_var);
+    value1  = QUtility::Move(arr_var);
 
-    ValueC value3(Memory::Move(value1));
+    ValueC value3(QUtility::Move(value1));
     test.IsNotNull(value3.GetArray(), __LINE__);
     test.IsEqual(value3.GetArray()->First(), storage, __LINE__);
 
@@ -959,7 +959,7 @@ static void TestArrayValue(QTest &test) {
     arr_var.Reset();
     arr_var.ResizeWithDefaultInit(13);
     storage = arr_var.First();
-    value3  = Memory::Move(arr_var); // Move
+    value3  = QUtility::Move(arr_var); // Move
     test.IsNotNull(value3.GetArray(), __LINE__);
     test.IsEqual(value3.GetArray()->First(), storage, __LINE__);
 
@@ -993,7 +993,7 @@ static void TestArrayValue(QTest &test) {
     value1[1] = 22;
     str_var   = "Qen";
     c_str_var = str_var.First();
-    value1[2] = Memory::Move(str_var);
+    value1[2] = QUtility::Move(str_var);
 
     value2 = value1;
     test.IsEqual(value2.Size(), 3U, __LINE__);
@@ -1031,7 +1031,7 @@ static void TestArrayValue(QTest &test) {
     val_ptr[0] = 10;
     val_ptr[1] = 20;
     val_ptr[2] = 30;
-    val_ptr[3] = Memory::Move(str_var);
+    val_ptr[3] = QUtility::Move(str_var);
 
     value2 = arr_var;
     test.IsEqual(value2.Size(), 4U, __LINE__);
@@ -1046,7 +1046,7 @@ static void TestArrayValue(QTest &test) {
 
     arr_var.Clear();
     arr_var.Resize(5);
-    value2 = Memory::Move(arr_var);
+    value2 = QUtility::Move(arr_var);
     test.IsNotNull(value2.GetArray(), __LINE__);
     test.IsEqual(value2.GetArray()->Capacity(), 5U, __LINE__);
 
@@ -1059,7 +1059,7 @@ static void TestArrayValue(QTest &test) {
 
     arr_var.Reset();
     arr_var.Reserve(10);
-    value2 = Memory::Move(arr_var);
+    value2 = QUtility::Move(arr_var);
     value2.Compress();
     test.IsNotNull(value2.GetArray(), __LINE__);
     test.IsEqual(value2.GetArray()->Capacity(), 0U, __LINE__);
@@ -1128,7 +1128,7 @@ static void TestObjectValue1(QTest &test) {
 
     storage = h_arr_var.First();
 
-    value1 = Memory::Move(h_arr_var); // Move
+    value1 = QUtility::Move(h_arr_var); // Move
     value2 = value1;
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsEqual(value1.Size(), 10U, __LINE__);
@@ -1160,7 +1160,7 @@ static void TestObjectValue1(QTest &test) {
     }
 
     storage = h_arr_var.First();
-    value1  = Memory::Move(h_arr_var);
+    value1  = QUtility::Move(h_arr_var);
 
     value2 = ValueC{value1};
     test.IsTrue(value2.IsObject(), __LINE__);
@@ -1184,10 +1184,10 @@ static void TestObjectValue1(QTest &test) {
     }
 
     storage = h_arr_var.First();
-    value1  = Memory::Move(h_arr_var);
+    value1  = QUtility::Move(h_arr_var);
 
     value2.Reset();
-    value2 = Memory::Move(value1);
+    value2 = QUtility::Move(value1);
     test.IsTrue(value2.IsObject(), __LINE__);
     test.IsEqual(value2.GetObject()->First(), storage, __LINE__);
 
@@ -1212,9 +1212,9 @@ static void TestObjectValue2(QTest &test) {
     }
 
     storage = h_arr_var.First();
-    value1  = Memory::Move(h_arr_var);
+    value1  = QUtility::Move(h_arr_var);
 
-    ValueC value3(Memory::Move(value1));
+    ValueC value3(QUtility::Move(value1));
     test.IsTrue(value3.IsObject(), __LINE__);
     test.IsEqual(value3.Size(), 7U, __LINE__);
     test.IsEqual(value3.GetObject()->First(), storage, __LINE__);
@@ -1245,7 +1245,7 @@ static void TestObjectValue2(QTest &test) {
     }
 
     storage = h_arr_var.First();
-    value3  = Memory::Move(h_arr_var); // Move
+    value3  = QUtility::Move(h_arr_var); // Move
     test.IsTrue(value3.IsObject(), __LINE__);
     test.IsEqual(value3.Size(), 13U, __LINE__);
     test.IsNotNull(value3.GetObject(), __LINE__);
@@ -1283,7 +1283,7 @@ static void TestObjectValue2(QTest &test) {
     value1["k2"] = 22;
     str_var      = "Qen";
     c_str_var    = str_var.First();
-    value1["k3"] = Memory::Move(str_var);
+    value1["k3"] = QUtility::Move(str_var);
 
     value3 = value1;
     test.IsEqual(value3.Size(), 3U, __LINE__);
@@ -1318,7 +1318,7 @@ static void TestObjectValue2(QTest &test) {
     h_arr_var[VString("w3")] = 30;
     str_var                  = "-ABCDEF0123456789ABCDEF0123456789-";
     c_str_var                = str_var.First();
-    h_arr_var[VString("w4")] = Memory::Move(str_var);
+    h_arr_var[VString("w4")] = QUtility::Move(str_var);
 
     value3 = h_arr_var;
     test.IsEqual(value3.Size(), 4U, __LINE__);
@@ -1336,7 +1336,7 @@ static void TestObjectValue2(QTest &test) {
     h_arr_var[VString("w2")] = 20;
     h_arr_var[VString("w3")] = 30;
 
-    value3 = Memory::Move(h_arr_var);
+    value3 = QUtility::Move(h_arr_var);
     test.IsEqual(value3.Size(), 3U, __LINE__);
 
     value3.Compress();
@@ -1389,7 +1389,7 @@ static void TestMoveValue1(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = Memory::Move(str_var);
+    value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1399,7 +1399,7 @@ static void TestMoveValue1(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = Memory::Move(arr_var);
+    value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1411,7 +1411,7 @@ static void TestMoveValue1(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = Memory::Move(h_arr_var);
+    value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1446,7 +1446,7 @@ static void TestMoveValue1(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = Memory::Move(str_var);
+    value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1456,7 +1456,7 @@ static void TestMoveValue1(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = Memory::Move(arr_var);
+    value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1468,7 +1468,7 @@ static void TestMoveValue1(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = Memory::Move(h_arr_var);
+    value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1503,7 +1503,7 @@ static void TestMoveValue1(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = Memory::Move(str_var);
+    value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1513,7 +1513,7 @@ static void TestMoveValue1(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = Memory::Move(arr_var);
+    value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1525,7 +1525,7 @@ static void TestMoveValue1(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = Memory::Move(h_arr_var);
+    value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1559,7 +1559,7 @@ static void TestMoveValue1(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = Memory::Move(str_var);
+    value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1569,7 +1569,7 @@ static void TestMoveValue1(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = Memory::Move(arr_var);
+    value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1581,7 +1581,7 @@ static void TestMoveValue1(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = Memory::Move(h_arr_var);
+    value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1623,7 +1623,7 @@ static void TestMoveValue1(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = Memory::Move(arr_var);
+    value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1635,7 +1635,7 @@ static void TestMoveValue1(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = Memory::Move(h_arr_var);
+    value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1677,7 +1677,7 @@ static void TestMoveValue1(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = Memory::Move(str_var);
+    value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1687,7 +1687,7 @@ static void TestMoveValue1(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = Memory::Move(h_arr_var);
+    value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1745,7 +1745,7 @@ static void TestMoveValue2(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = Memory::Move(str_var);
+    value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1755,7 +1755,7 @@ static void TestMoveValue2(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = Memory::Move(arr_var);
+    value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1787,7 +1787,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = true;
 
     value2 = false;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
@@ -1795,7 +1795,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = true;
 
     value2 = nullptr;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
@@ -1803,7 +1803,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = true;
 
     value2 = 11;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNumber(), __LINE__);
     test.IsEqual(value1.GetNumber(), 11.0, __LINE__);
     value1.Reset();
@@ -1813,8 +1813,8 @@ static void TestMoveValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
-    value1    = Memory::Move(value2);
+    value2    = QUtility::Move(str_var);
+    value1    = QUtility::Move(value2);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1824,8 +1824,8 @@ static void TestMoveValue3(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
-    value1      = Memory::Move(value2);
+    value2      = QUtility::Move(arr_var);
+    value1      = QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1837,8 +1837,8 @@ static void TestMoveValue3(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
-    value1        = Memory::Move(value2);
+    value2        = QUtility::Move(h_arr_var);
+    value1        = QUtility::Move(value2);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1850,7 +1850,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = false;
 
     value2 = true;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
@@ -1858,7 +1858,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = false;
 
     value2 = nullptr;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
@@ -1866,7 +1866,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = false;
 
     value2 = -90;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNumber(), __LINE__);
     test.IsEqual(value1.GetNumber(), -90.0, __LINE__);
     value1.Reset();
@@ -1876,8 +1876,8 @@ static void TestMoveValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
-    value1    = Memory::Move(value2);
+    value2    = QUtility::Move(str_var);
+    value1    = QUtility::Move(value2);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1887,8 +1887,8 @@ static void TestMoveValue3(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
-    value1      = Memory::Move(value2);
+    value2      = QUtility::Move(arr_var);
+    value1      = QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1900,8 +1900,8 @@ static void TestMoveValue3(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
-    value1        = Memory::Move(value2);
+    value2        = QUtility::Move(h_arr_var);
+    value1        = QUtility::Move(value2);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1913,7 +1913,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = nullptr;
 
     value2 = true;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
@@ -1921,7 +1921,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = nullptr;
 
     value2 = false;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
@@ -1929,7 +1929,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = nullptr;
 
     value2 = 7.5;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNumber(), __LINE__);
     test.IsEqual(value1.GetNumber(), 7.5, __LINE__);
     value1.Reset();
@@ -1939,8 +1939,8 @@ static void TestMoveValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
-    value1    = Memory::Move(value2);
+    value2    = QUtility::Move(str_var);
+    value1    = QUtility::Move(value2);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -1950,8 +1950,8 @@ static void TestMoveValue3(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
-    value1      = Memory::Move(value2);
+    value2      = QUtility::Move(arr_var);
+    value1      = QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -1963,8 +1963,8 @@ static void TestMoveValue3(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
-    value1        = Memory::Move(value2);
+    value2        = QUtility::Move(h_arr_var);
+    value1        = QUtility::Move(value2);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -1976,7 +1976,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = 13;
 
     value2 = true;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
@@ -1984,7 +1984,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = 40;
 
     value2 = false;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
@@ -1992,7 +1992,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = 33;
 
     value2 = nullptr;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
@@ -2001,8 +2001,8 @@ static void TestMoveValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
-    value1    = Memory::Move(value2);
+    value2    = QUtility::Move(str_var);
+    value1    = QUtility::Move(value2);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -2012,8 +2012,8 @@ static void TestMoveValue3(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
-    value1      = Memory::Move(value2);
+    value2      = QUtility::Move(arr_var);
+    value1      = QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -2025,8 +2025,8 @@ static void TestMoveValue3(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
-    value1        = Memory::Move(value2);
+    value2        = QUtility::Move(h_arr_var);
+    value1        = QUtility::Move(value2);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -2038,7 +2038,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = true;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
@@ -2046,7 +2046,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = false;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
@@ -2054,7 +2054,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = nullptr;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
@@ -2062,7 +2062,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = 4;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNumber(), __LINE__);
     test.IsEqual(value1.GetNumber(), 4.0, __LINE__);
     value1.Reset();
@@ -2072,8 +2072,8 @@ static void TestMoveValue3(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
-    value1      = Memory::Move(value2);
+    value2      = QUtility::Move(arr_var);
+    value1      = QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -2085,8 +2085,8 @@ static void TestMoveValue3(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
-    value1        = Memory::Move(value2);
+    value2        = QUtility::Move(h_arr_var);
+    value1        = QUtility::Move(value2);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -2098,7 +2098,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VArray(1);
 
     value2 = true;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
@@ -2106,7 +2106,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VArray(1);
 
     value2 = false;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
@@ -2114,7 +2114,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VArray(1);
 
     value2 = nullptr;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
@@ -2122,7 +2122,7 @@ static void TestMoveValue3(QTest &test) {
     value1 = VArray(1);
 
     value2 = 33;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNumber(), __LINE__);
     test.IsEqual(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
@@ -2132,8 +2132,8 @@ static void TestMoveValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
-    value1    = Memory::Move(value2);
+    value2    = QUtility::Move(str_var);
+    value1    = QUtility::Move(value2);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -2143,8 +2143,8 @@ static void TestMoveValue3(QTest &test) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
-    value1        = Memory::Move(value2);
+    value2        = QUtility::Move(h_arr_var);
+    value1        = QUtility::Move(value2);
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNotNull(value1.GetObject()->First(), __LINE__);
@@ -2173,7 +2173,7 @@ static void TestMoveValue4(QTest &test) {
     value1 = VHArray(1);
 
     value2 = true;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
@@ -2181,7 +2181,7 @@ static void TestMoveValue4(QTest &test) {
     value1 = VHArray(1);
 
     value2 = false;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
@@ -2189,7 +2189,7 @@ static void TestMoveValue4(QTest &test) {
     value1 = VHArray(1);
 
     value2 = nullptr;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
@@ -2197,7 +2197,7 @@ static void TestMoveValue4(QTest &test) {
     value1 = VHArray(1);
 
     value2 = 33;
-    value1 = Memory::Move(value2);
+    value1 = QUtility::Move(value2);
     test.IsTrue(value1.IsNumber(), __LINE__);
     test.IsEqual(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
@@ -2207,8 +2207,8 @@ static void TestMoveValue4(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
-    value1    = Memory::Move(value2);
+    value2    = QUtility::Move(str_var);
+    value1    = QUtility::Move(value2);
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
@@ -2218,8 +2218,8 @@ static void TestMoveValue4(QTest &test) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
-    value1      = Memory::Move(value2);
+    value2      = QUtility::Move(arr_var);
+    value1      = QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value1.GetArray()->First(), __LINE__);
@@ -2698,7 +2698,7 @@ static void TestCopyValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
+    value2    = QUtility::Move(str_var);
     value1    = value2;
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsNotEqual(value1.StringStorage(), c_str_var, __LINE__);
@@ -2721,7 +2721,7 @@ static void TestCopyValue3(QTest &test) {
     arr_var = VArray{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
     value1      = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2754,7 +2754,7 @@ static void TestCopyValue3(QTest &test) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
+    value2        = QUtility::Move(h_arr_var);
     value1        = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -2794,7 +2794,7 @@ static void TestCopyValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
+    value2    = QUtility::Move(str_var);
     value1    = value2;
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsNotEqual(value1.StringStorage(), c_str_var, __LINE__);
@@ -2817,7 +2817,7 @@ static void TestCopyValue3(QTest &test) {
     arr_var = VArray{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
     value1      = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2850,7 +2850,7 @@ static void TestCopyValue3(QTest &test) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
+    value2        = QUtility::Move(h_arr_var);
     value1        = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -2890,7 +2890,7 @@ static void TestCopyValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
+    value2    = QUtility::Move(str_var);
     value1    = value2;
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsNotEqual(value1.StringStorage(), c_str_var, __LINE__);
@@ -2913,7 +2913,7 @@ static void TestCopyValue3(QTest &test) {
     arr_var = VArray{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
     value1      = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2946,7 +2946,7 @@ static void TestCopyValue3(QTest &test) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
+    value2        = QUtility::Move(h_arr_var);
     value1        = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -2985,7 +2985,7 @@ static void TestCopyValue3(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
+    value2    = QUtility::Move(str_var);
     value1    = value2;
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsNotEqual(value1.StringStorage(), c_str_var, __LINE__);
@@ -3008,7 +3008,7 @@ static void TestCopyValue3(QTest &test) {
     arr_var = VArray{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
     value1      = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -3041,7 +3041,7 @@ static void TestCopyValue3(QTest &test) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
+    value2        = QUtility::Move(h_arr_var);
     value1        = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -3121,7 +3121,7 @@ static void TestCopyValue4(QTest &test) {
     arr_var = VArray{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
     value1      = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -3154,7 +3154,7 @@ static void TestCopyValue4(QTest &test) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
+    value2        = QUtility::Move(h_arr_var);
     value1        = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -3202,7 +3202,7 @@ static void TestCopyValue4(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
+    value2    = QUtility::Move(str_var);
     value1    = value2;
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsNotEqual(value1.StringStorage(), c_str_var, __LINE__);
@@ -3232,7 +3232,7 @@ static void TestCopyValue4(QTest &test) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = Memory::Move(h_arr_var);
+    value2        = QUtility::Move(h_arr_var);
     value1        = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -3280,7 +3280,7 @@ static void TestCopyValue4(QTest &test) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = Memory::Move(str_var);
+    value2    = QUtility::Move(str_var);
     value1    = value2;
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsNotEqual(value1.StringStorage(), c_str_var, __LINE__);
@@ -3303,7 +3303,7 @@ static void TestCopyValue4(QTest &test) {
     arr_var = VArray{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
     value1      = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -3602,7 +3602,7 @@ static void TestAddition2(QTest &test) {
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
-    value += Memory::Move(str);
+    value += QUtility::Move(str);
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 1U, __LINE__);
     test.IsTrue(value[0].IsString(), __LINE__);
@@ -3611,7 +3611,7 @@ static void TestAddition2(QTest &test) {
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
-    value += Memory::Move(str);
+    value += QUtility::Move(str);
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 2U, __LINE__);
     test.IsTrue(value[0].IsString(), __LINE__);
@@ -3755,7 +3755,7 @@ static void TestAddition3(QTest &test) {
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
 
-    value += Memory::Move(arr_var);
+    value += QUtility::Move(arr_var);
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 3U, __LINE__);
     test.IsNotNull(value.GetArray(), __LINE__);
@@ -3773,7 +3773,7 @@ static void TestAddition3(QTest &test) {
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
 
-    value += Memory::Move(arr_var);
+    value += QUtility::Move(arr_var);
     test.IsNull(arr_var.First(), __LINE__);
 
     test.IsTrue(value.IsArray(), __LINE__);
@@ -3853,7 +3853,7 @@ static void TestAddition4(QTest &test) {
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
-    value2            = Memory::Move(str);
+    value2            = QUtility::Move(str);
 
     value1 += value2;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -3864,7 +3864,7 @@ static void TestAddition4(QTest &test) {
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
-    value2             = Memory::Move(str);
+    value2             = QUtility::Move(str);
 
     value1 += value2;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -3901,7 +3901,7 @@ static void TestAddition4(QTest &test) {
     test.IsNotNull(value1.GetArray(), __LINE__);
 
     value2 = VArray(10);
-    value1.Merge(Memory::Move(value2));
+    value1.Merge(QUtility::Move(value2));
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -3914,9 +3914,9 @@ static void TestAddition4(QTest &test) {
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
 
-    value1.Merge(Memory::Move(value2));
+    value1.Merge(QUtility::Move(value2));
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 3U, __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -3934,7 +3934,7 @@ static void TestAddition4(QTest &test) {
     arr_var += ValueC{VString("^ABCDEF0123456789ABCDEF0123456789^")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
 
     value1.Merge(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -3971,7 +3971,7 @@ static void TestAddition5(QTest &test) {
     value2 = true;
     test.IsTrue(value2.IsTrue(), __LINE__);
 
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
 
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 1U, __LINE__);
@@ -3986,7 +3986,7 @@ static void TestAddition5(QTest &test) {
     value2 += VHArray(1);
 
     value2 = true;
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 2U, __LINE__);
     test.IsTrue(value1[0].IsTrue(), __LINE__);
@@ -3997,13 +3997,13 @@ static void TestAddition5(QTest &test) {
 
     value2 = false;
 
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 1U, __LINE__);
     test.IsTrue(value1[0].IsFalse(), __LINE__);
 
     value2 = false;
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 2U, __LINE__);
     test.IsTrue(value1[0].IsFalse(), __LINE__);
@@ -4013,13 +4013,13 @@ static void TestAddition5(QTest &test) {
     /////////////////
 
     value2 = nullptr;
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 1U, __LINE__);
     test.IsTrue(value1[0].IsNull(), __LINE__);
 
     value2 = nullptr;
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 2U, __LINE__);
     test.IsTrue(value1[0].IsNull(), __LINE__);
@@ -4029,9 +4029,9 @@ static void TestAddition5(QTest &test) {
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
-    value2            = Memory::Move(str);
+    value2            = QUtility::Move(str);
 
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 1U, __LINE__);
     test.IsTrue(value1[0].IsString(), __LINE__);
@@ -4040,9 +4040,9 @@ static void TestAddition5(QTest &test) {
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
-    value2             = Memory::Move(str);
+    value2             = QUtility::Move(str);
 
-    value1 += Memory::Move(value2);
+    value1 += QUtility::Move(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 2U, __LINE__);
     test.IsTrue(value1[0].IsString(), __LINE__);
@@ -4062,7 +4062,7 @@ static void TestAddition5(QTest &test) {
     test.IsNotNull(value2.GetArray(), __LINE__);
 
     value2 = VArray(1);
-    value1.Merge(Memory::Move(value2));
+    value1.Merge(QUtility::Move(value2));
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -4076,9 +4076,9 @@ static void TestAddition5(QTest &test) {
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
 
-    value1.Merge(Memory::Move(value2));
+    value1.Merge(QUtility::Move(value2));
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 3U, __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -4096,9 +4096,9 @@ static void TestAddition5(QTest &test) {
     arr_var += ValueC{VString("#0123456789ABCDEF0123456789ABCDEF#")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
-    value2      = Memory::Move(arr_var);
+    value2      = QUtility::Move(arr_var);
 
-    value1.Merge(Memory::Move(value2));
+    value1.Merge(QUtility::Move(value2));
     test.IsTrue(value2.IsUndefined(), __LINE__);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 6U, __LINE__);
@@ -4134,7 +4134,7 @@ static void TestAddition6(QTest &test) {
     value1["k2"] = 22;
     str_var      = "*ABCDEF0123456789ABCDEF0123456789*";
     str_c1       = str_var.First();
-    value1["k3"] = Memory::Move(str_var);
+    value1["k3"] = QUtility::Move(str_var);
 
     if (value1.GetObject() != nullptr) {
         h_arr_storage1 = value1.GetObject()->First();
@@ -4145,7 +4145,7 @@ static void TestAddition6(QTest &test) {
     h_arr_var[VString("w3")] = 30;
     str_var                  = "-ABCDEF0123456789ABCDEF0123456789-";
     str_c2                   = str_var.First();
-    h_arr_var[VString("w4")] = Memory::Move(str_var);
+    h_arr_var[VString("w4")] = QUtility::Move(str_var);
     h_arr_storage2           = h_arr_var.First();
 
     value2 = VHArray{};   // Setting to object type.
@@ -4172,8 +4172,8 @@ static void TestAddition6(QTest &test) {
 
     ////
 
-    value2 = VHArray{};                 // Clearing and  Setting to object type.
-    value2.Merge(Memory::Move(value1)); // Move
+    value2 = VHArray{};                   // Clearing and  Setting to object type.
+    value2.Merge(QUtility::Move(value1)); // Move
     test.IsTrue(value1.IsUndefined(), __LINE__);
     test.IsEqual(value2.Size(), 3U, __LINE__);
     test.IsNotNull(value2.GetObject(), __LINE__);
@@ -4186,8 +4186,8 @@ static void TestAddition6(QTest &test) {
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
 
-    value2 = VHArray{};                // Clearing and  Setting to object type.
-    value2 += Memory::Move(h_arr_var); // Move
+    value2 = VHArray{};                  // Clearing and  Setting to object type.
+    value2 += QUtility::Move(h_arr_var); // Move
     test.IsNull(h_arr_var.First(), __LINE__);
     test.IsEqual(value2.Size(), 4U, __LINE__);
     test.IsNotNull(value2.GetObject(), __LINE__);
@@ -4250,8 +4250,8 @@ static void TestAddition6(QTest &test) {
     value2["w4"] = 400;
     value2["w5"] = 500;
     value2["w6"] = 600;
-    value2.Merge(Memory::Move(value1)); // Move
-    value2 += Memory::Move(h_arr_var);  // Move
+    value2.Merge(QUtility::Move(value1)); // Move
+    value2 += QUtility::Move(h_arr_var);  // Move
     test.IsEqual(value2["w0"].GetNumber(), 5.0, __LINE__);
     test.IsEqual(value2["w1"].GetNumber(), 10.0, __LINE__);
     test.IsEqual(value2["w2"].GetNumber(), 20.0, __LINE__);
@@ -4314,7 +4314,7 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value1["k9"].GetNumber(), 9, __LINE__);
     test.IsEqual(value1["k10"].GetNumber(), 100, __LINE__);
 
-    value3 += Memory::Move(value2);
+    value3 += QUtility::Move(value2);
 
     test.IsEqual(value2.Size(), 0U, __LINE__);
     test.IsTrue(value2.IsUndefined(), __LINE__);

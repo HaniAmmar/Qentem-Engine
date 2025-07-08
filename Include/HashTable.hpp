@@ -260,7 +260,7 @@ struct HashTable {
 
                 // If not found, insert as a new item; otherwise, overwrite value (MoveDoublecat).
                 if (storage_item == nullptr) {
-                    insert(index, Memory::Move(*src_item));
+                    insert(index, QUtility::Move(*src_item));
                 } else {
                     storage_item->MoveDoublecat(*src_item);
                 }
@@ -329,7 +329,7 @@ struct HashTable {
      * @param key The key to insert (moved).
      */
     inline void Insert(Key_T &&key) {
-        tryInsert(Memory::Move(key)); // Move-insert or do nothing if key exists.
+        tryInsert(QUtility::Move(key)); // Move-insert or do nothing if key exists.
     }
 
     /**
@@ -484,7 +484,7 @@ struct HashTable {
     inline bool Rename(const Key_T &from, Key_T &&to) const noexcept {
         HItem_T *item = prepareRename(from, to); // Unlink and ready for new key
         if (item != nullptr) {
-            item->Key = Memory::Move(to); // Move-assign new key
+            item->Key = QUtility::Move(to); // Move-assign new key
 
             return true;
         }
@@ -620,9 +620,9 @@ struct HashTable {
      */
     void Sort(const bool ascend = true) noexcept {
         if (ascend) {
-            Memory::Sort<true>(Storage(), SizeT{0}, Size()); // Sort in ascending order
+            QUtility::Sort<true>(Storage(), SizeT{0}, Size()); // Sort in ascending order
         } else {
-            Memory::Sort<false>(Storage(), SizeT{0}, Size()); // Sort in descending order
+            QUtility::Sort<false>(Storage(), SizeT{0}, Size()); // Sort in descending order
         }
 
         // Reset hash table mapping and rebuild
@@ -683,8 +683,8 @@ struct HashTable {
             if (storage[index].Hash != 0) {
                 if (index != size) {
                     HItem_T *item = (storage + index);
-                    storage[size] = Memory::Move(*item); // Move live item to compacted position
-                    item->Hash    = 0;                   // Mark old slot as dead/tombstone
+                    storage[size] = QUtility::Move(*item); // Move live item to compacted position
+                    item->Hash    = 0;                     // Mark old slot as dead/tombstone
                 }
 
                 ++size; // Increment count of live items and next slot for compaction
@@ -1007,8 +1007,8 @@ struct HashTable {
         setSize(0); // Reset size to repopulate with only live entries
 
         while (item < end) {
-            if (item->Hash != 0) {                                // Only copy live items
-                Memory::Initialize(storage, Memory::Move(*item)); // Move construct in new storage
+            if (item->Hash != 0) {                                  // Only copy live items
+                Memory::Initialize(storage, QUtility::Move(*item)); // Move construct in new storage
                 ++storage;
                 ++size_; // Increment current count
             }
@@ -1210,7 +1210,7 @@ struct HashTable {
         ++size_;                                  // Increment count after using it
         item.Next = Capacity();                   // End of collision chain
 
-        Memory::Initialize(item_ptr, Memory::Move(item)); // Move or copy-construct in place
+        Memory::Initialize(item_ptr, QUtility::Move(item)); // Move or copy-construct in place
 
         return item_ptr;
     }
@@ -1228,7 +1228,7 @@ struct HashTable {
         item.Hash = hash;
         item.Key  = key; // Copy key
 
-        return insert(index, Memory::Move(item));
+        return insert(index, QUtility::Move(item));
     }
 
     /**
@@ -1242,9 +1242,9 @@ struct HashTable {
     HItem_T *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
         HItem_T item;
         item.Hash = hash;
-        item.Key  = Memory::Move(key); // Move key
+        item.Key  = QUtility::Move(key); // Move key
 
-        return insert(index, Memory::Move(item));
+        return insert(index, QUtility::Move(item));
     }
 
     /**
@@ -1303,8 +1303,8 @@ struct HashTable {
         HItem_T *item = hashAndFind(index, key, hash);
 
         if (item == nullptr) {
-            item = insert(index, Memory::Move(key), hash); // Insert new item, moving key
-            item->InitValue();                             // Ensure value is properly initialized
+            item = insert(index, QUtility::Move(key), hash); // Insert new item, moving key
+            item->InitValue();                               // Ensure value is properly initialized
         }
 
         return item;

@@ -73,7 +73,7 @@ struct QExpression {
     }
 
     QExpression(Array<QExpression> &&subExpressions, QOperation operation) noexcept
-        : SubExprs{Memory::Move(subExpressions)}, Operation{operation}, Type{ExpressionType::SubOperation} {
+        : SubExprs{QUtility::Move(subExpressions)}, Operation{operation}, Type{ExpressionType::SubOperation} {
     }
 
     ~QExpression() {
@@ -90,7 +90,7 @@ struct QExpression {
             }
 
             case ExpressionType::SubOperation: {
-                SubExprs = Memory::Move(src.SubExprs);
+                SubExprs = QUtility::Move(src.SubExprs);
                 break;
             }
 
@@ -158,7 +158,7 @@ struct QExpression {
                 }
 
                 case ExpressionType::SubOperation: {
-                    SubExprs = Memory::Move(src.SubExprs);
+                    SubExprs = QUtility::Move(src.SubExprs);
                     break;
                 }
 

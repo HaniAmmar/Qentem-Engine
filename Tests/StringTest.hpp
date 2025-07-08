@@ -82,7 +82,7 @@ static void TestString1(QTest &test) {
     test.IsEqual(str2.First(), str_ptr, __LINE__);
     test.IsEqual(str2.Length(), length, __LINE__);
 
-    str1 = Memory::Move(str2); // Move
+    str1 = QUtility::Move(str2); // Move
     test.IsEqual(str1.First(), str_ptr, __LINE__);
     test.IsEqual(str1.Length(), length, __LINE__);
     test.IsNull(str2.Storage(), __LINE__);
@@ -116,7 +116,7 @@ static void TestString1(QTest &test) {
     test.IsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), __LINE__);
 
     length = str1.Length();
-    str2   = QString(Memory::Move(str1));
+    str2   = QString(QUtility::Move(str1));
     test.IsNull(str1.Storage(), __LINE__);
     test.IsNull(str1.First(), __LINE__);
     test.IsEqual(str1.Length(), SizeT{0U}, __LINE__);
@@ -303,7 +303,7 @@ static void TestString2(QTest &test) {
     test.IsEqual(str1, "abcdef", __LINE__);
 
     str2 = "ghi";
-    str1 += Memory::Move(str2);
+    str1 += QUtility::Move(str2);
     test.IsEqual(str1.Length(), SizeT{9U}, __LINE__);
     test.IsNotNull(str1.First(), __LINE__);
     test.IsEqual(str1.First()[str1.Length()], char{0}, __LINE__);
@@ -350,7 +350,7 @@ static void TestString2(QTest &test) {
     str1.Reset();
     str1 = "1234";
     str2 = "5678";
-    str1 = str1 + Memory::Move(str2);
+    str1 = str1 + QUtility::Move(str2);
     test.IsEqual(str1.Length(), SizeT{8U}, __LINE__);
     test.IsNotNull(str1.First(), __LINE__);
     test.IsEqual(str1.First()[str1.Length()], char{0}, __LINE__);

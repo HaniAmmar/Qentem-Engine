@@ -99,7 +99,7 @@ struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>> {
      * @param key The key object to move.
      */
     inline void operator[](Key_T &&key) {
-        tryInsert(Memory::Move(key));
+        tryInsert(QUtility::Move(key));
     }
 
     /**

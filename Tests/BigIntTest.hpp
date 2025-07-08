@@ -221,8 +221,8 @@ static void TestBigInt2(QTest &test) {
     test.IsEqual(SizeT64{b_int_3}, SizeT64{0}, __LINE__);
     test.IsEqual(SizeT64{b_int_1}, SizeT64{0}, __LINE__);
 
-    b_int_1 = Memory::Move(b_int_4);
-    b_int_3 = Memory::Move(b_int_2);
+    b_int_1 = QUtility::Move(b_int_4);
+    b_int_3 = QUtility::Move(b_int_2);
 
     test.IsEqual(b_int_1.Index(), 7U, __LINE__);
     test.IsEqual(b_int_3.Index(), 3U, __LINE__);
@@ -235,8 +235,8 @@ static void TestBigInt2(QTest &test) {
     test.IsEqual(SizeT64{b_int_4}, SizeT64{0}, __LINE__);
     ///////////////////////////
 
-    const BigInt_8_64 b_int_5{Memory::Move(b_int_1)};
-    const BigInt_8_64 b_int_6{Memory::Move(b_int_3)};
+    const BigInt_8_64 b_int_5{QUtility::Move(b_int_1)};
+    const BigInt_8_64 b_int_6{QUtility::Move(b_int_3)};
 
     test.IsEqual(b_int_1.Index(), 0U, __LINE__);
     test.IsEqual(b_int_3.Index(), 0U, __LINE__);

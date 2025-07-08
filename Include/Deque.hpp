@@ -82,7 +82,7 @@ struct Deque {
     Deque &operator=(Deque &&src) noexcept {
         if (this != &src) {
             this->~Deque();
-            new (this) Deque(Memory::Move(src));
+            new (this) Deque(QUtility::Move(src));
         }
 
         return *this;
@@ -110,7 +110,7 @@ struct Deque {
             resize(capacity_ * SizeT{2});
         }
 
-        Memory::Initialize((Storage() + tail()), Memory::Move(item));
+        Memory::Initialize((Storage() + tail()), QUtility::Move(item));
 
         setSize(Size() + SizeT{1});
     }
@@ -148,7 +148,7 @@ struct Deque {
     inline Type_T &Insert(Type_T &&item) {
         const SizeT index = tail();
 
-        *this += Memory::Move(item);
+        *this += QUtility::Move(item);
 
         return Storage()[index];
     }

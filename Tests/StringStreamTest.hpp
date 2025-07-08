@@ -108,7 +108,7 @@ static void TestStringStream1(QTest &test) {
     test.IsEqual(ss1.Capacity(), lss, __LINE__);
 
     ss1.Reset();
-    ss1 = Memory::Move(ss2); // Move
+    ss1 = QUtility::Move(ss2); // Move
     test.IsEqual(ss1.Length(), SizeT{3}, __LINE__);
     test.IsTrue((ss1.Capacity() >= SizeT{3}), __LINE__);
     test.IsEqual(ss1, "abc", __LINE__);
@@ -119,7 +119,7 @@ static void TestStringStream1(QTest &test) {
 
     ss2 += 'a';
     ss1.Reset();
-    ss1 = Memory::Move(ss2); // Move
+    ss1 = QUtility::Move(ss2); // Move
     test.IsEqual(ss1.Length(), SizeT{1}, __LINE__);
     test.IsTrue((ss1.Capacity() >= SizeT{4}), __LINE__);
     test.IsEqual(ss1, "a", __LINE__);
@@ -137,7 +137,7 @@ static void TestStringStream1(QTest &test) {
     ss2.Reset();
 
     ss1 += "efg";
-    ss2 = StringStream<char>(Memory::Move(ss1)); // Move
+    ss2 = StringStream<char>(QUtility::Move(ss1)); // Move
     test.IsNull(ss1.Storage(), __LINE__);
     test.IsEqual(ss1.Length(), SizeT{0}, __LINE__);
     test.IsTrue((ss1.Capacity() == SizeT{0}), __LINE__);

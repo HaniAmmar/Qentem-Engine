@@ -66,7 +66,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      * @param item Source item to move from.
      */
     QENTEM_INLINE void MoveDoublecat(HAItem_T &item) {
-        Value = Memory::Move(item.Value);
+        Value = QUtility::Move(item.Value);
         Memory::Dispose(&(item.Key));
     }
 
@@ -148,7 +148,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @return Reference to the value.
      */
     inline Value_T &Get(Key_T &&key) {
-        HItem *item = tryInsert(Memory::Move(key));
+        HItem *item = tryInsert(QUtility::Move(key));
         return item->Value;
     }
 
@@ -161,7 +161,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @return Reference to the value.
      */
     inline Value_T &operator[](Key_T &&key) {
-        HItem *item = tryInsert(Memory::Move(key));
+        HItem *item = tryInsert(QUtility::Move(key));
         return item->Value;
     }
 
@@ -201,7 +201,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      */
     inline void Insert(const Key_T &key, Value_T &&value) {
         HItem *item = tryInsert(key);
-        item->Value = Memory::Move(value);
+        item->Value = QUtility::Move(value);
     }
 
     /**
@@ -213,7 +213,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param value Value to copy into the entry.
      */
     inline void Insert(Key_T &&key, const Value_T &value) {
-        HItem *item = tryInsert(Memory::Move(key));
+        HItem *item = tryInsert(QUtility::Move(key));
         item->Value = Value_T{value};
     }
 
@@ -226,8 +226,8 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param value Value to move into the entry.
      */
     inline void Insert(Key_T &&key, Value_T &&value) {
-        HItem *item = tryInsert(Memory::Move(key));
-        item->Value = Memory::Move(value);
+        HItem *item = tryInsert(QUtility::Move(key));
+        item->Value = QUtility::Move(value);
     }
 
     /**
@@ -400,7 +400,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      */
     inline void Insert(const Char_T *str, const SizeT length, Value_T &&value) {
         HItem *item = tryInsert(str, length); // Insert new or find existing entry by key
-        item->Value = Memory::Move(value);    // Move-assign value into the entry
+        item->Value = QUtility::Move(value);  // Move-assign value into the entry
     }
 
     /**
