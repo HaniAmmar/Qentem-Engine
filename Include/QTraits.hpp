@@ -1,26 +1,28 @@
 /**
  * @file QTraits.hpp
- * @brief Internal type traits for Qentem Engine containers.
+ * @brief Core compile-time type traits for Qentem Engine.
  *
- * This header defines compile-time type traits and helpers used internally by
- * Qentem containers and adapters. Notably, it provides the IsNumber<Type_T> trait,
- * which can be used in template metaprogramming to detect and specialize
- * behavior for numeric types (integral and floating-point).
+ * This header defines a collection of essential template metaprogramming tools used
+ * throughout Qentem for type manipulation, function inspection, and SFINAE logic.
  *
- * These internal utilities are designed to support template-based selection,
- * SFINAE, and adapter logic throughout Qentem's hash table and container code.
+ * It provides foundational type transformations such as RemoveCV, RemovePointer, and Decay,
+ * type detection like IsNumber<Type_T>, and callable introspection traits including
+ * FunctionParentType and FunctionFirstArgType.
  *
  * @author Hani Ammar
  * @date 2025
  * @copyright MIT License
  */
 
-#ifndef QENTEM_INTERNAL_H
-#define QENTEM_INTERNAL_H
+#ifndef QENTEM_TRAITS_H
+#define QENTEM_TRAITS_H
 
 namespace Qentem {
 namespace QTraits {
 
+///////////////////////////////////////////////////////////////
+//                    Type Transformations                  //
+///////////////////////////////////////////////////////////////
 template <typename Type_T>
 struct RemoveCV {
     using Type = Type_T;
@@ -87,6 +89,9 @@ struct Decay {
         typename RemoveReference<typename RemovePointer<typename RemoveExtent<Type_T>::Type>::Type>::Type>::Type;
 };
 
+///////////////////////////////////////////////////////////////
+//                    Type Categorization                   //
+///////////////////////////////////////////////////////////////
 template <typename Type_T>
 struct IsNumber {
     static constexpr bool value = false;
@@ -152,7 +157,63 @@ struct IsNumber<double> {
     static constexpr bool value = true;
 };
 
+///////////////////////////////////////////////////////////////
+//                   Function Traits                        //
+///////////////////////////////////////////////////////////////
+
+/**
+ * @brief Trait to extract parent class and return type from a member function pointer.
+ *
+ * For non-static member function pointers, HasParent is true, and ClassType/ReturnType are provided.
+ * For static member functions or free functions, HasParent is false, and ClassType/ReturnType are not defined.
+ */
+template <typename>
+struct FunctionParentType_T {
+    static constexpr bool HasParent = false;
+};
+
+// Non-const member function pointer
+template <typename Class_T, typename Return_T, typename... MethodArgs_T>
+struct FunctionParentType_T<Return_T (Class_T::*)(MethodArgs_T...)> {
+    static constexpr bool HasParent = true;
+    using ClassType                 = Class_T;
+    using ReturnType                = Return_T;
+};
+
+// Const member function pointer
+template <typename Class_T, typename Return_T, typename... MethodArgs_T>
+struct FunctionParentType_T<Return_T (Class_T::*)(MethodArgs_T...) const> {
+    static constexpr bool HasParent = true;
+    using ClassType                 = Class_T;
+    using ReturnType                = Return_T;
+};
+
+/**
+ * @brief Trait to extract the first argument type from a parameter pack.
+ *
+ * Causes a compile error if called with an empty argument list.
+ */
+template <typename... Args_T>
+struct FunctionFirstArgType_T;
+
+template <typename FirstArg_T, typename... Rest_T>
+struct FunctionFirstArgType_T<FirstArg_T, Rest_T...> {
+    using Type = FirstArg_T;
+};
+
+/**
+ * @brief Convenience aliases for extracting traits directly.
+ */
+template <typename Type_T>
+using FunctionParentType = typename FunctionParentType_T<Type_T>::ClassType;
+
+template <typename Type_T>
+using FunctionReturnType = typename FunctionParentType_T<Type_T>::ReturnType;
+
+template <typename... Args_T>
+using FunctionFirstArgType = typename FunctionFirstArgType_T<Args_T...>::Type;
+
 } // namespace QTraits
 } // namespace Qentem
 
-#endif
+#endif // QENTEM_QTRAITS_H
