@@ -19,10 +19,24 @@
 
 namespace Qentem {
 namespace QTraits {
+///////////////////////////////////////////////////////////////
+//                    Type Transformations                   //
+///////////////////////////////////////////////////////////////
+template <typename Type_T>
+struct ReferenceType {
+    using Type = Type_T;
+};
 
-///////////////////////////////////////////////////////////////
-//                    Type Transformations                  //
-///////////////////////////////////////////////////////////////
+template <typename Type_T>
+struct ReferenceType<Type_T &> {
+    using Type = Type_T;
+};
+
+template <typename Type_T>
+struct ReferenceType<Type_T &&> {
+    using Type = Type_T;
+};
+
 template <typename Type_T>
 struct RemoveCV {
     using Type = Type_T;
@@ -90,8 +104,28 @@ struct Decay {
 };
 
 ///////////////////////////////////////////////////////////////
-//                    Type Categorization                   //
+//                    Type Categorization                    //
 ///////////////////////////////////////////////////////////////
+template <typename>
+struct IsLValueReference {
+    static constexpr bool Value{false};
+};
+
+template <typename Type_T>
+struct IsLValueReference<Type_T &> {
+    static constexpr bool Value{true};
+};
+
+template <typename>
+struct IsRValueReference {
+    static constexpr bool Value{false};
+};
+
+template <typename Type_T>
+struct IsRValueReference<Type_T &&> {
+    static constexpr bool Value{true};
+};
+
 template <typename Type_T>
 struct IsNumber {
     static constexpr bool value = false;
@@ -158,7 +192,7 @@ struct IsNumber<double> {
 };
 
 ///////////////////////////////////////////////////////////////
-//                   Function Traits                        //
+//                   Function Traits                         //
 ///////////////////////////////////////////////////////////////
 
 /**

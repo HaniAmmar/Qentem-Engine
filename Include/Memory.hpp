@@ -15,6 +15,7 @@
 #define QENTEM_MEMORY_H
 
 #include "Platform.hpp"
+#include "QTraits.hpp"
 
 #ifndef QENTEM_ALLOCATE
 #if defined(_MSC_VER)
@@ -191,55 +192,21 @@ struct Memory {
         }
     }
     /////////////////////////////////////////////////////////////////////
-    template <typename Type_T>
-    struct ReferenceType {
-        using Type = Type_T;
-    };
 
     template <typename Type_T>
-    struct ReferenceType<Type_T &> {
-        using Type = Type_T;
-    };
-
-    template <typename Type_T>
-    struct ReferenceType<Type_T &&> {
-        using Type = Type_T;
-    };
-
-    template <typename>
-    struct IsLValueReference {
-        static constexpr bool Value{false};
-    };
-
-    template <typename Type_T>
-    struct IsLValueReference<Type_T &> {
-        static constexpr bool Value{true};
-    };
-
-    template <typename>
-    struct IsRValueReference {
-        static constexpr bool Value{false};
-    };
-
-    template <typename Type_T>
-    struct IsRValueReference<Type_T &&> {
-        static constexpr bool Value{true};
-    };
-
-    template <typename Type_T>
-    static constexpr Type_T &&Forward(typename ReferenceType<Type_T>::Type &value) noexcept {
+    static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &value) noexcept {
         return (Type_T &&)(value);
     }
 
     template <typename Type_T>
-    static constexpr Type_T &&Forward(typename ReferenceType<Type_T>::Type &&value) noexcept {
-        static_assert(!IsLValueReference<Type_T>::Value, "Forward<T>(x): Cannot forward an lvalue as rvalue.");
+    static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &&value) noexcept {
+        static_assert(!QTraits::IsLValueReference<Type_T>::Value, "Forward<T>(x): Cannot forward an lvalue as rvalue.");
         return (Type_T &&)(value);
     }
 
     template <typename Type_T>
-    static constexpr typename ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
-        return (typename ReferenceType<Type_T>::Type &&)(value);
+    static constexpr typename QTraits::ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
+        return (typename QTraits::ReferenceType<Type_T>::Type &&)(value);
     }
     /////////////////////////////////////////////////////////////////////
     template <typename Type_T>
