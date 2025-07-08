@@ -14,7 +14,7 @@
 #ifndef QENTEM_HASH_TABLE_ADAPTERS_H
 #define QENTEM_HASH_TABLE_ADAPTERS_H
 
-#include "Internal.hpp"
+#include "QTraits.hpp"
 #include "HashTable.hpp"
 #include "QNumber.hpp"
 #include "StringUtils.hpp"
@@ -473,7 +473,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
  * @brief Selects the appropriate hash table adapter (string or number) at compile time.
  *
  * This set of templates chooses between StringHashTable and NumberHashTable based
- * on whether the key type is a recognized numeric type, using Internal::IsNumber.
+ * on whether the key type is a recognized numeric type, using QTraits::IsNumber.
  *
  * Usage: Use AutoHashTable<Key_T, HItem_T> as a base class for associative containers.
  *
@@ -483,7 +483,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
  */
 
 // Primary template: does not define Type (will select via partial specialization)
-template <typename Key_T, typename HItem_T, bool = Internal::IsNumber<Key_T>::value>
+template <typename Key_T, typename HItem_T, bool = QTraits::IsNumber<Key_T>::value>
 struct HashTableSelector;
 
 // Specialization for non-numeric (string-like) keys
@@ -510,7 +510,7 @@ struct HashTableSelector<Key_T, HItem_T, true> {
  * @brief Type alias for automatic hash table selection.
  *
  * Resolves to StringHashTable if Key_T is not a recognized number type,
- * or NumberHashTable if Key_T is a recognized number type (per Internal::IsNumber).
+ * or NumberHashTable if Key_T is a recognized number type (per QTraits::IsNumber).
  *
  * Example:
  *   using Table = AutoHashTable<MyKeyType, MyItemType>;

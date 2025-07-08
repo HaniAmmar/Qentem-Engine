@@ -21,7 +21,7 @@
 #define QENTEM_TO_CHARS_HELPER_H
 
 #include "Digit.hpp"
-#include "Internal.hpp"
+#include "QTraits.hpp"
 #include "Unicode.hpp"
 #include "StringUtils.hpp"
 
@@ -37,10 +37,10 @@ struct ToCharsHelper {
     template <typename Stream_T, typename... Values_T>
     inline static void Write(Stream_T &stream, const Values_T &...values) {
 #if __cplusplus > 201402L
-        (Writer<Stream_T, typename Internal::Decay<Values_T>::Type>::Write(stream, values), ...);
+        (Writer<Stream_T, typename QTraits::Decay<Values_T>::Type>::Write(stream, values), ...);
 #else
         const int dummy[sizeof...(Values_T)] = {
-            (Writer<Stream_T, typename Internal::Decay<Values_T>::Type>::Write(stream, values), 0)...};
+            (Writer<Stream_T, typename QTraits::Decay<Values_T>::Type>::Write(stream, values), 0)...};
         (void)dummy;
 #endif
     }
@@ -48,7 +48,7 @@ struct ToCharsHelper {
     template <typename Stream_T, typename Value_T>
     struct Writer {
         static void Write(Stream_T &stream, const Value_T &value) {
-            using CharConverter = CharConverter_T<Stream_T, typename Internal::Decay<decltype(value.begin())>::Type>;
+            using CharConverter = CharConverter_T<Stream_T, typename QTraits::Decay<decltype(value.begin())>::Type>;
 
             for (const auto &v : value) {
                 CharConverter::Convert(stream, v);

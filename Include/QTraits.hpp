@@ -1,5 +1,5 @@
 /**
- * @file Internal.hpp
+ * @file QTraits.hpp
  * @brief Internal type traits for Qentem Engine containers.
  *
  * This header defines compile-time type traits and helpers used internally by
@@ -19,7 +19,7 @@
 #define QENTEM_INTERNAL_H
 
 namespace Qentem {
-namespace Internal {
+namespace QTraits {
 
 template <typename Type_T>
 struct RemoveCV {
@@ -152,7 +152,7 @@ struct IsNumber<double> {
     static constexpr bool value = true;
 };
 
-} // namespace Internal
+} // namespace QTraits
 } // namespace Qentem
 
 #endif

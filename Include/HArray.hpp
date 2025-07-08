@@ -489,14 +489,14 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
  * @brief Type selector for HArray containers.
  *
  * HArraySelector chooses the correct HArray implementation based on the key type:
- *  - If Key_T is a number type (as determined by Internal::IsNumber), use HArrayBase (fast numeric logic).
+ *  - If Key_T is a number type (as determined by QTraits::IsNumber), use HArrayBase (fast numeric logic).
  *  - Otherwise, use HArrayStrings (enables raw string pointer overloads).
  *
  * @tparam Key_T   The key type.
  * @tparam Value_T The value type.
  * @tparam IsNum   (Implementation detail) Whether the key is a number.
  */
-template <typename Key_T, typename Value_T, bool = Internal::IsNumber<Key_T>::value>
+template <typename Key_T, typename Value_T, bool = QTraits::IsNumber<Key_T>::value>
 struct HArraySelector;
 
 // Specialization for non-number keys: string-oriented version.
