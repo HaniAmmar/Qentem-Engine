@@ -78,7 +78,7 @@ struct QExpression {
 
     ~QExpression() {
         if (Type == ExpressionType::SubOperation) {
-            Memory::Dispose(&SubExprs);
+            QAllocator::Dispose(&SubExprs);
         }
     }
 
@@ -145,7 +145,7 @@ struct QExpression {
     QExpression &operator=(QExpression &&src) noexcept {
         if (this != &src) {
             if (Type == ExpressionType::SubOperation) {
-                Memory::Dispose(&SubExprs);
+                QAllocator::Dispose(&SubExprs);
             }
 
             Operation = src.Operation;

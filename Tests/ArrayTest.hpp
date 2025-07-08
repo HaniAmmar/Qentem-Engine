@@ -206,7 +206,7 @@ static void TestArray1(QTest &test) {
     test.IsNull(numbers2.First(), __LINE__);
     test.IsEqual(tmp, storage, __LINE__);
 
-    Memory::Deallocate(tmp);
+    QAllocator::Deallocate(tmp);
 }
 
 static void TestArray2(QTest &test) {

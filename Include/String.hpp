@@ -15,7 +15,7 @@
 #ifndef QENTEM_STRING_H
 #define QENTEM_STRING_H
 
-#include "Memory.hpp"
+#include "QAllocator.hpp"
 #include "StringUtils.hpp"
 
 namespace Qentem {
@@ -248,7 +248,7 @@ struct String {
 
             if (src != nullptr) {
                 Memory::CopyTo(ns, src, src_len);
-                Memory::Deallocate(src);
+                QAllocator::Deallocate(src);
             }
         }
     }
@@ -277,7 +277,7 @@ struct String {
         if (index < Length()) {
             const SizeT new_length = (Length() + SizeT{1});
 
-            Char_T *new_storage = Memory::Allocate<Char_T>(new_length);
+            Char_T *new_storage = QAllocator::Allocate<Char_T>(new_length);
 
             // 1. Copy prefix [0, index)
             if (index != 0) {
@@ -293,7 +293,7 @@ struct String {
             }
 
             // Clean up old storage and set new storage/capacity
-            Memory::Deallocate(Storage());
+            QAllocator::Deallocate(Storage());
             setStorage(new_storage);
             setLength(new_length);
         }
@@ -389,7 +389,7 @@ struct String {
     }
 
     Char_T *allocate(SizeT new_size) {
-        Char_T *ns = Memory::Allocate<Char_T>(new_size);
+        Char_T *ns = QAllocator::Allocate<Char_T>(new_size);
 
         setStorage(ns);
 
@@ -397,7 +397,7 @@ struct String {
     }
 
     void deallocate() noexcept {
-        Memory::Deallocate(Storage());
+        QAllocator::Deallocate(Storage());
     }
 
     void clearStorage() noexcept {

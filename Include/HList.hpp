@@ -45,7 +45,7 @@ struct HLItem_T : public HTableItem_T<Key_T> {
      * @param item The source item to move/dispose from.
      */
     QENTEM_INLINE void MoveDoublecat(HLItem_T &item) {
-        Memory::Dispose(&(item.Key));
+        QAllocator::Dispose(&(item.Key));
     }
 
     /**

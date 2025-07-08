@@ -14,7 +14,7 @@
 #ifndef QENTEM_ARRAY_H
 #define QENTEM_ARRAY_H
 
-#include "Memory.hpp"
+#include "QAllocator.hpp"
 
 namespace Qentem {
 
@@ -33,7 +33,7 @@ struct Array {
             Type_T *current = allocate();
 
             if (initialize) {
-                Memory::InitializeRange(current, (current + capacity));
+                QAllocator::InitializeRange(current, (current + capacity));
                 setSize(capacity);
             }
         }
@@ -48,8 +48,8 @@ struct Array {
 
     ~Array() {
         if (Storage() != nullptr) {
-            Memory::Dispose(Storage(), End());
-            Memory::Deallocate(Storage());
+            QAllocator::Dispose(Storage(), End());
+            QAllocator::Deallocate(Storage());
         }
     }
 
@@ -68,8 +68,8 @@ struct Array {
 
             if (storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                Memory::Dispose(storage, (storage + size));
-                Memory::Deallocate(storage);
+                QAllocator::Dispose(storage, (storage + size));
+                QAllocator::Deallocate(storage);
             }
         }
 
@@ -91,8 +91,8 @@ struct Array {
 
             if (storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                Memory::Dispose(storage, (storage + size));
-                Memory::Deallocate(storage);
+                QAllocator::Dispose(storage, (storage + size));
+                QAllocator::Deallocate(storage);
             }
         }
 
@@ -112,7 +112,7 @@ struct Array {
             }
 
             Memory::CopyTo((Storage() + Size()), src.Storage(), src.Size());
-            Memory::Deallocate(src.Storage());
+            QAllocator::Deallocate(src.Storage());
             setSize(n_size);
         }
 
@@ -135,7 +135,7 @@ struct Array {
         const Type_T *src_end  = (src_item + src.Size());
 
         while (src_item < src_end) {
-            Memory::Initialize(storage, *src_item);
+            QAllocator::Initialize(storage, *src_item);
             ++storage;
             ++src_item;
         }
@@ -146,7 +146,7 @@ struct Array {
             expand((Capacity() | SizeT{1}) * SizeT{2});
         }
 
-        Memory::Initialize((Storage() + Size()), QUtility::Move(item));
+        QAllocator::Initialize((Storage() + Size()), QUtility::Move(item));
         ++size_;
     }
 
@@ -155,7 +155,7 @@ struct Array {
             expand((Capacity() | SizeT{1}) * SizeT{2});
         }
 
-        Memory::Initialize((Storage() + Size()), item);
+        QAllocator::Initialize((Storage() + Size()), item);
         ++size_;
     }
 
@@ -206,14 +206,14 @@ struct Array {
     }
 
     void Clear() noexcept {
-        Memory::Dispose(Storage(), End());
+        QAllocator::Dispose(Storage(), End());
 
         setSize(0);
     }
 
     void Reset() noexcept {
-        Memory::Dispose(Storage(), End());
-        Memory::Deallocate(Storage());
+        QAllocator::Dispose(Storage(), End());
+        QAllocator::Deallocate(Storage());
 
         clearStorage();
         setSize(0);
@@ -238,7 +238,7 @@ struct Array {
             Type_T *current = allocate();
 
             if (initialize) {
-                Memory::InitializeRange(current, (current + size));
+                QAllocator::InitializeRange(current, (current + size));
                 setSize(size);
             }
         }
@@ -248,7 +248,7 @@ struct Array {
         if (new_size != 0) {
             if (Size() > new_size) {
                 // Shrink
-                Memory::Dispose((Storage() + new_size), End());
+                QAllocator::Dispose((Storage() + new_size), End());
                 setSize(new_size);
             }
 
@@ -264,7 +264,7 @@ struct Array {
 
         if (new_size > Size()) {
             Type_T *current = Storage();
-            Memory::InitializeRange((current + Size()), (current + new_size));
+            QAllocator::InitializeRange((current + Size()), (current + new_size));
         }
 
         setSize(Capacity());
@@ -308,7 +308,7 @@ struct Array {
         if (size <= Size()) {
             const SizeT new_size = (Size() - size);
 
-            Memory::Dispose((Storage() + new_size), End());
+            QAllocator::Dispose((Storage() + new_size), End());
             setSize(new_size);
         }
     }
@@ -386,7 +386,7 @@ struct Array {
     }
 
     Type_T *allocate() {
-        Type_T *new_storage = Memory::Allocate<Type_T>(Capacity());
+        Type_T *new_storage = QAllocator::Allocate<Type_T>(Capacity());
         setStorage(new_storage);
         return new_storage;
     }
@@ -412,7 +412,7 @@ struct Array {
 
         if (src != nullptr) {
             Memory::CopyTo(des, src, Size());
-            Memory::Deallocate(src);
+            QAllocator::Deallocate(src);
         }
     }
 
@@ -422,7 +422,7 @@ struct Array {
         const Type_T *src_end     = (src_item + src.Size());
 
         while (src_item < src_end) {
-            Memory::Initialize(new_storage, *src_item);
+            QAllocator::Initialize(new_storage, *src_item);
             ++new_storage;
             ++src_item;
         }

@@ -126,9 +126,9 @@ static void TestString1(QTest &test) {
     test.IsEqual(str1.Length(), SizeT{1U}, __LINE__);
     str_ptr = str1.Detach();
     test.IsEqual(str_ptr[0], 'A', __LINE__);
-    Memory::Deallocate(str_ptr);
+    QAllocator::Deallocate(str_ptr);
 
-    char         *tmp_size_2 = Memory::Allocate<char>(2);
+    char         *tmp_size_2 = QAllocator::Allocate<char>(2);
     const QString str_size_2 = QString(tmp_size_2, 2U);
 
     test.IsEqual(str_size_2.First(), tmp_size_2, __LINE__);

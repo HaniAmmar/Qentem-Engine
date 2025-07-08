@@ -31,7 +31,7 @@ struct StringStream {
     StringStream() = default;
 
     ~StringStream() {
-        Memory::Deallocate(Storage());
+        QAllocator::Deallocate(Storage());
     }
 
     inline explicit StringStream(SizeT capacity) {
@@ -56,7 +56,7 @@ struct StringStream {
 
     StringStream &operator=(StringStream &&stream) noexcept {
         if (this != &stream) {
-            Memory::Deallocate(Storage());
+            QAllocator::Deallocate(Storage());
 
             setCapacity(stream.Capacity());
             setStorage(stream.Storage());
@@ -245,7 +245,7 @@ struct StringStream {
     }
 
     void Reset() noexcept {
-        Memory::Deallocate(Storage());
+        QAllocator::Deallocate(Storage());
 
         clearStorage();
         setLength(0);
@@ -325,7 +325,7 @@ struct StringStream {
             } else {
                 // Not enough capacity: allocate a bigger buffer and copy in 3 steps.
                 SizeT   new_capacity = Memory::AlignToPow2(new_length);
-                Char_T *new_storage  = Memory::Allocate<Char_T>(new_capacity);
+                Char_T *new_storage  = QAllocator::Allocate<Char_T>(new_capacity);
 
                 // 1. Copy prefix [0, index)
                 if (index != 0) {
@@ -341,7 +341,7 @@ struct StringStream {
                 }
 
                 // Clean up old storage and set new storage/capacity
-                Memory::Deallocate(Storage());
+                QAllocator::Deallocate(Storage());
                 setStorage(new_storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
@@ -369,7 +369,7 @@ struct StringStream {
             } else {
                 // Not enough capacity: allocate, then copy with the shift.
                 SizeT   new_capacity = Memory::AlignToPow2(new_length);
-                Char_T *new_storage  = Memory::Allocate<Char_T>(new_capacity);
+                Char_T *new_storage  = QAllocator::Allocate<Char_T>(new_capacity);
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length != 0) {
@@ -377,7 +377,7 @@ struct StringStream {
                 }
 
                 // Clean up, set new pointers
-                Memory::Deallocate(Storage());
+                QAllocator::Deallocate(Storage());
                 setStorage(new_storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
@@ -503,13 +503,13 @@ struct StringStream {
         allocate(new_capacity);
 
         Memory::CopyTo(Storage(), str, Length());
-        Memory::Deallocate(str);
+        QAllocator::Deallocate(str);
     }
 
     void allocate(SizeT capacity) {
         capacity = Memory::AlignToPow2(capacity);
 
-        setStorage(Memory::Allocate<Char_T>(capacity));
+        setStorage(QAllocator::Allocate<Char_T>(capacity));
 
         setCapacity(capacity);
     }

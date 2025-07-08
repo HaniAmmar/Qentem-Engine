@@ -122,42 +122,42 @@ struct TagBit {
             case TagType::RawVariable: {
                 const VariableTag &tag = src.GetVariableTag();
 
-                storage_ = Memory::AllocateInit<VariableTag>(tag);
+                storage_ = QAllocator::AllocateInit<VariableTag>(tag);
                 break;
             }
 
             case TagType::Math: {
                 const MathTag &tag = src.GetMathTag();
 
-                storage_ = Memory::AllocateInit<MathTag>(tag);
+                storage_ = QAllocator::AllocateInit<MathTag>(tag);
                 break;
             }
 
             case TagType::SuperVariable: {
                 const SuperVariableTag &tag = src.GetSuperVariableTag();
 
-                storage_ = Memory::AllocateInit<SuperVariableTag>(tag);
+                storage_ = QAllocator::AllocateInit<SuperVariableTag>(tag);
                 break;
             }
 
             case TagType::InLineIf: {
                 const InLineIfTag &tag = src.GetInLineIfTag();
 
-                storage_ = Memory::AllocateInit<InLineIfTag>(tag);
+                storage_ = QAllocator::AllocateInit<InLineIfTag>(tag);
                 break;
             }
 
             case TagType::Loop: {
                 const LoopTag &tag = src.GetLoopTag();
 
-                storage_ = Memory::AllocateInit<LoopTag>(tag);
+                storage_ = QAllocator::AllocateInit<LoopTag>(tag);
                 break;
             }
 
             case TagType::If: {
                 const IfTag &tag = src.GetIfTag();
 
-                storage_ = Memory::AllocateInit<IfTag>(tag);
+                storage_ = QAllocator::AllocateInit<IfTag>(tag);
                 break;
             }
 
@@ -179,7 +179,7 @@ struct TagBit {
     }
 
     VariableTag *MakeVariableTag() {
-        VariableTag *tag = Memory::AllocateInit<VariableTag>();
+        VariableTag *tag = QAllocator::AllocateInit<VariableTag>();
 
         type_    = TagType::Variable;
         storage_ = tag;
@@ -188,7 +188,7 @@ struct TagBit {
     }
 
     VariableTag *MakeRawVariableTag() {
-        VariableTag *tag = Memory::AllocateInit<VariableTag>();
+        VariableTag *tag = QAllocator::AllocateInit<VariableTag>();
 
         type_    = TagType::RawVariable;
         storage_ = tag;
@@ -197,7 +197,7 @@ struct TagBit {
     }
 
     MathTag *MakeMathTag() {
-        MathTag *tag = Memory::AllocateInit<MathTag>();
+        MathTag *tag = QAllocator::AllocateInit<MathTag>();
 
         type_    = TagType::Math;
         storage_ = tag;
@@ -206,7 +206,7 @@ struct TagBit {
     }
 
     SuperVariableTag *MakeSuperVariableTag() {
-        SuperVariableTag *tag = Memory::AllocateInit<SuperVariableTag>();
+        SuperVariableTag *tag = QAllocator::AllocateInit<SuperVariableTag>();
 
         type_    = TagType::SuperVariable;
         storage_ = tag;
@@ -215,7 +215,7 @@ struct TagBit {
     }
 
     InLineIfTag *MakeInLineIfTag() {
-        InLineIfTag *tag = Memory::AllocateInit<InLineIfTag>();
+        InLineIfTag *tag = QAllocator::AllocateInit<InLineIfTag>();
 
         type_    = TagType::InLineIf;
         storage_ = tag;
@@ -224,7 +224,7 @@ struct TagBit {
     }
 
     LoopTag *MakeLoopTag() {
-        LoopTag *tag = Memory::AllocateInit<LoopTag>();
+        LoopTag *tag = QAllocator::AllocateInit<LoopTag>();
 
         type_    = TagType::Loop;
         storage_ = tag;
@@ -233,7 +233,7 @@ struct TagBit {
     }
 
     IfTag *MakeIfTag() {
-        IfTag *tag = Memory::AllocateInit<IfTag>();
+        IfTag *tag = QAllocator::AllocateInit<IfTag>();
 
         type_    = TagType::If;
         storage_ = tag;
@@ -249,42 +249,42 @@ struct TagBit {
             switch (GetType()) {
                 case TagType::Variable:
                 case TagType::RawVariable: {
-                    Memory::Deallocate(&GetVariableTag());
+                    QAllocator::Deallocate(&GetVariableTag());
                     break;
                 }
 
                 case TagType::Math: {
                     MathTag *ptr = &GetMathTag();
-                    Memory::Dispose(ptr);
-                    Memory::Deallocate(ptr);
+                    QAllocator::Dispose(ptr);
+                    QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::SuperVariable: {
                     SuperVariableTag *ptr = &GetSuperVariableTag();
-                    Memory::Dispose(ptr);
-                    Memory::Deallocate(ptr);
+                    QAllocator::Dispose(ptr);
+                    QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::InLineIf: {
                     InLineIfTag *ptr = &GetInLineIfTag();
-                    Memory::Dispose(ptr);
-                    Memory::Deallocate(ptr);
+                    QAllocator::Dispose(ptr);
+                    QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::Loop: {
                     LoopTag *ptr = &GetLoopTag();
-                    Memory::Dispose(ptr);
-                    Memory::Deallocate(ptr);
+                    QAllocator::Dispose(ptr);
+                    QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::If: {
                     IfTag *ptr = &GetIfTag();
-                    Memory::Dispose(ptr);
-                    Memory::Deallocate(ptr);
+                    QAllocator::Dispose(ptr);
+                    QAllocator::Deallocate(ptr);
                     break;
                 }
 

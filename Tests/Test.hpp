@@ -61,7 +61,7 @@ static int PrintResult(int passed, int failed) {
 }
 
 static void SelfTestLeak(QTest &test, char *&ptr) {
-    ptr        = Memory::Allocate<char>(8U);
+    ptr        = QAllocator::Allocate<char>(8U);
     char *nptr = nullptr;
 
     test.IsTrue(false, 1);
@@ -89,7 +89,7 @@ static void SelfTest() {
     char *ptr = nullptr;
     test.Test("SelfTestLeak", SelfTestLeak, true, ptr);
     Qentem::MemoryRecord::PrintMemoryStatus();
-    Memory::Deallocate(ptr);
+    QAllocator::Deallocate(ptr);
     MemoryRecord::ResetSubMemoryRecord();
     TestOutput::IsColored() = false;
 

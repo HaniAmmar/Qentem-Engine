@@ -67,7 +67,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      */
     QENTEM_INLINE void MoveDoublecat(HAItem_T &item) {
         Value = QUtility::Move(item.Value);
-        Memory::Dispose(&(item.Key));
+        QAllocator::Dispose(&(item.Key));
     }
 
     /**
@@ -85,7 +85,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      * Uses placement-new or custom Qentem initialization logic.
      */
     QENTEM_INLINE void InitValue() {
-        Memory::Initialize(&Value);
+        QAllocator::Initialize(&Value);
     }
 };
 

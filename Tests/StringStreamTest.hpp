@@ -167,7 +167,7 @@ static void TestStringStream1(QTest &test) {
 
     char      *e_str    = ss2.Detach();
     const bool is_equal = StringUtils::IsEqual(e_str, "abc", SizeT{3});
-    Memory::Deallocate(e_str);
+    QAllocator::Deallocate(e_str);
 
     test.IsTrue(is_equal, __LINE__);
 
