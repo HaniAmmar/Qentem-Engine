@@ -111,7 +111,7 @@ struct Array {
                 expand(n_size);
             }
 
-            Memory::CopyTo((Storage() + Size()), src.Storage(), src.Size());
+            MemoryUtils::CopyTo((Storage() + Size()), src.Storage(), src.Size());
             QAllocator::Deallocate(src.Storage());
             setSize(n_size);
         }
@@ -411,7 +411,7 @@ struct Array {
         Type_T *des = allocate();
 
         if (src != nullptr) {
-            Memory::CopyTo(des, src, Size());
+            MemoryUtils::CopyTo(des, src, Size());
             QAllocator::Deallocate(src);
         }
     }

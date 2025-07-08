@@ -580,9 +580,9 @@ struct HashTable {
         if (IsNotEmpty()) {
             SizeT   *ht      = getHashTable();
             HItem_T *storage = Storage();
-            Memory::SetToValue(ht, Capacity(), Capacity());   // Reset hash buckets
-            QAllocator::Dispose(storage, (storage + Size())); // Dispose each item (calls destructors)
-            setSize(0);                                       // Logical size is now zero
+            MemoryUtils::SetToValue(ht, Capacity(), Capacity()); // Reset hash buckets
+            QAllocator::Dispose(storage, (storage + Size()));    // Dispose each item (calls destructors)
+            setSize(0);                                          // Logical size is now zero
         }
     }
 
@@ -626,7 +626,7 @@ struct HashTable {
         }
 
         // Reset hash table mapping and rebuild
-        Memory::SetToValue(getHashTable(), Capacity(), Capacity());
+        MemoryUtils::SetToValue(getHashTable(), Capacity(), Capacity());
 
         generateHash();
     }
@@ -696,7 +696,7 @@ struct HashTable {
         setSize(size); // Update logical size to match number of live entries
 
         // Reset all hash table slots to empty
-        Memory::SetToValue(getHashTable(), Capacity(), Capacity());
+        MemoryUtils::SetToValue(getHashTable(), Capacity(), Capacity());
 
         // Rebuild hash table mapping to match new item layout
         generateHash();
@@ -903,7 +903,7 @@ struct HashTable {
     inline HItem_T *allocate(SizeT capacity) {
         SizeT *ht = allocateOnly(capacity); // Allocates raw memory and updates capacity_
 
-        Memory::SetToValue(ht, Capacity(), Capacity());
+        MemoryUtils::SetToValue(ht, Capacity(), Capacity());
 
         // Item storage comes directly after hash table in memory.
         return reinterpret_cast<HItem_T *>(ht + Capacity());
@@ -923,7 +923,7 @@ struct HashTable {
         constexpr SizeT32 size     = sizeof(SizeT);                 // Size of one hash entry
         constexpr SizeT   size_sum = SizeT{size + sizeof(HItem_T)}; // Total size per entry
 
-        capacity = Memory::AlignToPow2(capacity); // Align to power-of-two
+        capacity = MemoryUtils::AlignToPow2(capacity); // Align to power-of-two
 
         setCapacity(capacity); // Record new capacity
 
@@ -1451,7 +1451,7 @@ struct HashTable {
             HItem_T       *storage  = reinterpret_cast<HItem_T *>(ht + Capacity());
             SizeT          index{0};
 
-            Memory::CopyTo(ht, src_ht, Capacity()); // Duplicate hash table slot array
+            MemoryUtils::CopyTo(ht, src_ht, Capacity()); // Duplicate hash table slot array
 
             do {
                 if (src_item->Hash != 0) {

@@ -240,14 +240,14 @@ struct String {
             Char_T     *src     = Storage();
             Char_T     *ns      = allocate(new_len);
 
-            Memory::CopyTo((ns + src_len), str, length);
+            MemoryUtils::CopyTo((ns + src_len), str, length);
 
             --new_len;
             ns[new_len] = Char_T{0};
             setLength(new_len);
 
             if (src != nullptr) {
-                Memory::CopyTo(ns, src, src_len);
+                MemoryUtils::CopyTo(ns, src, src_len);
                 QAllocator::Deallocate(src);
             }
         }
@@ -281,7 +281,7 @@ struct String {
 
             // 1. Copy prefix [0, index)
             if (index != 0) {
-                Memory::CopyTo(new_storage, Storage(), index);
+                MemoryUtils::CopyTo(new_storage, Storage(), index);
             }
 
             // 2. Insert new char at 'index'
@@ -289,7 +289,7 @@ struct String {
 
             // 3. Copy suffix [index, length)
             if (index < Length()) {
-                Memory::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
+                MemoryUtils::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
             }
 
             // Clean up old storage and set new storage/capacity
@@ -409,11 +409,11 @@ struct String {
         Char_T *des = ns.Storage();
 
         if (len1 != 0) {
-            Memory::CopyTo(des, str1, len1);
+            MemoryUtils::CopyTo(des, str1, len1);
         }
 
         if (len2 != 0) {
-            Memory::CopyTo((des + len1), str2, len2);
+            MemoryUtils::CopyTo((des + len1), str2, len2);
         }
 
         return ns;
@@ -424,7 +424,7 @@ struct String {
         Char_T *new_storage = allocate(new_length + SizeT{1});
 
         if (Length() != 0) {
-            Memory::CopyTo(new_storage, old_storage, Length());
+            MemoryUtils::CopyTo(new_storage, old_storage, Length());
         }
 
         deallocate();            // Free the old storage
@@ -434,7 +434,7 @@ struct String {
     void copyString(const Char_T *str, const SizeT length) {
         Char_T *ns = allocate(length + SizeT{1});
 
-        Memory::CopyTo(ns, str, length);
+        MemoryUtils::CopyTo(ns, str, length);
 
         ns[length] = Char_T{0};
 

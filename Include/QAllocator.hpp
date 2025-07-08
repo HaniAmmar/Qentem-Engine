@@ -17,7 +17,7 @@
 #ifndef QENTEM_ALLOCATOR_H
 #define QENTEM_ALLOCATOR_H
 
-#include "Memory.hpp"
+#include "MemoryUtils.hpp"
 
 #ifndef QENTEM_ALLOCATE
 #if defined(_MSC_VER)

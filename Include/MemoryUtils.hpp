@@ -1,23 +1,24 @@
 /**
- * @file Memory.hpp
- * @brief Declares memory management utilities for Qentem Engine.
+ * @file MemoryUtils.hpp
+ * @brief Low-level memory fill, copy, and alignment utilities.
  *
- * This header provides fundamental functions and helpers for memory allocation,
- * deallocation, and manipulation, supporting the efficient and safe operation
- * of core Qentem Engine components.
+ * Provides fast, allocation-free operations for zeroing memory, filling with a value,
+ * copying data, and aligning sizes to powers of two.
+ *
+ * This header does *not* perform allocations or constructions.
  *
  * @author Hani Ammar
  * @date 2025
  * @copyright MIT License
  */
 
-#ifndef QENTEM_MEMORY_H
-#define QENTEM_MEMORY_H
+#ifndef QENTEM_MEMORY_UTILS_H
+#define QENTEM_MEMORY_UTILS_H
 
 #include "Platform.hpp"
 
 namespace Qentem {
-struct Memory {
+struct MemoryUtils {
     template <typename Type_T>
     QENTEM_INLINE static void SetToZeroByType(Type_T *des, SizeT size = 1) noexcept {
         constexpr SizeT   type_size = sizeof(Type_T);
@@ -60,35 +61,35 @@ struct Memory {
     }
 
     // size = the number of bytes
-    template <typename Number_T>
-    QENTEM_INLINE static void SetToZero(void *pointer, Number_T size) noexcept {
-        Number_T offset = 0;
+    // template <typename Number_T>
+    // QENTEM_INLINE static void SetToZero(void *pointer, Number_T size) noexcept {
+    //     Number_T offset = 0;
 
-        // if (QentemConfig::IsSIMDEnabled) {
-        //     const Number_T m_size = (size >> Platform::SIMD::Shift);
+    //     // if (QentemConfig::IsSIMDEnabled) {
+    //     //     const Number_T m_size = (size >> Platform::SIMD::Shift);
 
-        //     if (m_size != 0) {
-        //         offset = m_size;
-        //         offset <<= Platform::SIMD::Shift;
+    //     //     if (m_size != 0) {
+    //     //         offset = m_size;
+    //     //         offset <<= Platform::SIMD::Shift;
 
-        //         const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
-        //         Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
-        //         const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
+    //     //         const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
+    //     //         Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
+    //     //         const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
 
-        //         do {
-        //             Platform::SIMD::Store(m_pointer, m_zero);
-        //             ++m_pointer;
-        //         } while (m_pointer < end);
-        //     }
-        // }
+    //     //         do {
+    //     //             Platform::SIMD::Store(m_pointer, m_zero);
+    //     //             ++m_pointer;
+    //     //         } while (m_pointer < end);
+    //     //     }
+    //     // }
 
-        char *src = (char *)(pointer);
+    //     char *src = (char *)(pointer);
 
-        while (offset < size) {
-            src[offset] = 0;
-            ++offset;
-        }
-    }
+    //     while (offset < size) {
+    //         src[offset] = 0;
+    //         ++offset;
+    //     }
+    // }
 
     template <typename Type_T, typename Value_T>
     QENTEM_INLINE static void SetToValue(Type_T *src, Value_T value, SizeT size) noexcept {
@@ -101,37 +102,37 @@ struct Memory {
     }
 
     // size = the number of bytes
-    template <typename Number_T>
-    QENTEM_INLINE static void Copy(void *to, const void *from, Number_T size) noexcept {
-        Number_T offset = 0;
+    // template <typename Number_T>
+    // QENTEM_INLINE static void Copy(void *to, const void *from, Number_T size) noexcept {
+    //     Number_T offset = 0;
 
-        // if (QentemConfig::IsSIMDEnabled) {
-        // const Number_T m_size = (size >> Platform::SIMD::Shift);
+    //     // if (QentemConfig::IsSIMDEnabled) {
+    //     // const Number_T m_size = (size >> Platform::SIMD::Shift);
 
-        //     if (m_size != 0) {
-        //         offset = m_size;
-        //         offset <<= Platform::SIMD::Shift;
+    //     //     if (m_size != 0) {
+    //     //         offset = m_size;
+    //     //         offset <<= Platform::SIMD::Shift;
 
-        //         Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
-        //         const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
-        //         const Platform::SIMD::VAR_T *end    = (m_form + m_size);
+    //     //         Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
+    //     //         const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
+    //     //         const Platform::SIMD::VAR_T *end    = (m_form + m_size);
 
-        //         do {
-        //             Platform::SIMD::Store(m_to, Platform::SIMD::Load(m_form));
-        //             ++m_form;
-        //             ++m_to;
-        //         } while (m_form < end);
-        //     }
-        // }
+    //     //         do {
+    //     //             Platform::SIMD::Store(m_to, Platform::SIMD::Load(m_form));
+    //     //             ++m_form;
+    //     //             ++m_to;
+    //     //         } while (m_form < end);
+    //     //     }
+    //     // }
 
-        char       *des = (char *)(to);
-        const char *src = (const char *)(from);
+    //     char       *des = (char *)(to);
+    //     const char *src = (const char *)(from);
 
-        while (offset < size) {
-            des[offset] = src[offset];
-            ++offset;
-        }
-    }
+    //     while (offset < size) {
+    //         des[offset] = src[offset];
+    //         ++offset;
+    //     }
+    // }
     /////////////////////////////////////////////////////////////////////
     template <typename Type_T>
     QENTEM_INLINE static void CopyTo(Type_T *to, const Type_T *from, SizeT size) noexcept {
@@ -186,8 +187,8 @@ struct Memory {
 
         return size;
     }
-    /////////////////////////////////////////////////////////////////////
 };
+
 } // namespace Qentem
 
-#endif
+#endif // QENTEM_MEMORY_UTILS_H

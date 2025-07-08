@@ -411,7 +411,7 @@ struct Deque {
      * and frees the excess memory.
      */
     void Compress() {
-        const SizeT n_size = Memory::AlignToPow2(Size());
+        const SizeT n_size = MemoryUtils::AlignToPow2(Size());
 
         if (n_size < Capacity()) {
             Resize(n_size);
@@ -549,7 +549,7 @@ struct Deque {
      * @brief Allocates a buffer of power-of-two capacity >= new_capacity.
      */
     void allocate(SizeT capacity) {
-        setCapacity(Memory::AlignToPow2(capacity));
+        setCapacity(MemoryUtils::AlignToPow2(capacity));
         setStorage(QAllocator::Allocate<Type_T>(Capacity()));
         setPopCount(0);
     }
@@ -580,10 +580,10 @@ struct Deque {
         allocate(new_capacity);
 
         // Copy the first contiguous block
-        Memory::CopyTo(storage_, (old_storage + head()), first_count);
+        MemoryUtils::CopyTo(storage_, (old_storage + head()), first_count);
 
         if (second_count != 0) {
-            Memory::CopyTo((storage_ + first_count), old_storage, second_count);
+            MemoryUtils::CopyTo((storage_ + first_count), old_storage, second_count);
         }
 
         // 4) Clean up old buffer and reset head/index
