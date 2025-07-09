@@ -96,7 +96,7 @@ struct SystemMemory {
         DWORD old_protect;
         return (::VirtualProtect(ptr, static_cast<SystemIntType>(size), PAGE_NOACCESS, &old_protect) != 0);
 #elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
-        return (::mprotect(ptr, static_cast<SystemIntType>(size), PROT_NONE) == 0);
+        return (::mprotect(ptr, size, PROT_NONE) == 0);
 #else
         return false;
 #endif
@@ -128,12 +128,12 @@ struct SystemMemory {
     }
 
     /**
-     * @brief Frees memory previously allocated with Allocate().
+     * @brief Release memory previously allocated with Allocate().
      *
      * @param ptr  Pointer returned by Allocate().
      * @param size Size in bytes (same value passed to Allocate).
      */
-    static void Free(void *ptr, SystemIntType size) noexcept {
+    static void Release(void *ptr, SystemIntType size) noexcept {
 #if defined(_WIN32)
         (void)size;
         ::VirtualFree(ptr, 0, MEM_RELEASE);

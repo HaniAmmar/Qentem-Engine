@@ -194,7 +194,7 @@ struct LiteStream {
 
     void deallocate(char *storage, SizeT32 size) {
         if (storage != nullptr) {
-            SystemMemory::Free(storage, size);
+            SystemMemory::Release(storage, size);
         }
     }
 
