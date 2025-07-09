@@ -63,7 +63,7 @@ struct TestOutput {
     TestOutput &operator=(TestOutput &&)      = delete;
     TestOutput &operator=(const TestOutput &) = delete;
 
-    enum struct Colors : SizeT8 { TITLE, ERROR, PASS, END };
+    enum struct Colors : SizeT8 { TitleColor, ErrorColor, PassColor, EndColor };
 
     static bool &IsColored() noexcept {
         static bool isColored{true};
@@ -74,13 +74,13 @@ struct TestOutput {
     QENTEM_NOINLINE static const char *GetColor(Colors color) noexcept {
         if (IsColored()) {
             switch (color) {
-                case Colors::TITLE:
+                case Colors::TitleColor:
                     return "\x1B[36m";
-                case Colors::ERROR:
+                case Colors::ErrorColor:
                     return "\x1B[31m";
-                case Colors::PASS:
+                case Colors::PassColor:
                     return "\x1B[32m";
-                case Colors::END:
+                case Colors::EndColor:
                     return "\x1B[0m";
             }
         }
@@ -220,8 +220,8 @@ struct MemoryRecord {
         const SizeT remaining_allocations = (storage.allocations - storage.deallocations);
 
         if (remaining_allocations != 0) {
-            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ERROR), "Leak detected",
-                              TestOutput::GetColor(TestOutput::Colors::END), ": ", remaining_allocations,
+            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Leak detected",
+                              TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", remaining_allocations,
                               " remaining allocations.\n\n");
         }
 
@@ -260,15 +260,15 @@ struct QTest {
     }
 
     QENTEM_NOINLINE void PrintGroupName() const {
-        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TITLE), test_name_,
-                          TestOutput::GetColor(TestOutput::Colors::END), ":\n");
+        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TitleColor), test_name_,
+                          TestOutput::GetColor(TestOutput::Colors::EndColor), ":\n");
     }
 
     QENTEM_NOINLINE int EndTests() {
         if (!error_) {
-            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TITLE), test_name_,
-                              TestOutput::GetColor(TestOutput::Colors::PASS), " Passed all tests",
-                              TestOutput::GetColor(TestOutput::Colors::END), "\n\n");
+            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TitleColor), test_name_,
+                              TestOutput::GetColor(TestOutput::Colors::PassColor), " Passed all tests",
+                              TestOutput::GetColor(TestOutput::Colors::EndColor), "\n\n");
             return 0;
         }
 
@@ -340,8 +340,8 @@ struct QTest {
     template <typename Value1_T, typename Value2_T>
     QENTEM_NOINLINE void PrintErrorMessage(bool equal, const Value1_T &value1, const Value2_T &value2,
                                            unsigned long line) {
-        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ERROR), "Failed",
-                          TestOutput::GetColor(TestOutput::Colors::END), ": ", part_name_, '\n');
+        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Failed",
+                          TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", part_name_, '\n');
         TestOutput::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
                           "`\n     Returned: `", value1, "`\n\n");
     }
@@ -359,8 +359,8 @@ struct QTest {
     }
 
     QENTEM_NOINLINE static void PrintInfo(bool template_engine_info = true) {
-        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TITLE), "Configurations",
-                          TestOutput::GetColor(TestOutput::Colors::END), ":\n");
+        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TitleColor), "Configurations",
+                          TestOutput::GetColor(TestOutput::Colors::EndColor), ":\n");
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
             TestOutput::Print("Arch: 64-bit\n");
         } else {
@@ -398,8 +398,8 @@ struct QTest {
   private:
     QENTEM_NOINLINE void afterTest(bool test_for_leaks) {
         if (!error_) {
-            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::PASS), "Pass",
-                              TestOutput::GetColor(TestOutput::Colors::END), ": ", part_name_, '\n');
+            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::PassColor), "Pass",
+                              TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", part_name_, '\n');
         }
 
         if (test_for_leaks) {
@@ -407,8 +407,8 @@ struct QTest {
             MemoryRecord::ResetSubMemoryRecord();
 
             if (remaining_allocations != 0) {
-                TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ERROR), "Leak detected",
-                                  TestOutput::GetColor(TestOutput::Colors::END), ": ", remaining_allocations,
+                TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Leak detected",
+                                  TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", remaining_allocations,
                                   " remaining allocations.\n");
             }
         }
