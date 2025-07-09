@@ -131,6 +131,7 @@ struct SystemMemory {
      */
     static void Free(void *ptr, SystemIntType size) noexcept {
 #if defined(_WIN32)
+        (void)size;
         ::VirtualFree(ptr, 0, MEM_RELEASE);
 #elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
         ::munmap(ptr, size);
@@ -154,6 +155,8 @@ struct SystemMemory {
      */
     QENTEM_INLINE static void ReleasePages(void *start, SystemIntType size, bool reclaim = false) noexcept {
 #if defined(_WIN32)
+        (void)size;
+        (void)reclaim;
         // Always hard-unmap on Windows — madvise not applicable
         ::VirtualFree(start, 0, MEM_RELEASE);
 #elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
@@ -162,6 +165,9 @@ struct SystemMemory {
         } else {
             ::madvise(start, size, MADV_DONTNEED);
         }
+#else
+        (void)size;
+        (void)reclaim;
 #endif
     }
 
