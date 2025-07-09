@@ -33,6 +33,16 @@
 #endif
 #endif
 
+#ifndef QENTEM_NO_CUSTOM_PLACEMENT_NEW
+inline QENTEM_INLINE void *operator new(Qentem::SystemIntType, void *pointer, bool) noexcept {
+    return pointer;
+}
+
+inline QENTEM_INLINE void operator delete(void *, void *, Qentem::SizeT32) noexcept {
+    // no-op, only needed to satisfy compiler
+}
+#endif
+
 namespace Qentem {
 // TODO: Build a real Allocator
 struct QAllocator {
@@ -117,32 +127,29 @@ struct QAllocator {
     //               Construction / Initialization           //
     ///////////////////////////////////////////////////////////
 
-    // Initializer
-    template <typename Type_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer) noexcept {
-        ::new (pointer) Type_T{};
-    }
-
-    // Range default initializer
-    template <typename Type_T>
-    QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end) noexcept {
-        while (pointer < end) {
-            ::new (pointer) Type_T{};
-            ++pointer;
-        }
-    }
-
-    // Forward initializer
+    /**
+     * @brief Constructs an object of type `Type_T` in-place at the given memory address.
+     *
+     * This uses Qentem's internal placement-new operator unless disabled by `QENTEM_NO_CUSTOM_PLACEMENT_NEW`.
+     *
+     * @tparam Type_T    The type to construct.
+     * @tparam Values_T  Constructor argument types.
+     * @param pointer    The memory address to construct the object at.
+     * @param values     The arguments to pass to the constructor.
+     */
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static void Initialize(Type_T *pointer, Values_T &&...values) noexcept {
+#ifndef QENTEM_NO_CUSTOM_PLACEMENT_NEW
+        new (pointer, false) Type_T{QUtility::Forward<Values_T>(values)...};
+#else
         ::new (pointer) Type_T{QUtility::Forward<Values_T>(values)...};
+#endif
     }
 
-    // Range forward initializer
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end, Values_T &&...values) {
         while (pointer < end) {
-            ::new (pointer) Type_T{QUtility::Forward<Values_T>(values)...};
+            Initialize(pointer, QUtility::Forward<Values_T>(values)...);
             ++pointer;
         }
     }
