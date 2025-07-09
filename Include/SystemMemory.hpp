@@ -28,10 +28,14 @@
     #include <sys/mman.h>
     #include <unistd.h>
 
-    #if defined(__linux__) && !defined(MAP_STACK)
-        #define QENTEM_LINUX_MAP_STACK 0x20000
+    #if defined(__linux__)
+        #if !defined(MAP_STACK)
+            #define QENTEM_LINUX_MAP_STACK 0x20000
+        #else
+            #define QENTEM_LINUX_MAP_STACK MAP_STACK
+        #endif
     #else
-        #define QENTEM_LINUX_MAP_STACK MAP_STACK
+        #define QENTEM_LINUX_MAP_STACK 0 // No-op for non-Linux
     #endif
 #else
     // Unknown or freestanding platform — enable malloc fallback
