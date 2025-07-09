@@ -42,15 +42,6 @@
 #define QENTEM_RAW_DEALLOCATE(ptr) __builtin_free(ptr)
 #endif
 
-template <typename Type_T>
-void *operator new(Qentem::SystemIntType, Type_T *ptr) noexcept {
-    return ptr;
-}
-
-template <typename Type_T>
-void operator delete(void *, Type_T *) noexcept {
-    // No-op: required to match placement new
-}
 #endif // QENTEM_ALLOCATE
 
 namespace Qentem {
