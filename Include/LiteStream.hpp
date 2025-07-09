@@ -17,21 +17,14 @@
 #ifndef QENTEM_LITE_STREAM_H
 #define QENTEM_LITE_STREAM_H
 
+#include "SystemMemory.hpp"
 #include "StringUtils.hpp"
-
-#if defined(_MSC_VER)
-#define QENTEM_LITE_STREAM_ALLOCATE(size) malloc(size)
-#define QENTEM_LITE_STREAM_DEALLOCATE(ptr) free(ptr)
-#else
-#define QENTEM_LITE_STREAM_ALLOCATE(size) __builtin_malloc(size)
-#define QENTEM_LITE_STREAM_DEALLOCATE(ptr) __builtin_free(ptr)
-#endif
 
 namespace Qentem {
 
 struct LiteStream {
     using CharType = char;
-    static constexpr SizeT ExpandFactor{2};
+    static constexpr SizeT32 ExpandFactor{2};
 
     LiteStream()                              = default;
     LiteStream(LiteStream &&)                 = delete;
@@ -39,37 +32,37 @@ struct LiteStream {
     LiteStream &operator=(LiteStream &&)      = delete;
     LiteStream &operator=(const LiteStream &) = delete;
 
-    inline explicit LiteStream(SizeT capacity) {
+    explicit LiteStream(SizeT32 capacity) {
         if (capacity != 0) {
             allocate(capacity);
         }
     }
 
     ~LiteStream() {
-        QENTEM_LITE_STREAM_DEALLOCATE(Storage());
+        deallocate(storage_, capacity_);
     }
 
-    inline void Write(char ch) {
-        const SizeT new_length = (Length() + SizeT{1});
+    void Write(char ch) {
+        const SizeT32 new_length = (length_ + 1U);
 
-        if (Capacity() == Length()) {
+        if (Capacity() == length_) {
             expand(new_length * ExpandFactor);
         }
 
-        Storage()[Length()] = ch;
-        length_             = new_length;
+        storage_[length_] = ch;
+        length_           = new_length;
     }
 
-    inline void Write(const char *str, const SizeT length) {
+    void Write(const char *str, const SizeT32 length) {
         if (length != 0) {
-            const SizeT new_length = (Length() + length);
+            const SizeT32 new_length = (length_ + length);
 
             if (Capacity() < new_length) {
                 expand(new_length * ExpandFactor);
             }
 
-            char *des    = (Storage() + Length());
-            SizeT offset = 0;
+            char   *des    = (storage_ + length_);
+            SizeT32 offset = 0;
 
             while (offset < length) {
                 des[offset] = str[offset];
@@ -80,101 +73,101 @@ struct LiteStream {
         }
     }
 
-    inline void operator<<(char ch) {
+    void operator<<(char ch) {
         Write(ch);
     }
 
-    inline void operator<<(const char *str) {
+    void operator<<(const char *str) {
         Write(str, StringUtils::Count(str));
     }
 
-    inline void Clear() noexcept {
+    void Clear() noexcept {
         length_ = 0;
     }
 
-    inline void StepBack(const SizeT length) noexcept {
-        if (length <= Length()) {
+    void StepBack(const SizeT32 length) noexcept {
+        if (length <= length_) {
             length_ -= length;
         }
     }
 
-    inline char *Storage() noexcept {
+    char *Storage() noexcept {
         return storage_;
     }
 
-    inline const char *Storage() const noexcept {
+    const char *Storage() const noexcept {
         return storage_;
     }
 
-    inline const char *First() const noexcept {
+    const char *First() const noexcept {
         return storage_;
     }
 
-    inline char *Last() noexcept {
+    char *Last() noexcept {
         if (Capacity() != 0) {
-            return (Storage() + (Length() - SizeT{1}));
+            return (storage_ + (length_ - 1U));
         }
 
         return nullptr;
     }
 
-    inline const char *Last() const noexcept {
+    const char *Last() const noexcept {
         if (Capacity() != 0) {
-            return (Storage() + (Length() - SizeT{1}));
+            return (storage_ + (length_ - 1U));
         }
 
         return nullptr;
     }
 
-    inline SizeT Length() const noexcept {
+    SizeT32 Length() const noexcept {
         return length_;
     }
 
-    inline SizeT Capacity() const noexcept {
+    SizeT32 Capacity() const noexcept {
         return capacity_;
     }
 
     void InsertNull() {
-        if (Capacity() == Length()) {
-            expand(Length() + SizeT{1});
+        if (Capacity() == length_) {
+            expand(length_ + 1U);
         }
 
-        Storage()[Length()] = char{0};
+        storage_[length_] = char{0};
     }
 
-    inline void InsertAt(char ch, SizeT index) {
-        if (index < Length()) {
-            const SizeT new_length = (Length() + SizeT{1});
+    void InsertAt(char ch, SizeT32 index) {
+        if (index < length_) {
+            const SizeT32 new_length = (length_ + 1U);
 
             if (new_length <= Capacity()) {
-                char *data = Storage();
-                SizeT i    = Length();
+                char   *data = storage_;
+                SizeT32 i    = length_;
 
                 while (i > index) {
-                    data[i] = data[i - SizeT{1}];
+                    data[i] = data[i - 1U];
                     --i;
                 }
 
                 data[index] = ch;
                 length_     = new_length;
             } else {
-                char *new_storage = static_cast<char *>(QENTEM_LITE_STREAM_ALLOCATE(new_length));
+                char *new_storage = static_cast<char *>(SystemMemory::Allocate(new_length));
 
-                SizeT i = 0;
+                SizeT32 i = 0;
                 while (i < index) {
-                    new_storage[i] = Storage()[i];
+                    new_storage[i] = storage_[i];
                     ++i;
                 }
 
                 new_storage[index] = ch;
 
-                SizeT j = index;
-                while (j < Length()) {
-                    new_storage[j + 1] = Storage()[j];
+                SizeT32 j = index;
+                while (j < length_) {
+                    new_storage[j + 1] = storage_[j];
                     ++j;
                 }
 
-                QENTEM_LITE_STREAM_DEALLOCATE(Storage());
+                deallocate(storage_, capacity_);
                 storage_  = new_storage;
                 capacity_ = new_length;
                 length_   = new_length;
@@ -183,29 +176,48 @@ struct LiteStream {
     }
 
   private:
-    void expand(const SizeT new_capacity) {
-        char *str = Storage();
+    void expand(const SizeT32 new_capacity) {
+        char         *str          = storage_;
+        const SizeT32 old_capacity = capacity_;
 
         allocate(new_capacity);
 
-        SizeT offset = 0;
+        SizeT32 offset = 0;
 
-        while (offset < Length()) {
-            Storage()[offset] = str[offset];
+        while (offset < length_) {
+            storage_[offset] = str[offset];
             ++offset;
         }
 
-        QENTEM_LITE_STREAM_DEALLOCATE(str);
+        deallocate(str, old_capacity);
     }
 
-    void allocate(SizeT capacity) {
-        storage_  = static_cast<char *>(QENTEM_LITE_STREAM_ALLOCATE(capacity));
+    void deallocate(char *storage, SizeT32 size) {
+        if (storage != nullptr) {
+            SystemMemory::Free(storage, size);
+        }
+    }
+
+    void allocate(SizeT32 capacity) {
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+        const SizeT32 page_size = static_cast<SizeT32>(SystemMemory::PageSize());
+
+        if (capacity < page_size) {
+            capacity = page_size;
+        } else {
+            // Round up to next page boundary
+            capacity += (page_size - 1U);
+            capacity &= ~(page_size - 1U);
+        }
+#endif
+
+        storage_  = static_cast<char *>(SystemMemory::Allocate(capacity));
         capacity_ = capacity;
     }
 
-    char *storage_{nullptr};
-    SizeT length_{0};
-    SizeT capacity_{0};
+    char   *storage_{nullptr};
+    SizeT32 length_{0};
+    SizeT32 capacity_{0};
 };
 
 } // namespace Qentem
