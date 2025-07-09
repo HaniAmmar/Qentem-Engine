@@ -82,7 +82,7 @@ struct Deque {
     Deque &operator=(Deque &&src) noexcept {
         if (this != &src) {
             this->~Deque();
-            new (this) Deque(QUtility::Move(src));
+            QAllocator::Initialize(this, QUtility::Move(src));
         }
 
         return *this;
