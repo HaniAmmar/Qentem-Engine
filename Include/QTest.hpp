@@ -126,7 +126,7 @@ struct TestOutput {
     // }
 
     static LiteStream &GetStreamCache() noexcept {
-        static LiteStream ss{1024};
+        static LiteStream ss{32};
 
         return ss;
     }
