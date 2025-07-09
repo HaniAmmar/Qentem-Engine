@@ -60,6 +60,7 @@ static int PrintResult(int passed, int failed) {
     return 1;
 }
 
+QENTEM_MAYBE_UNUSED
 static void SelfTestLeak(QTest &test, char *&ptr) {
     ptr        = QAllocator::Allocate<char>(8U);
     char *nptr = nullptr;
@@ -77,6 +78,7 @@ static void SelfTestLeak(QTest &test, char *&ptr) {
     TestOutput::Print(U"a");
 }
 
+QENTEM_MAYBE_UNUSED
 static void SelfTest() {
     TestOutput::DisableOutput();
 
