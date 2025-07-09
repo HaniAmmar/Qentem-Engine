@@ -4789,6 +4789,53 @@ static void TestStringify1(QTest &test) {
     ///////////////////////////////////////
 }
 
+static void TestStringify4(QTest &test) {
+    StringStream<char> ss;
+    ValueC             value;
+
+    value[0] += true;
+    value[0] += false;
+    value[0] += nullptr;
+    value[0] += 0;
+    value[0] += "ABC";
+    value[0] += VArray{};
+    value[0] += VHArray{};
+    test.IsEqual(value.Stringify(ss), R"([[true,false,null,0,"ABC",[],{}]])", __LINE__);
+    ss.Clear();
+
+    value         = VArray{};
+    value[0]["a"] = true;
+    value[0]["0"] = false;
+    value[0]["1"] = nullptr;
+    value[0]["V"] = 0;
+    value[0]["B"] = "a";
+    value[0]["2"] = VArray{};
+    value[0]["6"] = VHArray{};
+    test.IsEqual(value.Stringify(ss), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", __LINE__);
+    ss.Clear();
+
+    value.Reset();
+    value["o"] += true;
+    value["o"] += false;
+    value["o"] += nullptr;
+    value["o"] += 0;
+    value["o"] += "ABC";
+    value["o"] += VArray{};
+    value["o"] += VHArray{};
+    test.IsEqual(value.Stringify(ss), R"({"o":[true,false,null,0,"ABC",[],{}]})", __LINE__);
+    ss.Clear();
+
+    value.Reset();
+    value["i"]["a"] = true;
+    value["i"]["0"] = false;
+    value["i"]["1"] = nullptr;
+    value["i"]["V"] = 0;
+    value["i"]["B"] = "a";
+    value["i"]["2"] = VArray{};
+    value["i"]["6"] = VHArray{};
+    test.IsEqual(value.Stringify(ss), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})", __LINE__);
+}
+
 static void TestStringify2(QTest &test) {
     StringStream<char> ss;
     ValueC             value;
@@ -5010,6 +5057,11 @@ static void TestStringify2(QTest &test) {
     value["A"] = "ABC";
     test.IsEqual(value.Stringify(ss, 2U), R"({"s":-8.9,"A":"ABC"})", __LINE__);
     ss.Clear();
+}
+
+static void TestStringify3(QTest &test) {
+    StringStream<char> ss;
+    ValueC             value;
 
     value.Reset();
     value["-"] = "a";
@@ -5248,54 +5300,7 @@ static void TestStringify2(QTest &test) {
     ///////////////////////////////////////
 }
 
-static void TestStringify3(QTest &test) {
-    StringStream<char> ss;
-    ValueC             value;
-
-    value[0] += true;
-    value[0] += false;
-    value[0] += nullptr;
-    value[0] += 0;
-    value[0] += "ABC";
-    value[0] += VArray{};
-    value[0] += VHArray{};
-    test.IsEqual(value.Stringify(ss), R"([[true,false,null,0,"ABC",[],{}]])", __LINE__);
-    ss.Clear();
-
-    value         = VArray{};
-    value[0]["a"] = true;
-    value[0]["0"] = false;
-    value[0]["1"] = nullptr;
-    value[0]["V"] = 0;
-    value[0]["B"] = "a";
-    value[0]["2"] = VArray{};
-    value[0]["6"] = VHArray{};
-    test.IsEqual(value.Stringify(ss), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", __LINE__);
-    ss.Clear();
-
-    value.Reset();
-    value["o"] += true;
-    value["o"] += false;
-    value["o"] += nullptr;
-    value["o"] += 0;
-    value["o"] += "ABC";
-    value["o"] += VArray{};
-    value["o"] += VHArray{};
-    test.IsEqual(value.Stringify(ss), R"({"o":[true,false,null,0,"ABC",[],{}]})", __LINE__);
-    ss.Clear();
-
-    value.Reset();
-    value["i"]["a"] = true;
-    value["i"]["0"] = false;
-    value["i"]["1"] = nullptr;
-    value["i"]["V"] = 0;
-    value["i"]["B"] = "a";
-    value["i"]["2"] = VArray{};
-    value["i"]["6"] = VHArray{};
-    test.IsEqual(value.Stringify(ss), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})", __LINE__);
-}
-
-static void TestStringify4(QTest &test) {
+static void TestStringify5(QTest &test) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -6108,6 +6113,7 @@ static int RunValueTests() {
     test.Test("Stringify Test 2", TestStringify2);
     test.Test("Stringify Test 3", TestStringify3);
     test.Test("Stringify Test 4", TestStringify4);
+    test.Test("Stringify Test 5", TestStringify5);
 
     test.Test("Delete Value Test", TestDeleteValue);
     test.Test("Compress Value Test", TestCompressValue);
