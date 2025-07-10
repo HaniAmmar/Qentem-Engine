@@ -255,35 +255,35 @@ struct TagBit {
 
                 case TagType::Math: {
                     MathTag *ptr = &GetMathTag();
-                    QAllocator::Dispose(ptr);
+                    MemoryUtils::Dispose(ptr);
                     QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::SuperVariable: {
                     SuperVariableTag *ptr = &GetSuperVariableTag();
-                    QAllocator::Dispose(ptr);
+                    MemoryUtils::Dispose(ptr);
                     QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::InLineIf: {
                     InLineIfTag *ptr = &GetInLineIfTag();
-                    QAllocator::Dispose(ptr);
+                    MemoryUtils::Dispose(ptr);
                     QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::Loop: {
                     LoopTag *ptr = &GetLoopTag();
-                    QAllocator::Dispose(ptr);
+                    MemoryUtils::Dispose(ptr);
                     QAllocator::Deallocate(ptr);
                     break;
                 }
 
                 case TagType::If: {
                     IfTag *ptr = &GetIfTag();
-                    QAllocator::Dispose(ptr);
+                    MemoryUtils::Dispose(ptr);
                     QAllocator::Deallocate(ptr);
                     break;
                 }

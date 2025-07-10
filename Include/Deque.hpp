@@ -82,7 +82,7 @@ struct Deque {
     Deque &operator=(Deque &&src) noexcept {
         if (this != &src) {
             this->~Deque();
-            QAllocator::Initialize(this, QUtility::Move(src));
+            MemoryUtils::Initialize(this, QUtility::Move(src));
         }
 
         return *this;
@@ -110,7 +110,7 @@ struct Deque {
             resize(capacity_ * SizeT{2});
         }
 
-        QAllocator::Initialize((Storage() + tail()), QUtility::Move(item));
+        MemoryUtils::Initialize((Storage() + tail()), QUtility::Move(item));
 
         setSize(Size() + SizeT{1});
     }
@@ -128,7 +128,7 @@ struct Deque {
             resize(capacity_ * SizeT{2});
         }
 
-        QAllocator::Initialize((Storage() + tail()), item);
+        MemoryUtils::Initialize((Storage() + tail()), item);
 
         setSize(Size() + SizeT{1});
     }
@@ -182,7 +182,7 @@ struct Deque {
      */
     void Dequeue() {
         if (IsNotEmpty()) {
-            QAllocator::Dispose(First());
+            MemoryUtils::Dispose(First());
 
             setHead((head() + SizeT{1}) & (Capacity() - SizeT{1}));
             --size_;
@@ -202,7 +202,7 @@ struct Deque {
     void DequeueBack() {
         if (IsNotEmpty()) {
             // Destroy the very last element in place
-            QAllocator::Dispose(Last());
+            MemoryUtils::Dispose(Last());
             // Decrement logical size
             --size_;
         }
@@ -349,11 +349,11 @@ struct Deque {
 
                 if (count != 0) {
                     if (end <= Capacity()) {
-                        QAllocator::Dispose((Storage() + start), (Storage() + end));
+                        MemoryUtils::Dispose((Storage() + start), (Storage() + end));
                     } else {
                         // Wrapped range
-                        QAllocator::Dispose((Storage() + start), (Storage() + Capacity()));
-                        QAllocator::Dispose(Storage(), (Storage() + (count - (Capacity() - start))));
+                        MemoryUtils::Dispose((Storage() + start), (Storage() + Capacity()));
+                        MemoryUtils::Dispose(Storage(), (Storage() + (count - (Capacity() - start))));
                     }
                 }
 
@@ -394,7 +394,7 @@ struct Deque {
 
             // 3) Initialize contiguous range
             if (end <= Capacity()) {
-                QAllocator::InitializeRange((Storage() + start), (Storage() + end));
+                MemoryUtils::InitializeRange((Storage() + start), (Storage() + end));
             }
 
             // 4) Update logical size to include the new default-initialized elements
@@ -594,10 +594,10 @@ struct Deque {
     void clear() noexcept {
         if (Size() != 0) {
             if ((head() + Size()) <= Capacity()) {
-                QAllocator::Dispose(Storage() + head(), Storage() + head() + Size());
+                MemoryUtils::Dispose(Storage() + head(), Storage() + head() + Size());
             } else {
-                QAllocator::Dispose((Storage() + head()), (Storage() + Capacity()));
-                QAllocator::Dispose(Storage(), (Storage() + (Size()) - (Capacity() - head())));
+                MemoryUtils::Dispose((Storage() + head()), (Storage() + Capacity()));
+                MemoryUtils::Dispose(Storage(), (Storage() + (Size()) - (Capacity() - head())));
             }
         }
     }

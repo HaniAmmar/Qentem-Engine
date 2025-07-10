@@ -158,7 +158,7 @@ struct HashTable {
         HItem_T *storage   = Storage();
 
         if (hashTable != nullptr) {
-            QAllocator::Dispose(storage, (storage + Size()));
+            MemoryUtils::Dispose(storage, (storage + Size()));
             QAllocator::Deallocate(hashTable);
         }
     }
@@ -191,7 +191,7 @@ struct HashTable {
 
             if (ht != nullptr) {
                 // Dispose of the old memory (after transfer, in case of derived/child arrays).
-                QAllocator::Dispose(storage, (storage + size));
+                MemoryUtils::Dispose(storage, (storage + size));
                 QAllocator::Deallocate(ht);
             }
         }
@@ -225,7 +225,7 @@ struct HashTable {
 
             if (ht != nullptr) {
                 // Dispose of the old memory (after transfer, in case of derived/child arrays).
-                QAllocator::Dispose(storage, (storage + size));
+                MemoryUtils::Dispose(storage, (storage + size));
                 QAllocator::Deallocate(ht);
             }
         }
@@ -542,7 +542,7 @@ struct HashTable {
             if (Size() > new_size) {
                 // Shrink: Dispose of elements outside new bounds
                 HItem_T *storage = Storage();
-                QAllocator::Dispose((storage + new_size), (storage + Size()));
+                MemoryUtils::Dispose((storage + new_size), (storage + Size()));
                 setSize(new_size); // Adjust logical size
             }
 
@@ -581,7 +581,7 @@ struct HashTable {
             SizeT   *ht      = getHashTable();
             HItem_T *storage = Storage();
             MemoryUtils::SetToValue(ht, Capacity(), Capacity()); // Reset hash buckets
-            QAllocator::Dispose(storage, (storage + Size()));    // Dispose each item (calls destructors)
+            MemoryUtils::Dispose(storage, (storage + Size()));   // Dispose each item (calls destructors)
             setSize(0);                                          // Logical size is now zero
         }
     }
@@ -598,8 +598,8 @@ struct HashTable {
         if (Capacity() != 0) {
             HItem_T *storage = Storage();
 
-            QAllocator::Dispose(storage, (storage + Size())); // Dispose all elements
-            QAllocator::Deallocate(getHashTable());           // Free the hash table & storage block
+            MemoryUtils::Dispose(storage, (storage + Size())); // Dispose all elements
+            QAllocator::Deallocate(getHashTable());            // Free the hash table & storage block
 
             clearHashTable(); // Set pointer to nullptr
             setSize(0);       // Size is now zero
@@ -1007,8 +1007,8 @@ struct HashTable {
         setSize(0); // Reset size to repopulate with only live entries
 
         while (item < end) {
-            if (item->Hash != 0) {                                      // Only copy live items
-                QAllocator::Initialize(storage, QUtility::Move(*item)); // Move construct in new storage
+            if (item->Hash != 0) {                                       // Only copy live items
+                MemoryUtils::Initialize(storage, QUtility::Move(*item)); // Move construct in new storage
                 ++storage;
                 ++size_; // Increment current count
             }
@@ -1210,7 +1210,7 @@ struct HashTable {
         ++size_;                                  // Increment count after using it
         item.Next = Capacity();                   // End of collision chain
 
-        QAllocator::Initialize(item_ptr, QUtility::Move(item)); // Move or copy-construct in place
+        MemoryUtils::Initialize(item_ptr, QUtility::Move(item)); // Move or copy-construct in place
 
         return item_ptr;
     }
@@ -1418,8 +1418,8 @@ struct HashTable {
             SizeT          index{0};
 
             do {
-                if (src_item->Hash != 0) {                      // Only copy valid entries
-                    QAllocator::Initialize(storage, *src_item); // Copy-construct in new storage
+                if (src_item->Hash != 0) {                       // Only copy valid entries
+                    MemoryUtils::Initialize(storage, *src_item); // Copy-construct in new storage
                     ++storage;
                     ++index;
                 }
@@ -1455,7 +1455,7 @@ struct HashTable {
 
             do {
                 if (src_item->Hash != 0) {
-                    QAllocator::Initialize(storage, *src_item);
+                    MemoryUtils::Initialize(storage, *src_item);
                     ++storage;
                     ++index;
                 }

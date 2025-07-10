@@ -52,17 +52,17 @@ struct Value {
     ~Value() {
         switch (Type()) {
             case ValueType::Object: {
-                QAllocator::Dispose(&object_);
+                MemoryUtils::Dispose(&object_);
                 break;
             }
 
             case ValueType::Array: {
-                QAllocator::Dispose(&array_);
+                MemoryUtils::Dispose(&array_);
                 break;
             }
 
             case ValueType::String: {
-                QAllocator::Dispose(&string_);
+                MemoryUtils::Dispose(&string_);
                 break;
             }
 

@@ -33,7 +33,7 @@ struct Array {
             Type_T *current = allocate();
 
             if (initialize) {
-                QAllocator::InitializeRange(current, (current + capacity));
+                MemoryUtils::InitializeRange(current, (current + capacity));
                 setSize(capacity);
             }
         }
@@ -48,7 +48,7 @@ struct Array {
 
     ~Array() {
         if (Storage() != nullptr) {
-            QAllocator::Dispose(Storage(), End());
+            MemoryUtils::Dispose(Storage(), End());
             QAllocator::Deallocate(Storage());
         }
     }
@@ -68,7 +68,7 @@ struct Array {
 
             if (storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                QAllocator::Dispose(storage, (storage + size));
+                MemoryUtils::Dispose(storage, (storage + size));
                 QAllocator::Deallocate(storage);
             }
         }
@@ -91,7 +91,7 @@ struct Array {
 
             if (storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                QAllocator::Dispose(storage, (storage + size));
+                MemoryUtils::Dispose(storage, (storage + size));
                 QAllocator::Deallocate(storage);
             }
         }
@@ -135,7 +135,7 @@ struct Array {
         const Type_T *src_end  = (src_item + src.Size());
 
         while (src_item < src_end) {
-            QAllocator::Initialize(storage, *src_item);
+            MemoryUtils::Initialize(storage, *src_item);
             ++storage;
             ++src_item;
         }
@@ -146,7 +146,7 @@ struct Array {
             expand((Capacity() | SizeT{1}) * SizeT{2});
         }
 
-        QAllocator::Initialize((Storage() + Size()), QUtility::Move(item));
+        MemoryUtils::Initialize((Storage() + Size()), QUtility::Move(item));
         ++size_;
     }
 
@@ -155,7 +155,7 @@ struct Array {
             expand((Capacity() | SizeT{1}) * SizeT{2});
         }
 
-        QAllocator::Initialize((Storage() + Size()), item);
+        MemoryUtils::Initialize((Storage() + Size()), item);
         ++size_;
     }
 
@@ -206,13 +206,13 @@ struct Array {
     }
 
     void Clear() noexcept {
-        QAllocator::Dispose(Storage(), End());
+        MemoryUtils::Dispose(Storage(), End());
 
         setSize(0);
     }
 
     void Reset() noexcept {
-        QAllocator::Dispose(Storage(), End());
+        MemoryUtils::Dispose(Storage(), End());
         QAllocator::Deallocate(Storage());
 
         clearStorage();
@@ -238,7 +238,7 @@ struct Array {
             Type_T *current = allocate();
 
             if (initialize) {
-                QAllocator::InitializeRange(current, (current + size));
+                MemoryUtils::InitializeRange(current, (current + size));
                 setSize(size);
             }
         }
@@ -248,7 +248,7 @@ struct Array {
         if (new_size != 0) {
             if (Size() > new_size) {
                 // Shrink
-                QAllocator::Dispose((Storage() + new_size), End());
+                MemoryUtils::Dispose((Storage() + new_size), End());
                 setSize(new_size);
             }
 
@@ -264,7 +264,7 @@ struct Array {
 
         if (new_size > Size()) {
             Type_T *current = Storage();
-            QAllocator::InitializeRange((current + Size()), (current + new_size));
+            MemoryUtils::InitializeRange((current + Size()), (current + new_size));
         }
 
         setSize(Capacity());
@@ -308,7 +308,7 @@ struct Array {
         if (size <= Size()) {
             const SizeT new_size = (Size() - size);
 
-            QAllocator::Dispose((Storage() + new_size), End());
+            MemoryUtils::Dispose((Storage() + new_size), End());
             setSize(new_size);
         }
     }
@@ -422,7 +422,7 @@ struct Array {
         const Type_T *src_end     = (src_item + src.Size());
 
         while (src_item < src_end) {
-            QAllocator::Initialize(new_storage, *src_item);
+            MemoryUtils::Initialize(new_storage, *src_item);
             ++new_storage;
             ++src_item;
         }

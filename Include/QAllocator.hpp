@@ -33,16 +33,6 @@
 #endif
 #endif
 
-#ifndef QENTEM_NO_CUSTOM_PLACEMENT_NEW
-inline QENTEM_INLINE void *operator new(Qentem::SystemIntType, void *pointer, bool) noexcept {
-    return pointer;
-}
-
-inline QENTEM_INLINE void operator delete(void *, void *, Qentem::SizeT32) noexcept {
-    // no-op, only needed to satisfy compiler
-}
-#endif
-
 namespace Qentem {
 // TODO: Build a real Allocator
 struct QAllocator {
@@ -78,14 +68,14 @@ struct QAllocator {
     template <typename Type_T>
     QENTEM_INLINE static Type_T *AllocateInit() {
         Type_T *pointer = Allocate<Type_T>(1);
-        Initialize(pointer);
+        MemoryUtils::Initialize(pointer);
         return pointer;
     }
 
     template <typename Type_T, typename... Values_T>
     QENTEM_INLINE static Type_T *AllocateInit(Values_T &&...values) noexcept {
         Type_T *pointer = Allocate<Type_T>(1);
-        Initialize(pointer, QUtility::Forward<Values_T>(values)...);
+        MemoryUtils::Initialize(pointer, QUtility::Forward<Values_T>(values)...);
         return pointer;
     }
 
@@ -120,56 +110,6 @@ struct QAllocator {
             MemoryRecord::RemoveAllocation(raw);
 #endif
             QENTEM_RAW_DEALLOCATE(raw);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////
-    //               Construction / Initialization           //
-    ///////////////////////////////////////////////////////////
-
-    /**
-     * @brief Constructs an object of type `Type_T` in-place at the given memory address.
-     *
-     * This uses Qentem's internal placement-new operator unless disabled by `QENTEM_NO_CUSTOM_PLACEMENT_NEW`.
-     *
-     * @tparam Type_T    The type to construct.
-     * @tparam Values_T  Constructor argument types.
-     * @param pointer    The memory address to construct the object at.
-     * @param values     The arguments to pass to the constructor.
-     */
-    template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer, Values_T &&...values) noexcept {
-#ifndef QENTEM_NO_CUSTOM_PLACEMENT_NEW
-        new (pointer, false) Type_T{QUtility::Forward<Values_T>(values)...};
-#else
-        ::new (pointer) Type_T{QUtility::Forward<Values_T>(values)...};
-#endif
-    }
-
-    template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end, Values_T &&...values) {
-        while (pointer < end) {
-            Initialize(pointer, QUtility::Forward<Values_T>(values)...);
-            ++pointer;
-        }
-    }
-
-    ///////////////////////////////////////////////////////////
-    //                      Destruction                      //
-    ///////////////////////////////////////////////////////////
-
-    template <typename Type_T>
-    QENTEM_INLINE static void Dispose(Type_T *item) noexcept {
-        if (item != nullptr) {
-            item->~Type_T();
-        }
-    }
-
-    template <typename Type_T>
-    QENTEM_INLINE static void Dispose(Type_T *item, const Type_T *end) noexcept {
-        while (item < end) {
-            Dispose(item);
-            ++item;
         }
     }
 };
