@@ -191,6 +191,8 @@ struct JSONUtils {
     static void Escape(const Char_T *content, SizeT length, Stream_T &stream) {
         using NotationConstants = NotationConstants_T<Char_T>;
 
+        static constexpr Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
+
         SizeT offset  = 0;
         SizeT offset2 = 0;
 
@@ -222,7 +224,7 @@ struct JSONUtils {
                     offset2 = offset;
                     ++offset2;
 
-                    stream.Write(NotationConstants::GetReplacementChar(SizeT32(ch)));
+                    stream.Write(ReplaceList[static_cast<SizeT8>(ch)]);
                     break;
                 }
 
@@ -262,12 +264,6 @@ struct JSONUtils {
         static constexpr Char_T LineControlChar      = '\n';
         static constexpr Char_T FormfeedControlChar  = '\f';
         static constexpr Char_T CarriageControlChar  = '\r';
-
-        static Char_T GetReplacementChar(SizeT32 index) noexcept {
-            static const Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
-
-            return ReplaceList[index];
-        }
 
         static constexpr Char_T B_Char  = 'b';
         static constexpr Char_T T_Char  = 't';
