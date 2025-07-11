@@ -62,22 +62,24 @@ struct SystemMemory {
      * @return Size of a memory page in bytes.
      */
     static SystemIntType PageSize() noexcept {
-#if defined(_WIN32)
+        // clang-format off
+        #if defined(_WIN32)
         SYSTEM_INFO info;
         GetSystemInfo(&info);
         static const SystemIntType page_size = static_cast<SystemIntType>(info.dwPageSize);
-#elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
-        static const SystemIntType page_size = static_cast<SystemIntType>(::sysconf(
-#if defined(_SC_PAGESIZE)
-            _SC_PAGESIZE
-#else
-            _SC_PAGE_SIZE
-#endif
-            ));
-#else
-        // Fallback for freestanding
-        static constexpr SystemIntType page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
-#endif
+        #elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
+                static const SystemIntType page_size = static_cast<SystemIntType>(::sysconf(
+            #if defined(_SC_PAGESIZE)
+                        _SC_PAGESIZE
+            #else
+                        _SC_PAGE_SIZE
+            #endif
+                    ));
+        #else
+                // Fallback for freestanding
+                static constexpr SystemIntType page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
+        #endif
+        // clang-format on
 
         return page_size;
     }
