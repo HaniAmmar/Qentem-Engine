@@ -335,6 +335,10 @@ struct QTest {
                           TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", part_name_, '\n');
         TestOutput::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
                           "`\n     Returned: `", value1, "`\n\n");
+
+        if (!continue_on_error_) {
+            ::exit(1);
+        }
     }
 
     inline void ContinueOnError(bool continue_on_error) noexcept {
