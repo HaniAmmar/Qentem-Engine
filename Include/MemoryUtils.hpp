@@ -189,9 +189,10 @@ struct MemoryUtils {
         }
     }
     /////////////////////////////////////////////////////////////////////
-    QENTEM_INLINE static SizeT AlignToPow2(SizeT n_size) noexcept {
+    template <typename Number_T>
+    QENTEM_INLINE static Number_T AlignToPow2(Number_T n_size) noexcept {
         // Ensure scanned n_size is >= 2, so msb >= 1.
-        SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size | SizeT{2}));
+        Number_T size = static_cast<Number_T>(Number_T{1} << Platform::FindLastBit(n_size | Number_T{2}));
 
         // If n_size wasn’t already exactly that power-of-two, bump up
         size <<= SizeT32(size < n_size);
