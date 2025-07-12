@@ -46,11 +46,6 @@ struct String {
         }
     }
 
-    String(Char_T *str, SizeT length) {
-        setLength(length);
-        setStorage(str);
-    }
-
     String(const Char_T *str, SizeT length) {
         copyString(str, length);
     }
@@ -223,6 +218,16 @@ struct String {
         clearLength();
 
         return str;
+    }
+
+    void Adopt(Char_T *str, SizeT length /*, SizeT capacity*/) {
+        // Clean up any existing storage
+        Reset();
+
+        // Take ownership of the new buffer
+        setStorage(str);
+        setLength(length);
+        // setCapacity(capacity);
     }
 
     static String Merge(const String &src1, const String &src2) {

@@ -78,7 +78,7 @@ static void TestString1(QTest &test) {
     str_ptr = str1.Detach();
     test.IsNotNull(str_ptr, __LINE__);
 
-    str2 = QString(str_ptr, length); // Manage
+    str2.Adopt(str_ptr, length);
     test.IsEqual(str2.First(), str_ptr, __LINE__);
     test.IsEqual(str2.Length(), length, __LINE__);
 
@@ -124,12 +124,15 @@ static void TestString1(QTest &test) {
 
     str1 = "A";
     test.IsEqual(str1.Length(), SizeT{1U}, __LINE__);
+    // const SizeT str_len = str1.Length();
     str_ptr = str1.Detach();
     test.IsEqual(str_ptr[0], 'A', __LINE__);
-    QAllocator::Deallocate(str_ptr);
+    QAllocator::Deallocate(str_ptr /*, str_len + 1*/);
 
-    char         *tmp_size_2 = QAllocator::Allocate<char>(2);
-    const QString str_size_2 = QString(tmp_size_2, 2U);
+    char   *tmp_size_2 = QAllocator::Allocate<char>(2);
+    QString str_size_2 = QString(tmp_size_2, SizeT{2});
+
+    str_size_2.Adopt(tmp_size_2, SizeT{2});
 
     test.IsEqual(str_size_2.First(), tmp_size_2, __LINE__);
 }
