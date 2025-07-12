@@ -1,13 +1,15 @@
 /**
  * @file SystemMemory.hpp
- * @brief Platform-agnostic, low-level memory allocator for page-aligned system memory.
+ * @brief Low-level, platform-independent system for acquiring and releasing page-aligned virtual memory.
  *
- * This header defines the Qentem::SystemMemory struct, which provides direct access
- * to virtual memory allocation via mmap (on Unix-like systems) or VirtualAlloc (on Windows).
- * It enables fine-grained memory control.
+ * Defines Qentem::SystemMemory — a minimal interface for direct memory management using
+ * system calls (mmap on Unix-like platforms, VirtualAlloc on Windows), bypassing libc.
  *
- * Supports optional stack-specific mappings (e.g., MAP_STACK on Linux) via template toggle,
- * and offers a consistent interface for allocation and deallocation across platforms.
+ * Designed for allocators, buffers, and runtime systems requiring page-level control.
+ * Supports optional stack-specific allocation (e.g., MAP_STACK on Linux) and provides
+ * unified access to allocation, release, and protection routines.
+ *
+ * On unknown or freestanding platforms, it transparently falls back to malloc.
  *
  * @author Hani Ammar
  * @date 2025
