@@ -23,30 +23,33 @@
 #include "Test.hpp"
 
 int main() {
-    Qentem::Test::SelfTest();
-    Qentem::QTest::PrintInfo();
+    using namespace Qentem;
+
+    Test::SelfTest();
+    QTest::PrintInfo();
 
     // for (int i = 0; i < 100000; i++) {
-    //     Qentem::Test::RunStringUtilsTests();
-    //     Qentem::Test::RunStringTests();
-    //     Qentem::Test::RunStringStreamTests();
-    //     Qentem::Test::RunArrayTests();
-    //     Qentem::Test::RunDequeTests();
-    //     Qentem::Test::RunBigIntTests();
-    //     Qentem::Test::RunDigitTests();
-    //     Qentem::Test::RunHArrayTests();
-    //     Qentem::Test::RunUnicodeTests();
-    //     Qentem::Test::RunJSONUtilsTests();
-    //     Qentem::Test::RunValueTests();
-    //     Qentem::Test::RunJSONTests();
-    //     Qentem::Test::RunEvaluateTests();
-    //     Qentem::Test::RunTemplateTests();
-    //     Qentem::Test::RunTemplateUTests();
-    //     Qentem::Test::RunTemplateLTests();
+    //     Test::RunStringUtilsTests();
+    //     Test::RunReserverTests();
+    //     Test::RunStringTests();
+    //     Test::RunStringStreamTests();
+    //     Test::RunArrayTests();
+    //     Test::RunDequeTests();
+    //     Test::RunBigIntTests();
+    //     Test::RunDigitTests();
+    //     Test::RunHArrayTests();
+    //     Test::RunUnicodeTests();
+    //     Test::RunJSONUtilsTests();
+    //     Test::RunValueTests();
+    //     Test::RunJSONTests();
+    //     Test::RunEvaluateTests();
+    //     Test::RunTemplateTests();
+    //     Test::RunTemplateUTests();
+    //     Test::RunTemplateLTests();
     // }
 
-    const int ret = Qentem::Test::RunTests();
-    Qentem::MemoryRecord::PrintMemoryStatus();
+    const int ret = Test::RunTests();
+    QTest::PrintMemoryStatus();
 
     return ret;
 }

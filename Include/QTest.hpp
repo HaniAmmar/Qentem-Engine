@@ -14,18 +14,14 @@
 
 #ifndef QENTEM_ENABLE_MEMORY_RECORD_H
 #define QENTEM_ENABLE_MEMORY_RECORD_H
+#include <cstdlib>
 #endif
 
 #ifndef QENTEM_Q_TEST_H
 #define QENTEM_Q_TEST_H
 
-#include "ToCharsHelper.hpp"
-#include "LiteStream.hpp"
-
+#include "QConsole.hpp"
 #include "MemoryRecord.hpp"
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifndef QENTEM_ALLOCATE
 #if defined(_MSC_VER)
@@ -44,90 +40,6 @@
 
 namespace Qentem {
 
-struct TestOutput {
-    TestOutput()                              = delete;
-    ~TestOutput()                             = delete;
-    TestOutput(TestOutput &&)                 = delete;
-    TestOutput(const TestOutput &)            = delete;
-    TestOutput &operator=(TestOutput &&)      = delete;
-    TestOutput &operator=(const TestOutput &) = delete;
-
-    enum struct Colors : SizeT8 { TitleColor, ErrorColor, PassColor, EndColor };
-
-    static bool &IsColored() noexcept {
-        static bool isColored{true};
-
-        return isColored;
-    }
-
-    QENTEM_NOINLINE static const char *GetColor(Colors color) noexcept {
-        if (IsColored()) {
-            switch (color) {
-                case Colors::TitleColor:
-                    return "\x1B[36m";
-                case Colors::ErrorColor:
-                    return "\x1B[31m";
-                case Colors::PassColor:
-                    return "\x1B[32m";
-                case Colors::EndColor:
-                    return "\x1B[0m";
-            }
-        }
-
-        return "";
-    }
-
-    template <typename... Values_T>
-    inline static void Print(const Values_T &...values) {
-        LiteStream &ss = GetStreamCache();
-        ToCharsHelper::Write(ss, values...);
-
-        if (IsOutputEnabled()) {
-            fwrite(ss.First(), 1, ss.Length(), stdout);
-            ss.Clear();
-        }
-    }
-
-    static void Flush() noexcept {
-        fflush(stdout);
-    }
-
-    static void Clear() noexcept {
-        GetStreamCache().Clear();
-    }
-
-    static void DisableOutput() noexcept {
-        getOutputEnabledRef() = false;
-    }
-
-    static void EnableOutput() noexcept {
-        getOutputEnabledRef() = true;
-    }
-
-    static bool IsOutputEnabled() noexcept {
-        return getOutputEnabledRef();
-    }
-
-    // static void SetDoubleFormat() noexcept {
-    // }
-
-    // static void ResetDoubleFormat() noexcept {
-    // }
-
-    static LiteStream &GetStreamCache() noexcept {
-        static LiteStream ss{32};
-
-        return ss;
-    }
-
-  private:
-    static bool &getOutputEnabledRef() noexcept {
-        static bool enable_output_ = true;
-
-        return enable_output_;
-    }
-};
-
 struct QTest {
     QTest()                         = delete;
     ~QTest()                        = default;
@@ -140,15 +52,15 @@ struct QTest {
     }
 
     QENTEM_NOINLINE void PrintGroupName() const {
-        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TitleColor), test_name_,
-                          TestOutput::GetColor(TestOutput::Colors::EndColor), ":\n");
+        QConsole::Print(QConsole::GetColor(QConsole::Colors::TitleColor), test_name_,
+                        QConsole::GetColor(QConsole::Colors::EndColor), ":\n");
     }
 
     QENTEM_NOINLINE int EndTests() {
         if (!error_) {
-            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TitleColor), test_name_,
-                              TestOutput::GetColor(TestOutput::Colors::PassColor), " Passed all tests",
-                              TestOutput::GetColor(TestOutput::Colors::EndColor), "\n\n");
+            QConsole::Print(QConsole::GetColor(QConsole::Colors::TitleColor), test_name_,
+                            QConsole::GetColor(QConsole::Colors::PassColor), " Passed all tests",
+                            QConsole::GetColor(QConsole::Colors::EndColor), "\n\n");
             return 0;
         }
 
@@ -220,10 +132,10 @@ struct QTest {
     template <typename Value1_T, typename Value2_T>
     QENTEM_NOINLINE void PrintErrorMessage(bool equal, const Value1_T &value1, const Value2_T &value2,
                                            unsigned long line) {
-        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Failed",
-                          TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", part_name_, '\n');
-        TestOutput::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
-                          "`\n     Returned: `", value1, "`\n\n");
+        QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Failed",
+                        QConsole::GetColor(QConsole::Colors::EndColor), ": ", part_name_, '\n');
+        QConsole::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
+                        "`\n     Returned: `", value1, "`\n\n");
 
         if (!continue_on_error_) {
             ::exit(1);
@@ -245,11 +157,11 @@ struct QTest {
     QENTEM_NOINLINE static void PrintMemoryRecord() {
         static const auto &storage = MemoryRecord::GetRecord();
 
-        TestOutput::Print("Memory: ", (double(storage.Size) / 1024), " KiB, Peak: ", (double(storage.PeakSize) / 1024),
-                          " KiB.\n");
+        QConsole::Print("Memory: ", (double(storage.Size) / 1024), " KiB, Peak: ", (double(storage.PeakSize) / 1024),
+                        " KiB.\n");
 
-        TestOutput::Print("Reserves: ", storage.Reserved, ", Releases: ", storage.Released, ".\n");
-        TestOutput::Print("Kept Pages: ", storage.Pages, ", Sum: ", (double(storage.PagesSumSize) / 1024), " KiB.\n");
+        QConsole::Print("Reserves: ", storage.Reserved, ", Releases: ", storage.Released, ".\n");
+        QConsole::Print("Kept Pages: ", storage.Pages, ", Sum: ", (double(storage.PagesSumSize) / 1024), " KiB.\n");
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
@@ -259,54 +171,54 @@ struct QTest {
         const SystemIntType remaining_allocations = (storage.Reserved - storage.Released);
 
         if (remaining_allocations != 0) {
-            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Leak detected",
-                              TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", remaining_allocations,
-                              " remaining Allocations.\n\n");
+            QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Leak detected",
+                            QConsole::GetColor(QConsole::Colors::EndColor), ": ", remaining_allocations,
+                            " remaining Allocations.\n\n");
         }
     }
 
     QENTEM_NOINLINE static void PrintInfo(bool template_engine_info = true) {
-        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TitleColor), "Configurations",
-                          TestOutput::GetColor(TestOutput::Colors::EndColor), ":\n");
+        QConsole::Print(QConsole::GetColor(QConsole::Colors::TitleColor), "Configurations",
+                        QConsole::GetColor(QConsole::Colors::EndColor), ":\n");
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
-            TestOutput::Print("Arch: 64-bit\n");
+            QConsole::Print("Arch: 64-bit\n");
         } else {
-            TestOutput::Print("Arch: 32-bit\n");
+            QConsole::Print("Arch: 32-bit\n");
         }
 
-        TestOutput::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
+        QConsole::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::IsBigEndian) {
-            TestOutput::Print("Endianness: Big-Endian\n");
+            QConsole::Print("Endianness: Big-Endian\n");
         } else {
-            TestOutput::Print("Endianness: Little-Endian\n");
+            QConsole::Print("Endianness: Little-Endian\n");
         }
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-        TestOutput::Print("Advanced Vector Extensions: On\n");
+        QConsole::Print("Advanced Vector Extensions: On\n");
 #endif
 
 #if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-        TestOutput::Print("Streaming SIMD Extensions 2: On\n");
+        QConsole::Print("Streaming SIMD Extensions 2: On\n");
 #endif
 
 #if defined(QENTEM_MSIMD128) && (QENTEM_MSIMD128 == 1)
-        TestOutput::Print("WASM SIMD128: On\n");
+        QConsole::Print("WASM SIMD128: On\n");
 #endif
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::AutoEscapeHTML) {
             if (template_engine_info) {
-                TestOutput::Print("Auto Escape HTML: On\n");
+                QConsole::Print("Auto Escape HTML: On\n");
             }
         }
 
-        TestOutput::Print('\n');
+        QConsole::Print('\n');
     }
 
   private:
     QENTEM_NOINLINE void afterTest(bool test_for_leaks) {
         if (!error_) {
-            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::PassColor), "Pass",
-                              TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", part_name_, '\n');
+            QConsole::Print(QConsole::GetColor(QConsole::Colors::PassColor), "Pass",
+                            QConsole::GetColor(QConsole::Colors::EndColor), ": ", part_name_, '\n');
         }
 
         if (test_for_leaks) {
@@ -314,9 +226,9 @@ struct QTest {
             MemoryRecord::EraseSubMemoryRecord();
 
             if (remaining_allocations != 0) {
-                TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Leak detected",
-                                  TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", remaining_allocations,
-                                  " remaining allocations.\n");
+                QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Leak detected",
+                                QConsole::GetColor(QConsole::Colors::EndColor), ": ", remaining_allocations,
+                                " remaining allocations.\n");
             }
         }
     }

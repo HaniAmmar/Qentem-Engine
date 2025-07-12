@@ -48,41 +48,39 @@ namespace Test {
 
 static int PrintResult(int passed, int failed) {
     if (failed == 0) {
-        TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::PassColor), "All good. (", passed, ") tests",
-                          TestOutput::GetColor(TestOutput::Colors::EndColor), "\n\n");
+        QConsole::Print(QConsole::GetColor(QConsole::Colors::PassColor), "All good. (", passed, ") tests",
+                        QConsole::GetColor(QConsole::Colors::EndColor), "\n\n");
         return 0;
     }
 
-    TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Not good!",
-                      TestOutput::GetColor(TestOutput::Colors::EndColor), " ", failed, " out of ", (passed + failed),
-                      " failed.\n\n");
+    QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Not good!",
+                    QConsole::GetColor(QConsole::Colors::EndColor), " ", failed, " out of ", (passed + failed),
+                    " failed.\n\n");
 
     return 1;
 }
 
 QENTEM_MAYBE_UNUSED
 static void SelfTestLeak(QTest &test, char *&ptr) {
-    ptr        = QAllocator::Allocate<char>(8U);
     char *nptr = nullptr;
 
     test.IsTrue(false, 1);
     test.IsFalse(true, 2);
-    test.IsNull(ptr, 2);
     test.IsNotNull(nptr, 1);
     test.IsEqual(true, false, 4);
     test.IsNotEqual(true, true, 5);
     test.IsNotEqual(u'a', u'a', 7);
     test.IsNotEqual(U'a', U'a', 6);
 
-    TestOutput::Print(u"a");
-    TestOutput::Print(U"a");
+    QConsole::Print(u"a");
+    QConsole::Print(U"a");
 }
 
 QENTEM_MAYBE_UNUSED
 static void SelfTest() {
-    TestOutput::DisableOutput();
+    QConsole::DisableOutput();
 
-    const bool is_colored = TestOutput::IsColored();
+    const bool is_colored = QConsole::IsColored();
 
     QTest test{"Test.hpp", __FILE__};
 
@@ -90,10 +88,9 @@ static void SelfTest() {
 
     char *ptr = nullptr;
     test.Test("SelfTestLeak", SelfTestLeak, true, ptr);
-    Qentem::MemoryRecord::PrintMemoryStatus();
-    QAllocator::Deallocate(ptr);
-    MemoryRecord::ResetSubMemoryRecord();
-    TestOutput::IsColored() = false;
+    QTest::PrintMemoryStatus();
+    MemoryRecord::EraseSubMemoryRecord();
+    QConsole::IsColored() = false;
 
     test.EndTests();
 
@@ -102,31 +99,31 @@ static void SelfTest() {
         // const wchar_t *failed_message = L"Not good! 5 out of 15 failed.\n";
     }
 
-    TestOutput::IsColored() = is_colored;
-    TestOutput::EnableOutput();
-    TestOutput::GetStreamCache().Clear();
+    QConsole::IsColored() = is_colored;
+    QConsole::EnableOutput();
+    QConsole::GetStreamCache().Clear();
 }
 
 static int RunTests() {
     int passed = 0;
     int failed = 0;
 
-    ((Qentem::Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunArrayTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunDequeTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunBigIntTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunDigitTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunHArrayTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunUnicodeTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunJSONUtilsTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunEvaluateTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunTemplateUTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
+    ((Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
+    ((Test::RunStringTests() == 0) ? ++passed : ++failed);
+    ((Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
+    ((Test::RunArrayTests() == 0) ? ++passed : ++failed);
+    ((Test::RunDequeTests() == 0) ? ++passed : ++failed);
+    ((Test::RunBigIntTests() == 0) ? ++passed : ++failed);
+    ((Test::RunDigitTests() == 0) ? ++passed : ++failed);
+    ((Test::RunHArrayTests() == 0) ? ++passed : ++failed);
+    ((Test::RunUnicodeTests() == 0) ? ++passed : ++failed);
+    ((Test::RunJSONUtilsTests() == 0) ? ++passed : ++failed);
+    ((Test::RunValueTests() == 0) ? ++passed : ++failed);
+    ((Test::RunJSONTests() == 0) ? ++passed : ++failed);
+    ((Test::RunEvaluateTests() == 0) ? ++passed : ++failed);
+    ((Test::RunTemplateTests() == 0) ? ++passed : ++failed);
+    ((Test::RunTemplateUTests() == 0) ? ++passed : ++failed);
+    ((Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
 
     return PrintResult(passed, failed);
 }
