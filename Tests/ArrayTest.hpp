@@ -200,13 +200,14 @@ static void TestArray1(QTest &test) {
     test.IsNotNull(numbers2.First(), __LINE__);
     test.IsEqual(numbers2.First(), storage, __LINE__);
 
-    SizeT *tmp = numbers2.Detach();
+    const SizeT tmp_size = numbers2.Size();
+    const SizeT tmp_cap  = numbers2.Capacity();
+    SizeT      *tmp      = numbers2.Detach();
     test.IsEqual(numbers2.Size(), 0U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 0U, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
     test.IsEqual(tmp, storage, __LINE__);
-
-    QAllocator::Deallocate(tmp);
+    numbers2.Adopt(tmp, tmp_size, tmp_cap);
 }
 
 static void TestArray2(QTest &test) {
