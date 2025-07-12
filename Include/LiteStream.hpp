@@ -34,12 +34,12 @@ struct LiteStream {
 
     explicit LiteStream(SizeT32 capacity) {
         if (capacity != 0) {
-            allocate(capacity);
+            reserve(capacity);
         }
     }
 
     ~LiteStream() {
-        deallocate(storage_, capacity_);
+        release(storage_, capacity_);
     }
 
     void Write(char ch) {
@@ -151,7 +151,7 @@ struct LiteStream {
                 data[index] = ch;
                 length_     = new_length;
             } else {
-                char *new_storage = static_cast<char *>(SystemMemory::Allocate(new_length));
+                char *new_storage = static_cast<char *>(SystemMemory::Reserve(new_length));
 
                 SizeT32 i = 0;
                 while (i < index) {
@@ -167,7 +167,7 @@ struct LiteStream {
                     ++j;
                 }
 
-                deallocate(storage_, capacity_);
+                release(storage_, capacity_);
                 storage_  = new_storage;
                 capacity_ = new_length;
                 length_   = new_length;
@@ -180,7 +180,7 @@ struct LiteStream {
         char         *str          = storage_;
         const SizeT32 old_capacity = capacity_;
 
-        allocate(new_capacity);
+        reserve(new_capacity);
 
         SizeT32 offset = 0;
 
@@ -189,16 +189,16 @@ struct LiteStream {
             ++offset;
         }
 
-        deallocate(str, old_capacity);
+        release(str, old_capacity);
     }
 
-    void deallocate(char *storage, SizeT32 size) {
+    void release(char *storage, SizeT32 size) {
         if (storage != nullptr) {
             SystemMemory::Release(storage, size);
         }
     }
 
-    void allocate(SizeT32 capacity) {
+    void reserve(SizeT32 capacity) {
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
         const SizeT32 page_size    = static_cast<SizeT32>(SystemMemory::PageSize());
         const SizeT32 page_size_m1 = (page_size - 1U);
@@ -212,7 +212,7 @@ struct LiteStream {
         }
 #endif
 
-        storage_  = static_cast<char *>(SystemMemory::Allocate(capacity));
+        storage_  = static_cast<char *>(SystemMemory::Reserve(capacity));
         capacity_ = capacity;
     }
 

@@ -107,35 +107,35 @@ struct SystemMemory {
     }
 
     /**
-     * @brief Allocates page-aligned memory suitable for general-purpose use.
+     * @brief Reserves page-aligned memory suitable for general-purpose use.
      *
      * The returned memory is readable and writable and does not include guard pages.
      *
-     * @param size Number of bytes to allocate. Should be a multiple of the system page size.
+     * @param size Number of bytes to reserve. Should be a multiple of the system page size.
      * @return Pointer to memory on success, or nullptr on failure.
      */
-    static void *Allocate(SystemIntType size) noexcept {
-        return allocate<false>(size);
+    static void *Reserve(SystemIntType size) noexcept {
+        return reserve<false>(size);
     }
 
     /**
-     * @brief Allocates page-aligned memory intended for use as a stack.
+     * @brief Reserves page-aligned memory intended for use as a stack.
      *
      * On Linux, this enables the MAP_STACK flag (if available) to inform the kernel
      * that the memory will be used as a downward-growing stack. No guard page is applied.
      *
-     * @param size Number of bytes to allocate. Should be a multiple of the system page size.
+     * @param size Number of bytes to reserve. Should be a multiple of the system page size.
      * @return Pointer to memory on success, or nullptr on failure.
      */
-    static void *AllocateStack(SystemIntType size) noexcept {
-        return allocate<true>(size);
+    static void *ReserveStack(SystemIntType size) noexcept {
+        return reserve<true>(size);
     }
 
     /**
-     * @brief Release memory previously allocated with Allocate().
+     * @brief Release memory previously acquired with Reserve().
      *
-     * @param ptr  Pointer returned by Allocate().
-     * @param size Size in bytes (same value passed to Allocate).
+     * @param ptr  Pointer returned by Reserve().
+     * @param size Size in bytes (same value passed to Reserve).
      */
     static void Release(void *ptr, SystemIntType size) noexcept {
 #if defined(_WIN32)
@@ -151,7 +151,7 @@ struct SystemMemory {
     }
 
     /**
-     * @brief Releases a range of memory pages previously allocated by Allocate().
+     * @brief Releases a range of memory pages previously reserved by Reserve().
      *
      * Depending on the platform and policy, this may either unmap the memory entirely
      * (via munmap) or mark it as discardable (via madvise). Use this only for page-aligned,
@@ -187,11 +187,11 @@ struct SystemMemory {
      * optionally including stack-specific flags (e.g., MAP_STACK on Linux).
      *
      * @tparam IS_STACK_MEMORY_T If true, marks the memory as stack-eligible where supported.
-     * @param size Number of bytes to allocate. Should be a multiple of the system page size.
-     * @return Pointer to allocated memory, or nullptr on failure.
+     * @param size Number of bytes to reserve. Should be a multiple of the system page size.
+     * @return Pointer to reserved memory, or nullptr on failure.
      */
     template <bool IS_STACK_MEMORY_T>
-    static void *allocate(SystemIntType size) noexcept {
+    static void *reserve(SystemIntType size) noexcept {
 #if defined(_WIN32)
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 #elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
