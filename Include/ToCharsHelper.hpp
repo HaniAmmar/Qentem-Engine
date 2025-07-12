@@ -250,7 +250,7 @@ struct ToCharsHelper {
     template <typename Stream_T>
     struct Writer<Stream_T, float> {
         static void Write(Stream_T &stream, float number) {
-            Digit::NumberToString(stream, number, {3, Digit::RealFormatType::SemiFixed});
+            Digit::NumberToString(stream, number, {2, Digit::RealFormatType::SemiFixed});
         }
 
         static void Write(Stream_T &stream, const float *number) {
@@ -261,7 +261,7 @@ struct ToCharsHelper {
     template <typename Stream_T>
     struct Writer<Stream_T, double> {
         static void Write(Stream_T &stream, double number) {
-            Digit::NumberToString(stream, number, {3, Digit::RealFormatType::SemiFixed});
+            Digit::NumberToString(stream, number, {2, Digit::RealFormatType::SemiFixed});
         }
 
         static void Write(Stream_T &stream, const double *number) {
