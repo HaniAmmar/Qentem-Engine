@@ -3,7 +3,7 @@
 int main() {
     Qentem::QTest::PrintInfo();
     const int ret = Qentem::Test::RunUnicodeTests();
-    Qentem::MemoryRecord::PrintMemoryStatus();
+    Qentem::QTest::PrintMemoryStatus();
 
     return ret;
 }
