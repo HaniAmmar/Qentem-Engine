@@ -3,7 +3,11 @@
 #ifndef QENTEM_CONSOLE_H
 #define QENTEM_CONSOLE_H
 
-#include <stdio.h>
+#if defined(_WIN32)
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 
 #include "ToCharsHelper.hpp"
 #include "LiteStream.hpp"
@@ -20,7 +24,7 @@ struct QConsole {
 
     enum struct Colors : SizeT8 { TitleColor, ErrorColor, PassColor, EndColor };
 
-    static bool &IsColored() noexcept {
+    QENTEM_NOINLINE static bool &IsColored() noexcept {
         static bool isColored{true};
 
         return isColored;
@@ -44,50 +48,75 @@ struct QConsole {
     }
 
     template <typename... Values_T>
-    inline static void Print(const Values_T &...values) {
+    QENTEM_NOINLINE static void Print(const Values_T &...values) {
         LiteStream &ss = GetStreamCache();
         ToCharsHelper::Write(ss, values...);
 
         if (IsOutputEnabled()) {
-            fwrite(ss.First(), 1, ss.Length(), stdout);
+            // fwrite(ss.First(), 1, ss.Length(), stdout);
+            if (ss.Length() >= SizeT{512}) {
+                RawWrite(ss.First(), ss.Length());
+                ss.Clear();
+            }
+        }
+    }
+
+    QENTEM_NOINLINE static void Flush() noexcept {
+        LiteStream &ss = GetStreamCache();
+
+        if (ss.Length() != 0) {
+            RawWrite(ss.First(), ss.Length());
             ss.Clear();
         }
     }
 
-    static void Flush() noexcept {
-        fflush(stdout);
-    }
-
-    static void Clear() noexcept {
+    QENTEM_NOINLINE static void Clear() noexcept {
         GetStreamCache().Clear();
     }
 
-    static void DisableOutput() noexcept {
+    QENTEM_NOINLINE static void DisableOutput() noexcept {
         getOutputEnabledRef() = false;
     }
 
-    static void EnableOutput() noexcept {
+    QENTEM_NOINLINE static void EnableOutput() noexcept {
         getOutputEnabledRef() = true;
     }
 
-    static bool IsOutputEnabled() noexcept {
+    QENTEM_NOINLINE static bool IsOutputEnabled() noexcept {
         return getOutputEnabledRef();
     }
 
-    // static void SetDoubleFormat() noexcept {
+    // QENTEM_NOINLINE static void SetDoubleFormat() noexcept {
     // }
 
-    // static void ResetDoubleFormat() noexcept {
+    // QENTEM_NOINLINE static void ResetDoubleFormat() noexcept {
     // }
 
-    static LiteStream &GetStreamCache() noexcept {
+    QENTEM_NOINLINE static void RawWrite(const char *data, unsigned length) noexcept {
+#if defined(_WIN32)
+        DWORD written = 0;
+        ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), data, length, &written, nullptr);
+#else
+        ::write(1, data, length); // stdout
+#endif
+    }
+
+    QENTEM_NOINLINE static LiteStream &GetStreamCache() noexcept {
         static LiteStream ss{32};
+
+        struct OnExit {
+            ~OnExit() {
+                Flush(); // Now safe
+            }
+        };
+
+        static OnExit oe;
 
         return ss;
     }
 
   private:
-    static bool &getOutputEnabledRef() noexcept {
+    QENTEM_NOINLINE static bool &getOutputEnabledRef() noexcept {
         static bool enable_output_ = true;
 
         return enable_output_;

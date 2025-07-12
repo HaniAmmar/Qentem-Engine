@@ -143,6 +143,8 @@ struct QTest {
         QConsole::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
                         "`\n     Returned: `", value1, "`\n\n");
 
+        QConsole::Flush();
+
         if (!continue_on_error_) {
             terminate();
         }
