@@ -165,9 +165,10 @@ static void TestStringStream1(QTest &test) {
     ss2.Write("bcdef", SizeT{1});
     ss2.Write("cdef", SizeT{1});
 
+    // const SizeT e_str_len = ss2.Length();
     char      *e_str    = ss2.Detach();
     const bool is_equal = StringUtils::IsEqual(e_str, "abc", SizeT{3});
-    QAllocator::Deallocate(e_str);
+    QAllocator::Deallocate(e_str /*, e_str_len*/);
 
     test.IsTrue(is_equal, __LINE__);
 

@@ -15,8 +15,8 @@
 #ifndef QENTEM_STRING_H
 #define QENTEM_STRING_H
 
+#include "StringView.hpp"
 #include "QAllocator.hpp"
-#include "StringUtils.hpp"
 
 namespace Qentem {
 /*
@@ -240,20 +240,20 @@ struct String {
 
     void Write(const Char_T *str, const SizeT length) {
         if ((str != nullptr) && (length != 0)) {
-            const SizeT src_len = Length();
-            SizeT       new_len = (src_len + length + SizeT{1});
-            Char_T     *src     = Storage();
-            Char_T     *ns      = allocate(new_len);
+            const SizeT old_length  = Length();
+            SizeT       new_len     = (old_length + length + SizeT{1});
+            Char_T     *old_storage = Storage();
+            Char_T     *ns          = allocate(new_len);
 
-            MemoryUtils::CopyTo((ns + src_len), str, length);
+            MemoryUtils::CopyTo((ns + old_length), str, length);
 
             --new_len;
             ns[new_len] = Char_T{0};
             setLength(new_len);
 
-            if (src != nullptr) {
-                MemoryUtils::CopyTo(ns, src, src_len);
-                QAllocator::Deallocate(src);
+            if (old_storage != nullptr) {
+                MemoryUtils::CopyTo(ns, old_storage, old_length);
+                QAllocator::Deallocate(old_storage /*, old_length + SizeT{1}*/);
             }
         }
     }
@@ -298,7 +298,8 @@ struct String {
             }
 
             // Clean up old storage and set new storage/capacity
-            QAllocator::Deallocate(Storage());
+            QAllocator::Deallocate(Storage() /*, Length() + SizeT{1}*/);
+
             setStorage(new_storage);
             setLength(new_length);
         }
@@ -402,7 +403,7 @@ struct String {
     }
 
     void deallocate() noexcept {
-        QAllocator::Deallocate(Storage());
+        QAllocator::Deallocate(Storage() /*, Length() + SizeT{1}*/);
     }
 
     void clearStorage() noexcept {
@@ -447,6 +448,7 @@ struct String {
     }
 
     Char_T *storage_{nullptr};
+    SizeT   capacity_{0};
     SizeT   length_{0};
 };
 
