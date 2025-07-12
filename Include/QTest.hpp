@@ -14,7 +14,13 @@
 
 #ifndef QENTEM_ENABLE_MEMORY_RECORD_H
 #define QENTEM_ENABLE_MEMORY_RECORD_H
-#include <cstdlib>
+#endif
+
+#if defined(_WIN32)
+#include <windows.h>
+#else
+#include <signal.h>
+#include <unistd.h>
 #endif
 
 #ifndef QENTEM_Q_TEST_H
@@ -138,7 +144,7 @@ struct QTest {
                         "`\n     Returned: `", value1, "`\n\n");
 
         if (!continue_on_error_) {
-            ::exit(1);
+            terminate();
         }
     }
 
@@ -231,6 +237,16 @@ struct QTest {
                                 " remaining allocations.\n");
             }
         }
+    }
+
+    [[noreturn]] QENTEM_INLINE void terminate() noexcept {
+#if defined(_WIN32)
+        ::ExitProcess(1); // Native Windows termination
+#else
+        _exit(1);         // POSIX immediate termination (no cleanup)
+        __builtin_trap(); // Should never reach; added as safeguard
+#endif
+        __builtin_unreachable(); // Declares unreachable for compilers/optimizers
     }
 
     const char *part_name_{nullptr};
