@@ -12,22 +12,20 @@
  * @copyright MIT License
  */
 
+#ifndef QENTEM_ENABLE_MEMORY_RECORD_H
+#define QENTEM_ENABLE_MEMORY_RECORD_H
+#endif
+
 #ifndef QENTEM_Q_TEST_H
 #define QENTEM_Q_TEST_H
 
 #include "ToCharsHelper.hpp"
 #include "LiteStream.hpp"
 
+#include "MemoryRecord.hpp"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-#if defined(__APPLE__)
-#include <malloc/malloc.h>
-#elif defined(__FreeBSD__)
-#include <malloc_np.h>
-#else
-#include <malloc.h>
-#endif
 
 #ifndef QENTEM_ALLOCATE
 #if defined(_MSC_VER)
@@ -127,115 +125,6 @@ struct TestOutput {
         static bool enable_output_ = true;
 
         return enable_output_;
-    }
-};
-
-struct MemoryRecordData {
-    SizeT         allocations{0};
-    SizeT         deallocations{0};
-    SizeT         subAllocations{0};
-    SizeT         subDeallocations{0};
-    SystemIntType remainingSize{0};
-    SystemIntType peakSize{0};
-};
-
-struct MemoryRecord {
-    MemoryRecord()                                = delete;
-    ~MemoryRecord()                               = delete;
-    MemoryRecord(MemoryRecord &&)                 = delete;
-    MemoryRecord(const MemoryRecord &)            = delete;
-    MemoryRecord &operator=(MemoryRecord &&)      = delete;
-    MemoryRecord &operator=(const MemoryRecord &) = delete;
-
-    inline static void ResetMemoryRecord() noexcept {
-        GetRecord() = MemoryRecordData{};
-    }
-
-    inline static void ResetSubMemoryRecord() noexcept {
-        static MemoryRecordData &storage = GetRecord();
-
-        storage.subAllocations   = 0;
-        storage.subDeallocations = 0;
-    }
-
-    inline static SizeT CheckSubAllocationCount() noexcept {
-        static const MemoryRecordData &storage = GetRecord();
-
-        return (storage.subAllocations - storage.subDeallocations);
-    }
-
-    inline static void AddAllocation(void *pointer) noexcept {
-        static MemoryRecordData &storage = GetRecord();
-
-        ++(storage.allocations);
-        ++(storage.subAllocations);
-
-#if defined(_WIN32) || defined(_M_X64)
-        storage.remainingSize += _msize(pointer);
-#elif defined(__APPLE__)
-        storage.remainingSize += malloc_size(pointer);
-#else
-        storage.remainingSize += malloc_usable_size(pointer);
-#endif
-
-        if (storage.remainingSize > storage.peakSize) {
-            storage.peakSize = storage.remainingSize;
-        }
-    }
-
-    QENTEM_NOINLINE static void RemoveAllocation(void *pointer) noexcept {
-        static MemoryRecordData &storage = GetRecord();
-
-        ++(storage.deallocations);
-        ++(storage.subDeallocations);
-
-#if defined(_WIN32) || defined(_M_X64)
-        storage.remainingSize -= _msize(pointer);
-#elif defined(__APPLE__)
-        storage.remainingSize -= malloc_size(pointer);
-#else
-        storage.remainingSize -= malloc_usable_size(pointer);
-#endif
-    }
-
-    QENTEM_NOINLINE static void PrintMemoryStatus() {
-        static const MemoryRecordData &storage = GetRecord();
-
-        // TestOutput::SetDoubleFormat();
-
-        TestOutput::Print("Memory: ", (double(storage.remainingSize) / 1024),
-                          " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
-
-        TestOutput::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
-
-        const SizeT remaining_allocations = (storage.allocations - storage.deallocations);
-
-        if (remaining_allocations != 0) {
-            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Leak detected",
-                              TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", remaining_allocations,
-                              " remaining allocations.\n\n");
-        }
-
-        // TestOutput::ResetDoubleFormat();
-    }
-
-    QENTEM_NOINLINE static void PrintMemoryRecord() {
-        static const MemoryRecordData &storage = GetRecord();
-
-        // TestOutput::SetDoubleFormat();
-
-        TestOutput::Print("Memory: ", (double(storage.remainingSize) / 1024),
-                          " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
-
-        TestOutput::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
-
-        // TestOutput::ResetDoubleFormat();
-    }
-
-    static MemoryRecordData &GetRecord() noexcept {
-        static MemoryRecordData data{};
-
-        return data;
     }
 };
 
@@ -353,6 +242,29 @@ struct QTest {
         return continue_on_error_;
     }
 
+    QENTEM_NOINLINE static void PrintMemoryRecord() {
+        static const auto &storage = MemoryRecord::GetRecord();
+
+        TestOutput::Print("Memory: ", (double(storage.Size) / 1024), " KiB, Peak: ", (double(storage.PeakSize) / 1024),
+                          " KiB.\n");
+
+        TestOutput::Print("Reserves: ", storage.Reserved, ", Releases: ", storage.Released, ".\n");
+        TestOutput::Print("Kept Pages: ", storage.Pages, ", Sum: ", (double(storage.PagesSumSize) / 1024), " KiB.\n");
+    }
+
+    QENTEM_NOINLINE static void PrintMemoryStatus() {
+        static const auto &storage = MemoryRecord::GetRecord();
+        PrintMemoryRecord();
+
+        const SystemIntType remaining_allocations = (storage.Reserved - storage.Released);
+
+        if (remaining_allocations != 0) {
+            TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Leak detected",
+                              TestOutput::GetColor(TestOutput::Colors::EndColor), ": ", remaining_allocations,
+                              " remaining Allocations.\n\n");
+        }
+    }
+
     QENTEM_NOINLINE static void PrintInfo(bool template_engine_info = true) {
         TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::TitleColor), "Configurations",
                           TestOutput::GetColor(TestOutput::Colors::EndColor), ":\n");
@@ -398,8 +310,8 @@ struct QTest {
         }
 
         if (test_for_leaks) {
-            const SizeT remaining_allocations = MemoryRecord::CheckSubAllocationCount();
-            MemoryRecord::ResetSubMemoryRecord();
+            const SystemIntType remaining_allocations = MemoryRecord::CheckSubRecord();
+            MemoryRecord::EraseSubMemoryRecord();
 
             if (remaining_allocations != 0) {
                 TestOutput::Print(TestOutput::GetColor(TestOutput::Colors::ErrorColor), "Leak detected",

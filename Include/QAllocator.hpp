@@ -42,22 +42,11 @@ struct QAllocator {
 
     template <typename Type_T>
     inline static Type_T *Allocate(SizeT size) {
-        Type_T *pointer = static_cast<Type_T *>(QENTEM_ALLOCATE(SystemIntType(size * sizeof(Type_T))));
-
-#ifdef QENTEM_Q_TEST_H
-        MemoryRecord::AddAllocation(pointer);
-#endif
-        return pointer;
+        return static_cast<Type_T *>(QENTEM_ALLOCATE(SystemIntType(size * sizeof(Type_T))));
     }
 
     template <typename Type_T>
     inline static void Deallocate(Type_T *pointer) noexcept {
-#ifdef QENTEM_Q_TEST_H
-        if (pointer != nullptr) {
-            MemoryRecord::RemoveAllocation(pointer);
-        }
-#endif
-
         QENTEM_DEALLOCATE(pointer);
     }
 
@@ -93,9 +82,6 @@ struct QAllocator {
 
         void *raw = QENTEM_RAW_ALLOCATE((sizeof(Type_T) * count) + padding);
 
-#ifdef QENTEM_Q_TEST_H
-        MemoryRecord::AddAllocation(raw);
-#endif
         void *aligned = reinterpret_cast<void *>((reinterpret_cast<SystemIntType>(raw) + sizeof(void *) + alignment) &
                                                  ~(alignment));
 
@@ -105,11 +91,7 @@ struct QAllocator {
 
     inline static void DeallocateAligned(void *ptr) noexcept {
         if (ptr != nullptr) {
-            void *raw = (static_cast<void **>(ptr))[-1];
-#ifdef QENTEM_Q_TEST_H
-            MemoryRecord::RemoveAllocation(raw);
-#endif
-            QENTEM_RAW_DEALLOCATE(raw);
+            QENTEM_RAW_DEALLOCATE((static_cast<void **>(ptr))[-1]);
         }
     }
 };
