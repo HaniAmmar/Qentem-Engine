@@ -5055,6 +5055,8 @@ static int RunDigitTests() {
     test.Test("FloatToString Test 4", TestFloatToString4, false, stream);
     test.Test("FloatToString Test 5", TestFloatToString5, false, stream);
 
+    stream.Reset();
+
     return test.EndTests();
 }
 
