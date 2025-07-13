@@ -208,12 +208,13 @@ using BFloatT16 = decltype(0.0BF16); // bfloat16_t, requires C++23
 ///////////////////////////////////////////////////////////////
 // clang-format off
 #ifdef QENTEM_DEBUG
-    #define QENTEM_NOINLINE
     #define QENTEM_INLINE
 
     #ifdef _MSC_VER
+        #define QENTEM_NOINLINE
         #define QENTEM_MAYBE_UNUSED
     #else
+        #define QENTEM_NOINLINE __attribute__((noinline))
         #define QENTEM_MAYBE_UNUSED __attribute__((unused))
     #endif
 #else
