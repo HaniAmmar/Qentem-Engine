@@ -12,9 +12,8 @@
  * @copyright MIT License
  */
 
-#ifndef QENTEM_ENABLE_MEMORY_RECORD_H
-#define QENTEM_ENABLE_MEMORY_RECORD_H
-#endif
+#define QENTEM_DEBUG
+#define QENTEM_ENABLE_MEMORY_RECORD
 
 #if defined(_WIN32)
 #include <windows.h>
