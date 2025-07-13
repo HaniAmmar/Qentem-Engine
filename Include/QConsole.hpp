@@ -52,19 +52,16 @@ struct QConsole {
         LiteStream &ss = GetStreamCache();
         ToCharsHelper::Write(ss, values...);
 
-        if (IsOutputEnabled()) {
-            // fwrite(ss.First(), 1, ss.Length(), stdout);
-            if (ss.Length() >= SizeT{512}) {
-                RawWrite(ss.First(), ss.Length());
-                ss.Clear();
-            }
+        if (IsOutputEnabled() && (ss.Length() >= SizeT{512})) {
+            RawWrite(ss.First(), ss.Length());
+            ss.Clear();
         }
     }
 
     QENTEM_NOINLINE static void Flush() noexcept {
         LiteStream &ss = GetStreamCache();
 
-        if (ss.Length() != 0) {
+        if (IsOutputEnabled() && (ss.Length() != 0)) {
             RawWrite(ss.First(), ss.Length());
             ss.Clear();
         }
