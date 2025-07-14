@@ -48,13 +48,14 @@ namespace Test {
 
 static int PrintResult(int passed, int failed) {
     if (failed == 0) {
-        QConsole::Print(QConsole::GetColor(QConsole::Colors::PassColor), "All good. (", passed, ") tests",
-                        QConsole::GetColor(QConsole::Colors::EndColor), "\n\n");
+        QConsole::Print(QConsole::GetColor(QConsole::Color::PassColor), "All good. (", passed, ") tests",
+                        QConsole::GetColor(QConsole::Color::EndColor), "\n\n");
+
         return 0;
     }
 
-    QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Not good!",
-                    QConsole::GetColor(QConsole::Colors::EndColor), " ", failed, " out of ", (passed + failed),
+    QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Not good!",
+                    QConsole::GetColor(QConsole::Color::EndColor), " ", failed, " out of ", (passed + failed),
                     " failed.\n\n");
 
     return 1;

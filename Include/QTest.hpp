@@ -57,15 +57,15 @@ struct QTest {
     }
 
     QENTEM_NOINLINE void PrintGroupName() const {
-        QConsole::Print(QConsole::GetColor(QConsole::Colors::TitleColor), test_name_,
-                        QConsole::GetColor(QConsole::Colors::EndColor), ":\n");
+        QConsole::Print(QConsole::GetColor(QConsole::Color::TitleColor), test_name_,
+                        QConsole::GetColor(QConsole::Color::EndColor), ":\n");
     }
 
     QENTEM_NOINLINE int EndTests() {
         if (!error_) {
-            QConsole::Print(QConsole::GetColor(QConsole::Colors::TitleColor), test_name_,
-                            QConsole::GetColor(QConsole::Colors::PassColor), " Passed all tests",
-                            QConsole::GetColor(QConsole::Colors::EndColor), "\n\n");
+            QConsole::Print(QConsole::GetColor(QConsole::Color::TitleColor), test_name_,
+                            QConsole::GetColor(QConsole::Color::PassColor), " Passed all tests",
+                            QConsole::GetColor(QConsole::Color::EndColor), "\n\n");
             return 0;
         }
 
@@ -137,8 +137,8 @@ struct QTest {
     template <typename Value1_T, typename Value2_T>
     QENTEM_NOINLINE void PrintErrorMessage(bool equal, const Value1_T &value1, const Value2_T &value2,
                                            unsigned long line) {
-        QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Failed",
-                        QConsole::GetColor(QConsole::Colors::EndColor), ": ", part_name_, '\n');
+        QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Failed",
+                        QConsole::GetColor(QConsole::Color::EndColor), ": ", part_name_, '\n');
         QConsole::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
                         "`\n     Returned: `", value1, "`\n\n");
 
@@ -178,15 +178,15 @@ struct QTest {
         const SystemIntType remaining_allocations = (storage.Reserved - storage.Released);
 
         if (remaining_allocations != 0) {
-            QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Leak detected",
-                            QConsole::GetColor(QConsole::Colors::EndColor), ": ", remaining_allocations,
+            QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Leak detected",
+                            QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining_allocations,
                             " remaining Allocations.\n\n");
         }
     }
 
     QENTEM_NOINLINE static void PrintInfo(bool template_engine_info = true) {
-        QConsole::Print(QConsole::GetColor(QConsole::Colors::TitleColor), "Configurations",
-                        QConsole::GetColor(QConsole::Colors::EndColor), ":\n");
+        QConsole::Print(QConsole::GetColor(QConsole::Color::TitleColor), "Configurations",
+                        QConsole::GetColor(QConsole::Color::EndColor), ":\n");
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
             QConsole::Print("Arch: 64-bit\n");
         } else {
@@ -224,8 +224,8 @@ struct QTest {
   private:
     QENTEM_NOINLINE void afterTest(bool test_for_leaks) {
         if (!error_) {
-            QConsole::Print(QConsole::GetColor(QConsole::Colors::PassColor), "Pass",
-                            QConsole::GetColor(QConsole::Colors::EndColor), ": ", part_name_, '\n');
+            QConsole::Print(QConsole::GetColor(QConsole::Color::PassColor), "Pass",
+                            QConsole::GetColor(QConsole::Color::EndColor), ": ", part_name_, '\n');
         }
 
         if (test_for_leaks) {
@@ -233,8 +233,8 @@ struct QTest {
             MemoryRecord::EraseSubMemoryRecord();
 
             if (remaining_allocations != 0) {
-                QConsole::Print(QConsole::GetColor(QConsole::Colors::ErrorColor), "Leak detected",
-                                QConsole::GetColor(QConsole::Colors::EndColor), ": ", remaining_allocations,
+                QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Leak detected",
+                                QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining_allocations,
                                 " remaining allocations.\n");
             }
         }

@@ -4,6 +4,7 @@
 #define QENTEM_CONSOLE_H
 
 #if defined(_WIN32)
+#define NOMINMAX
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -22,7 +23,7 @@ struct QConsole {
     QConsole &operator=(QConsole &&)      = delete;
     QConsole &operator=(const QConsole &) = delete;
 
-    enum struct Colors : SizeT8 { TitleColor, ErrorColor, PassColor, EndColor };
+    enum struct Color : SizeT8 { TitleColor, ErrorColor, PassColor, EndColor };
 
     QENTEM_NOINLINE static bool &IsColored() noexcept {
         static bool isColored{true};
@@ -30,16 +31,16 @@ struct QConsole {
         return isColored;
     }
 
-    QENTEM_NOINLINE static const char *GetColor(Colors color) noexcept {
+    QENTEM_NOINLINE static const char *GetColor(Color color) noexcept {
         if (IsColored()) {
             switch (color) {
-                case Colors::TitleColor:
+                case Color::TitleColor:
                     return "\x1B[36m";
-                case Colors::ErrorColor:
+                case Color::ErrorColor:
                     return "\x1B[31m";
-                case Colors::PassColor:
+                case Color::PassColor:
                     return "\x1B[32m";
-                case Colors::EndColor:
+                case Color::EndColor:
                     return "\x1B[0m";
             }
         }
