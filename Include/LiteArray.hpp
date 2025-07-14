@@ -42,6 +42,11 @@ struct LiteArray {
 
     QENTEM_INLINE LiteArray(LiteArray &&src) noexcept
         : storage_{src.storage_}, size_{src.size_}, capacity_{src.capacity_} {
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+        raw_storage_     = src.raw_storage_;
+        src.raw_storage_ = nullptr;
+#endif
+
         src.storage_  = nullptr;
         src.size_     = 0;
         src.capacity_ = 0;
@@ -49,6 +54,11 @@ struct LiteArray {
 
     QENTEM_INLINE LiteArray &operator=(LiteArray &&src) noexcept {
         if (this != &src) {
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+            void *old_raw_storage = raw_storage_;
+            raw_storage_          = src.raw_storage_;
+            src.raw_storage_      = nullptr;
+#endif
             Type_T     *old_storage  = storage_;
             const SizeT old_size     = size_;
             const SizeT old_capacity = capacity_;
@@ -65,9 +75,9 @@ struct LiteArray {
                 // Just in case the copied array is not a child array, do this last.
                 MemoryUtils::Dispose(old_storage, (old_storage + old_size));
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-                SystemMemory::Release(raw_storage_, old_capacity);
+                release(old_raw_storage, old_capacity);
 #else
-                SystemMemory::Release(old_storage, old_capacity);
+                release(old_storage, old_capacity);
 #endif
             }
         }
@@ -78,19 +88,18 @@ struct LiteArray {
     QENTEM_INLINE ~LiteArray() {
         if (storage_ != nullptr) {
             MemoryUtils::Dispose(storage_, End());
-            SystemMemory::Release(storage_, capacity_);
+
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+            release(raw_storage_, capacity_);
+#else
+            release(storage_, capacity_);
+#endif
         }
     }
 
     QENTEM_INLINE void operator+=(Type_T &&item) {
         if (size_ == capacity_) {
-            if (capacity_ == 0) {
-                capacity_ = SizeT{1};
-            } else {
-                capacity_ *= SizeT{2};
-            }
-
-            expand(capacity_);
+            expand((capacity_ != 0) ? (capacity_ * SizeT{2}) : SizeT{1});
         }
 
         MemoryUtils::Initialize((storage_ + size_), QUtility::Move(item));
@@ -126,10 +135,11 @@ struct LiteArray {
     QENTEM_INLINE void Reset() noexcept {
         if (storage_ != nullptr) {
             MemoryUtils::Dispose(storage_, End());
+
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-            SystemMemory::Release(raw_storage_, capacity_);
+            release(raw_storage_, capacity_);
 #else
-            SystemMemory::Release(storage_, capacity_);
+            release(storage_, capacity_);
 #endif
         }
 
@@ -201,7 +211,12 @@ struct LiteArray {
 
   private:
     QENTEM_INLINE void expand(SizeT new_capacity) {
-        Type_T     *old_storage  = storage_;
+        Type_T *old_storage = storage_;
+
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+        void *old_raw_storage = raw_storage_;
+#endif
+
         const SizeT old_capacity = Capacity();
 
         reserve(new_capacity);
@@ -209,9 +224,9 @@ struct LiteArray {
         if (old_storage != nullptr) {
             MemoryUtils::CopyTo(storage_, old_storage, size_);
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-            SystemMemory::Release(raw_storage_, old_capacity);
+            release(old_raw_storage, old_capacity);
 #else
-            SystemMemory::Release(old_storage, old_capacity);
+            release(old_storage, old_capacity);
 #endif
         }
     }
@@ -219,7 +234,7 @@ struct LiteArray {
     /**
      * @brief Reserves raw memory for element storage, rounded to page size.
      *
-     * This performs allocation in **bytes**, but stores capacity as number of elements.
+     * This reserves in **bytes**, but stores capacity as number of elements.
      * Ensures proper alignment and page efficiency.
      */
     QENTEM_INLINE void reserve(SizeT capacity) {
@@ -241,11 +256,15 @@ struct LiteArray {
 #else
         raw_storage_                        = SystemMemory::Reserve(capacity_bytes + 63U);
         const SystemIntType raw_address     = reinterpret_cast<SystemIntType>(raw_storage_);
-        const SystemIntType aligned_address = ((raw_address + SizeT32{63}) & ~SizeT32{63});
+        const SystemIntType aligned_address = ((raw_address + SystemIntType{63}) & ~SystemIntType{63});
         storage_                            = reinterpret_cast<Type_T *>(aligned_address);
 #endif
 
         capacity_ = (capacity_bytes / sizeof(Type_T));
+    }
+
+    static void release(void *storage, SizeT capacity) {
+        SystemMemory::Release(storage, (capacity * sizeof(Type_T)));
     }
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
