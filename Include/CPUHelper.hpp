@@ -18,6 +18,7 @@
 #include "QCommon.hpp" // Defines SizeT32 and other basic types
 
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h> // GetSystemInfo
 #else
 #include <sched.h>  // sched_setaffinity
