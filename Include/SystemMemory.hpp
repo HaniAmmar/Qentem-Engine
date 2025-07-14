@@ -23,28 +23,35 @@
 
 // clang-format off
 #if defined(_WIN32)
+    // Prevent <windows.h> from defining min/max macros that interfere with standard headers
     #define NOMINMAX
     #include <windows.h>
 
-#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || \
+      defined(__NetBSD__) || defined(__OpenBSD__)
+    // POSIX-style platforms: mmap, sysconf, etc.
     #include <sys/mman.h>
     #include <unistd.h>
 
     #if defined(__linux__)
+        // MAP_STACK was added in Linux 2.6.27; define manually if missing
         #if !defined(MAP_STACK)
             #define QENTEM_LINUX_MAP_STACK 0x20000
         #else
             #define QENTEM_LINUX_MAP_STACK MAP_STACK
         #endif
     #else
-        #define QENTEM_LINUX_MAP_STACK 0 // No-op for non-Linux
+        // Non-Linux POSIX platforms don’t use MAP_STACK
+        #define QENTEM_LINUX_MAP_STACK 0
     #endif
-#else
-    // Unknown or freestanding platform — enable malloc fallback
+
+#elif !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+    // Unknown, unsupported, or freestanding platform — fallback to malloc
     #define QENTEM_SYSTEM_MEMORY_FALLBACK 1
 #endif
 
 #ifndef QENTEM_FALLBACK_SYSTEM_PAGE_SIZE
+    /// Fallback page size (4KiB) used if system page size cannot be queried.
     #define QENTEM_FALLBACK_SYSTEM_PAGE_SIZE 4096
 #endif
 // clang-format on
@@ -65,22 +72,24 @@ struct SystemMemory {
      */
     static SystemIntType PageSize() noexcept {
         // clang-format off
-        #if defined(_WIN32)
-        SYSTEM_INFO info;
-        GetSystemInfo(&info);
-        static const SystemIntType page_size = static_cast<SystemIntType>(info.dwPageSize);
-        #elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
-                static const SystemIntType page_size = static_cast<SystemIntType>(::sysconf(
-            #if defined(_SC_PAGESIZE)
-                        _SC_PAGESIZE
-            #else
-                        _SC_PAGE_SIZE
-            #endif
-                    ));
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+    #if defined(_WIN32)
+            SYSTEM_INFO info;
+            GetSystemInfo(&info);
+            static const SystemIntType page_size = static_cast<SystemIntType>(info.dwPageSize);
+    #else
+            static const SystemIntType page_size = static_cast<SystemIntType>(::sysconf(
+        #if defined(_SC_PAGESIZE)
+                    _SC_PAGESIZE
         #else
-                // Fallback for freestanding
-                static constexpr SystemIntType page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
+                    _SC_PAGE_SIZE
         #endif
+                ));
+    #endif
+#else
+        // Fallback for freestanding
+        static constexpr SystemIntType page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
+#endif
         // clang-format on
 
         return page_size;
@@ -96,12 +105,16 @@ struct SystemMemory {
      * @return True on success, false on failure.
      */
     static bool ProtectGuardPage(void *ptr, SystemIntType size) noexcept {
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
 #if defined(_WIN32)
         DWORD old_protect;
         return (::VirtualProtect(ptr, static_cast<SystemIntType>(size), PAGE_NOACCESS, &old_protect) != 0);
-#elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
-        return (::mprotect(ptr, size, PROT_NONE) == 0);
 #else
+        return (::mprotect(ptr, size, PROT_NONE) == 0);
+#endif
+#else
+        (void)ptr;
+        (void)size;
         return false;
 #endif
     }
@@ -138,11 +151,13 @@ struct SystemMemory {
      * @param size Size in bytes (same value passed to Reserve).
      */
     static void Release(void *ptr, SystemIntType size) noexcept {
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
 #if defined(_WIN32)
         (void)size;
         ::VirtualFree(ptr, 0, MEM_RELEASE);
-#elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
+#else
         ::munmap(ptr, size);
+#endif
 #else
         // Size ignored when using malloc-based fallback.
         (void)size;
@@ -162,18 +177,21 @@ struct SystemMemory {
      * @param reclaim Completely release the memory (true = munmap, false = madvise).
      */
     QENTEM_INLINE static void ReleasePages(void *start, SystemIntType size, bool reclaim = false) noexcept {
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
 #if defined(_WIN32)
         (void)size;
         (void)reclaim;
         // Always hard-unmap on Windows — madvise not applicable
         ::VirtualFree(start, 0, MEM_RELEASE);
-#elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
+#else
         if (reclaim) {
             ::munmap(start, size);
         } else {
             ::madvise(start, size, MADV_DONTNEED);
         }
+#endif
 #else
+        (void)start;
         (void)size;
         (void)reclaim;
 #endif
@@ -192,11 +210,13 @@ struct SystemMemory {
      */
     template <bool IS_STACK_MEMORY_T>
     static void *reserve(SystemIntType size) noexcept {
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
 #if defined(_WIN32)
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-#elif defined(_SC_PAGESIZE) || defined(_SC_PAGE_SIZE)
+#else
         constexpr auto flags = MAP_PRIVATE | MAP_ANONYMOUS | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
         return ::mmap(nullptr, size, PROT_READ | PROT_WRITE, flags, -1, 0);
+#endif
 #else
         return __builtin_malloc(size);
 #endif
