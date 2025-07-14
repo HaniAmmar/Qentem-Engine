@@ -244,10 +244,10 @@ struct QTest {
 #if defined(_WIN32)
         ::ExitProcess(1); // Native Windows termination
 #else
-        _exit(1);         // POSIX immediate termination (no cleanup)
-        __builtin_trap(); // Should never reach; added as safeguard
-#endif
+        _exit(1);                // POSIX immediate termination (no cleanup)
+        __builtin_trap();        // Should never reach; added as safeguard
         __builtin_unreachable(); // Declares unreachable for compilers/optimizers
+#endif
     }
 
     const char *part_name_{nullptr};
