@@ -2,10 +2,10 @@
  * @file MemoryUtils.hpp
  * @brief Low-level memory fill, copy, and alignment utilities.
  *
- * Provides fast, allocation-free operations for zeroing memory, filling with a value,
- * copying data, and aligning sizes to powers of two.
+ * Provides fast, reserve-free operations for zeroing memory, filling with a value,
+ * copying data, and adjusting sizes to alignment boundaries.
  *
- * This header does *not* perform allocations or constructions.
+ * This header does *not* manage memory ownership or object construction.
  *
  * @author Hani Ammar
  * @date 2025
@@ -22,7 +22,7 @@ inline QENTEM_INLINE void *operator new(Qentem::SystemIntType, void *pointer, bo
     return pointer;
 }
 
-inline QENTEM_INLINE void operator delete(void *, void *, Qentem::SizeT32) noexcept {
+inline QENTEM_INLINE void operator delete(void *, void *, bool) noexcept {
     // no-op, only needed to satisfy compiler
 }
 #endif
