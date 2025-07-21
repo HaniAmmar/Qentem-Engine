@@ -46,43 +46,43 @@ struct Platform {
         static constexpr SizeT32 Shift = 5U;
         static constexpr SizeT32 Size  = 32U;
 
-        static VAR_T Load(const VAR_T *pointer) noexcept {
+        QENTEM_INLINE static VAR_T Load(const VAR_T *pointer) noexcept {
             return _mm256_loadu_si256(pointer);
         }
 
-        static void Store(VAR_T *left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static void Store(VAR_T *left, const VAR_T &right) noexcept {
             _mm256_storeu_si256(left, right);
         }
 
-        static VAR_T Zero() noexcept {
+        QENTEM_INLINE static VAR_T Zero() noexcept {
             return _mm256_setzero_si256();
         }
 
-        static VAR_T SetToOne8Bit(char value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne8Bit(char value) noexcept {
             return _mm256_set1_epi8(value);
         }
 
-        static VAR_T SetToOne16Bit(short value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne16Bit(short value) noexcept {
             return _mm256_set1_epi16(value);
         }
 
-        static VAR_T SetToOne32Bit(int value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne32Bit(int value) noexcept {
             return _mm256_set1_epi32(value);
         }
 
-        static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
             return _mm256_set1_epi64x(value);
         }
 
-        static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(_mm256_movemask_epi8(_mm256_cmpeq_epi8(left, right)));
         }
 
-        static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(_mm256_movemask_epi8(_mm256_cmpeq_epi16(left, right)));
         }
 
-        static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(_mm256_movemask_epi8(_mm256_cmpeq_epi32(left, right)));
         }
     };
@@ -94,43 +94,43 @@ struct Platform {
         static constexpr SizeT32 Shift = 4U;
         static constexpr SizeT32 Size  = 16U;
 
-        static VAR_T Load(const VAR_T *pointer) noexcept {
+        QENTEM_INLINE static VAR_T Load(const VAR_T *pointer) noexcept {
             return _mm_loadu_si128(pointer);
         }
 
-        static void Store(VAR_T *left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static void Store(VAR_T *left, const VAR_T &right) noexcept {
             _mm_storeu_si128(left, right);
         }
 
-        static VAR_T Zero() noexcept {
+        QENTEM_INLINE static VAR_T Zero() noexcept {
             return _mm_setzero_si128();
         }
 
-        static VAR_T SetToOne8Bit(char value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne8Bit(char value) noexcept {
             return _mm_set1_epi8(value);
         }
 
-        static VAR_T SetToOne16Bit(short value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne16Bit(short value) noexcept {
             return _mm_set1_epi16(value);
         }
 
-        static VAR_T SetToOne32Bit(int value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne32Bit(int value) noexcept {
             return _mm_set1_epi32(value);
         }
 
-        static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
             return _mm_set1_epi64x(value);
         }
 
-        static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(_mm_movemask_epi8(_mm_cmpeq_epi8(left, right)));
         }
 
-        static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(_mm_movemask_epi8(_mm_cmpeq_epi16(left, right)));
         }
 
-        static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(_mm_movemask_epi8(_mm_cmpeq_epi32(left, right)));
         }
     };
@@ -142,43 +142,43 @@ struct Platform {
         static constexpr SizeT32 Shift = 4U;
         static constexpr SizeT32 Size  = 16U;
 
-        static VAR_T Load(const VAR_T *pointer) noexcept {
+        QENTEM_INLINE static VAR_T Load(const VAR_T *pointer) noexcept {
             return wasm_v128_load(pointer);
         }
 
-        static void Store(VAR_T *left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static void Store(VAR_T *left, const VAR_T &right) noexcept {
             wasm_v128_store(left, right);
         }
 
-        static VAR_T Zero() noexcept {
+        QENTEM_INLINE static VAR_T Zero() noexcept {
             return wasm_i64x2_const_splat(0);
         }
 
-        static VAR_T SetToOne8Bit(char value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne8Bit(char value) noexcept {
             return wasm_i8x16_splat(value);
         }
 
-        static VAR_T SetToOne16Bit(short value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne16Bit(short value) noexcept {
             return wasm_i16x8_splat(value);
         }
 
-        static VAR_T SetToOne32Bit(int value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne32Bit(int value) noexcept {
             return wasm_i32x4_splat(value);
         }
 
-        static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
+        QENTEM_INLINE static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
             return wasm_i64x2_splat(value);
         }
 
-        static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(wasm_i8x16_bitmask(wasm_i8x16_eq(left, right)));
         }
 
-        static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(wasm_i8x16_bitmask(wasm_i16x8_eq(left, right)));
         }
 
-        static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        QENTEM_INLINE static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
             return (Number_T)(wasm_i8x16_bitmask(wasm_i32x4_eq(left, right)));
         }
     };
@@ -233,7 +233,7 @@ struct Platform {
 
 #ifdef _MSC_VER
     template <typename Number_T>
-    inline static SizeT32 FindFirstBit(Number_T value) noexcept {
+    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindFirstBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
         unsigned long  index     = 0;
@@ -269,7 +269,7 @@ struct Platform {
     }
 
     template <typename Number_T>
-    inline static SizeT32 FindLastBit(Number_T value) noexcept {
+    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindLastBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
         unsigned long  index     = 0;
@@ -306,7 +306,7 @@ struct Platform {
 
 #else  // _MSC_VER
     template <typename Number_T>
-    inline static SizeT32 FindFirstBit(Number_T value) noexcept {
+    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindFirstBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
 
@@ -336,7 +336,7 @@ struct Platform {
     }
 
     template <typename Number_T>
-    inline static SizeT32 FindLastBit(Number_T value) noexcept {
+    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindLastBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr SizeT32 int_size    = (sizeof(int) * 8U);
         constexpr SizeT32 taken_size  = (int_size - 1U);
@@ -351,7 +351,6 @@ struct Platform {
             return (taken_size - SizeT32(__builtin_clz(SizeT32(value))));
         } else {
             if QENTEM_CONST_EXPRESSION (is_size_63b) {
-                // ---> 01010101
                 const SizeT32 lower_bits = SizeT32(value);
                 value >>= int_size;
 
@@ -371,16 +370,16 @@ struct Platform {
     struct SIMDCompare_T {};
 
     template <typename Char_T, typename SIMDValue>
-    inline static constexpr Platform::SIMD::Number_T SIMDCompare(const SIMDValue &val1,
-                                                                 const SIMDValue &val2) noexcept {
+    QENTEM_INLINE static constexpr Platform::SIMD::Number_T SIMDCompare(const SIMDValue &val1,
+                                                                        const SIMDValue &val2) noexcept {
         return SIMDCompare_T<Char_T, SIMDValue, sizeof(Char_T)>::Compare(val1, val2);
     }
 
     // char
     template <typename Char_T, typename SIMDValue>
     struct SIMDCompare_T<Char_T, SIMDValue, 1U> {
-        inline static constexpr Platform::SIMD::Number_T Compare(const SIMDValue &val1,
-                                                                 const SIMDValue &val2) noexcept {
+        QENTEM_INLINE static constexpr Platform::SIMD::Number_T Compare(const SIMDValue &val1,
+                                                                        const SIMDValue &val2) noexcept {
             return Platform::SIMD::Compare8Bit(val1, val2);
         }
     };
@@ -439,14 +438,14 @@ struct Platform {
     struct SIMDSetToOne_T {};
 
     template <typename Char_T>
-    inline static constexpr Platform::SIMD::VAR_T SIMDSetToOne(const Char_T value) noexcept {
+    QENTEM_INLINE static constexpr Platform::SIMD::VAR_T SIMDSetToOne(const Char_T value) noexcept {
         return SIMDSetToOne_T<Char_T, sizeof(Char_T)>::Set(value);
     }
 
     // char
     template <typename Char_T>
     struct SIMDSetToOne_T<Char_T, 1U> {
-        inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
+        QENTEM_INLINE static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
             return Platform::SIMD::SetToOne8Bit(value);
         }
     };
@@ -454,7 +453,7 @@ struct Platform {
     // char16
     template <typename Char_T>
     struct SIMDSetToOne_T<Char_T, 2U> {
-        inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
+        QENTEM_INLINE static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
             return Platform::SIMD::SetToOne16Bit(short(value));
         }
     };
@@ -462,13 +461,13 @@ struct Platform {
     // char32_t
     template <typename Char_T>
     struct SIMDSetToOne_T<Char_T, 4U> {
-        inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
+        QENTEM_INLINE static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
             return Platform::SIMD::SetToOne32Bit(int(value));
         }
     };
 
     template <typename Char_T, typename Number_T>
-    inline static constexpr Number_T SIMDNextOffset() noexcept {
+    QENTEM_INLINE static constexpr Number_T SIMDNextOffset() noexcept {
         return (Platform::SIMD::Size / sizeof(Char_T));
     }
 };
