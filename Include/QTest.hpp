@@ -16,6 +16,7 @@
 #define QENTEM_ENABLE_MEMORY_RECORD
 
 #if defined(_WIN32)
+#define NOMINMAX
 #include <windows.h>
 #else
 #include <signal.h>
@@ -73,70 +74,74 @@ struct QTest {
     }
 
     template <typename Char_T, typename FUNC_T>
-    QENTEM_NOINLINE void Test(Char_T *name, FUNC_T func) {
+    QENTEM_NOINLINE void Test(Char_T *name, FUNC_T func, bool test_for_leaks = true) {
         if (!error_ || continue_on_error_) {
             part_name_ = name;
             func(*this);
-            afterTest(true);
-        }
-    }
-
-    template <typename Char_T, typename FUNC_T, typename... Values_T>
-    QENTEM_NOINLINE void Test(Char_T *name, FUNC_T func, bool test_for_leaks, Values_T &...values) {
-        if (!error_ || continue_on_error_) {
-            part_name_ = name;
-            func(*this, values...);
             afterTest(test_for_leaks);
         }
     }
 
-    QENTEM_NOINLINE void IsTrue(bool value, unsigned long line) {
+    template <typename Char_T, typename FUNC_T, typename... Values_T>
+    QENTEM_NOINLINE void Test(Char_T *name, FUNC_T func, bool test_for_leaks, Values_T &&...values) {
+        if (!error_ || continue_on_error_) {
+            part_name_ = name;
+            func(*this, QUtility::Forward<Values_T>(values)...);
+            afterTest(test_for_leaks);
+        }
+    }
+
+    template <typename LineNumber_T>
+    QENTEM_NOINLINE void IsTrue(bool value, LineNumber_T line) {
         if ((!error_ || continue_on_error_) && !value) {
             error_ = true;
             QTest::PrintErrorMessage(false, "false", "true", line);
         }
     }
 
-    QENTEM_NOINLINE void IsFalse(bool value, unsigned long line) {
+    template <typename LineNumber_T>
+    QENTEM_NOINLINE void IsFalse(bool value, LineNumber_T line) {
         if ((!error_ || continue_on_error_) && value) {
             error_ = true;
             QTest::PrintErrorMessage(false, "true", "false", line);
         }
     }
 
-    QENTEM_NOINLINE void IsNull(const void *value, unsigned long line) {
+    template <typename LineNumber_T>
+    QENTEM_NOINLINE void IsNull(const void *value, LineNumber_T line) {
         if ((!error_ || continue_on_error_) && (value != nullptr)) {
             error_ = true;
             QTest::PrintErrorMessage(false, value, "null", line);
         }
     }
 
-    QENTEM_NOINLINE void IsNotNull(const void *value, unsigned long line) {
+    template <typename LineNumber_T>
+    QENTEM_NOINLINE void IsNotNull(const void *value, LineNumber_T line) {
         if ((!error_ || continue_on_error_) && (value == nullptr)) {
             error_ = true;
             QTest::PrintErrorMessage(true, "null", "null", line);
         }
     }
 
-    template <typename Value1_T, typename Value2_T>
-    QENTEM_NOINLINE void IsEqual(const Value1_T &left, const Value2_T &right, unsigned long line) {
+    template <typename Value1_T, typename Value2_T, typename LineNumber_T>
+    QENTEM_NOINLINE void IsEqual(const Value1_T &left, const Value2_T &right, LineNumber_T line) {
         if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
             QTest::PrintErrorMessage(false, left, right, line);
         }
     }
 
-    template <typename Value1_T, typename Value2_T>
-    QENTEM_NOINLINE void IsNotEqual(const Value1_T &left, const Value2_T &right, unsigned long line) {
+    template <typename Value1_T, typename Value2_T, typename LineNumber_T>
+    QENTEM_NOINLINE void IsNotEqual(const Value1_T &left, const Value2_T &right, LineNumber_T line) {
         if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
             QTest::PrintErrorMessage(true, left, right, line);
         }
     }
 
-    template <typename Value1_T, typename Value2_T>
+    template <typename Value1_T, typename Value2_T, typename LineNumber_T>
     QENTEM_NOINLINE void PrintErrorMessage(bool equal, const Value1_T &value1, const Value2_T &value2,
-                                           unsigned long line) {
+                                           LineNumber_T line) {
         QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Failed",
                         QConsole::GetColor(QConsole::Color::EndColor), ": ", part_name_, '\n');
         QConsole::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
@@ -168,19 +173,19 @@ struct QTest {
                         " KiB.\n");
 
         QConsole::Print("Reserves: ", storage.Reserved, ", Releases: ", storage.Released, ".\n");
-        QConsole::Print("Kept Pages: ", storage.Pages, ", Sum: ", (double(storage.PagesSumSize) / 1024), " KiB.\n");
+        QConsole::Print("Kept Blocks: ", storage.Blocks, ", Total: ", (double(storage.BlocksTotalSize) / 1024),
+                        " KiB.\n");
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
         static const auto &storage = MemoryRecord::GetRecord();
         PrintMemoryRecord();
 
-        const SystemIntType remaining_allocations = (storage.Reserved - storage.Released);
+        const SystemIntType remaining = (storage.Reserved - storage.Released);
 
-        if (remaining_allocations != 0) {
+        if (remaining != 0) {
             QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Leak detected",
-                            QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining_allocations,
-                            " remaining Allocations.\n\n");
+                            QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining, " not released.\n\n");
         }
     }
 
@@ -229,13 +234,12 @@ struct QTest {
         }
 
         if (test_for_leaks) {
-            const SystemIntType remaining_allocations = MemoryRecord::CheckSubRecord();
+            const SystemIntType remaining = MemoryRecord::CheckSubRecord();
             MemoryRecord::EraseSubMemoryRecord();
 
-            if (remaining_allocations != 0) {
+            if (remaining != 0) {
                 QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Leak detected",
-                                QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining_allocations,
-                                " remaining allocations.\n");
+                                QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining, " not released.\n");
             }
         }
     }
