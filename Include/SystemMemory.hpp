@@ -49,11 +49,6 @@
     // Unknown, unsupported, or freestanding platform — fallback to malloc
     #define QENTEM_SYSTEM_MEMORY_FALLBACK 1
 #endif
-
-#ifndef QENTEM_FALLBACK_SYSTEM_PAGE_SIZE
-    /// Fallback page size (4KiB) used if system page size cannot be queried.
-    #define QENTEM_FALLBACK_SYSTEM_PAGE_SIZE 4096
-#endif
 // clang-format on
 
 namespace Qentem {

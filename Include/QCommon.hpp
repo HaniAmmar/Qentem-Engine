@@ -101,6 +101,10 @@ union PtrCast_T {
     Type_T       *Pointer;
     SystemIntType Number;
 };
+/// Fallback page size (4KiB) used if system page size cannot be queried.
+#ifndef QENTEM_FALLBACK_SYSTEM_PAGE_SIZE
+#define QENTEM_FALLBACK_SYSTEM_PAGE_SIZE 4096
+#endif
 
 ///////////////////////////////////////////////////////////////
 //              Configuration Macros (Overridable)           //
