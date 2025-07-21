@@ -29,7 +29,7 @@ struct LiteArray {
     LiteArray(const LiteArray &)            = delete;
     LiteArray &operator=(const LiteArray &) = delete;
 
-    QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) {
+    QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) noexcept {
         if (capacity != 0) {
             reserve(capacity);
 
@@ -85,7 +85,7 @@ struct LiteArray {
         return *this;
     }
 
-    QENTEM_INLINE ~LiteArray() {
+    QENTEM_INLINE ~LiteArray() noexcept {
         if (storage_ != nullptr) {
             MemoryUtils::Dispose(storage_, End());
 
@@ -97,7 +97,7 @@ struct LiteArray {
         }
     }
 
-    QENTEM_INLINE void operator+=(Type_T &&item) {
+    QENTEM_INLINE void operator+=(Type_T &&item) noexcept {
         if (size_ == capacity_) {
             expand((capacity_ != 0) ? (capacity_ * SizeT{2}) : SizeT{1});
         }
@@ -106,7 +106,7 @@ struct LiteArray {
         ++size_;
     }
 
-    QENTEM_INLINE Type_T &Insert(Type_T &&item) {
+    QENTEM_INLINE Type_T &Insert(Type_T &&item) noexcept {
         const SizeT size = size_;
 
         *this += QUtility::Move(item);
@@ -210,7 +210,7 @@ struct LiteArray {
     }
 
   private:
-    QENTEM_INLINE void expand(SizeT new_capacity) {
+    QENTEM_INLINE void expand(SizeT new_capacity) noexcept {
         Type_T *old_storage = storage_;
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
@@ -237,7 +237,7 @@ struct LiteArray {
      * This reserves in **bytes**, but stores capacity as number of elements.
      * Ensures proper alignment and page efficiency.
      */
-    QENTEM_INLINE void reserve(SizeT capacity) {
+    QENTEM_INLINE void reserve(SizeT capacity) noexcept {
         SizeT capacity_bytes = (capacity * sizeof(Type_T));
 
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
@@ -254,7 +254,7 @@ struct LiteArray {
 
         storage_ = static_cast<Type_T *>(SystemMemory::Reserve(capacity_bytes));
 #else
-        raw_storage_                        = SystemMemory::Reserve(capacity_bytes + 63U);
+        raw_storage_                        = SystemMemory::Reserve(capacity_bytes + 64U);
         const SystemIntType raw_address     = reinterpret_cast<SystemIntType>(raw_storage_);
         const SystemIntType aligned_address = ((raw_address + SystemIntType{63}) & ~SystemIntType{63});
         storage_                            = reinterpret_cast<Type_T *>(aligned_address);
@@ -263,7 +263,7 @@ struct LiteArray {
         capacity_ = (capacity_bytes / sizeof(Type_T));
     }
 
-    static void release(void *storage, SizeT capacity) {
+    static void release(void *storage, SizeT capacity) noexcept {
         SystemMemory::Release(storage, (capacity * sizeof(Type_T)));
     }
 
