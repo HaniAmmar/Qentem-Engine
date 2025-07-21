@@ -14,8 +14,8 @@ struct MemoryRecord {
         SystemIntType subReleased{0};
         SystemIntType Size{0};
         SystemIntType PeakSize{0};
-        SystemIntType Pages{0};
-        SystemIntType PagesSumSize{0};
+        SystemIntType Blocks{0};
+        SystemIntType BlocksTotalSize{0};
     };
 
     MemoryRecord()                                = delete;
@@ -64,18 +64,18 @@ struct MemoryRecord {
         storage.Size -= size;
     }
 
-    QENTEM_NOINLINE static void ReservedPage(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void ReservedBlock(SystemIntType size) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
-        ++(storage.Pages);
-        storage.PagesSumSize += size;
+        ++(storage.Blocks);
+        storage.BlocksTotalSize += size;
     }
 
-    QENTEM_NOINLINE static void ReleasedPage(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void ReleasedBlock(SystemIntType size) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
-        --(storage.Pages);
-        storage.PagesSumSize -= size;
+        --(storage.Blocks);
+        storage.BlocksTotalSize -= size;
     }
 
     QENTEM_NOINLINE static MemoryRecordData &GetRecord() noexcept {
