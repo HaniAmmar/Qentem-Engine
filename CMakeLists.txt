@@ -39,6 +39,14 @@ else()
     endif()
 endif()
 
+# MemoryBlock
+add_executable(MemoryBlockTest Tests/MemoryBlockTest.cpp)
+add_test(NAME MemoryBlockTest COMMAND MemoryBlockTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(MemoryBlockTest --coverage)
+endif()
+
 # StringUtils
 add_executable(StringUtilsTest Tests/StringUtilsTest.cpp)
 add_test(NAME StringUtilsTest COMMAND StringUtilsTest)

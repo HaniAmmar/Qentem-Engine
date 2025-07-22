@@ -25,6 +25,7 @@
 
 // clang-format off
 #include "QTest.hpp"
+#include "MemoryBlockTest.hpp"
 #include "StringUtilsTest.hpp"
 #include "StringTest.hpp"
 #include "StringStreamTest.hpp"
@@ -109,6 +110,7 @@ static int RunTests() {
     int passed = 0;
     int failed = 0;
 
+    ((Test::RunMemoryBlockTests() == 0) ? ++passed : ++failed);
     ((Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
     ((Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
