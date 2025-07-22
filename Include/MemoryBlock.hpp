@@ -34,13 +34,13 @@ namespace Qentem {
  *
  * @tparam Alignment_T Chunk alignment in bytes. Must be power of two.
  */
-template <SizeT32 Alignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT>
+template <SizeT32 Alignment_T>
 struct MemoryBlock {
     static constexpr SystemIntType MIN_BASE_ALIGNMENT  = 64;
     static constexpr SystemIntType MAX_SYSTEM_INT_TYPE = ~SystemIntType{0};
     static constexpr SizeT32       PTR_SIZE            = sizeof(SystemIntType);
     static constexpr SizeT32       BIT_WIDTH           = (PTR_SIZE * 8U);
-    static constexpr SystemIntType ALIGNMENT_M1        = (Alignment_T - 1U);
+    static constexpr SystemIntType ALIGNMENT_M1        = static_cast<SystemIntType>(Alignment_T - 1U);
     static constexpr SystemIntType ALIGNMENT_N         = ~ALIGNMENT_M1;
 
     MemoryBlock() noexcept                      = default;
