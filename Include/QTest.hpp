@@ -27,22 +27,7 @@
 #define QENTEM_Q_TEST_H
 
 #include "QConsole.hpp"
-#include "MemoryRecord.hpp"
-
-#ifndef QENTEM_ALLOCATE
-#if defined(_MSC_VER)
-#define QENTEM_ALLOCATE(size) malloc(size)
-#define QENTEM_DEALLOCATE(ptr) free(ptr)
-#define QENTEM_RAW_ALLOCATE(size) malloc(size)
-#define QENTEM_RAW_DEALLOCATE(ptr) free(ptr)
-#else
-#define QENTEM_ALLOCATE(size) __builtin_malloc(size)
-#define QENTEM_DEALLOCATE(ptr) __builtin_free(ptr)
-#define QENTEM_RAW_ALLOCATE(size) __builtin_malloc(size)
-#define QENTEM_RAW_DEALLOCATE(ptr) __builtin_free(ptr)
-#endif
-
-#endif // QENTEM_ALLOCATE
+#include "Reserver.hpp"
 
 namespace Qentem {
 
@@ -63,7 +48,11 @@ struct QTest {
     }
 
     QENTEM_NOINLINE int EndTests() {
-        if (!error_) {
+        if (!(Reserver::IsEmpty())) {
+            QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Reserver should be empty.\n\n",
+                            QConsole::GetColor(QConsole::Color::EndColor));
+            error_ = true;
+        } else if (!error_) {
             QConsole::Print(QConsole::GetColor(QConsole::Color::TitleColor), test_name_,
                             QConsole::GetColor(QConsole::Color::PassColor), " Passed all tests",
                             QConsole::GetColor(QConsole::Color::EndColor), "\n\n");

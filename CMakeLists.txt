@@ -47,6 +47,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(MemoryBlockTest --coverage)
 endif()
 
+# Reserver
+add_executable(ReserverTest Tests/ReserverTest.cpp)
+add_test(NAME ReserverTest COMMAND ReserverTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(ReserverTest --coverage)
+endif()
+
 # StringUtils
 add_executable(StringUtilsTest Tests/StringUtilsTest.cpp)
 add_test(NAME StringUtilsTest COMMAND StringUtilsTest)

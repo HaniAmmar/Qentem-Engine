@@ -101,9 +101,70 @@ union PtrCast_T {
     Type_T       *Pointer;
     SystemIntType Number;
 };
+
+///////////////////////////////////////////////////////////////
+//                  Reserver Configuration                  //
+///////////////////////////////////////////////////////////////
 /// Fallback page size (4KiB) used if system page size cannot be queried.
 #ifndef QENTEM_FALLBACK_SYSTEM_PAGE_SIZE
 #define QENTEM_FALLBACK_SYSTEM_PAGE_SIZE 4096
+#endif
+
+/**
+ * @brief Enables fallback memory handling for unsupported or freestanding platforms.
+ *
+ * Define this macro to bypass platform-specific memory APIs (e.g., mmap, VirtualAlloc)
+ * and use standard heap-based functions (e.g., malloc) instead.
+ *
+ * When defined, page size defaults to QENTEM_FALLBACK_SYSTEM_PAGE_SIZE.
+ */
+// #define QENTEM_SYSTEM_MEMORY_FALLBACK ///< Define to disable mmap/VirtualAlloc use
+
+/**
+ * @brief Default memory alignment applied to all reserve requests unless overridden.
+ *
+ * The alignment is set to (sizeof(void*) * 2), ensuring compatibility with
+ * all fundamental types:
+ *   - 16 bytes on 64-bit systems
+ *   - 8 bytes on 32-bit systems
+ *
+ * This ensures compatibility with all fundamental types and most SIMD types on modern platforms,
+ * including safe support for `double`, `long long`, and `max_align_t` on x86_64.
+ */
+#ifndef QENTEM_RESERVER_DEFAULT_ALIGNMENT
+#define QENTEM_RESERVER_DEFAULT_ALIGNMENT (sizeof(void *) * 2)
+#endif
+
+/**
+ * @brief Initial size of the first memory block reserved by the Reserver.
+ *
+ * A moderate default (64 KiB) that balances memory footprint and fragmentation,
+ * especially suited for small-to-medium workloads.
+ */
+#ifndef QENTEM_RESERVER_INITIAL_BLOCK_SIZE
+#define QENTEM_RESERVER_INITIAL_BLOCK_SIZE (64U * 1024U) // 64 KiB
+#endif
+
+/**
+ * @brief Maximum size of fully free memory blocks to retain.
+ *
+ * Blocks larger than this will be released back to the system once empty,
+ * ensuring memory is returned aggressively. Smaller blocks may be reused.
+ */
+#ifndef QENTEM_RESERVER_MAX_BLOCK_SIZE_TO_KEEP
+#define QENTEM_RESERVER_MAX_BLOCK_SIZE_TO_KEEP (256U * 1024U) // 256 KiB
+#endif
+
+/**
+ * @brief Growth multiplier for reserving larger blocks after exhaustion.
+ *
+ * When a block cannot fulfill a reserve request, the next block size will be
+ * increased by this factor (e.g., ×4) to reduce future fragmentation.
+ *
+ * Growth is capped by QENTEM_RESERVER_MAX_BLOCK_SIZE_TO_KEEP to avoid runaway memory use.
+ */
+#ifndef QENTEM_RESERVER_BLOCK_GROWTH_FACTOR
+#define QENTEM_RESERVER_BLOCK_GROWTH_FACTOR 4
 #endif
 
 ///////////////////////////////////////////////////////////////

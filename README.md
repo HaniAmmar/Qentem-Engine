@@ -10,6 +10,7 @@
 -   [Features](#features)
 -   [Requirements](#requirements)
 -   [Embedded / Microcontroller Support](#embedded--microcontroller-support)
+-   [Reserver (Memory System)](#reserver-memory-system)
 -   [Documentation](#documentation)
 -   [Live Testing](#live-testing)
 -   [Template Example](#template-example)
@@ -56,6 +57,21 @@ A C++11 or later compiler.
 ## Embedded / Microcontroller Support
 
 Qentem Engine’s modular, STL-free architecture enables it to run effectively on embedded systems and microcontroller platforms with limited resources. The core modules—including template rendering, JSON parsing, and custom containers—have been successfully tested on ESP32 and are suitable for use in Arduino-style or bare-metal C++ projects. All components are designed without exceptions, threading, or OS-specific dependencies, making them well-suited to single-threaded, minimal environments. Qentem Engine does not provide file or stream I/O code for embedded targets.
+
+## Reserver (Memory System)
+
+**Reserver** is Qentem's internal memory system, designed to replace traditional dynamic heap strategies with more deterministic, high-performance region reuse. It features:
+
+-   No internal metadata in memory regions.
+-   First-fit strategy with optional in-place region reuse.
+-   Support for core-pinned, per-thread separation.
+-   Backed by preallocated blocks with size growth.
+-   Optional memory tracking through `MemoryRecord`.
+
+This system ensures consistent behavior and lower fragmentation, particularly under sustained usage patterns. While it is **functional and fast**, it is currently targeted at **single-threaded, core-pinned workloads** and may evolve to support multithreaded use in future updates.
+
+> _Note: Reserver is still under active development._
+> It has been integrated into QenWeb and early results show it matches or exceeds system allocator performance under typical workloads.
 
 ## Documentation
 
@@ -330,6 +346,7 @@ The test suite includes over 23k lines of code, more than five times the size of
     ```
 
 -   cmake
+
     ```shell
     mkdir Build
     cd Build

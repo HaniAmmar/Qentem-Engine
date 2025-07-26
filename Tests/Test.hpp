@@ -26,6 +26,7 @@
 // clang-format off
 #include "QTest.hpp"
 #include "MemoryBlockTest.hpp"
+#include "ReserverTest.hpp"
 #include "StringUtilsTest.hpp"
 #include "StringTest.hpp"
 #include "StringStreamTest.hpp"
@@ -64,18 +65,17 @@ static int PrintResult(int passed, int failed) {
 
 QENTEM_MAYBE_UNUSED
 static void SelfTestLeak(QTest &test, char *&ptr) {
+    ptr        = Reserver::Reserve<char>(8U);
     char *nptr = nullptr;
 
     test.IsTrue(false, 1);
     test.IsFalse(true, 2);
+    test.IsNull(ptr, 2);
     test.IsNotNull(nptr, 1);
     test.IsEqual(true, false, 4);
     test.IsNotEqual(true, true, 5);
     test.IsNotEqual(u'a', u'a', 7);
     test.IsNotEqual(U'a', U'a', 6);
-
-    QConsole::Print(u"a");
-    QConsole::Print(U"a");
 }
 
 QENTEM_MAYBE_UNUSED
@@ -91,6 +91,7 @@ static void SelfTest() {
     char *ptr = nullptr;
     test.Test("SelfTestLeak", SelfTestLeak, true, ptr);
     QTest::PrintMemoryStatus();
+    Reserver::Release(ptr, 8U);
     MemoryRecord::EraseSubMemoryRecord();
     QConsole::IsColored() = false;
 
@@ -102,8 +103,8 @@ static void SelfTest() {
     }
 
     QConsole::IsColored() = is_colored;
-    QConsole::EnableOutput();
     QConsole::GetStreamCache().Clear();
+    QConsole::EnableOutput();
 }
 
 static int RunTests() {
@@ -111,6 +112,7 @@ static int RunTests() {
     int failed = 0;
 
     ((Test::RunMemoryBlockTests() == 0) ? ++passed : ++failed);
+    ((Test::RunReserverTests() == 0) ? ++passed : ++failed);
     ((Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
     ((Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
