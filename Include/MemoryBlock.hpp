@@ -4,8 +4,8 @@
  *
  * Provides a low-level, page-aligned memory region that is subdivided into
  * fixed-size aligned chunks. Allocation state is tracked using a compact
- * bitfield stored at the beginning of the block. Suitable for use in custom
- * allocators, pool systems, and high-performance memory managers.
+ * bitfield stored at the beginning of the block. Suitable for use in
+ * high-performance memory managers.
  *
  * This component is header-only, non-STL, and designed for embedded or
  * high-throughput systems. No internal dynamic allocation is performed.
@@ -37,6 +37,7 @@ namespace Qentem {
 template <SizeT32 Alignment_T>
 struct MemoryBlock {
     static constexpr SystemIntType MIN_BASE_ALIGNMENT  = 64;
+    static constexpr SystemIntType BITS_IN_CHAR        = 8;
     static constexpr SystemIntType MAX_SYSTEM_INT_TYPE = ~SystemIntType{0};
     static constexpr SizeT32       PTR_SIZE            = sizeof(SystemIntType);
     static constexpr SizeT32       BIT_WIDTH           = (PTR_SIZE * 8U);
@@ -58,7 +59,13 @@ struct MemoryBlock {
      * @param capacity Minimum number of bytes to reserve (may be rounded up).
      */
     QENTEM_INLINE explicit MemoryBlock(SystemIntType capacity) noexcept : capacity_{capacity} {
+        static_assert((Alignment_T > 0) && ((Alignment_T & (Alignment_T - 1)) == 0),
+                      "Alignment_T must be power-of-two");
+
         static const SizeT32 page_size = static_cast<SizeT32>(SystemMemory::PageSize());
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+        capacity += page_size; // Insure correct alignment
+#endif
 
         if (capacity_ > page_size) {
             // Round up to next page boundary
@@ -80,22 +87,29 @@ struct MemoryBlock {
 
             capacity_ -= (aligned_address - raw_address);
         }
-#else
-        base_ = base_raw_;
 #endif
 
-        table_size_ = (capacity_ / (Alignment_T * SystemIntType{8})); // 8 bits in one byte.
+        table_size_ = (capacity_ / (Alignment_T * BITS_IN_CHAR));
+
+        table_mask_shift_ = BIT_WIDTH;
 
         if (table_size_ < PTR_SIZE) {
-            table_end_padding_ = (BIT_WIDTH - static_cast<SizeT32>(capacity_ >> DefaultAlignmentBit()));
-            table_size_        = PTR_SIZE;
+            table_mask_shift_ = (static_cast<SizeT32>(capacity_ >> DefaultAlignmentBit()));
+            table_size_       = PTR_SIZE;
         }
 
         const SystemIntType usable_base_raw =
             reinterpret_cast<SystemIntType>((static_cast<char *>(base_) + table_size_));
         const SystemIntType aligned_usable_base = ((usable_base_raw + ALIGNMENT_M1) & ALIGNMENT_N);
         const SystemIntType unusable            = (table_size_ + (aligned_usable_base - usable_base_raw));
+
         table_size_ /= PTR_SIZE;
+
+        SizeT32 unusable_bits    = static_cast<SizeT32>(unusable >> DefaultAlignmentBit());
+        SizeT32 unusable_indices = (unusable_bits / BIT_WIDTH);
+
+        table_size_ -= unusable_indices;
+        table_mask_shift_ -= (unusable_bits - (unusable_indices * BIT_WIDTH));
 
         data_ = reinterpret_cast<char *>(aligned_usable_base);
 
@@ -111,9 +125,13 @@ struct MemoryBlock {
     }
 
     QENTEM_INLINE MemoryBlock(MemoryBlock &&src) noexcept
-        : base_raw_{src.base_raw_}, base_{src.base_}, data_{src.data_}, data_alignment_{src.data_alignment_},
-          table_end_padding_{src.table_end_padding_}, table_size_{src.table_size_}, capacity_{src.capacity_},
-          usable_size_{src.usable_size_}, available_{src.available_} {
+        : base_raw_{src.base_raw_}, data_{src.data_}, usable_size_{src.usable_size_}, available_{src.available_},
+          next_index_{src.next_index_}, table_size_{src.table_size_}, data_alignment_{src.data_alignment_},
+          table_mask_shift_{src.table_mask_shift_}, capacity_{src.capacity_} {
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+        base_ = src.base_;
+#endif
+
         src.base_raw_ = nullptr;
     }
 
@@ -121,15 +139,18 @@ struct MemoryBlock {
         if (this != &src) {
             release();
 
-            base_raw_          = src.base_raw_;
-            base_              = src.base_;
-            data_              = src.data_;
-            data_alignment_    = src.data_alignment_;
-            table_end_padding_ = src.table_end_padding_;
-            table_size_        = src.table_size_;
-            capacity_          = src.capacity_;
-            usable_size_       = src.usable_size_;
-            available_         = src.available_;
+            base_raw_ = src.base_raw_;
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+            base_ = src.base_;
+#endif
+            data_             = src.data_;
+            usable_size_      = src.usable_size_;
+            available_        = src.available_;
+            next_index_       = src.next_index_;
+            table_size_       = src.table_size_;
+            data_alignment_   = src.data_alignment_;
+            table_mask_shift_ = src.table_mask_shift_;
+            capacity_         = src.capacity_;
 
             src.base_raw_ = nullptr;
         }
@@ -187,11 +208,16 @@ struct MemoryBlock {
         return (static_cast<const char *>(base_) + capacity_);
     }
 
+    QENTEM_INLINE SystemIntType &GetRefNextIndex() noexcept {
+        return next_index_;
+    }
+
     QENTEM_INLINE SystemIntType TableSize() const noexcept {
         return table_size_;
     }
 
     QENTEM_INLINE static constexpr SizeT32 TableFirstBit() noexcept {
+        // BIT_WIDTH = bits in one entry (e.g., 64); result = log2(BIT_WIDTH) = 6
         return Platform::FindFirstBit(BIT_WIDTH);
     }
 
@@ -205,6 +231,10 @@ struct MemoryBlock {
 
     QENTEM_INLINE SystemIntType Available() const noexcept {
         return available_;
+    }
+
+    QENTEM_INLINE SystemIntType UsableSize() const noexcept {
+        return usable_size_;
     }
 
     QENTEM_INLINE void IncreaseAvailable(SystemIntType size) noexcept {
@@ -222,23 +252,21 @@ struct MemoryBlock {
      * accounting for padding and unusable tail regions.
      */
     QENTEM_INLINE void ClearTable() noexcept {
-        SystemIntType      *table = static_cast<SystemIntType *>(base_);
+        SystemIntType      *table         = static_cast<SystemIntType *>(base_);
+        const SystemIntType table_size_m1 = (table_size_ - SystemIntType{1});
         const SystemIntType table_mask =
-            (MAX_SYSTEM_INT_TYPE >>
-             ((BIT_WIDTH - table_end_padding_) - ((capacity_ - usable_size_) >> DefaultAlignmentBit())));
+            ((table_mask_shift_ != BIT_WIDTH) ? (MAX_SYSTEM_INT_TYPE >> table_mask_shift_) : 0);
 
         {
             SystemIntType index = 0;
-            while (index < table_size_) {
+            while (index < table_size_m1) {
                 table[index] = 0;
                 ++index;
             }
         }
 
-        if (table != nullptr) {
-            // Prevent allocation beyond usable capacity in the last table entry
-            table[table_size_ - SystemIntType{1}] = table_mask;
-        }
+        // Prevent allocation beyond usable capacity in the last table entry
+        table[table_size_m1] = table_mask;
     }
 
     /**
@@ -272,6 +300,8 @@ struct MemoryBlock {
             table[table_index] |= mask;
         }
 
+        // next_index_ *= static_cast<SystemIntType>(table_index != (table_size_ - SystemIntType{1}));
+
         return ptr;
     }
 
@@ -299,6 +329,8 @@ struct MemoryBlock {
 
         chunks += bit_index;
 
+        next_index_ = ((table_index <= next_index_) ? table_index : next_index_);
+
         while (chunks > BIT_WIDTH) {
             chunks -= BIT_WIDTH;
             mask = MAX_SYSTEM_INT_TYPE;
@@ -315,15 +347,24 @@ struct MemoryBlock {
         }
     }
 
-    void         *base_raw_{nullptr};
-    void         *base_{nullptr};
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+    void *base_raw_{nullptr};
+    void *base_{nullptr};
+#else
+    union {
+        void *base_raw_{nullptr};
+        void *base_;
+    };
+#endif
+
     void         *data_{nullptr};
-    SizeT32       data_alignment_{0};
-    SizeT32       table_end_padding_{0};
-    SystemIntType table_size_{0};
-    SystemIntType capacity_{0};
     SystemIntType usable_size_{0};
     SystemIntType available_{0};
+    SystemIntType next_index_{0};
+    SystemIntType table_size_{0};
+    SizeT32       data_alignment_{0};
+    SizeT32       table_mask_shift_{0};
+    SystemIntType capacity_{0};
 };
 
 } // namespace Qentem

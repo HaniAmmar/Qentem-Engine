@@ -32,8 +32,8 @@ namespace Test {
 constexpr SystemIntType MemoryBlockPointerWidth{sizeof(void *) * 8};
 
 template <typename LineNumber_T>
-static bool TestMemoryBlockSeedTableEnd(QTest &test, LiteArray<SystemIntType> &table, SizeT size,
-                                        SystemIntType bit_count, LineNumber_T line) {
+inline static bool TestMemoryBlockSeedTableEnd(QTest &test, LiteArray<SystemIntType> &table, SizeT size,
+                                               SystemIntType bit_count, LineNumber_T line) {
     SizeT index = 0;
     table.Clear();
 
@@ -60,7 +60,7 @@ static bool TestMemoryBlockSeedTableEnd(QTest &test, LiteArray<SystemIntType> &t
     return true;
 }
 
-static bool TestMemoryBlockVerifyTable(LiteArray<SystemIntType> &table1, SystemIntType *table2) {
+inline static bool TestMemoryBlockVerifyTable(LiteArray<SystemIntType> &table1, SystemIntType *table2) {
     SizeT index = 0;
 
     while (index < table1.Size()) {
@@ -74,8 +74,8 @@ static bool TestMemoryBlockVerifyTable(LiteArray<SystemIntType> &table1, SystemI
     return true;
 }
 
-static bool TestMemoryBlockVerifyAlignment(void *ptr, SystemIntType alignment) {
-    const SystemIntType mb_alignment_m1 = alignment - 1;
+inline static bool TestMemoryBlockVerifyAlignment(void *ptr, SystemIntType alignment) {
+    const SystemIntType mb_alignment_m1 = (alignment - SystemIntType{1});
     const SystemIntType mb_alignment_n  = ~mb_alignment_m1;
     const SystemIntType raw_address     = reinterpret_cast<SystemIntType>(ptr);
     const SystemIntType aligned_address = ((raw_address + mb_alignment_m1) & mb_alignment_n);
@@ -88,19 +88,16 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
                             SystemIntType expected_capacity) {
     using MemoryBlockT = MemoryBlock<Alignment_T>;
 
-    MemoryBlockT        mb{capacity};
-    const SystemIntType table_size = (mb.Capacity() > (Alignment_T * MemoryBlockPointerWidth))
-                                         ? (mb.Capacity() / (Alignment_T * MemoryBlockPointerWidth))
-                                         : 1;
+    MemoryBlockT mb{capacity};
 
     test.IsEqual(mb.Capacity(), SystemIntType{expected_capacity}, __LINE__);
     test.IsNotNull(mb.Base(), __LINE__);
     test.IsNotNull(mb.Data(), __LINE__);
     test.IsEqual(static_cast<const char *>(mb.End()), (static_cast<const char *>(mb.Base()) + mb.Capacity()), __LINE__);
     test.IsNotEqual(mb.TableSize(), SystemIntType{0}, __LINE__);
-    test.IsEqual(mb.TableSize(), table_size, __LINE__);
     test.IsTrue(mb.IsEmpty(), __LINE__);
     test.IsNotEqual(mb.Available(), mb.Capacity(), __LINE__);
+    test.IsEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsTrue(mb.Capacity() - mb.TableSize() >= mb.Available(), __LINE__);
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Base(), MemoryBlockT::MIN_BASE_ALIGNMENT), __LINE__);
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Data(), Alignment_T), __LINE__);
@@ -117,40 +114,61 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
     test.IsEqual(MemoryBlockT::DefaultAlignmentBit(), alignment, __LINE__);
 
     mb.ClearTable();
-    const SystemIntType unusable =
+    SystemIntType unusable_regions =
         static_cast<SystemIntType>(static_cast<char *>(mb.Data()) - static_cast<char *>(mb.Base())) / Alignment_T;
+    test.IsEqual((mb.Capacity() - mb.UsableSize()) / Alignment_T, unusable_regions, __LINE__);
+
+    const SizeT32 unusable_indices = static_cast<SizeT32>(unusable_regions / MemoryBlockPointerWidth);
+
+    const SystemIntType table_size =
+        (mb.Capacity() > (Alignment_T * MemoryBlockPointerWidth))
+            ? ((mb.Capacity() / (Alignment_T * MemoryBlockPointerWidth)) - unusable_indices)
+            : 1;
+
+    test.IsEqual(mb.TableSize(), table_size, __LINE__);
+
+    while (unusable_regions >= MemoryBlockPointerWidth) {
+        unusable_regions -= MemoryBlockPointerWidth;
+    }
 
     const SystemIntType chunk_count = (mb.Capacity() >> MemoryBlockT::DefaultAlignmentBit());
-    test.IsNotEqual(mb.Available(), (chunk_count - unusable * SystemIntType{8}), __LINE__);
 
     TestMemoryBlockSeedTableEnd(
         test, a_table, static_cast<SizeT>(mb.TableSize()),
-        (unusable + ((chunk_count >= MemoryBlockPointerWidth)
-                         ? 0
-                         : (MemoryBlockPointerWidth -
-                            static_cast<SizeT32>(mb.Capacity() >> MemoryBlockT::DefaultAlignmentBit())))),
+        (unusable_regions + ((chunk_count >= MemoryBlockPointerWidth)
+                                 ? 0
+                                 : (MemoryBlockPointerWidth -
+                                    static_cast<SizeT32>(mb.Capacity() >> MemoryBlockT::DefaultAlignmentBit())))),
         __LINE__);
     test.IsEqual(mb.TableSize(), a_table.Size(), __LINE__);
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemIntType *>(mb.Base())), __LINE__);
 
     mb.DecreaseAvailable(512);
     test.IsFalse(mb.IsEmpty(), __LINE__);
+    test.IsNotEqual(mb.Available(), mb.UsableSize(), __LINE__);
     mb.IncreaseAvailable(512);
     test.IsTrue(mb.IsEmpty(), __LINE__);
+    test.IsEqual(mb.Available(), mb.UsableSize(), __LINE__);
 
     mb.DecreaseAvailable(64);
+    test.IsNotEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsFalse(mb.IsEmpty(), __LINE__);
     mb.DecreaseAvailable(8);
+    test.IsNotEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsFalse(mb.IsEmpty(), __LINE__);
     mb.DecreaseAvailable(16);
+    test.IsNotEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsFalse(mb.IsEmpty(), __LINE__);
 
     mb.IncreaseAvailable(64);
+    test.IsNotEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsFalse(mb.IsEmpty(), __LINE__);
     mb.IncreaseAvailable(16);
+    test.IsNotEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsFalse(mb.IsEmpty(), __LINE__);
     mb.IncreaseAvailable(8);
     test.IsTrue(mb.IsEmpty(), __LINE__);
+    test.IsEqual(mb.Available(), mb.UsableSize(), __LINE__);
     ///////////////////
 
     void          *region  = mb.ReserveRegion(0, mb.Available() / Alignment_T);
@@ -183,9 +201,7 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
     mb.ReleaseRegion(region, 3);
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemIntType *>(mb.Base())), __LINE__);
 
-    const SystemIntType usable_chunks = (chunk_count - unusable);
-
-    if (usable_chunks > MemoryBlockPointerWidth * SystemIntType{2}) {
+    if (((mb.TableSize() * MemoryBlockPointerWidth) - unusable_regions) > MemoryBlockPointerWidth * SystemIntType{2}) {
         region = mb.ReserveRegion(MemoryBlockPointerWidth - 8, 16);
         map0   = table[0];
         test.IsEqual(table[0], (map0 | SystemIntType{255}), __LINE__);
@@ -213,7 +229,6 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
 
         test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemIntType *>(mb.Base())), __LINE__);
     }
-
     ///////////////////
     MemoryBlockT mb2{QUtility::Move(mb)};
     test.IsEqual(mb2.Capacity(), SystemIntType{expected_capacity}, __LINE__);
@@ -247,17 +262,29 @@ static int RunMemoryBlockTests() {
     test.Test("MemoryBlock Test 4096:16", TestMemoryBlock<16>, false, a_table, SystemIntType{4096},
               SystemIntType{4096});
 
+    test.Test("MemoryBlock Test 4096:32", TestMemoryBlock<32>, false, a_table, SystemIntType{4096},
+              SystemIntType{4096});
+
+    test.Test("MemoryBlock Test 4096:64", TestMemoryBlock<64>, false, a_table, SystemIntType{4096},
+              SystemIntType{4096});
+
+    test.Test("MemoryBlock Test 4096:128", TestMemoryBlock<128>, false, a_table, SystemIntType{4096},
+              SystemIntType{4096});
+
+    test.Test("MemoryBlock Test 4096:512", TestMemoryBlock<512>, false, a_table, SystemIntType{4096},
+              SystemIntType{4096});
+
+    test.Test("MemoryBlock Test 4096:1024", TestMemoryBlock<1024>, false, a_table, SystemIntType{4096},
+              SystemIntType{4096});
+
     test.Test("MemoryBlock Test 8192:16", TestMemoryBlock<16>, false, a_table, SystemIntType{4096 + 3},
+              SystemIntType{8192});
+
+    test.Test("MemoryBlock Test 8192:32", TestMemoryBlock<32>, false, a_table, SystemIntType{4096 + 4095},
               SystemIntType{8192});
 
     test.Test("MemoryBlock Test 12288:16", TestMemoryBlock<16>, false, a_table, SystemIntType{4096 + 4096 + 3},
               SystemIntType{12288});
-
-    test.Test("MemoryBlock Test 4096:32", TestMemoryBlock<32>, false, a_table, SystemIntType{4096},
-              SystemIntType{4096});
-
-    test.Test("MemoryBlock Test 8192:32", TestMemoryBlock<32>, false, a_table, SystemIntType{4096 + 4095},
-              SystemIntType{8192});
 
     test.Test("MemoryBlock Test 16K:8", TestMemoryBlock<8>, false, a_table, SystemIntType{16 * 1024},
               SystemIntType{16 * 1024});
@@ -268,14 +295,7 @@ static int RunMemoryBlockTests() {
     test.Test("MemoryBlock Test 16K:32", TestMemoryBlock<32>, false, a_table, SystemIntType{16 * 1024},
               SystemIntType{16 * 1024});
 
-    test.Test("MemoryBlock Test 4096:128", TestMemoryBlock<128>, false, a_table, SystemIntType{4096},
-              SystemIntType{4096});
-
-    test.Test("MemoryBlock Test 4096:512", TestMemoryBlock<512>, false, a_table, SystemIntType{4096},
-              SystemIntType{4096});
-
-    test.Test("MemoryBlock Test 4096:1024", TestMemoryBlock<1024>, false, a_table, SystemIntType{4096},
-              SystemIntType{4096});
+    test.Test("MemoryBlock Test 32K:8", TestMemoryBlock<8>, false, a_table, SystemIntType{32768}, SystemIntType{32768});
 
     return test.EndTests();
 }
