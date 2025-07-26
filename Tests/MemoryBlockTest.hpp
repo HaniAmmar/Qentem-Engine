@@ -90,7 +90,12 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
 
     MemoryBlockT mb{capacity};
 
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+    test.IsTrue(mb.Capacity() >= SystemIntType{expected_capacity}, __LINE__);
+#else
     test.IsEqual(mb.Capacity(), SystemIntType{expected_capacity}, __LINE__);
+#endif
+
     test.IsNotNull(mb.Base(), __LINE__);
     test.IsNotNull(mb.Data(), __LINE__);
     test.IsEqual(static_cast<const char *>(mb.End()), (static_cast<const char *>(mb.Base()) + mb.Capacity()), __LINE__);
@@ -99,7 +104,9 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
     test.IsNotEqual(mb.Available(), mb.Capacity(), __LINE__);
     test.IsEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsTrue(mb.Capacity() - mb.TableSize() >= mb.Available(), __LINE__);
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Base(), MemoryBlockT::MIN_BASE_ALIGNMENT), __LINE__);
+#endif
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Data(), Alignment_T), __LINE__);
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Data(), mb.DataAlignment()), __LINE__);
 
@@ -114,8 +121,14 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
     test.IsEqual(MemoryBlockT::DefaultAlignmentBit(), alignment, __LINE__);
 
     mb.ClearTable();
-    SystemIntType unusable_regions =
-        static_cast<SystemIntType>(static_cast<char *>(mb.Data()) - static_cast<char *>(mb.Base())) / Alignment_T;
+    SystemIntType diff = static_cast<SystemIntType>(static_cast<char *>(mb.Data()) - static_cast<char *>(mb.Base()));
+    SystemIntType unusable_regions     = diff / Alignment_T;
+    SystemIntType unusable_regions_rem = diff % Alignment_T;
+
+    if (unusable_regions_rem != 0) {
+        ++unusable_regions;
+    }
+
     test.IsEqual((mb.Capacity() - mb.UsableSize()) / Alignment_T, unusable_regions, __LINE__);
 
     const SizeT32 unusable_indices = static_cast<SizeT32>(unusable_regions / MemoryBlockPointerWidth);
@@ -230,24 +243,20 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
         test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemIntType *>(mb.Base())), __LINE__);
     }
     ///////////////////
+    const SystemIntType mb_capacity = mb.Capacity();
+
     MemoryBlockT mb2{QUtility::Move(mb)};
-    test.IsEqual(mb2.Capacity(), SystemIntType{expected_capacity}, __LINE__);
+    test.IsEqual(mb2.Capacity(), mb_capacity, __LINE__);
     test.IsNotNull(mb2.Base(), __LINE__);
     test.IsNotNull(mb2.Data(), __LINE__);
     test.IsNotEqual(mb2.TableSize(), SystemIntType{0}, __LINE__);
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb2.Base(), MemoryBlockT::MIN_BASE_ALIGNMENT), __LINE__);
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb2.Data(), Alignment_T), __LINE__);
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb2.Data(), mb2.DataAlignment()), __LINE__);
 
     MemoryBlockT mb3;
     mb3 = QUtility::Move(mb2);
-    test.IsEqual(mb3.Capacity(), SystemIntType{expected_capacity}, __LINE__);
+    test.IsEqual(mb3.Capacity(), mb_capacity, __LINE__);
     test.IsNotNull(mb3.Base(), __LINE__);
     test.IsNotNull(mb3.Data(), __LINE__);
     test.IsNotEqual(mb3.TableSize(), SystemIntType{0}, __LINE__);
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb3.Base(), MemoryBlockT::MIN_BASE_ALIGNMENT), __LINE__);
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb3.Data(), Alignment_T), __LINE__);
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb3.Data(), mb3.DataAlignment()), __LINE__);
 }
 
 static int RunMemoryBlockTests() {

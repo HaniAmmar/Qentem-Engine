@@ -63,9 +63,6 @@ struct MemoryBlock {
                       "Alignment_T must be power-of-two");
 
         static const SystemIntType page_size = SystemMemory::PageSize();
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-        capacity += page_size; // Insure correct alignment
-#endif
 
         if (capacity_ > page_size) {
             // Round up to next page boundary
@@ -74,6 +71,10 @@ struct MemoryBlock {
         } else {
             capacity_ = page_size;
         }
+
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+        capacity_ += page_size; // Insure correct alignment
+#endif
 
         base_raw_ = SystemMemory::Reserve(capacity_);
 
@@ -84,8 +85,6 @@ struct MemoryBlock {
             const SystemIntType     raw_address     = reinterpret_cast<SystemIntType>(base_raw_);
             const SystemIntType     aligned_address = ((raw_address + mb_alignment_m1) & mb_alignment_n);
             base_                                   = reinterpret_cast<void *>(aligned_address);
-
-            capacity_ -= (aligned_address - raw_address);
         }
 #endif
 
@@ -101,7 +100,8 @@ struct MemoryBlock {
         const SystemIntType usable_base_raw =
             reinterpret_cast<SystemIntType>((static_cast<char *>(base_) + table_size_));
         const SystemIntType aligned_usable_base = ((usable_base_raw + ALIGNMENT_M1) & ALIGNMENT_N);
-        const SystemIntType unusable            = (table_size_ + (aligned_usable_base - usable_base_raw));
+        const SystemIntType unusable =
+            (((table_size_ + (aligned_usable_base - usable_base_raw)) + ALIGNMENT_M1) & ALIGNMENT_N);
 
         table_size_ /= PTR_SIZE;
 

@@ -670,7 +670,7 @@ struct Reserver {
         return getReservers().Storage()[core_id];
 #else
         (void)core_id;
-        static ReserverCore reserver{};
+        static ReserverCore<> reserver{};
         return reserver;
 #endif
     }
