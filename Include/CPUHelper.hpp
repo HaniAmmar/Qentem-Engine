@@ -48,7 +48,7 @@ struct CPUHelper {
 #ifdef _WIN32
         SYSTEM_INFO sysinfo;
         GetSystemInfo(&sysinfo);
-        static_cast<SizeT32>(sysinfo.dwNumberOfProcessors);
+        return SizeT32(sysinfo.dwNumberOfProcessors);
 #else
         auto count = sysconf(_SC_NPROCESSORS_ONLN);
         return (count > 0) ? static_cast<SizeT32>(count) : 1U;
