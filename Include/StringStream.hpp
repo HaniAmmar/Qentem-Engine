@@ -30,49 +30,60 @@ struct StringStream {
     QENTEM_INLINE StringStream() = default;
 
     QENTEM_INLINE ~StringStream() {
-        QAllocator::Deallocate(Storage() /*, Capacity()*/);
+        Reserver::Release(Storage(), Capacity());
     }
 
-    inline explicit StringStream(SizeT capacity) {
+    explicit StringStream(SizeT capacity) {
         if (capacity != 0) {
-            allocate(capacity);
+            reserve(capacity);
         }
     }
 
-    StringStream(StringStream &&stream) noexcept
-        : storage_{stream.Storage()}, length_{stream.Length()}, capacity_{stream.Capacity()} {
-        stream.clearStorage();
-        stream.setLength(0);
-        stream.setCapacity(0);
+    StringStream(StringStream &&src) noexcept
+        : storage_{src.Storage()}, length_{src.Length()}, capacity_{src.Capacity()} {
+        src.clearStorage();
+        src.setLength(0);
+        src.setCapacity(0);
     }
 
-    StringStream(const StringStream &stream) {
-        if (stream.Length() != 0) {
-            allocate(stream.Length());
-            write(stream.First(), stream.Length());
+    StringStream(const StringStream &src) {
+        if (src.Length() != 0) {
+            reserve(src.Length());
+            write(src.First(), src.Length());
         }
     }
 
-    StringStream &operator=(StringStream &&stream) noexcept {
-        if (this != &stream) {
-            QAllocator::Deallocate(Storage() /*, Capacity()*/);
+    StringStream(const Char_T *str, SizeT length) {
+        reserve(length);
+        write(str, length);
+    }
 
-            setCapacity(stream.Capacity());
-            setStorage(stream.Storage());
-            setLength(stream.Length());
+    StringStream(const Char_T *str) {
+        const SizeT length = StringUtils::Count(str);
+        reserve(length);
+        write(str, length);
+    }
 
-            stream.clearStorage();
-            stream.setCapacity(0);
-            stream.setLength(0);
+    StringStream &operator=(StringStream &&src) noexcept {
+        if (this != &src) {
+            Reserver::Release(Storage(), Capacity());
+
+            setCapacity(src.Capacity());
+            setStorage(src.Storage());
+            setLength(src.Length());
+
+            src.clearStorage();
+            src.setCapacity(0);
+            src.setLength(0);
         }
 
         return *this;
     }
 
-    StringStream &operator=(const StringStream &stream) {
-        if (this != &stream) {
+    StringStream &operator=(const StringStream &src) {
+        if (this != &src) {
             Clear();
-            write(stream.First(), stream.Length());
+            write(src.First(), src.Length());
         }
 
         return *this;
@@ -227,7 +238,7 @@ struct StringStream {
         Reset();
 
         if (size != 0) {
-            allocate(size);
+            reserve(size);
         }
     }
 
@@ -244,7 +255,7 @@ struct StringStream {
     }
 
     void Reset() noexcept {
-        QAllocator::Deallocate(Storage() /*, Capacity()*/);
+        Reserver::Release(Storage(), Capacity());
 
         clearStorage();
         setLength(0);
@@ -259,22 +270,23 @@ struct StringStream {
         Storage()[Length()] = Char_T{0};
     }
 
-    StringView<Char_T> GetStringView() {
+    QENTEM_INLINE StringView<Char_T> GetStringView() {
         InsertNull();
         return StringView<Char_T>{First(), Length()};
     }
 
     // Without NULL terminator
-    StringView<Char_T> View() const noexcept {
-        return StringView<Char_T>{First(), Length()};
+    QENTEM_INLINE StringView<Char_T> View() const noexcept {
+        return GetStringView();
     }
 
     String<Char_T> GetString() {
         if (Capacity() > Length()) {
-            const SizeT length  = Length(); // Detach() resets the length.
-            Storage()[Length()] = Char_T{0};
+            const SizeT length   = Length();   // Detach() resets the length.
+            const SizeT capacity = Capacity(); // Detach() resets the length.
+            Storage()[Length()]  = Char_T{0};
             String<Char_T> a_string{};
-            a_string.Adopt(Detach(), length);
+            a_string.Adopt(Detach(), length, (capacity - SizeT{1}));
             return a_string;
         }
 
@@ -324,9 +336,9 @@ struct StringStream {
                 data[index] = ch;
                 setLength(new_length);
             } else {
-                // Not enough capacity: allocate a bigger buffer and copy in 3 steps.
+                // Not enough capacity: reserve a bigger buffer and copy in 3 steps.
                 SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
-                Char_T *new_storage  = QAllocator::Allocate<Char_T>(new_capacity);
+                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_capacity);
 
                 // 1. Copy prefix [0, index)
                 if (index != 0) {
@@ -342,7 +354,7 @@ struct StringStream {
                 }
 
                 // Clean up old storage and set new storage/capacity
-                QAllocator::Deallocate(Storage() /*, Capacity()*/);
+                Reserver::Release(Storage(), Capacity());
                 setStorage(new_storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
@@ -368,9 +380,9 @@ struct StringStream {
 
                 setLength(new_length);
             } else {
-                // Not enough capacity: allocate, then copy with the shift.
+                // Not enough capacity: reserve, then copy with the shift.
                 SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
-                Char_T *new_storage  = QAllocator::Allocate<Char_T>(new_capacity);
+                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_capacity);
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length != 0) {
@@ -378,7 +390,7 @@ struct StringStream {
                 }
 
                 // Clean up, set new pointers
-                QAllocator::Deallocate(Storage() /*, Capacity()*/);
+                Reserver::Release(Storage(), Capacity());
                 setStorage(new_storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
@@ -484,7 +496,7 @@ struct StringStream {
         capacity_ = new_capacity;
     }
 
-    QENTEM_INLINE void write(const Char_T *str, const SizeT length) {
+    void write(const Char_T *str, const SizeT length) {
         if (length != 0) {
             const SizeT new_length = (Length() + length);
 
@@ -498,19 +510,19 @@ struct StringStream {
         }
     }
 
-    QENTEM_INLINE void expand(const SizeT new_capacity) {
-        Char_T *old_storage = Storage();
-        // SizeT   old_capacity = Capacity();
+    void expand(const SizeT new_capacity) {
+        Char_T *old_storage  = Storage();
+        SizeT   old_capacity = Capacity();
 
-        allocate(new_capacity);
+        reserve(new_capacity);
 
         MemoryUtils::CopyTo(Storage(), old_storage, Length());
-        QAllocator::Deallocate(old_storage /*, old_capacity*/);
+        Reserver::Release(old_storage, old_capacity);
     }
 
-    QENTEM_INLINE void allocate(SizeT capacity) {
+    void reserve(SizeT capacity) {
         capacity = MemoryUtils::AlignToPow2(capacity);
-        setStorage(QAllocator::Allocate<Char_T>(capacity));
+        setStorage(Reserver::Reserve<Char_T>(capacity));
         setCapacity(capacity);
     }
 

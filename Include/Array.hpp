@@ -14,15 +14,15 @@
 #ifndef QENTEM_ARRAY_H
 #define QENTEM_ARRAY_H
 
-#include "QAllocator.hpp"
+#include "Reserver.hpp"
 
 namespace Qentem {
 
 template <typename Type_T>
 struct Array {
-    Array() noexcept = default;
+    QENTEM_INLINE Array() noexcept = default;
 
-    Array(Array &&src) noexcept : storage_{src.storage_}, size_{src.size_}, capacity_{src.capacity_} {
+    QENTEM_INLINE Array(Array &&src) noexcept : storage_{src.storage_}, size_{src.size_}, capacity_{src.capacity_} {
         src.clearStorage();
         src.setSize(0);
         src.setCapacity(0);
@@ -30,33 +30,31 @@ struct Array {
 
     explicit Array(SizeT capacity, bool initialize = false) : capacity_{capacity} {
         if (capacity != 0) {
-            Type_T *current = allocate();
+            reserve();
 
             if (initialize) {
-                MemoryUtils::InitializeRange(current, (current + capacity));
-                setSize(capacity);
+                MemoryUtils::InitializeRange(Storage(), (Storage() + Capacity()));
+                setSize(Capacity());
             }
         }
     }
 
-    Array(const Array &src) : capacity_{src.Size()} {
+    QENTEM_INLINE Array(const Array &src) : size_{src.Size()}, capacity_{src.Size()} {
         if (src.IsNotEmpty()) {
-            setSize(src.Size());
             copyArray(src);
         }
     }
 
     ~Array() {
-        if (Storage() != nullptr) {
-            MemoryUtils::Dispose(Storage(), End());
-            QAllocator::Deallocate(Storage());
-        }
+        MemoryUtils::Dispose(Storage(), End());
+        Reserver::Release(Storage(), Capacity());
     }
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
-            Type_T     *storage = Storage();
-            const SizeT size    = Size();
+            Type_T     *old_storage  = Storage();
+            const SizeT old_size     = Size();
+            const SizeT old_capacity = Capacity();
 
             setStorage(src.Storage());
             setSize(src.Size());
@@ -66,10 +64,10 @@ struct Array {
             src.setSize(0);
             src.setCapacity(0);
 
-            if (storage != nullptr) {
+            if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                MemoryUtils::Dispose(storage, (storage + size));
-                QAllocator::Deallocate(storage);
+                MemoryUtils::Dispose(old_storage, (old_storage + old_size));
+                Reserver::Release(old_storage, old_capacity);
             }
         }
 
@@ -78,21 +76,22 @@ struct Array {
 
     Array &operator=(const Array &src) {
         if (this != &src) {
-            Type_T     *storage = Storage();
-            const SizeT size    = Size();
+            Type_T     *old_storage  = Storage();
+            const SizeT old_size     = Size();
+            const SizeT old_capacity = Capacity();
 
             clearStorage();
             setSize(src.Size());
             setCapacity(src.Size());
 
-            if (IsNotEmpty()) {
+            if (src.IsNotEmpty()) {
                 copyArray(src);
             }
 
-            if (storage != nullptr) {
+            if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                MemoryUtils::Dispose(storage, (storage + size));
-                QAllocator::Deallocate(storage);
+                MemoryUtils::Dispose(old_storage, (old_storage + old_size));
+                Reserver::Release(old_storage, old_capacity);
             }
         }
 
@@ -108,11 +107,11 @@ struct Array {
             const SizeT n_size = (Size() + src.Size());
 
             if (n_size > Capacity()) {
-                expand(n_size);
+                resize(n_size);
             }
 
             MemoryUtils::CopyTo((Storage() + Size()), src.Storage(), src.Size());
-            QAllocator::Deallocate(src.Storage());
+            Reserver::Release(src.Storage(), src.Capacity());
             setSize(n_size);
         }
 
@@ -125,7 +124,7 @@ struct Array {
         const SizeT n_size = (Size() + src.Size());
 
         if (n_size > Capacity()) {
-            expand(n_size);
+            resize(n_size);
         }
 
         size_ += src.Size();
@@ -143,16 +142,16 @@ struct Array {
 
     void operator+=(Type_T &&item) {
         if (Size() == Capacity()) {
-            expand((Capacity() | SizeT{1}) * SizeT{2});
+            resize((Capacity() | SizeT{1}) * SizeT{2});
         }
 
         MemoryUtils::Initialize((Storage() + Size()), QUtility::Move(item));
         ++size_;
     }
 
-    inline void operator+=(const Type_T &item) {
+    void operator+=(const Type_T &item) {
         if (Size() == Capacity()) {
-            expand((Capacity() | SizeT{1}) * SizeT{2});
+            resize((Capacity() | SizeT{1}) * SizeT{2});
         }
 
         MemoryUtils::Initialize((Storage() + Size()), item);
@@ -160,16 +159,14 @@ struct Array {
     }
 
     /**
-     * @brief Adopts (takes ownership of) a pre-allocated buffer and manages its lifetime.
+     * @brief Adopts (takes ownership of) a pre-reserved buffer and assumes responsibility for its release.
      *
-     * The Array takes responsibility for the provided memory block (pointer, capacity, and length).
-     * When the Array is destroyed or cleared, it will properly destroy and deallocate all elements.
+     * @warning The buffer must have been reserved using a compatible strategy,
+     *          and must not be accessed elsewhere after adoption.
      *
-     * @warning The buffer must have been allocated with the appropriate allocator,
-     *          and must not be used elsewhere after being adopted.
-     * @param ptr   Pointer to the pre-allocated memory block.
-     * @param size  The current logical size (number of constructed elements).
-     * @param capacity   The capacity of the buffer (number of slots allocated).
+     * @param ptr       Pointer to the pre-reserved memory block.
+     * @param size      The current logical size (number of constructed elements).
+     * @param capacity  The total capacity of the buffer (number of available slots).
      */
     void Adopt(Type_T *ptr, SizeT size, SizeT capacity) {
         // Clean up any existing storage
@@ -181,15 +178,15 @@ struct Array {
         setCapacity(capacity);
     }
 
-    inline void Insert(Array &&src) {
+    QENTEM_INLINE void Insert(Array &&src) {
         *this += QUtility::Move(src);
     }
 
-    inline void Insert(const Array &src) {
+    QENTEM_INLINE void Insert(const Array &src) {
         *this += src;
     }
 
-    inline Type_T &Insert(Type_T &&item) {
+    QENTEM_INLINE Type_T &Insert(Type_T &&item) {
         const SizeT size = Size();
 
         *this += QUtility::Move(item);
@@ -197,7 +194,7 @@ struct Array {
         return Storage()[size];
     }
 
-    inline Type_T &Insert(const Type_T &item) {
+    QENTEM_INLINE Type_T &Insert(const Type_T &item) {
         const SizeT size = Size();
 
         *this += item;
@@ -205,7 +202,7 @@ struct Array {
         return Storage()[size];
     }
 
-    void Clear() noexcept {
+    QENTEM_INLINE void Clear() noexcept {
         MemoryUtils::Dispose(Storage(), End());
 
         setSize(0);
@@ -213,7 +210,7 @@ struct Array {
 
     void Reset() noexcept {
         MemoryUtils::Dispose(Storage(), End());
-        QAllocator::Deallocate(Storage());
+        Reserver::Release(Storage(), Capacity());
 
         clearStorage();
         setSize(0);
@@ -235,10 +232,10 @@ struct Array {
 
         if (size != 0) {
             setCapacity(size);
-            Type_T *current = allocate();
+            reserve();
 
             if (initialize) {
-                MemoryUtils::InitializeRange(current, (current + size));
+                MemoryUtils::InitializeRange(Storage(), (Storage() + size));
                 setSize(size);
             }
         }
@@ -252,7 +249,7 @@ struct Array {
                 setSize(new_size);
             }
 
-            expand(new_size);
+            resize(new_size);
             return;
         }
 
@@ -270,15 +267,15 @@ struct Array {
         setSize(Capacity());
     }
 
-    inline void Expect(SizeT size) {
+    QENTEM_INLINE void Expect(SizeT size) {
         const SizeT n_size = (size + Size());
 
         if (n_size > Capacity()) {
-            expand(n_size);
+            resize(n_size);
         }
     }
 
-    void Swap(Type_T &item1, Type_T &item2) noexcept {
+    QENTEM_INLINE void Swap(Type_T &item1, Type_T &item2) noexcept {
         QUtility::Swap(item1, item2);
     }
 
@@ -294,17 +291,17 @@ struct Array {
     /**
      * @brief Shrinks the internal buffer to match the current element count.
      *
-     * If the allocated capacity exceeds the number of stored elements,
-     * this method reallocates the buffer to the exact size, copies
-     * all elements into the new storage and frees the excess memory.
+     * If the reserved capacity exceeds the number of stored elements,
+     * this method creates a new buffer with the exact required size,
+     * transfers all elements into it, and releases the surplus memory.
      */
-    void Compress() {
+    QENTEM_INLINE void Compress() {
         if (Size() < Capacity()) {
             Resize(Size());
         }
     }
 
-    inline void Drop(const SizeT size) noexcept {
+    void Drop(const SizeT size) noexcept {
         if (size <= Size()) {
             const SizeT new_size = (Size() - size);
 
@@ -313,27 +310,27 @@ struct Array {
         }
     }
 
-    inline Type_T *Storage() noexcept {
+    QENTEM_INLINE Type_T *Storage() noexcept {
         return storage_;
     }
 
-    inline const Type_T *Storage() const noexcept {
+    QENTEM_INLINE const Type_T *Storage() const noexcept {
         return storage_;
     }
 
-    inline SizeT Size() const noexcept {
+    QENTEM_INLINE SizeT Size() const noexcept {
         return size_;
     }
 
-    inline SizeT Capacity() const noexcept {
+    QENTEM_INLINE SizeT Capacity() const noexcept {
         return capacity_;
     }
 
-    inline const Type_T *First() const noexcept {
+    QENTEM_INLINE const Type_T *First() const noexcept {
         return storage_;
     }
 
-    inline Type_T *Last() noexcept {
+    QENTEM_INLINE Type_T *Last() noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - SizeT{1}));
         }
@@ -341,7 +338,7 @@ struct Array {
         return nullptr;
     }
 
-    inline const Type_T *Last() const noexcept {
+    QENTEM_INLINE const Type_T *Last() const noexcept {
         if (IsNotEmpty()) {
             return (First() + (Size() - SizeT{1}));
         }
@@ -349,81 +346,83 @@ struct Array {
         return nullptr;
     }
 
-    inline const Type_T *End() const noexcept {
+    QENTEM_INLINE const Type_T *End() const noexcept {
         return (First() + Size());
     }
 
-    inline bool IsEmpty() const noexcept {
+    QENTEM_INLINE bool IsEmpty() const noexcept {
         return (Size() == 0);
     }
 
-    inline bool IsNotEmpty() const noexcept {
+    QENTEM_INLINE bool IsNotEmpty() const noexcept {
         return !(IsEmpty());
     }
 
     // For STL
-    inline const Type_T *begin() const noexcept {
+    QENTEM_INLINE const Type_T *begin() const noexcept {
         return First();
     }
 
-    inline const Type_T *end() const noexcept {
+    QENTEM_INLINE const Type_T *end() const noexcept {
         return End();
     }
 
-    inline Type_T *begin() noexcept {
+    QENTEM_INLINE Type_T *begin() noexcept {
         return Storage();
     }
 
-    inline Type_T *end() noexcept {
+    QENTEM_INLINE Type_T *end() noexcept {
         return (Storage() + Size());
     }
 
     //////////// Private ////////////
 
   private:
-    void setStorage(Type_T *ptr) noexcept {
+    QENTEM_INLINE void setStorage(Type_T *ptr) noexcept {
         storage_ = ptr;
     }
 
-    Type_T *allocate() {
-        Type_T *new_storage = QAllocator::Allocate<Type_T>(Capacity());
-        setStorage(new_storage);
-        return new_storage;
+    QENTEM_INLINE void reserve() {
+        storage_ = Reserver::Reserve<Type_T>(Capacity());
     }
 
-    void clearStorage() noexcept {
+    QENTEM_INLINE void clearStorage() noexcept {
         storage_ = nullptr;
     }
 
-    void setSize(SizeT new_size) noexcept {
+    QENTEM_INLINE void setSize(SizeT new_size) noexcept {
         size_ = new_size;
     }
 
-    void setCapacity(SizeT new_capacity) noexcept {
+    QENTEM_INLINE void setCapacity(SizeT new_capacity) noexcept {
         capacity_ = new_capacity;
     }
 
-    void expand(SizeT new_capacity) {
-        Type_T *src = Storage();
+    void resize(SizeT new_capacity) {
+        Type_T     *old_storage  = Storage();
+        const SizeT old_capacity = Capacity();
 
         setCapacity(new_capacity);
 
-        Type_T *des = allocate();
+        reserve();
 
-        if (src != nullptr) {
-            MemoryUtils::CopyTo(des, src, Size());
-            QAllocator::Deallocate(src);
+        if (old_storage != nullptr) {
+            MemoryUtils::CopyTo(Storage(), old_storage, Size());
+            Reserver::Release(old_storage, old_capacity);
         }
     }
 
     void copyArray(const Array &src) {
-        Type_T       *new_storage = allocate();
-        const Type_T *src_item    = src.First();
-        const Type_T *src_end     = (src_item + src.Size());
+        reserve();
+
+        Type_T *storage = Storage();
+
+        const Type_T *src_item = src.First();
+        const Type_T *src_end  = (src_item + src.Size());
 
         while (src_item < src_end) {
-            MemoryUtils::Initialize(new_storage, *src_item);
-            ++new_storage;
+            MemoryUtils::Initialize(storage, *src_item);
+            ++storage;
             ++src_item;
         }
     }

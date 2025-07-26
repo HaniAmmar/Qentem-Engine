@@ -15,7 +15,7 @@
 #ifndef QENTEM_HASH_TABLE_H
 #define QENTEM_HASH_TABLE_H
 
-#include "QAllocator.hpp"
+#include "Reserver.hpp"
 
 namespace Qentem {
 
@@ -112,18 +112,19 @@ struct HashTable {
     /**
      * @brief Default constructor. Initializes an empty hash table.
      */
-    HashTable() = default;
+    QENTEM_INLINE HashTable() = default;
 
     /**
      * @brief Constructs a hash table with the given initial capacity.
      *
-     * Allocates storage for at least @p size elements.
+     * Reserves internal storage sufficient to hold at least @p capacity items,
+     * enabling early insertion without immediate resizing.
      *
-     * @param size Initial capacity (number of items).
+     * @param capacity Initial capacity (number of items to prepare for).
      */
-    explicit HashTable(const SizeT capacity) {
+    QENTEM_INLINE explicit HashTable(const SizeT capacity) {
         if (capacity != 0) {
-            allocate(capacity);
+            reserve(capacity);
         }
     }
 
@@ -134,7 +135,7 @@ struct HashTable {
      *
      * @param src HashTable to move from.
      */
-    inline HashTable(HashTable &&src) noexcept
+    QENTEM_INLINE HashTable(HashTable &&src) noexcept
         : hashTable_{src.hashTable_}, size_{src.size_}, capacity_{src.capacity_} {
         src.setSize(0);
         src.setCapacity(0);
@@ -146,21 +147,18 @@ struct HashTable {
      *
      * @param src HashTable to copy from.
      */
-    inline HashTable(const HashTable &src) {
+    QENTEM_INLINE HashTable(const HashTable &src) {
         copyTableWithHash(src);
     }
 
     /**
      * @brief Destructor. Disposes of all storage and items.
      */
-    inline ~HashTable() {
+    ~HashTable() {
         SizeT   *hashTable = getHashTable();
         HItem_T *storage   = Storage();
-
-        if (hashTable != nullptr) {
-            MemoryUtils::Dispose(storage, (storage + Size()));
-            QAllocator::Deallocate(hashTable);
-        }
+        MemoryUtils::Dispose(storage, (storage + Size()));
+        release(hashTable, Capacity());
     }
 
     /**
@@ -175,9 +173,10 @@ struct HashTable {
     HashTable &operator=(HashTable &&src) noexcept {
         if (this != &src) {
             // Save current pointers and size for cleanup after reassignment.
-            SizeT      *ht      = getHashTable();
-            HItem_T    *storage = Storage();
-            const SizeT size    = Size();
+            SizeT      *ht           = getHashTable();
+            HItem_T    *storage      = Storage();
+            const SizeT old_capacity = Capacity();
+            const SizeT size         = Size();
 
             // Take ownership of src's memory and bookkeeping.
             setHashTable(src.getHashTable());
@@ -189,11 +188,9 @@ struct HashTable {
             src.setSize(0);
             src.setCapacity(0);
 
-            if (ht != nullptr) {
-                // Dispose of the old memory (after transfer, in case of derived/child arrays).
-                MemoryUtils::Dispose(storage, (storage + size));
-                QAllocator::Deallocate(ht);
-            }
+            // Dispose of the old memory (after transfer, in case of derived/child arrays).
+            MemoryUtils::Dispose(storage, (storage + size));
+            release(ht, old_capacity);
         }
 
         return *this;
@@ -211,9 +208,10 @@ struct HashTable {
     HashTable &operator=(const HashTable &src) {
         if (this != &src) {
             // Save old pointers and size for safe cleanup after copying.
-            SizeT      *ht      = getHashTable();
-            HItem_T    *storage = Storage();
-            const SizeT size    = Size();
+            SizeT      *ht           = getHashTable();
+            HItem_T    *storage      = Storage();
+            const SizeT old_capacity = Capacity();
+            const SizeT size         = Size();
 
             // Clear current state before copying new data.
             clearHashTable();
@@ -223,23 +221,22 @@ struct HashTable {
             // Deep copy all items and hash table layout from src.
             copyTable(src);
 
-            if (ht != nullptr) {
-                // Dispose of the old memory (after transfer, in case of derived/child arrays).
-                MemoryUtils::Dispose(storage, (storage + size));
-                QAllocator::Deallocate(ht);
-            }
+            // Dispose of the old memory (after transfer, in case of derived/child arrays).
+            MemoryUtils::Dispose(storage, (storage + size));
+            release(ht, old_capacity);
         }
 
         return *this;
     }
 
     /**
-     * @brief Move-adds all items from another hash table (src) into this table.
+     * @brief Move-adds all items from another hash table (@p src) into this table.
      *
-     * Moves every valid item from @p src into this table, overwriting values if the key exists.
-     * After completion, @p src is cleared and its storage deallocated.
+     * Transfers ownership of each valid entry from @p src into this instance, replacing
+     * any existing value with the same key. Once complete, @p src is cleared and its
+     * internal buffer is released for reuse.
      *
-     * @param src HashTable to move from (will be left empty).
+     * @param src HashTable to move from (will be left empty and inert).
      */
     void operator+=(HashTable &&src) {
         // Compute the total size after merge.
@@ -269,7 +266,7 @@ struct HashTable {
         }
 
         // Release src's memory and reset its bookkeeping.
-        QAllocator::Deallocate(src.getHashTable());
+        release(src.getHashTable(), src.Capacity());
         src.clearHashTable();
         src.setSize(0);
         src.setCapacity(0);
@@ -317,7 +314,7 @@ struct HashTable {
      *
      * @param key The key to insert (copied).
      */
-    inline void Insert(const Key_T &key) {
+    QENTEM_INLINE void Insert(const Key_T &key) {
         tryInsert(key); // Insert or do nothing if key already exists.
     }
 
@@ -328,7 +325,7 @@ struct HashTable {
      *
      * @param key The key to insert (moved).
      */
-    inline void Insert(Key_T &&key) {
+    QENTEM_INLINE void Insert(Key_T &&key) {
         tryInsert(QUtility::Move(key)); // Move-insert or do nothing if key exists.
     }
 
@@ -338,7 +335,7 @@ struct HashTable {
      * @param key The key to look up.
      * @return true if the key is found; false otherwise.
      */
-    inline bool Has(const Key_T &key) const noexcept {
+    QENTEM_INLINE bool Has(const Key_T &key) const noexcept {
         if (IsNotEmpty()) {
             SizeT index;
             return (find(index, key) != nullptr); // Return true if found, false if not.
@@ -353,7 +350,7 @@ struct HashTable {
      * @param index The array-style index to access.
      * @return Pointer to the key at the given index, or nullptr if index is invalid or empty.
      */
-    inline const Key_T *GetKeyAt(const SizeT index) const noexcept {
+    QENTEM_INLINE const Key_T *GetKeyAt(const SizeT index) const noexcept {
         const HItem_T *src = First();
 
         // Check bounds and ensure this slot is not deleted.
@@ -370,7 +367,7 @@ struct HashTable {
      * @param key The key to find.
      * @return Pointer to the found item, or nullptr if not found.
      */
-    inline HItem_T *GetItem(const Key_T &key) noexcept {
+    QENTEM_INLINE HItem_T *GetItem(const Key_T &key) noexcept {
         if (IsNotEmpty()) {
             SizeT *index;
             return find(index, key);
@@ -379,7 +376,7 @@ struct HashTable {
         return nullptr; // Not found or table is empty.
     }
 
-    inline const HItem_T *GetItem(const Key_T &key) const noexcept {
+    QENTEM_INLINE const HItem_T *GetItem(const Key_T &key) const noexcept {
         if (IsNotEmpty()) {
             SizeT index;
             return find(index, key);
@@ -394,7 +391,7 @@ struct HashTable {
      * @param index The array-style index to access.
      * @return Pointer to the item at the given index, or nullptr if index is invalid or empty.
      */
-    inline HItem_T *GetItemAt(const SizeT index) noexcept {
+    QENTEM_INLINE HItem_T *GetItemAt(const SizeT index) noexcept {
         HItem_T *src = Storage();
 
         // Check bounds and ensure this slot is not deleted.
@@ -411,7 +408,7 @@ struct HashTable {
      * @param index The array-style index to access.
      * @return Const pointer to the item at the given index, or nullptr if index is invalid or empty.
      */
-    inline const HItem_T *GetItemAt(const SizeT index) const noexcept {
+    QENTEM_INLINE const HItem_T *GetItemAt(const SizeT index) const noexcept {
         const HItem_T *src = First();
 
         // Check bounds and ensure this slot is not deleted.
@@ -431,7 +428,7 @@ struct HashTable {
      * @param key The key to search for.
      * @return true if the key is found and index set; false otherwise.
      */
-    inline bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
+    QENTEM_INLINE bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
         if (IsNotEmpty()) {
             find(index, key);
             return (index != Capacity());
@@ -447,7 +444,7 @@ struct HashTable {
      *
      * @param key The key to remove.
      */
-    inline void Remove(const Key_T &key) noexcept {
+    QENTEM_INLINE void Remove(const Key_T &key) noexcept {
         remove(key); // Dispatch to private remove logic.
     }
 
@@ -458,7 +455,7 @@ struct HashTable {
      *
      * @param index The array-style index of the item to remove.
      */
-    inline void RemoveAt(const SizeT index) noexcept {
+    QENTEM_INLINE void RemoveAt(const SizeT index) noexcept {
         // Only act if index is within bounds.
         if (index < Size()) {
             HItem_T *item = (Storage() + index);
@@ -481,7 +478,7 @@ struct HashTable {
      * @param to   The new key name (rvalue).
      * @return true if renaming is successful; false otherwise.
      */
-    inline bool Rename(const Key_T &from, Key_T &&to) const noexcept {
+    bool Rename(const Key_T &from, Key_T &&to) const noexcept {
         HItem_T *item = prepareRename(from, to); // Unlink and ready for new key
         if (item != nullptr) {
             item->Key = QUtility::Move(to); // Move-assign new key
@@ -501,7 +498,7 @@ struct HashTable {
      * @param to   The new key name (const lvalue).
      * @return true if renaming is successful; false otherwise.
      */
-    inline bool Rename(const Key_T &from, const Key_T &to) {
+    bool Rename(const Key_T &from, const Key_T &to) {
         HItem_T *item = prepareRename(from, to); // Unlink and ready for new key
         if (item != nullptr) {
             item->Key = to; // Copy-assign new key
@@ -520,7 +517,7 @@ struct HashTable {
      *
      * @param count Number of additional elements to expect.
      */
-    inline void Expect(const SizeT count) {
+    QENTEM_INLINE void Expect(const SizeT count) {
         const SizeT new_size = (count + Size()); // Total required size after 'count' more elements
 
         if (new_size > Capacity()) {
@@ -529,13 +526,14 @@ struct HashTable {
     }
 
     /**
-     * @brief Changes the table's capacity to hold exactly 'new_size' elements.
+     * @brief Adjusts the table's capacity to match exactly @p new_size elements.
      *
-     * If the new size is smaller than the current number of elements, shrinks the array
-     * and disposes any items beyond the new limit. If larger, expands capacity as needed.
-     * If new_size is zero, completely resets (deallocates) the table.
+     * If @p new_size is less than the current number of stored items, excess entries
+     * are discarded. If greater, a new buffer is reserved with sufficient space to
+     * accommodate the requested size. When set to zero, the table is fully reset
+     * and its memory is released.
      *
-     * @param new_size The new maximum number of items for the table.
+     * @param new_size The target number of items the table should support.
      */
     void Resize(const SizeT new_size) {
         if (new_size != 0) {
@@ -548,23 +546,23 @@ struct HashTable {
 
             resize(new_size); // Internal grow/shrink logic
         } else {
-            Reset(); // If new_size is zero, fully deallocate
+            Reset();
         }
     }
 
     /**
      * @brief Ensures the hash table has at least the requested capacity and clears existing contents.
      *
-     * Resets the table and (re)allocates internal storage to hold at least 'size' items.
-     * If 'size' is zero, the table is left empty and unallocated.
+     * Resets the table and reserves internal storage sufficient to hold at least @p size items.
+     * If @p size is zero, the table is cleared and no new storage is acquired.
      *
      * @param size The number of elements to reserve space for.
      */
-    inline void Reserve(SizeT size) {
-        Reset(); // Deallocate any current storage and reset size/capacity
+    QENTEM_INLINE void Reserve(SizeT size) {
+        Reset(); // Release any current storage and reset size/capacity
 
         if (size != 0) {
-            allocate(size); // Allocate storage for at least 'size' items
+            reserve(size); // Reserves storage for at least 'size' items
         }
     }
 
@@ -572,11 +570,11 @@ struct HashTable {
      * @brief Removes all entries from the table, keeping current capacity.
      *
      * Sets the hash table to empty (size zero), disposes all stored items,
-     * and resets the hash buckets to zero, but does not free the allocation.
+     * and resets the hash buckets to zero, but does not released the buffer.
      *
      * Safe to call on an already-empty table.
      */
-    void Clear() noexcept {
+    QENTEM_INLINE void Clear() noexcept {
         if (IsNotEmpty()) {
             SizeT   *ht      = getHashTable();
             HItem_T *storage = Storage();
@@ -587,24 +585,22 @@ struct HashTable {
     }
 
     /**
-     * @brief Completely deallocates all storage and resets the table to an uninitialized state.
+     * @brief Completely releases all storage and resets the table to an uninitialized state.
      *
      * Removes all entries, frees internal storage, and sets capacity and size to zero.
      * After this call, the table is as if default-constructed.
      *
      * Safe to call repeatedly.
      */
-    void Reset() noexcept {
-        if (Capacity() != 0) {
-            HItem_T *storage = Storage();
+    QENTEM_INLINE void Reset() noexcept {
+        HItem_T *storage = Storage();
 
-            MemoryUtils::Dispose(storage, (storage + Size())); // Dispose all elements
-            QAllocator::Deallocate(getHashTable());            // Free the hash table & storage block
+        MemoryUtils::Dispose(storage, (storage + Size())); // Dispose all elements
+        release(getHashTable(), Capacity());               // Free the hash table & storage block
 
-            clearHashTable(); // Set pointer to nullptr
-            setSize(0);       // Size is now zero
-            setCapacity(0);   // Capacity is now zero
-        }
+        clearHashTable(); // Set pointer to nullptr
+        setSize(0);       // Size is now zero
+        setCapacity(0);   // Capacity is now zero
     }
 
     /**
@@ -618,7 +614,7 @@ struct HashTable {
      * The sorting is stable and preserves key/value associations. After sorting,
      * all hash buckets are reset and rebuilt for consistency.
      */
-    void Sort(const bool ascend = true) noexcept {
+    QENTEM_INLINE void Sort(const bool ascend = true) noexcept {
         if (ascend) {
             QUtility::Sort<true>(Storage(), SizeT{0}, Size()); // Sort in ascending order
         } else {
@@ -636,12 +632,12 @@ struct HashTable {
      *
      * If the actual item count is less than the logical size, resizes the table to remove
      * excess (deleted) items and reclaim memory. If all items have been deleted, the
-     * table is fully reset and deallocated.
+     * table is fully reset and released.
      *
      * @note
      * This operation can be used after bulk removals to optimize memory use.
      */
-    void Compress() {
+    QENTEM_INLINE void Compress() {
         const SizeT size = ActualSize(); // Count of truly live items
 
         if (size != 0) {
@@ -715,7 +711,7 @@ struct HashTable {
      * This value may be less than the logical size (Size()) if items were deleted.
      * Used by Compress() and other memory management routines to optimize storage.
      */
-    SizeT ActualSize() const noexcept {
+    QENTEM_INLINE SizeT ActualSize() const noexcept {
         const HItem_T *item = First();         // Pointer to start of item storage
         const HItem_T *end  = (item + Size()); // Pointer to end of logical array
         SizeT          size = 0;               // Live item counter
@@ -738,19 +734,19 @@ struct HashTable {
      *
      * @return Number of items (live + logically deleted).
      */
-    inline SizeT Size() const noexcept {
+    QENTEM_INLINE SizeT Size() const noexcept {
         return size_;
     }
 
     /**
      * @brief Returns the storage capacity of the table.
      *
-     * Indicates the total number of slots allocated for items, which
-     * may be larger than the logical size.
+     * Indicates the total number of slots reserved for items, which
+     * may exceed the current logical size.
      *
-     * @return Allocated capacity for items.
+     * @return Reserved capacity for items.
      */
-    inline SizeT Capacity() const noexcept {
+    QENTEM_INLINE SizeT Capacity() const noexcept {
         return capacity_;
     }
 
@@ -762,7 +758,7 @@ struct HashTable {
      *
      * @return Pointer to the start of item storage.
      */
-    inline HItem_T *Storage() noexcept {
+    QENTEM_INLINE HItem_T *Storage() noexcept {
         return reinterpret_cast<HItem_T *>(getHashTable() + Capacity());
     }
 
@@ -774,7 +770,7 @@ struct HashTable {
      *
      * @return Const pointer to the start of item storage.
      */
-    inline const HItem_T *Storage() const noexcept {
+    QENTEM_INLINE const HItem_T *Storage() const noexcept {
         return reinterpret_cast<const HItem_T *>(getHashTable() + Capacity());
     }
 
@@ -785,7 +781,7 @@ struct HashTable {
      *
      * @return Pointer to the first item.
      */
-    inline const HItem_T *First() const noexcept {
+    QENTEM_INLINE const HItem_T *First() const noexcept {
         return reinterpret_cast<const HItem_T *>(getHashTable() + Capacity());
     }
 
@@ -796,7 +792,7 @@ struct HashTable {
      *
      * @return Pointer to last item, or nullptr if empty.
      */
-    inline HItem_T *Last() noexcept {
+    QENTEM_INLINE HItem_T *Last() noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - SizeT{1}));
         }
@@ -810,7 +806,7 @@ struct HashTable {
      *
      * @return Const pointer to last item, or nullptr if empty.
      */
-    inline const HItem_T *Last() const noexcept {
+    QENTEM_INLINE const HItem_T *Last() const noexcept {
         if (IsNotEmpty()) {
             return (First() + (Size() - SizeT{1}));
         }
@@ -824,7 +820,7 @@ struct HashTable {
      *
      * @return Pointer to one past the last item.
      */
-    inline const HItem_T *End() const noexcept {
+    QENTEM_INLINE const HItem_T *End() const noexcept {
         return (First() + Size());
     }
 
@@ -833,7 +829,7 @@ struct HashTable {
      *
      * @return True if no items are stored.
      */
-    inline bool IsEmpty() const noexcept {
+    QENTEM_INLINE bool IsEmpty() const noexcept {
         return (Size() == 0);
     }
 
@@ -842,7 +838,7 @@ struct HashTable {
      *
      * @return True if at least one item is stored.
      */
-    inline bool IsNotEmpty() const noexcept {
+    QENTEM_INLINE bool IsNotEmpty() const noexcept {
         return !(IsEmpty());
     }
 
@@ -851,28 +847,28 @@ struct HashTable {
     /**
      * @brief Returns const iterator to the first item.
      */
-    inline const HItem_T *begin() const noexcept {
+    QENTEM_INLINE const HItem_T *begin() const noexcept {
         return First();
     }
 
     /**
      * @brief Returns const iterator to one past the last item.
      */
-    inline const HItem_T *end() const noexcept {
+    QENTEM_INLINE const HItem_T *end() const noexcept {
         return End();
     }
 
     /**
      * @brief Returns mutable iterator to the first item.
      */
-    inline HItem_T *begin() noexcept {
+    QENTEM_INLINE HItem_T *begin() noexcept {
         return Storage();
     }
 
     /**
      * @brief Returns mutable iterator to one past the last item.
      */
-    inline HItem_T *end() noexcept {
+    QENTEM_INLINE HItem_T *end() noexcept {
         return (Storage() + Size());
     }
 
@@ -885,23 +881,23 @@ struct HashTable {
      *
      * @return The base mask for hashing (Capacity() - 1).
      */
-    inline SizeT getBase() const noexcept {
+    QENTEM_INLINE SizeT getBase() const noexcept {
         SizeT base = Capacity();
         --base; // Convert capacity to mask for (hash & base)
         return base;
     }
 
     /**
-     * @brief Allocates storage for the hash table and item array.
+     * @brief Reserves storage for the hash table and item array.
      *
-     * Allocates a contiguous memory block to hold both the hash table
-     * (buckets) and the item storage. Sets the hash table to zero.
+     * Requests a contiguous memory block large enough to contain both
+     * the hash table and the item storage.
      *
-     * @param capacity Number of items to allocate space for.
-     * @return Pointer to the first item slot (after hash table).
+     * @param capacity Number of items to reserve space for.
+     * @return Pointer to the first item slot (immediately after hash table).
      */
-    inline HItem_T *allocate(SizeT capacity) {
-        SizeT *ht = allocateOnly(capacity); // Allocates raw memory and updates capacity_
+    QENTEM_INLINE HItem_T *reserve(SizeT capacity) {
+        SizeT *ht = reserveOnly(capacity); // reserves raw memory and updates capacity_
 
         MemoryUtils::SetToValue(ht, Capacity(), Capacity());
 
@@ -910,16 +906,16 @@ struct HashTable {
     }
 
     /**
-     * @brief Allocates a contiguous memory block for the hash table.
+     * @brief Reserves a contiguous memory block for the hash table.
      *
-     * This allocates enough space for both the hash buckets and the item array.
-     * The block is laid out as [hash table | items], allowing for
-     * cache-friendly and pointer-arithmetic-based access.
+     * This reserves enough space for both the hash buckets and the item array.
+     * The block is arranged as [hash table | items], enabling
+     * cache-friendly access and efficient pointer arithmetic.
      *
-     * @param capacity The number of item slots to allocate.
+     * @param capacity The number of item slots to reserve.
      * @return Pointer to the start of the hash table segment.
      */
-    inline SizeT *allocateOnly(SizeT capacity) {
+    SizeT *reserveOnly(SizeT capacity) {
         constexpr SizeT32 size     = sizeof(SizeT);                 // Size of one hash entry
         constexpr SizeT   size_sum = SizeT{size + sizeof(HItem_T)}; // Total size per entry
 
@@ -927,8 +923,8 @@ struct HashTable {
 
         setCapacity(capacity); // Record new capacity
 
-        // Allocate a single block for [hash table][items]
-        SizeT *ht = reinterpret_cast<SizeT *>(QAllocator::Allocate<char>(size_sum * capacity));
+        // Reserve a single block for [hash table][items]
+        SizeT *ht = reinterpret_cast<SizeT *>(Reserver::Reserve<char>(size_sum * capacity));
 
         setHashTable(ht); // Set hash table pointer
 
@@ -940,7 +936,7 @@ struct HashTable {
      *
      * @param ptr Pointer to the start of the hash table segment.
      */
-    inline void setHashTable(SizeT *ptr) noexcept {
+    QENTEM_INLINE void setHashTable(SizeT *ptr) noexcept {
         hashTable_ = ptr;
     }
 
@@ -949,7 +945,7 @@ struct HashTable {
      *
      * @return Pointer to the start of the hash table segment.
      */
-    inline SizeT *getHashTable() noexcept {
+    QENTEM_INLINE SizeT *getHashTable() noexcept {
         return hashTable_;
     }
 
@@ -958,7 +954,7 @@ struct HashTable {
      *
      * @return Pointer to the start of the hash table segment.
      */
-    inline const SizeT *getHashTable() const noexcept {
+    QENTEM_INLINE const SizeT *getHashTable() const noexcept {
         return hashTable_;
     }
 
@@ -967,7 +963,7 @@ struct HashTable {
      *
      * Sets the internal pointer to nullptr, signaling the storage is invalid or released.
      */
-    inline void clearHashTable() noexcept {
+    QENTEM_INLINE void clearHashTable() noexcept {
         hashTable_ = nullptr;
     }
 
@@ -976,7 +972,7 @@ struct HashTable {
      *
      * @param new_size New size to set.
      */
-    inline void setSize(const SizeT new_size) noexcept {
+    QENTEM_INLINE void setSize(const SizeT new_size) noexcept {
         size_ = new_size;
     }
 
@@ -985,24 +981,27 @@ struct HashTable {
      *
      * @param capacity New capacity to set.
      */
-    inline void setCapacity(const SizeT capacity) noexcept {
+    QENTEM_INLINE void setCapacity(const SizeT capacity) noexcept {
         capacity_ = capacity;
     }
 
     /**
-     * @brief Reallocate and migrate all live items to a new storage block of the given size.
+     * @brief Reserves a new storage block and migrates all live items into it.
      *
-     * If increasing the size, creates a new memory region, migrates all live entries (Hash != 0),
-     * and resets the hash table. Deleted or empty slots are not carried over.
-     * The previous storage is deallocated after migration. The hash table is rebuilt for the new layout.
+     * When increasing size, a fresh memory region is reserved, all live entries (where Hash ≠ 0)
+     * are migrated, and the hash table is rebuilt accordingly. Deleted or empty slots
+     * are excluded from the transfer.
      *
-     * @param new_size The new capacity (number of slots) to allocate.
+     * The previous storage is released after migration.
+     *
+     * @param new_size The new capacity (number of slots) to reserve.
      */
     void resize(const SizeT new_size) {
-        SizeT         *ht      = getHashTable();     // Old hash table pointer
-        HItem_T       *item    = Storage();          // Pointer to old item storage
-        const HItem_T *end     = (item + Size());    // End of old storage
-        HItem_T       *storage = allocate(new_size); // Allocate new storage+table
+        SizeT         *ht           = getHashTable(); // Old hash table pointer
+        HItem_T       *item         = Storage();      // Pointer to old item storage
+        const SizeT    old_capacity = Capacity();
+        const HItem_T *end          = (item + Size());   // End of old storage
+        HItem_T       *storage      = reserve(new_size); // Reserve a new storage+table
 
         setSize(0); // Reset size to repopulate with only live entries
 
@@ -1015,14 +1014,14 @@ struct HashTable {
             ++item;
         }
 
-        QAllocator::Deallocate(ht); // Free old hash table+storage
-        generateHash();             // Rebuild hash table from migrated entries
+        release(ht, old_capacity); // Free old hash table+storage
+        generateHash();            // Rebuild hash table from migrated entries
     }
 
     /**
      * @brief Double the capacity of the table, growing it to the next aligned power of two.
      */
-    inline void expand() {
+    QENTEM_INLINE void expand() {
         resize(Capacity() * SizeT{2});
     }
 
@@ -1115,7 +1114,7 @@ struct HashTable {
      * @param[in]  key   The key to look up.
      * @return Pointer to the matching item if found; nullptr otherwise.
      */
-    HItem_T *find(SizeT *&index, const Key_T &key) noexcept {
+    QENTEM_INLINE HItem_T *find(SizeT *&index, const Key_T &key) noexcept {
         // Delegate to the main find(), using the computed hash for this key
         return find(index, key, KeyUtils_T::Hash(key));
     }
@@ -1130,7 +1129,7 @@ struct HashTable {
      * @param[in]  key   The key to look up.
      * @return Const pointer to the matching item if found; nullptr otherwise.
      */
-    const HItem_T *find(SizeT &index, const Key_T &key) const noexcept {
+    QENTEM_INLINE const HItem_T *find(SizeT &index, const Key_T &key) const noexcept {
         // Delegate to the main find(), using the computed hash for this key
         return find(index, key, KeyUtils_T::Hash(key));
     }
@@ -1145,7 +1144,7 @@ struct HashTable {
      * @param[in]  item  The item to search for (provides both key and hash).
      * @return Pointer to the matching item if found; nullptr otherwise.
      */
-    inline HItem_T *find(SizeT *&index, const HItem_T &item) noexcept {
+    QENTEM_INLINE HItem_T *find(SizeT *&index, const HItem_T &item) noexcept {
         // Lookup using the item's key and its precomputed hash value
         return find(index, item.Key, item.Hash);
     }
@@ -1160,7 +1159,7 @@ struct HashTable {
      * @param[in]  item  The item to search for (provides both key and hash).
      * @return Const pointer to the matching item if found; nullptr otherwise.
      */
-    inline const HItem_T *find(SizeT &index, const HItem_T &item) const noexcept {
+    QENTEM_INLINE const HItem_T *find(SizeT &index, const HItem_T &item) const noexcept {
         // Lookup using the item's key and its precomputed hash value
         return find(index, item.Key, item.Hash);
     }
@@ -1175,7 +1174,7 @@ struct HashTable {
      * @param[out] hash  The computed hash value for this key.
      * @return Pointer to the matching item if found; nullptr otherwise.
      */
-    HItem_T *hashAndFind(SizeT *&index, const Key_T &key, SizeT &hash) noexcept {
+    QENTEM_INLINE HItem_T *hashAndFind(SizeT *&index, const Key_T &key, SizeT &hash) noexcept {
         hash = KeyUtils_T::Hash(key);  // Compute hash for the key
         return find(index, key, hash); // Lookup with explicit hash
     }
@@ -1190,7 +1189,7 @@ struct HashTable {
      * @param[out] hash  The computed hash value for this key.
      * @return Const pointer to the matching item if found; nullptr otherwise.
      */
-    const HItem_T *hashAndFind(SizeT &index, const Key_T &key, SizeT &hash) const noexcept {
+    QENTEM_INLINE const HItem_T *hashAndFind(SizeT &index, const Key_T &key, SizeT &hash) const noexcept {
         hash = KeyUtils_T::Hash(key);  // Compute hash for the key
         return find(index, key, hash); // Lookup with explicit hash
     }
@@ -1223,7 +1222,7 @@ struct HashTable {
      * @param[in]     hash  The precomputed hash for the key.
      * @return Pointer to the newly inserted item.
      */
-    HItem_T *insert(SizeT *index, const Key_T &key, const SizeT hash) noexcept {
+    QENTEM_INLINE HItem_T *insert(SizeT *index, const Key_T &key, const SizeT hash) noexcept {
         HItem_T item;
         item.Hash = hash;
         item.Key  = key; // Copy key
@@ -1239,7 +1238,7 @@ struct HashTable {
      * @param[in]     hash  The precomputed hash for the key.
      * @return Pointer to the newly inserted item.
      */
-    HItem_T *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
+    QENTEM_INLINE HItem_T *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
         HItem_T item;
         item.Hash = hash;
         item.Key  = QUtility::Move(key); // Move key
@@ -1254,7 +1253,7 @@ struct HashTable {
      * @param[in]     item  The item to copy and insert.
      * @return Pointer to the newly inserted item.
      */
-    inline HItem_T *insert(SizeT *index, const HItem_T &item) noexcept {
+    QENTEM_INLINE HItem_T *insert(SizeT *index, const HItem_T &item) noexcept {
         return insert(index, HItem_T{item});
     }
 
@@ -1267,7 +1266,7 @@ struct HashTable {
      * @param[in] key The key to find or insert (copied).
      * @return Pointer to the existing or newly inserted item.
      */
-    inline HItem_T *tryInsert(const Key_T &key) noexcept {
+    HItem_T *tryInsert(const Key_T &key) noexcept {
         if (Size() == Capacity()) {
             expand(); // Grow the table if needed
         }
@@ -1293,7 +1292,7 @@ struct HashTable {
      * @param[in] key The key to find or insert (moved).
      * @return Pointer to the existing or newly inserted item.
      */
-    inline HItem_T *tryInsert(Key_T &&key) noexcept {
+    HItem_T *tryInsert(Key_T &&key) noexcept {
         if (Size() == Capacity()) {
             expand(); // Grow the table if needed
         }
@@ -1319,7 +1318,7 @@ struct HashTable {
      * @param[in,out] index Pointer to the hash slot that points to this item.
      * @param[in,out] item  Pointer to the item to remove.
      */
-    void remove(SizeT *index, HItem_T *item) noexcept {
+    QENTEM_INLINE void remove(SizeT *index, HItem_T *item) noexcept {
         if (item != nullptr) {
             *index     = item->Next; // Unlink from hash chain
             item->Hash = 0;          // Mark as deleted
@@ -1337,7 +1336,7 @@ struct HashTable {
      *
      * @param[in,out] item Pointer to the item to remove.
      */
-    void remove(HItem_T *item) noexcept {
+    QENTEM_INLINE void remove(HItem_T *item) noexcept {
         if (IsNotEmpty()) {
             SizeT *index;
             find(index, *item); // Locate the slot for this item
@@ -1353,7 +1352,7 @@ struct HashTable {
      *
      * @param[in] key The key of the item to remove.
      */
-    void remove(const Key_T &key) noexcept {
+    QENTEM_INLINE void remove(const Key_T &key) noexcept {
         if (IsNotEmpty()) {
             SizeT   *index;
             HItem_T *item = find(index, key); // Find by key
@@ -1372,7 +1371,7 @@ struct HashTable {
      * @param to   The destination key that must not already exist.
      * @return Pointer to the item if rename is possible and links are updated, nullptr otherwise.
      */
-    inline HItem_T *prepareRename(const Key_T &from, const Key_T &to) {
+    HItem_T *prepareRename(const Key_T &from, const Key_T &to) {
         if (IsNotEmpty()) {
             SizeT *left_index;  // Pointer to the hash table slot for 'from'
             SizeT *right_index; // Pointer to the hash table slot for 'to'
@@ -1403,10 +1402,11 @@ struct HashTable {
     }
 
     /**
-     * @brief Deep copies all non-empty items from another hash table, rebuilding the hash table structure.
+     * @brief Deep-copies all non-empty items from another hash table, rebuilding internal links.
      *
-     * Allocates a new storage array, copies each valid item, then re-generates the hash links
-     * to match the new memory layout. Used for copy construction and copy assignment.
+     * Reserves fresh storage and copy-constructs each valid item from @p src.
+     * Once all items are transferred, the hash table structure is re-generated
+     * to reflect the new layout. Used in copy construction and assignment.
      *
      * @param[in] src The source hash table to copy from.
      */
@@ -1414,7 +1414,7 @@ struct HashTable {
         if (src.IsNotEmpty()) {
             const HItem_T *src_item = src.First();
             const HItem_T *src_end  = (src_item + src.Size());
-            HItem_T       *storage  = allocate(src.Size());
+            HItem_T       *storage  = reserve(src.Size());
             SizeT          index{0};
 
             do {
@@ -1447,7 +1447,7 @@ struct HashTable {
             const HItem_T *src_item = src.First();
             const HItem_T *src_end  = (src_item + src.Size());
             const SizeT   *src_ht   = src.getHashTable();
-            SizeT         *ht       = allocateOnly(Capacity());
+            SizeT         *ht       = reserveOnly(Capacity());
             HItem_T       *storage  = reinterpret_cast<HItem_T *>(ht + Capacity());
             SizeT          index{0};
 
@@ -1468,18 +1468,18 @@ struct HashTable {
     }
 
     /**
-     * @brief Rebuilds the hash table slot links for all valid items.
+     * @brief Rebuilds hash slot chains for all active entries in storage.
      *
-     * This method traverses the storage array and updates the hash table's
-     * slot pointers (`ht`) and each item's `Next` pointer to correctly form
-     * the hash chains. Used after resizing, sorting, or when items are
-     * re-allocated/copied so that the slot chains match the new memory layout.
+     * Traverses the item array and reconstructs the hash table links by:
+     *   - Resetting each item's `Next` to Capacity(), marking end of chain.
+     *   - Computing the correct slot for each hash using base masking.
+     *   - Following existing slot chains (via `Next`) until an empty slot is found.
+     *   - Linking the item into its corresponding slot chain.
      *
-     * Algorithm:
-     *  - For each valid item (with non-zero hash), resets its `Next` pointer to Capacity().
-     *  - Finds the correct hash slot for the item's hash.
-     *  - If the slot is occupied, follows the `Next` chain to the end.
-     *  - Adds the new item to the chain, updating slot indices accordingly.
+     * Used after operations that relocate or reorder items (e.g., resizing, sorting),
+     * to ensure hash collisions are resolved against the current layout.
+     *
+     * This preserves O(1) average-time lookup while avoiding intrusive metadata.
      */
     void generateHash() noexcept {
         SizeT         *ht   = getHashTable();  // Pointer to hash table slot array
@@ -1503,6 +1503,13 @@ struct HashTable {
             ++i;
             ++item;
         }
+    }
+
+    QENTEM_INLINE static void release(void *hashTable, SizeT capacity) {
+        constexpr SizeT32 size     = sizeof(SizeT);                 // Size of one hash entry
+        constexpr SizeT   size_sum = SizeT{size + sizeof(HItem_T)}; // Total size per entry
+
+        Reserver::Release(static_cast<char *>(hashTable), (capacity * size_sum));
     }
 
     SizeT *hashTable_{nullptr};

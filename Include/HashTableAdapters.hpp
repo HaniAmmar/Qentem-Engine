@@ -214,8 +214,6 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::Sort;
     using BaseT::Storage;
 
-    using BaseT::allocate;
-    using BaseT::allocateOnly;
     using BaseT::clearHashTable;
     using BaseT::copyTable;
     using BaseT::copyTableWithHash;
@@ -227,6 +225,8 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::hashAndFind;
     using BaseT::insert;
     using BaseT::remove;
+    using BaseT::reserve;
+    using BaseT::reserveOnly;
     using BaseT::resize;
     using BaseT::setCapacity;
     using BaseT::setHashTable;

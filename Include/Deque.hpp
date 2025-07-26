@@ -8,16 +8,16 @@
  * arbitrary front-pops, you can enable the built-in pop-count biasing:
  *
  *   - pop_count_ tracks the total number of times Dequeue() has been called
- *     since the last buffer reallocation or reset.
+ *     since the last buffer resized or reset.
  *   - To record an element’s absolute index on insertion, compute:
  *         absolute = current_size + PopCount();
  *   - To recover its current logical index for Get(), compute:
  *         logical = absolute - PopCount();
  *
- * Because pop_count_ is reset to zero whenever the underlying storage moves
- * (in allocate(), resize(), or reset()), all biased indices stay consistent
- * without needing any full rebuild of stored mappings. This pattern yields
- * true O(1) insertion, eviction, and index lookup in dynamic table scenarios.
+ * Because pop_count_ is reset to zero whenever the underlying storage is refreshed
+ * (during reserve expansion, resizing, or reset), all biased indices remain consistent
+ * without requiring a full rebuild of stored mappings. This design ensures
+ * true O(1) insertion, eviction, and index lookup — even in dynamic table scenarios.
  *
  * @author Hani Ammar
  * @date 2025
@@ -27,7 +27,7 @@
 #ifndef QENTEM_DEQUE_HPP
 #define QENTEM_DEQUE_HPP
 
-#include "QAllocator.hpp"
+#include "Reserver.hpp"
 
 namespace Qentem {
 
@@ -40,7 +40,7 @@ struct Deque {
     /**
      * @brief Default constructor: creates an empty deque.
      */
-    Deque() noexcept = default;
+    QENTEM_INLINE Deque() noexcept = default;
 
     /**
      * @brief Deleted copy constructor: Deque is non-copyable.
@@ -56,8 +56,8 @@ struct Deque {
      * @brief Constructs with an initial capacity (rounded to power-of-two).
      * @param cap Minimum number of elements to support without resizing.
      */
-    explicit Deque(SizeT capacity) {
-        allocate(capacity);
+    QENTEM_INLINE explicit Deque(SizeT capacity) {
+        reserve(capacity);
     }
 
     /**
@@ -89,9 +89,9 @@ struct Deque {
     }
 
     /**
-     * @brief Destructor: disposes all elements and deallocates buffer.
+     * @brief Destructor: disposes all elements and release buffer.
      */
-    ~Deque() {
+    QENTEM_INLINE ~Deque() {
         dispose();
     }
 
@@ -103,7 +103,7 @@ struct Deque {
      *
      * @param item Rvalue of type `Type_T` to be moved into the deque.
      *
-     * @complexity Amortized O(1), occasional O(n) when reallocation occurs.
+     * @complexity Amortized O(1), occasional O(n) when resize occurs.
      */
     void operator+=(Type_T &&item) {
         if (IsFull()) {
@@ -121,9 +121,9 @@ struct Deque {
      * If the deque is full, its capacity is automatically doubled (power-of-two)
      * before inserting. The element is then copy-constructed into the tail slot.
      *
-     * @complexity Amortized O(1), with occasional O(n) when a reallocation occurs.
+     * @complexity Amortized O(1), with occasional O(n) when a resize occurs.
      */
-    inline void operator+=(const Type_T &item) {
+    void operator+=(const Type_T &item) {
         if (IsFull()) {
             resize(capacity_ * SizeT{2});
         }
@@ -143,9 +143,9 @@ struct Deque {
      * @param item Rvalue of type `Type_T` to be moved into the deque.
      * @return Reference to the element now stored at the back.
      *
-     * @complexity Amortized O(1), occasional O(n) when reallocation occurs.
+     * @complexity Amortized O(1), occasional O(n) when resize occurs.
      */
-    inline Type_T &Insert(Type_T &&item) {
+    QENTEM_INLINE Type_T &Insert(Type_T &&item) {
         const SizeT index = tail();
 
         *this += QUtility::Move(item);
@@ -161,9 +161,9 @@ struct Deque {
      *
      * @param item  Const reference to the element to copy into the deque.
      *
-     * @complexity Amortized O(1), with occasional O(n) when a reallocation occurs.
+     * @complexity Amortized O(1), with occasional O(n) when a resize occurs.
      */
-    inline Type_T &Insert(const Type_T &item) {
+    QENTEM_INLINE Type_T &Insert(const Type_T &item) {
         const SizeT index = tail();
 
         *this += item;
@@ -180,7 +180,7 @@ struct Deque {
      *
      * @complexity Amortized O(1)
      */
-    void Dequeue() {
+    QENTEM_INLINE void Dequeue() {
         if (IsNotEmpty()) {
             MemoryUtils::Dispose(First());
 
@@ -199,7 +199,7 @@ struct Deque {
      *
      * @complexity O(1)
      */
-    void DequeueBack() {
+    QENTEM_INLINE void DequeueBack() {
         if (IsNotEmpty()) {
             // Destroy the very last element in place
             MemoryUtils::Dispose(Last());
@@ -216,9 +216,8 @@ struct Deque {
      * valid until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
-     * @note noexcept: no heap allocations or exceptions are thrown.
      */
-    const Type_T *First() const noexcept {
+    QENTEM_INLINE const Type_T *First() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + head());
         }
@@ -234,9 +233,8 @@ struct Deque {
      * valid until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
-     * @note noexcept: no heap allocations or exceptions are thrown.
      */
-    Type_T *First() noexcept {
+    QENTEM_INLINE Type_T *First() noexcept {
         if (IsNotEmpty()) {
             return (Storage() + head());
         }
@@ -252,9 +250,8 @@ struct Deque {
      * until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
-     * @note noexcept: no heap allocations or exceptions are thrown.
      */
-    const Type_T *Last() const noexcept {
+    QENTEM_INLINE const Type_T *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + ((head() + (Size() - SizeT{1})) & (Capacity() - SizeT{1})));
         }
@@ -270,9 +267,8 @@ struct Deque {
      *until the deque is modified (e.g., by insertion, removal, or resize).
      *
      * @complexity O(1)
-     * @note noexcept: no heap allocations or exceptions are thrown.
      */
-    Type_T *Last() noexcept {
+    QENTEM_INLINE Type_T *Last() noexcept {
         if (IsNotEmpty()) {
             return (Storage() + ((head() + (Size() - SizeT{1})) & (Capacity() - SizeT{1})));
         }
@@ -285,7 +281,7 @@ struct Deque {
      * @param index Offset from front (0-based).
      * @return Pointer to Storage()[(head + index) & mask] if index < Size(), else nullptr.
      */
-    Type_T *Get(SizeT index) noexcept {
+    QENTEM_INLINE Type_T *Get(SizeT index) noexcept {
         if (index < Size()) {
             return (Storage() + ((head() + index) & (Capacity() - SizeT{1})));
         }
@@ -304,9 +300,8 @@ struct Deque {
      * @return Pointer to the element at that index, or nullptr if index ≥ Size().
      *
      * @complexity O(1)
-     * @note noexcept: no allocations or exceptions are thrown.
      */
-    const Type_T *Get(SizeT index) const noexcept {
+    QENTEM_INLINE const Type_T *Get(SizeT index) const noexcept {
         if (index < Size()) {
             return (Storage() + ((head() + index) & (Capacity() - SizeT{1})));
         }
@@ -324,7 +319,7 @@ struct Deque {
      * @param index Zero-based offset from the front of the deque.
      * @return Pointer to the element at that index, or nullptr if index ≥ Size().
      */
-    inline void Expect(SizeT additional) {
+    QENTEM_INLINE void Expect(SizeT additional) {
         SizeT needed = (additional + Size());
 
         if (needed > Capacity()) {
@@ -362,7 +357,7 @@ struct Deque {
 
             resize(new_size);
         } else {
-            // Completely clear and deallocate
+            // Fully clear and return reserved memory
             Reset();
         }
     }
@@ -371,9 +366,9 @@ struct Deque {
      * @brief Resizes the deque and default-initializes any newly added slots.
      *
      * Behavior:
-     *  - If new_size == 0: fully resets the deque and deallocates storage.
-     *  - If new_size > current Size(): grows capacity if needed, then default-
-     *    constructs elements in the new slots, and updates logical size.
+     *  - If new_size == 0: fully resets the deque and releases all reserved memory.
+     *  - If new_size > current Size(): expands capacity if needed, default-constructs
+     *    elements in the new slots, and updates the logical size.
      *  - If new_size <= current Size(): behaves like a shrink-only Resize, destroying
      *    elements beyond new_size and updating logical size.
      *
@@ -405,10 +400,10 @@ struct Deque {
     /**
      * @brief Shrinks the internal buffer to match the current element count.
      *
-     * If the allocated capacity exceeds the number of stored elements,
-     * this method reallocates the buffer to the exact size, copies
-     * all elements into the new storage (resetting head to zero),
-     * and frees the excess memory.
+     * If the reserved capacity exceeds the number of stored elements,
+     * this method requests a tighter buffer sized exactly to fit,
+     * moves all elements into the new region (resetting head to zero),
+     * and returns any surplus memory.
      */
     void Compress() {
         const SizeT n_size = MemoryUtils::AlignToPow2(Size());
@@ -421,31 +416,30 @@ struct Deque {
     /**
      * @brief Reserves a fresh buffer of exactly `cap` capacity, discarding existing data.
      *
-     * This operation resets the deque to empty, deallocates any prior storage,
-     * and then allocates a new buffer of power-of-two capacity ≥ `cap`.
+     * This operation resets the deque to an empty state, releases any previously
+     * reserved memory, and secures a new buffer with a power-of-two capacity ≥ `cap`.
      *
-     * @param cap Minimum number of elements the new buffer should hold.
+     * @param cap Minimum number of elements the new buffer should support.
      * @post Size() == 0 and Capacity() == AlignToPow2(cap)
      */
-    void Reserve(SizeT cap) {
-        // Clear and deallocate the old buffer
+    QENTEM_INLINE void Reserve(SizeT cap) {
+        // Release old buffer and reset state
         Reset();
 
-        // Allocate a new buffer with the requested minimum capacity
-        allocate(cap);
+        // Acquire new buffer with requested minimum capacity
+        reserve(cap);
     }
 
     /**
-     * @brief Destroys all elements in the deque while keeping the existing buffer.
+     * @brief Destructs all elements in the deque while preserving the underlying buffer.
      *
-     * Invokes the destructor on each element from the current head to the tail,
-     * correctly handling wrap-around, but does not free or reallocate the underlying
-     * storage. After calling Clear(), Size() == 0 and Head() == 0, but Capacity()
-     * remains unchanged for immediate reuse.
+     * Calls the destructor on each element from head to tail, correctly handling wrap-around.
+     * The reserved memory is retained for future use—no memory is released or requested.
+     * After Clear(), Size() == 0 and Head() == 0, but Capacity() remains unchanged.
      *
-     * @complexity O(n), where n is the number of elements.
+     * @complexity O(n), where n is the current number of elements.
      */
-    void Clear() {
+    QENTEM_INLINE void Clear() {
         clear();
         setSize(0);
         setPopCount(0);
@@ -453,16 +447,12 @@ struct Deque {
     }
 
     /**
-     * @brief Completely clears the deque and releases all memory.
+     * @brief Resets the deque to an empty state and returns its reserved buffer.
      *
-     * Destroys every element, deallocates the underlying buffer,
-     * and resets head, size, and capacity to zero. After calling
-     * Reset(), the deque is equivalent to a freshly default-constructed
-     * instance.
-     *
-     * @complexity O(n) for element destruction plus O(1) for deallocation.
+     * All elements are destroyed, and the internal memory block is released
+     * back to the reserver or system. The logical size and position are reset.
      */
-    void Reset() {
+    QENTEM_INLINE void Reset() {
         dispose();
         clearStorage();
         setSize(0);
@@ -472,99 +462,109 @@ struct Deque {
     }
 
     // Accessors
-    inline Type_T *Storage() const noexcept {
+    QENTEM_INLINE Type_T *Storage() const noexcept {
         return storage_;
     }
 
-    SizeT Capacity() const noexcept {
+    QENTEM_INLINE SizeT Capacity() const noexcept {
         return capacity_;
     }
 
-    SizeT Size() const noexcept {
+    QENTEM_INLINE SizeT Size() const noexcept {
         return size_;
     }
 
     /**
-     * @brief Get the number of times elements have been dequeued since the last buffer change.
+     * @brief Returns the number of elements removed from the front since the last buffer refresh.
      *
-     * This pop-count can be used to bias stored absolute indices so that they remain
-     * valid even after front-pop operations. It is reset to zero whenever the underlying
-     * storage is reallocated, resized, or fully reset, ensuring index consistency.
+     * This pop-count is useful for tracking relative positions or maintaining offset-based
+     * mappings that remain valid across pop-front operations. The counter resets to zero
+     * whenever the internal storage is refreshed—either by resizing, reserving new space,
+     * or a full reset—ensuring consistent indexing semantics.
      *
-     * @return The current pop_count_ value.
+     * @return The current value of pop_count_.
      */
-    inline SizeT PopCount() const noexcept {
+    QENTEM_INLINE SizeT PopCount() const noexcept {
         return pop_count_;
     }
 
-    bool IsEmpty() const noexcept {
+    QENTEM_INLINE bool IsEmpty() const noexcept {
         return Size() == 0;
     }
 
-    bool IsNotEmpty() const noexcept {
+    QENTEM_INLINE bool IsNotEmpty() const noexcept {
         return Size() != 0;
     }
 
-    bool IsFull() const noexcept {
+    QENTEM_INLINE bool IsFull() const noexcept {
         return (Size() == Capacity());
     }
 
   private:
-    inline SizeT head() const noexcept {
+    QENTEM_INLINE SizeT head() const noexcept {
         return head_;
     }
 
     /**
      * @brief Computes the next insertion index (tail) = (head+size) & (capacity-1).
      */
-    inline SizeT tail() const noexcept {
+    QENTEM_INLINE SizeT tail() const noexcept {
         return ((head() + Size()) & (Capacity() - SizeT{1}));
     }
 
-    inline void setSize(SizeT new_size) noexcept {
+    QENTEM_INLINE void setSize(SizeT new_size) noexcept {
         size_ = new_size;
     }
 
-    inline void setHead(SizeT new_head) noexcept {
+    QENTEM_INLINE void setHead(SizeT new_head) noexcept {
         head_ = new_head;
     }
 
-    inline void setPopCount(SizeT new_pop_count) noexcept {
+    QENTEM_INLINE void setPopCount(SizeT new_pop_count) noexcept {
         pop_count_ = new_pop_count;
     }
 
-    inline void setCapacity(SizeT new_capacity) noexcept {
+    QENTEM_INLINE void setCapacity(SizeT new_capacity) noexcept {
         capacity_ = new_capacity;
     }
 
-    void setStorage(Type_T *ptr) noexcept {
+    QENTEM_INLINE void setStorage(Type_T *ptr) noexcept {
         storage_ = ptr;
     }
 
-    inline void clearStorage() noexcept {
+    QENTEM_INLINE void clearStorage() noexcept {
         setStorage(nullptr);
     }
 
     /**
-     * @brief Allocates a buffer of power-of-two capacity >= new_capacity.
+     * @brief Reserves a buffer with power-of-two capacity ≥ new_capacity.
+     *
+     * The capacity is rounded up to the next power of two to maintain efficient
+     * wrapping and indexing. A fresh buffer is obtained via the Reserver, and any
+     * previous pop history is cleared.
+     *
+     * @param capacity Minimum number of elements to support.
      */
-    void allocate(SizeT capacity) {
+    void reserve(SizeT capacity) {
         setCapacity(MemoryUtils::AlignToPow2(capacity));
-        setStorage(QAllocator::Allocate<Type_T>(Capacity()));
+        setStorage(Reserver::Reserve<Type_T>(Capacity()));
         setPopCount(0);
     }
 
     /**
-     * @brief Ensures the internal buffer has capacity ≥ new_capacity while preserving existing elements.
+     * @brief Expands the buffer to accommodate at least `new_capacity` elements, preserving contents.
      *
-     * When new_capacity is greater than the current capacity, this method:
-     *   1. Allocates a new power-of-two buffer of size ≥ new_capacity.
-     *   2. Moves existing elements in-order from the old buffer to the new one.
-     *   3. Deallocates the old buffer and resets head to 0.
+     * If the requested capacity exceeds the current one, this method:
+     *   1. Reserves a new power-of-two buffer of size ≥ `new_capacity`.
+     *   2. Moves existing elements into the new buffer in correct order, handling wrap-around.
+     *   3. Releases the old buffer and resets internal indexing.
      *   4. Leaves the logical size unchanged.
      *
-     * @param new_capacity Desired minimum capacity for the deque's buffer.
-     * @complexity Amortized O(n) when growing (due to element moves); O(1) otherwise.
+     * This ensures stable element layout during capacity growth, while preserving
+     * deque semantics and minimizing disruptions.
+     *
+     * @param new_capacity Minimum number of elements to support.
+     * @complexity Amortized O(n) when growing (due to data movement), O(1) otherwise.
      */
     void resize(SizeT new_capacity) {
         // 1) Bulk‐copy, two-segment style to preserve order
@@ -574,10 +574,11 @@ struct Deque {
         const SizeT second_count = (Size() - first_count);
 
         // 2) Capture old storage
-        Type_T *old_storage = storage_;
+        Type_T     *old_storage  = storage_;
+        const SizeT old_capacity = capacity_;
 
-        // 3) Allocate new buffer (updates storage_, capacity_)
-        allocate(new_capacity);
+        // 3) Reserve a new buffer (updates storage_, capacity_)
+        reserve(new_capacity);
 
         // Copy the first contiguous block
         MemoryUtils::CopyTo(storage_, (old_storage + head()), first_count);
@@ -587,7 +588,7 @@ struct Deque {
         }
 
         // 4) Clean up old buffer and reset head/index
-        QAllocator::Deallocate(old_storage);
+        Reserver::Release(old_storage, old_capacity);
         setHead(0);
     }
 
@@ -603,11 +604,12 @@ struct Deque {
     }
 
     /**
-     * @brief Disposes elements and deallocates the buffer.
+     * @brief Destructs all elements and returns the buffer to the memory Reserver.
+     *
      */
-    void dispose() {
+    QENTEM_INLINE void dispose() {
         clear();
-        QAllocator::Deallocate(storage_);
+        Reserver::Release(storage_, capacity_);
     }
 
     // Underlying buffer pointer and indices

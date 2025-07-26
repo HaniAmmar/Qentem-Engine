@@ -6,7 +6,7 @@
  * Elements can be accessed both by their index (array-style) and by key (hash-style).
  *
  * - Preserves insertion order and uses a single contiguous memory block.
- * - No extra allocations on collisions: the initial size determines capacity.
+ * - No extra reserves on collisions: the initial size determines capacity.
  * - When resized, deleted items are dropped and the hash base is rebuilt/reset.
  *
  * Ideal for scenarios needing fast iteration and direct lookup, combining the
@@ -95,8 +95,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
  * HArrayBase combines the features of an ordered array and a hash table, preserving
  * insertion order while enabling fast lookups by key. It adapts internally to the key type:
  * string keys use an efficient string hashing policy, and number keys use direct hashing,
- * with all storage provided in a single contiguous block and minimal allocations.
- *
+ * with all storage provided in a single contiguous block and minimal memory.
  *
  * @tparam Key_T   The key type. Supports both string types and plain integral types.
  *                 The correct hash policy is selected automatically.
@@ -134,7 +133,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key The key object.
      * @return Reference to the value.
      */
-    inline Value_T &Get(const Key_T &key) {
+    QENTEM_INLINE Value_T &Get(const Key_T &key) {
         HItem *item = tryInsert(key);
         return item->Value;
     }
@@ -147,7 +146,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key The key object to move.
      * @return Reference to the value.
      */
-    inline Value_T &Get(Key_T &&key) {
+    QENTEM_INLINE Value_T &Get(Key_T &&key) {
         HItem *item = tryInsert(QUtility::Move(key));
         return item->Value;
     }
@@ -160,7 +159,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key The key object to move.
      * @return Reference to the value.
      */
-    inline Value_T &operator[](Key_T &&key) {
+    QENTEM_INLINE Value_T &operator[](Key_T &&key) {
         HItem *item = tryInsert(QUtility::Move(key));
         return item->Value;
     }
@@ -173,7 +172,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key The key object.
      * @return Reference to the value.
      */
-    inline Value_T &operator[](const Key_T &key) {
+    QENTEM_INLINE Value_T &operator[](const Key_T &key) {
         HItem *item = tryInsert(key);
         return item->Value;
     }
@@ -186,7 +185,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key   The key object.
      * @param value Value to copy into the entry.
      */
-    inline void Insert(const Key_T &key, const Value_T &value) {
+    QENTEM_INLINE void Insert(const Key_T &key, const Value_T &value) {
         HItem *item = tryInsert(key);
         item->Value = Value_T{value};
     }
@@ -199,7 +198,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key   The key object.
      * @param value Value to move into the entry.
      */
-    inline void Insert(const Key_T &key, Value_T &&value) {
+    QENTEM_INLINE void Insert(const Key_T &key, Value_T &&value) {
         HItem *item = tryInsert(key);
         item->Value = QUtility::Move(value);
     }
@@ -212,7 +211,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key   The key object to move.
      * @param value Value to copy into the entry.
      */
-    inline void Insert(Key_T &&key, const Value_T &value) {
+    QENTEM_INLINE void Insert(Key_T &&key, const Value_T &value) {
         HItem *item = tryInsert(QUtility::Move(key));
         item->Value = Value_T{value};
     }
@@ -225,7 +224,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key   The key object to move.
      * @param value Value to move into the entry.
      */
-    inline void Insert(Key_T &&key, Value_T &&value) {
+    QENTEM_INLINE void Insert(Key_T &&key, Value_T &&value) {
         HItem *item = tryInsert(QUtility::Move(key));
         item->Value = QUtility::Move(value);
     }
@@ -238,7 +237,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key The key object.
      * @return Pointer to the value, or nullptr if not found.
      */
-    inline Value_T *GetValue(const Key_T &key) noexcept {
+    QENTEM_INLINE Value_T *GetValue(const Key_T &key) noexcept {
         if (Size() != 0) {
             SizeT *index;
             HItem *item = find(index, key);
@@ -259,7 +258,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param key The key object.
      * @return Const pointer to the value, or nullptr if not found.
      */
-    inline const Value_T *GetValue(const Key_T &key) const noexcept {
+    QENTEM_INLINE const Value_T *GetValue(const Key_T &key) const noexcept {
         if (Size() != 0) {
             SizeT        index;
             const HItem *item = find(index, key);
@@ -281,7 +280,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param index The item index.
      * @return Pointer to the value, or nullptr if not found.
      */
-    inline Value_T *GetValueAt(const SizeT index) noexcept {
+    QENTEM_INLINE Value_T *GetValueAt(const SizeT index) noexcept {
         HItem *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
@@ -300,7 +299,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
      * @param index The item index.
      * @return Const pointer to the value, or nullptr if not found.
      */
-    inline const Value_T *GetValueAt(const SizeT index) const noexcept {
+    QENTEM_INLINE const Value_T *GetValueAt(const SizeT index) const noexcept {
         const HItem *src = First();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
@@ -369,7 +368,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @param length Number of characters in the key.
      * @return Reference to the value associated with the key.
      */
-    inline Value_T &Get(const Char_T *str, const SizeT length) {
+    QENTEM_INLINE Value_T &Get(const Char_T *str, const SizeT length) {
         HItem *item = tryInsert(str, length);
         return item->Value;
     }
@@ -384,7 +383,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @param str Pointer to null-terminated character array.
      * @return Reference to the value associated with the key.
      */
-    inline Value_T &operator[](const Char_T *str) {
+    QENTEM_INLINE Value_T &operator[](const Char_T *str) {
         return Get(str, StringUtils::Count(str));
     }
 
@@ -398,7 +397,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @param length Number of characters in the key.
      * @param value  Value to move into the entry.
      */
-    inline void Insert(const Char_T *str, const SizeT length, Value_T &&value) {
+    QENTEM_INLINE void Insert(const Char_T *str, const SizeT length, Value_T &&value) {
         HItem *item = tryInsert(str, length); // Insert new or find existing entry by key
         item->Value = QUtility::Move(value);  // Move-assign value into the entry
     }
@@ -414,7 +413,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @param hash   Precomputed hash value for the key.
      * @return Pointer to the associated value if found; nullptr if not found or table is empty.
      */
-    inline Value_T *GetValue(const Char_T *str, const SizeT length, const SizeT hash) noexcept {
+    QENTEM_INLINE Value_T *GetValue(const Char_T *str, const SizeT length, const SizeT hash) noexcept {
         if (Size() != 0) {
             SizeT *index;
             HItem *item = find(index, str, length, hash);
@@ -438,7 +437,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @param hash  Precomputed hash value for the key.
      * @return Const pointer to the associated value if found, nullptr if not found or table is empty.
      */
-    inline const Value_T *GetValue(const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+    QENTEM_INLINE const Value_T *GetValue(const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
         // Only attempt lookup if the table contains at least one item
         if (Size() != 0) {
             // Find the index of the entry matching the key and hash
@@ -466,7 +465,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @param length Number of characters in the key.
      * @return Pointer to the value if found; nullptr if not found.
      */
-    inline Value_T *GetValue(const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE Value_T *GetValue(const Char_T *str, const SizeT length) noexcept {
         return GetValue(str, length, StringUtils::Hash(str, length));
     }
 
@@ -480,7 +479,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
      * @param length Number of characters in the key.
      * @return Const pointer to the value if found; nullptr if not found.
      */
-    inline const Value_T *GetValue(const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE const Value_T *GetValue(const Char_T *str, const SizeT length) const noexcept {
         return GetValue(str, length, StringUtils::Hash(str, length));
     }
 };

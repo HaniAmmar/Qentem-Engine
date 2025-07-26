@@ -16,7 +16,7 @@
 #define QENTEM_STRING_H
 
 #include "StringView.hpp"
-#include "QAllocator.hpp"
+#include "Reserver.hpp"
 
 namespace Qentem {
 /*
@@ -27,87 +27,95 @@ template <typename Char_T>
 struct String {
     using CharType = Char_T;
 
-    String() noexcept = default;
+    QENTEM_INLINE String() = default;
 
-    String(String &&src) noexcept : storage_{src.storage_}, length_{src.length_} {
-        src.clearLength();
+    QENTEM_INLINE ~String() {
+        Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+    }
+
+    explicit String(SizeT capacity) {
+        if (capacity != 0) {
+            reserve(capacity);
+        }
+    }
+
+    String(String &&src) noexcept : storage_{src.Storage()}, capacity_{src.Capacity()}, length_{src.Length()} {
         src.clearStorage();
+        src.setLength(0);
+        src.setCapacity(0);
     }
 
     String(const String &src) {
-        copyString(src.First(), src.Length());
-    }
-
-    explicit String(SizeT length) {
-        if (length != 0) {
-            Char_T *ns = allocate(length + SizeT{1});
-            ns[length] = Char_T{0};
-            setLength(length);
+        if (src.Length() != 0) {
+            write(src.First(), src.Length());
         }
     }
 
     String(const Char_T *str, SizeT length) {
-        copyString(str, length);
+        write(str, length);
     }
 
     String(const Char_T *str) {
-        copyString(str, StringUtils::Count(str));
-    }
-
-    ~String() {
-        deallocate();
+        write(str, StringUtils::Count(str));
     }
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
-            deallocate();
+            Reserver::Release(Storage(), (Capacity() + SizeT{1}));
 
+            setCapacity(src.Capacity());
             setStorage(src.Storage());
             setLength(src.Length());
 
             src.clearStorage();
-            src.clearLength();
-        }
-
-        return *this;
-    }
-
-    String &operator=(const String &src) {
-        if (this != &src) {
-            deallocate();
-            copyString(src.First(), src.Length());
+            src.setCapacity(0);
+            src.setLength(0);
         }
 
         return *this;
     }
 
     String &operator=(const Char_T *str) {
-        deallocate();
-        copyString(str, StringUtils::Count(str));
+        Clear();
+        write(str, StringUtils::Count(str));
+
         return *this;
     }
 
+    String &operator=(const String &src) {
+        Clear();
+        write(src.First(), src.Length());
+        return *this;
+    }
+
+    String &operator=(const StringView<Char_T> &src) {
+        Clear();
+        write(src.First(), src.Length());
+
+        return *this;
+    }
+
+    QENTEM_INLINE void operator+=(Char_T ch) {
+        Write(ch);
+    }
+
+    QENTEM_INLINE void operator+=(const String &r) {
+        write(r.First(), r.Length());
+    }
+
     String &operator+=(String &&src) {
-        Write(src.First(), src.Length());
+        write(src.First(), src.Length());
         src.Reset();
 
         return *this;
     }
 
-    String &operator+=(const String &src) {
-        Write(src.First(), src.Length());
-        return *this;
+    QENTEM_INLINE void operator+=(const StringView<char> &string_view) {
+        write(string_view.First(), string_view.Length());
     }
 
-    String &operator+=(const Char_T ch) {
-        Write(&ch, SizeT{1});
-
-        return *this;
-    }
-
-    String &operator+=(const Char_T *str) {
-        Write(str, StringUtils::Count(str));
-        return *this;
+    QENTEM_INLINE void operator+=(const Char_T *str) {
+        write(str, StringUtils::Count(str));
     }
 
     String operator+(String &&src) const {
@@ -117,55 +125,67 @@ struct String {
         return ns;
     }
 
-    inline String operator+(const String &src) const {
+    QENTEM_INLINE String operator+(const String &src) const {
         return Merge(*this, src);
     }
 
-    String operator+(const Char_T *str) const {
+    QENTEM_INLINE String operator+(const Char_T *str) const {
         return merge(First(), Length(), str, StringUtils::Count(str));
     }
 
-    friend String &operator<<(String &out, const Char_T *str) {
-        out.Write(str, StringUtils::Count(str));
-
-        return out;
-    }
-
-    friend String &operator<<(String &out, const String &src) {
-        out += src;
-
-        return out;
-    }
-
     template <typename Stream_T>
-    friend Stream_T &operator<<(Stream_T &out, const String &src) {
-        out << src.First();
-
+    QENTEM_INLINE friend Stream_T &operator<<(Stream_T &out, const String &string) {
+        out << string.First();
         return out;
     }
 
-    inline bool operator==(const String &string) const noexcept {
-        return (((Length() == string.Length())) && StringUtils::IsEqual(First(), string.First(), Length()));
+    QENTEM_INLINE friend String &operator<<(String &out, const String &string) {
+        out.write(string.First(), string.Length());
+        return out;
     }
 
-    inline bool operator==(const Char_T *str) const noexcept {
-        SizeT offset{0};
-
-        if (str != nullptr) {
-            while ((*str != Char_T{0}) && (*str == First()[offset])) {
-                ++str;
-                ++offset;
-            }
-        }
-
-        return ((*str == Char_T{0}) && (Length() == offset));
+    QENTEM_INLINE friend String &operator<<(String &out, const StringView<Char_T> &string) {
+        out.write(string.First(), string.Length());
+        return out;
     }
 
-    inline bool operator!=(const String &string) const noexcept {
+    QENTEM_INLINE friend String &operator<<(String &out, Char_T ch) {
+        out.Write(ch);
+        return out;
+    }
+
+    QENTEM_INLINE friend String &operator<<(String &out, const Char_T *str) {
+        out.write(str, StringUtils::Count(str));
+        return out;
+    }
+
+    QENTEM_INLINE bool operator==(const String &string) const noexcept {
+        return ((Length() == string.Length()) && StringUtils::IsEqual(First(), string.First(), Length()));
+    }
+
+    QENTEM_INLINE bool operator==(const StringView<Char_T> &string) const noexcept {
+        return ((Length() == string.Length()) && StringUtils::IsEqual(First(), string.First(), Length()));
+    }
+
+    QENTEM_INLINE bool operator==(const Char_T *str) const noexcept {
+        const SizeT length = StringUtils::Count(str);
+
+        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
+    }
+
+    QENTEM_INLINE bool IsEqual(const Char_T *str, const SizeT length) const noexcept {
+        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
+    }
+
+    QENTEM_INLINE bool operator!=(const String &string) const noexcept {
         return (!(*this == string));
     }
 
-    inline bool operator!=(const Char_T *str) const noexcept {
+    QENTEM_INLINE bool operator!=(const StringView<Char_T> &string) const noexcept {
+        return (!(*this == string));
+    }
+
+    QENTEM_INLINE bool operator!=(const Char_T *str) const noexcept {
         return (!(*this == str));
     }
 
@@ -201,61 +221,200 @@ struct String {
         return StringUtils::IsGreater(First(), str, Length(), StringUtils::Count(str), true);
     }
 
-    inline bool IsEqual(const Char_T *str, SizeT length) const noexcept {
-        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
+    void Write(Char_T ch) {
+        const SizeT new_length = (Length() + SizeT{1});
+
+        if (Capacity() == Length()) {
+            expand(new_length);
+        }
+
+        Storage()[Length()] = ch;
+        setLength(new_length);
     }
 
-    void Reset() noexcept {
-        deallocate();
-        clearStorage();
-        clearLength();
+    QENTEM_INLINE void Write(const Char_T *str, const SizeT length) {
+        write(str, length);
     }
 
-    Char_T *Detach() {
-        Char_T *str = Storage();
-
-        clearStorage();
-        clearLength();
-
-        return str;
-    }
-
-    void Adopt(Char_T *str, SizeT length /*, SizeT capacity*/) {
-        // Clean up any existing storage
-        Reset();
-
-        // Take ownership of the new buffer
-        setStorage(str);
-        setLength(length);
-        // setCapacity(capacity);
+    QENTEM_INLINE void WriteAt(const SizeT index, const Char_T *str, const SizeT length) {
+        if ((index + length) <= Length()) {
+            MemoryUtils::CopyTo((Storage() + index), str, length);
+        }
     }
 
     static String Merge(const String &src1, const String &src2) {
         return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
     }
 
-    void Write(const Char_T ch) {
-        Write(&ch, SizeT{1});
+    QENTEM_INLINE void Expect(SizeT length) {
+        length += Length();
+
+        if (Capacity() < length) {
+            expand(length);
+        }
     }
 
-    void Write(const Char_T *str, const SizeT length) {
-        if ((str != nullptr) && (length != 0)) {
-            const SizeT old_length  = Length();
-            SizeT       new_len     = (old_length + length + SizeT{1});
-            Char_T     *old_storage = Storage();
-            Char_T     *ns          = allocate(new_len);
+    QENTEM_INLINE void Reserve(const SizeT size) {
+        Reset();
 
-            MemoryUtils::CopyTo((ns + old_length), str, length);
+        if (size != 0) {
+            reserve(size);
+        }
+    }
 
-            --new_len;
-            ns[new_len] = Char_T{0};
-            setLength(new_len);
+    QENTEM_INLINE void SetLength(SizeT length) {
+        if (Capacity() < length) {
+            expand(length);
+        }
 
-            if (old_storage != nullptr) {
-                MemoryUtils::CopyTo(ns, old_storage, old_length);
-                QAllocator::Deallocate(old_storage /*, old_length + SizeT{1}*/);
+        setLength(length);
+    }
+
+    QENTEM_INLINE void Clear() noexcept {
+        setLength(0);
+    }
+
+    void Reset() noexcept {
+        Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+
+        clearStorage();
+        setLength(0);
+        setCapacity(0);
+    }
+
+    QENTEM_INLINE StringView<Char_T> GetStringView() {
+        return StringView<Char_T>{First(), Length()};
+    }
+
+    // Without NULL terminator
+    QENTEM_INLINE StringView<Char_T> View() const noexcept {
+        return StringView<Char_T>{First(), Length()};
+    }
+
+    Char_T *Detach() noexcept {
+        Char_T *str = Storage();
+        clearStorage();
+
+        setLength(0);
+        setCapacity(0);
+
+        return str;
+    }
+
+    void Adopt(Char_T *str, SizeT length, SizeT capacity_with_out_null) {
+        // Clean up any existing storage
+        Reset();
+
+        // Take ownership of the new buffer
+        setStorage(str);
+        setLength(length);
+        setCapacity(capacity_with_out_null);
+    }
+
+    QENTEM_INLINE void StepBack(const SizeT length) noexcept {
+        if (length <= Length()) {
+            length_ -= length;
+        }
+    }
+
+    QENTEM_INLINE void Reverse(SizeT start = 0) noexcept {
+        StringUtils::Reverse(Storage(), start, Length());
+    }
+
+    void InsertAt(Char_T ch, SizeT index) {
+        if (index < Length()) {
+            const SizeT new_length = (Length() + SizeT{1});
+
+            if (new_length <= Capacity()) {
+                // Enough capacity, shift tail right by one, insert in-place.
+                Char_T *data = Storage();
+
+                // Shift right: move everything [index, length) -> [index+1, new_length)
+                SizeT i = Length();
+
+                while (i > index) {
+                    data[i] = data[i - SizeT{1}];
+                    --i;
+                }
+
+                data[index] = ch;
+                setLength(new_length);
+            } else {
+                // Not enough capacity: reserve a bigger buffer and copy in 3 steps.
+                SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
+                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_length);
+
+                // 1. Copy prefix [0, index)
+                if (index != 0) {
+                    MemoryUtils::CopyTo(new_storage, Storage(), index);
+                }
+
+                // 2. Insert new char at 'index'
+                new_storage[index] = ch;
+
+                // 3. Copy suffix [index, length)
+                if (index < Length()) {
+                    MemoryUtils::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
+                }
+
+                // Clean up old storage and set new storage/capacity
+                Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+                setStorage(new_storage);
+                setCapacity(new_capacity);
+                setLength(new_length);
             }
         }
+    }
+
+    void ShiftRight(SizeT shift) {
+        if ((shift != 0) && IsNotEmpty()) {
+            const SizeT old_length = Length();
+            const SizeT new_length = (old_length + shift);
+
+            if (new_length <= Capacity()) {
+                // Enough capacity, shift in place (backwards to avoid overlap).
+                Char_T *data = Storage();
+                SizeT   i    = old_length;
+
+                while (i != 0) {
+                    data[i + (shift - SizeT{1})] = data[i - SizeT{1}];
+
+                    --i;
+                }
+
+                setLength(new_length);
+            } else {
+                // Not enough capacity: reserve, then copy with the shift.
+                SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
+                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_capacity);
+
+                // 2. Copy old data to the right position in new storage
+                if (old_length != 0) {
+                    MemoryUtils::CopyTo(new_storage + shift, Storage(), old_length);
+                }
+
+                // Clean up, set new pointers
+                Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+                setStorage(new_storage);
+                setCapacity(new_capacity);
+                setLength(new_length);
+            }
+        }
+    }
+
+    // Set the needed length to write directly to a returned buffer,
+    Char_T *Buffer(SizeT length) {
+        const SizeT new_length = (Length() + length);
+
+        if (Capacity() < new_length) {
+            expand(new_length);
+        }
+
+        Char_T *str = (Storage() + Length());
+
+        setLength(new_length);
+
+        return str;
     }
 
     static String Trim(const String &src) {
@@ -267,151 +426,109 @@ struct String {
         return String((str + offset), length);
     }
 
-    inline void StepBack(const SizeT length) noexcept {
-        if (length <= Length()) {
-            length_ -= length;
-            Storage()[length_] = Char_T{0};
-        }
+    QENTEM_INLINE Char_T *Storage() noexcept {
+        return storage_;
     }
 
-    inline void Reverse(SizeT start = 0) noexcept {
-        StringUtils::Reverse(Storage(), start, Length());
+    QENTEM_INLINE const Char_T *Storage() const noexcept {
+        return storage_;
     }
 
-    inline void InsertAt(Char_T ch, SizeT index) {
-        if (index < Length()) {
-            const SizeT new_length = (Length() + SizeT{1});
-
-            Char_T *new_storage = QAllocator::Allocate<Char_T>(new_length);
-
-            // 1. Copy prefix [0, index)
-            if (index != 0) {
-                MemoryUtils::CopyTo(new_storage, Storage(), index);
-            }
-
-            // 2. Insert new char at 'index'
-            new_storage[index] = ch;
-
-            // 3. Copy suffix [index, length)
-            if (index < Length()) {
-                MemoryUtils::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
-            }
-
-            // Clean up old storage and set new storage/capacity
-            QAllocator::Deallocate(Storage() /*, Length() + SizeT{1}*/);
-
-            setStorage(new_storage);
-            setLength(new_length);
-        }
-    }
-
-    inline SizeT Length() const noexcept {
+    QENTEM_INLINE SizeT Length() const noexcept {
         return length_;
     }
 
-    inline void SetLength(SizeT length) {
-        if (Length() < length) {
-            expand(length);
-        }
-
-        if (Length() != 0) {
-            Storage()[length] = Char_T{0};
-            setLength(length); // Update internal length
-        }
+    QENTEM_INLINE SizeT Capacity() const noexcept {
+        return capacity_;
     }
 
-    inline Char_T *Storage() noexcept {
+    QENTEM_INLINE const Char_T *First() const noexcept {
         return storage_;
     }
 
-    inline const Char_T *Storage() const noexcept {
-        return storage_;
-    }
-
-    inline const Char_T *First() const noexcept {
-        return Storage();
-    }
-
-    inline Char_T *Last() noexcept {
-        if (Length() != 0) {
+    QENTEM_INLINE Char_T *Last() noexcept {
+        if (IsNotEmpty()) {
             return (Storage() + (Length() - SizeT{1}));
         }
 
         return nullptr;
     }
 
-    inline const Char_T *Last() const noexcept {
-        const SizeT length = Length();
-
-        if (length != 0) {
-            return (First() + (length - SizeT{1}));
+    QENTEM_INLINE const Char_T *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (First() + (Length() - SizeT{1}));
         }
 
         return nullptr;
     }
 
-    inline const Char_T *End() const noexcept {
+    QENTEM_INLINE const Char_T *End() const noexcept {
         return (First() + Length());
     }
 
-    inline bool IsEmpty() const noexcept {
+    QENTEM_INLINE bool IsEmpty() const noexcept {
         return (Length() == 0);
     }
 
-    inline bool IsNotEmpty() const noexcept {
+    QENTEM_INLINE bool IsNotEmpty() const noexcept {
         return !(IsEmpty());
     }
 
     // For STL
-    inline const Char_T *begin() const noexcept {
+    QENTEM_INLINE const Char_T *begin() const noexcept {
         return First();
     }
 
-    inline const Char_T *end() const noexcept {
+    QENTEM_INLINE const Char_T *end() const noexcept {
         return End();
     }
 
-    inline Char_T *begin() noexcept {
+    QENTEM_INLINE Char_T *begin() noexcept {
         return Storage();
     }
 
-    inline Char_T *end() noexcept {
+    QENTEM_INLINE Char_T *end() noexcept {
         return (Storage() + Length());
     }
 
     //////////// Private ////////////
-
   private:
-    void clearLength() noexcept {
-        length_ = 0;
+    QENTEM_INLINE void setStorage(Char_T *new_storage) noexcept {
+        storage_ = new_storage;
     }
 
-    void setLength(SizeT new_length) noexcept {
+    QENTEM_INLINE void clearStorage() noexcept {
+        setStorage(nullptr);
+    }
+
+    QENTEM_INLINE void setLength(const SizeT new_length) noexcept {
         length_ = new_length;
     }
 
-    void setStorage(Char_T *ptr) noexcept {
-        storage_ = ptr;
+    QENTEM_INLINE void setCapacity(const SizeT new_capacity) noexcept {
+        capacity_ = new_capacity;
     }
 
-    Char_T *allocate(SizeT new_size) {
-        Char_T *ns = QAllocator::Allocate<Char_T>(new_size);
+    void write(const Char_T *str, const SizeT length) {
+        if (length != 0) {
+            const SizeT new_length = (Length() + length);
 
-        setStorage(ns);
+            if (Capacity() < new_length) {
+                expand(new_length);
+            }
 
-        return ns;
-    }
+            MemoryUtils::CopyTo((Storage() + Length()), str, length);
 
-    void deallocate() noexcept {
-        QAllocator::Deallocate(Storage() /*, Length() + SizeT{1}*/);
-    }
-
-    void clearStorage() noexcept {
-        storage_ = nullptr;
+            Storage()[new_length] = 0;
+            setLength(new_length);
+        }
     }
 
     static String merge(const Char_T *str1, const SizeT len1, const Char_T *str2, const SizeT len2) {
-        String  ns  = String{SizeT(len1 + len2)};
+        const SizeT length = SizeT(len1 + len2);
+        String      ns{length};
+        ns.setLength(length);
+
         Char_T *des = ns.Storage();
 
         if (len1 != 0) {
@@ -422,29 +539,24 @@ struct String {
             MemoryUtils::CopyTo((des + len1), str2, len2);
         }
 
+        des[length] = 0;
+
         return ns;
     }
 
-    void expand(const SizeT new_length) {
-        Char_T *old_storage = Storage();
-        Char_T *new_storage = allocate(new_length + SizeT{1});
+    void expand(const SizeT new_capacity) {
+        Char_T *old_storage  = Storage();
+        SizeT   old_capacity = Capacity();
 
-        if (Length() != 0) {
-            MemoryUtils::CopyTo(new_storage, old_storage, Length());
-        }
+        reserve(new_capacity);
 
-        deallocate();            // Free the old storage
-        setStorage(new_storage); // Swap in new pointer
+        MemoryUtils::CopyTo(Storage(), old_storage, Length());
+        Reserver::Release(old_storage, (old_capacity + SizeT{1}));
     }
 
-    void copyString(const Char_T *str, const SizeT length) {
-        Char_T *ns = allocate(length + SizeT{1});
-
-        MemoryUtils::CopyTo(ns, str, length);
-
-        ns[length] = Char_T{0};
-
-        setLength(length);
+    void reserve(SizeT capacity) {
+        setStorage(Reserver::Reserve<Char_T>(capacity + SizeT{1})); // 1 for the null terminator
+        setCapacity(capacity);
     }
 
     Char_T *storage_{nullptr};

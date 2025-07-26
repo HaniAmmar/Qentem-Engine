@@ -298,7 +298,7 @@ struct StringUtils {
      *
      * This function operates directly on a raw character buffer, scanning it in-place and replacing
      * all comment content with space (`' '`) or newline (`'\n'`). The goal is to preserve the text's
-     * structure, line count, and character offsets without allocating memory or altering length.
+     * structure, line count, and character offsets without reserving new memory or altering length.
      *
      * String literals are preserved, including escaped quotes (e.g., `\"`), and comments within
      * them are ignored. Block comments that are unterminated at the end of the buffer are masked
