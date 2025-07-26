@@ -62,7 +62,7 @@ struct MemoryBlock {
         static_assert((Alignment_T > 0) && ((Alignment_T & (Alignment_T - 1)) == 0),
                       "Alignment_T must be power-of-two");
 
-        static const SizeT32 page_size = static_cast<SizeT32>(SystemMemory::PageSize());
+        static const SystemIntType page_size = SystemMemory::PageSize();
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
         capacity += page_size; // Insure correct alignment
 #endif
