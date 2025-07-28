@@ -10,7 +10,7 @@
 -   [Features](#features)
 -   [Requirements](#requirements)
 -   [Embedded / Microcontroller Support](#embedded--microcontroller-support)
--   [Reserver (Memory System)](#reserver-memory-system)
+-   [Reserver (Custom Memory Allocator)](#reserver-custom-memory-allocator)
 -   [Documentation](#documentation)
 -   [Live Testing](#live-testing)
 -   [Template Example](#template-example)
@@ -56,22 +56,34 @@ A C++11 or later compiler.
 
 ## Embedded / Microcontroller Support
 
-Qentem Engine’s modular, STL-free architecture enables it to run effectively on embedded systems and microcontroller platforms with limited resources. The core modules—including template rendering, JSON parsing, and custom containers—have been successfully tested on ESP32 and are suitable for use in Arduino-style or bare-metal C++ projects. All components are designed without exceptions, threading, or OS-specific dependencies, making them well-suited to single-threaded, minimal environments. Qentem Engine does not provide file or stream I/O code for embedded targets.
+Qentem Engine’s modular, STL-free architecture enables it to operate efficiently on embedded systems and microcontrollers with limited memory and no operating system. The core components—including template rendering, JSON parsing, and custom containers—have been validated on platforms such as the ESP32, and are suitable for use in bare-metal or Arduino-style C++ environments.
 
-## Reserver (Memory System)
+All modules are designed without exceptions, dynamic threading, or OS-specific dependencies, making them ideal for **single-threaded, memory-constrained targets**.
 
-**Reserver** is Qentem's internal memory system, designed to replace traditional dynamic heap strategies with more deterministic, high-performance region reuse. It features:
+To tailor memory usage, developers may configure `QENTEM_RESERVER_BLOCK_SIZE` at compile time. This constant defines the block size (in bytes) used by the internal memory allocator (`Reserver`), allowing the engine to operate within tight memory budgets when static or deterministic allocation is required.
 
--   No internal metadata in memory regions.
--   First-fit strategy with optional in-place region reuse.
--   Support for core-pinned, per-thread separation.
--   Backed by preallocated blocks with size growth.
--   Optional memory tracking through `MemoryRecord`.
+> _Note_: Qentem Engine does not provide file or stream I/O abstractions for embedded environments. Developers are expected to supply their own I/O bindings as needed.
 
-This system ensures consistent behavior and lower fragmentation, particularly under sustained usage patterns. While it is **functional and fast**, it is currently targeted at **single-threaded, core-pinned workloads** and may evolve to support multithreaded use in future updates.
+## Reserver (Custom Memory Allocator)
 
-> _Note: Reserver is still under active development._
-> It has been integrated into QenWeb and early results show it matches or exceeds system allocator performance under typical workloads.
+**Reserver** is Qentem's internal memory system, engineered for high-performance, deterministic memory reuse. It replaces traditional heap allocation with block-based reservation, optimized for locality, alignment, and long-term reuse without runtime metadata.
+
+### Features
+
+-   **Zero metadata** stored in allocated regions — memory remains clean and unpolluted.
+-   **First-fit region selection** with bitfield-based tracking for fast lookup.
+-   **Fixed-size preallocated blocks**, avoiding unpredictable growth or fragmentation.
+-   **Per-core arenas** for thread-local routing and NUMA-friendliness.
+-   **Optional memory recording** via `MemoryRecord`, useful for diagnostics and leak tracking.
+
+### Design Focus
+
+Reserver emphasizes predictable behavior and low overhead, especially under sustained allocation and release cycles. It is well-suited for systems where performance and control outweigh general-purpose flexibility — such as embedded servers, scripting engines, or custom object pools.
+
+Although thread-safe multithreaded support is not currently provided, the system is designed for **core-pinned, single-threaded workloads** and is future-compatible with per-core extension strategies.
+
+> **Note**: Reserver is under active refinement.
+> It is now fully integrated into QenWeb, and benchmarks show it consistently matches or outperforms `malloc` under real-world web workloads, especially in reuse-heavy scenarios.
 
 ## Documentation
 
