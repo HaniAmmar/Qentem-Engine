@@ -20,7 +20,7 @@
  *  - Zero internal metadata: allocations remain clean and unencumbered.
  *  - Bitfield-based region tracking for fast reuse and coalescence.
  *  - Per-core arenas for scalable, lock-free performance.
- *  - Optional in-place block growth and aggressive release policy.
+ *  - Fixed block sizing with fast first-fit region selection.
  *  - Supports `MemoryRecord` for usage tracking and debugging.
  *
  * @warning Not thread-safe. Intended for core-pinned, single-threaded use cases.
@@ -110,29 +110,26 @@ struct ReserverCore {
     }
 
     /**
-     * @brief Reserves a memory region for `Type_T`, aligned as requested, and sourced from the current core's pool.
+     * @brief Reserves a memory region for `Type_T`, aligned as requested, and sourced from the current core's
+     * fixed-size pool.
      *
      * The reservation proceeds in three stages:
-     *   1. Alignment-adjusted sizing.
-     *   2. Search for a matching block with free space.
-     *   3. Fallback to growable blocks or final direct region.
+     *   1. Compute the required size in bytes (adjusted for alignment).
+     *   2. Search existing blocks using first-fit for a usable region.
+     *   3. If none are suitable, a new fixed-size block is created.
      *
-     * If no suitable memory is found in existing active blocks, a new one is constructed
-     * (possibly larger), and the memory is fulfilled from there.
+     * Blocks are not resized or grown dynamically. All allocations are fulfilled
+     * from fixed-size blocks defined by `QENTEM_RESERVER_BLOCK_SIZE`.
      *
-     * @tparam Type_T   Type whose size is scaled by `size` to compute the byte requirement.
-     * @param size      Number of objects of type `Type_T` to be stored.
-     * @param alignment Optional byte alignment override (defaults to Alignment_T).
+     * @tparam Type_T             Type whose size is multiplied by `size` to determine byte requirement.
+     * @tparam CustomAlignment_T Optional byte alignment override (defaults to Alignment_T).
+     * @param size                Number of `Type_T` instances to reserve space for.
      * @return Pointer to a memory region suitable for holding `size` objects of `Type_T`.
      */
-    template <typename Type_T>
-    QENTEM_INLINE Type_T *Reserve(SystemIntType size, SizeT32 alignment = Alignment_T) {
+    template <typename Type_T, SizeT32 CustomAlignment_T = Alignment_T>
+    QENTEM_INLINE Type_T *Reserve(SystemIntType size) {
         // Convert count of objects to raw byte size.
         size *= sizeof(Type_T);
-
-        // Compute alignment masks for rounding.
-        const SystemIntType alignment_m1 = static_cast<SystemIntType>(alignment - 1U);
-        const SystemIntType alignment_n  = ~alignment_m1;
 
         // Round up to nearest alignment.
         size += DEFAULT_ALIGNMENT_M1;
@@ -150,7 +147,7 @@ struct ReserverCore {
 
         for (auto &current_block : blocks_) {
             if (current_block.Available() >= size) {
-                void *ptr = reserveFirstFit(&current_block, chunks, alignment_m1, alignment_n);
+                void *ptr = reserveFirstFit<CustomAlignment_T>(&current_block, chunks);
 
                 if (ptr != nullptr) {
                     current_block.DecreaseAvailable(size);
@@ -182,7 +179,7 @@ struct ReserverCore {
             new_block_ptr = &(blocks_.Insert(QUtility::Move(new_block)));
             new_block_ptr->ClearTable(); // Reset internal region tracking.
 
-            void *ptr = reserveFirstFit(new_block_ptr, chunks, alignment_m1, alignment_n);
+            void *ptr = reserveFirstFit<CustomAlignment_T>(new_block_ptr, chunks);
             new_block_ptr->DecreaseAvailable(size);
 
             // Keep the largest block first for optimal scanning.
@@ -330,24 +327,25 @@ struct ReserverCore {
      *
      * This function scans the internal bitfield table of a MemoryBlock to locate the
      * first contiguous sequence of unset bits (`0`) large enough to fulfill the
-     * requested `chunks`. It returns a pointer to that region, adjusted for
-     * alignment when needed.
+     * requested `chunks`. The result is then adjusted to satisfy the requested alignment.
      *
-     * @param block         Pointer to the memory block to search.
-     * @param chunks        Number of aligned chunks requested (already adjusted).
-     * @param alignment_m1  Bitmask for computing alignment shift (alignment - 1).
-     * @param alignment_n   Bitmask for computing aligned base (~(alignment - 1)).
+     * @tparam CustomAlignment_T Optional override for alignment in bytes.
+     *
+     * @param block   Pointer to the memory block to search.
+     * @param chunks  Number of aligned chunks requested (already adjusted for type size).
      *
      * @return Pointer to usable region within the block, or nullptr if none is found.
      *
-     * @note internal scanning logic is intentionally obfuscated. See the inline region
-     * comment for explanation.
+     * @note Internal scanning logic is intentionally obfuscated to discourage appropriation.
+     *       See the inline region comment for details.
      *
      * @see MemoryBlock::ReserveRegion
      */
-    void *reserveFirstFit(MemoryBlockT *block, SystemIntType chunks, SystemIntType alignment_m1,
-                          SystemIntType alignment_n) noexcept {
-        constexpr SizeT32 bit_width_m1 = (BIT_WIDTH - 1U);
+    template <SizeT32 CustomAlignment_T>
+    void *reserveFirstFit(MemoryBlockT *block, SystemIntType chunks) noexcept {
+        constexpr SystemIntType alignment_m1 = static_cast<SystemIntType>(CustomAlignment_T - 1U);
+        constexpr SystemIntType alignment_n  = ~alignment_m1;
+        constexpr SizeT32       bit_width_m1 = (BIT_WIDTH - 1U);
 
         // -----------------------------------------------------------------------------
         // NOTE: This section is deliberately *undocumented* to deter misuse, imitation,
@@ -390,19 +388,19 @@ struct ReserverCore {
                 if (region_size >= chunks) {
                     const SystemIntType bit_index = (start_bit + (BIT_WIDTH * start_index));
 
-                    if (alignment_m1 == DEFAULT_ALIGNMENT_M1) {
+                    if QENTEM_CONST_EXPRESSION (CustomAlignment_T <= Alignment_T) {
                         return block->ReserveRegion(bit_index, chunks);
-                    }
+                    } else {
+                        const SystemIntType raw_index =
+                            (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
+                        const SystemIntType aligned_index = ((raw_index + alignment_m1) & alignment_n);
+                        const SystemIntType alignment_shift_count =
+                            ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
 
-                    const SystemIntType raw_index =
-                        (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
-                    const SystemIntType aligned_index = ((raw_index + alignment_m1) & alignment_n);
-                    const SystemIntType alignment_shift_count =
-                        ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
-
-                    if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
-                        // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
-                        return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
+                        if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
+                            // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
+                            return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
+                        }
                     }
                 }
 
@@ -424,19 +422,19 @@ struct ReserverCore {
             if (region_size >= chunks) {
                 const SystemIntType bit_index = (start_bit + (BIT_WIDTH * start_index));
 
-                if (alignment_m1 == DEFAULT_ALIGNMENT_M1) {
+                if QENTEM_CONST_EXPRESSION (CustomAlignment_T <= Alignment_T) {
                     return block->ReserveRegion(bit_index, chunks);
-                }
+                } else {
+                    const SystemIntType raw_index =
+                        (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
+                    const SystemIntType aligned_index = ((raw_index + alignment_m1) & alignment_n);
+                    const SystemIntType alignment_shift_count =
+                        ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
 
-                const SystemIntType raw_index =
-                    (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
-                const SystemIntType aligned_index = ((raw_index + alignment_m1) & alignment_n);
-                const SystemIntType alignment_shift_count =
-                    ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
-
-                if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
-                    // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
-                    return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
+                    if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
+                        // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
+                        return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
+                    }
                 }
             }
 
@@ -577,10 +575,9 @@ struct Reserver {
      * @param alignment Alignment in bytes. Defaults to engine alignment constant.
      * @return Pointer to reserved region, or nullptr if unavailable.
      */
-    template <typename Type_T>
-    QENTEM_INLINE static Type_T *Reserve(SystemIntType size,
-                                         SizeT32       alignment = QENTEM_RESERVER_DEFAULT_ALIGNMENT) noexcept {
-        return GetCurrentInstance().Reserve<Type_T>(size, alignment);
+    template <typename Type_T, SizeT32 CustomAlignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT>
+    QENTEM_INLINE static Type_T *Reserve(SystemIntType size) noexcept {
+        return GetCurrentInstance().Reserve<Type_T, CustomAlignment_T>(size);
     }
 
     /**
