@@ -34,7 +34,7 @@ static void TestReserver1(QTest &test) {
     constexpr SizeT32 size      = (sizeof(void *) * 2);
     constexpr SizeT32 page_size = 4096;
 
-    ReserverCore<> r{page_size, page_size};
+    ReserverCore<(sizeof(void *) * 2), page_size> r{};
 
     char *var1;
     char *var2;
@@ -59,7 +59,7 @@ static void TestReserver2(QTest &test) {
     constexpr SizeT32 size      = (sizeof(void *) * 2);
     constexpr SizeT32 page_size = 4096;
 
-    ReserverCore<> r{page_size, page_size};
+    ReserverCore<(sizeof(void *) * 2), page_size> r{};
 
     char *var1;
     char *var2;

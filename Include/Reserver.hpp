@@ -1,25 +1,30 @@
 /**
  * @file Reserver.hpp
- * @brief Low-level, high-performance memory region controller with zero internal metadata.
+ * @brief High-performance memory reservation system with zero internal metadata.
  *
- * This module provides Qentem's internal memory management system — Reserver — a fast,
- * reusable region tracker built for deterministic memory reuse across block spans of any size.
+ * This module implements Qentem's low-level allocator — Reserver — a deterministic,
+ * reusable memory region manager built to replace traditional heap mechanisms
+ * with precise, high-efficiency block control.
  *
- * Reserver is designed to bypass traditional heap allocators, enabling precise and scalable
- * control over memory usage, alignment, and recycling, without relying on internal headers
- * or runtime metadata. Blocks grow dynamically and maintain reusable regions through
- * bit-level tracking and coalescing, with support for platform-aware alignment and
- * NUMA-friendly placement when pinned.
+ * Each memory block is divided and tracked via compact bit tables, avoiding
+ * per-region metadata and ensuring tight memory boundaries. Allocations are aligned,
+ * coalescible, and free of runtime headers. All tracking is external and
+ * architecture-aware, making it ideal for systems with strict performance constraints.
+ *
+ * Reserver is designed for per-core use, with one instance per logical CPU to avoid
+ * contention and preserve cache locality. Memory requests are routed to the current
+ * core's arena, with optional cross-core fallback for safe reclamation. The system
+ * supports NUMA-friendly placement and configurable block sizes for tuning.
  *
  * Features:
- *  - Manual region tracking via compact bit tables (no per-region metadata).
- *  - Fast path for reuse from same-core pools, with fallback cross-core deallocation.
- *  - Optional in-place block growth, dynamic capacity scaling, and zero fragmentation overhead.
- *  - Thread-local routing with per-core instance resolution.
- *  - Optional memory usage recording via `MemoryRecord`.
+ *  - Zero internal metadata: allocations remain clean and unencumbered.
+ *  - Bitfield-based region tracking for fast reuse and coalescence.
+ *  - Per-core arenas for scalable, lock-free performance.
+ *  - Optional in-place block growth and aggressive release policy.
+ *  - Supports `MemoryRecord` for usage tracking and debugging.
  *
- * @warning Not thread-safe by default. Designed for use in core-pinned, single-threaded contexts.
- * @note    Requires MemoryBlock and LiteArray. Configurable via compile-time constants.
+ * @warning Not thread-safe. Intended for core-pinned, single-threaded use cases.
+ * @note    Depends on MemoryBlock and LiteArray. Behavior customizable via macros.
  *
  * @author  Hani Ammar
  * @date    2025
@@ -42,15 +47,23 @@
 namespace Qentem {
 
 /**
- * @brief Per-core memory manager responsible for fulfilling and tracking reservations.
+ * @brief Per-core memory manager for fast, reusable allocations.
  *
- * Each core holds a dedicated instance of this structure, ensuring minimal contention
- * and maximum locality for all memory requests. It governs a sequence of memory blocks,
- * orchestrates fallback handling, and tracks usable regions without storing metadata in user memory.
+ * This structure handles memory reservations for a single CPU core.
+ * It allocates memory in blocks, splits them into regions, and keeps
+ * track of what's free using bitfields —  without embedding metadata
+ * into the allocated regions, preserving clean memory boundaries and
+ * minimizing overhead.
  *
- * @tparam Alignment_T Desired base alignment.
+ * Because each core has its own manager, memory stays local (and fast),
+ * and there's no locking or contention between threads. Memory can be
+ * returned, reused, or released depending on usage patterns.
+ *
+ * @tparam Alignment_T Minimum alignment for allocations (in bytes).
+ * @tparam BlockSize_T Size of each memory block managed (default: QENTEM_RESERVER_BLOCK_SIZE).
  */
-template <SizeT32 Alignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT>
+template <SizeT32       Alignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT,
+          SystemIntType BlockSize_T = QENTEM_RESERVER_BLOCK_SIZE>
 struct ReserverCore {
     /// Alias for the managed memory block type, bound to the default alignment.
     using MemoryBlockT = MemoryBlock<QENTEM_RESERVER_DEFAULT_ALIGNMENT>;
@@ -78,18 +91,8 @@ struct ReserverCore {
      *
      * Begins with a smaller-than-target block to allow gradual scaling.
      * Each block obtained is internally subdivided, zero-overhead, and alignment-aware.
-     *
-     * @param initial_block_size Requested entry size for the first usable memory block.
-     *                           Will be internally reduced to slow growth ramp-up.
-     * @param max_block_size     The upper bound for internal block size growth.
      */
-    ReserverCore(SystemIntType initial_block_size = QENTEM_RESERVER_INITIAL_BLOCK_SIZE,
-                 SystemIntType max_block_size     = QENTEM_RESERVER_MAX_BLOCK_SIZE_TO_KEEP) noexcept
-        : current_block_size_{initial_block_size / QENTEM_RESERVER_BLOCK_GROWTH_FACTOR},
-          initial_block_size_{initial_block_size / QENTEM_RESERVER_BLOCK_GROWTH_FACTOR},
-          max_block_size_{max_block_size} {
-        static_assert((QENTEM_RESERVER_INITIAL_BLOCK_SIZE / QENTEM_RESERVER_BLOCK_GROWTH_FACTOR) != 0,
-                      "Initial block size divided by growth factor must not be zero.");
+    ReserverCore() noexcept {
         static_assert(Alignment_T >= sizeof(void *),
                       "Alignment_T must be at least the size of a pointer to ensure correct placement.");
     }
@@ -163,14 +166,10 @@ struct ReserverCore {
         }
 
         ///////////////////////////////////////////////////////////
-        // Phase 2: No block could fulfill it — grow a new one.
-
-        if (current_block_size_ < max_block_size_) {
-            current_block_size_ *= QENTEM_RESERVER_BLOCK_GROWTH_FACTOR;
-        }
+        // Phase 2: No block could fulfill it — reserve a new one.
 
         // Pick either the current growth size or just enough for the request.
-        MemoryBlockT new_block{(size <= current_block_size_) ? current_block_size_ : size};
+        MemoryBlockT new_block{(size <= BlockSize_T) ? BlockSize_T : size};
 
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
         MemoryRecord::ReservedBlock(new_block.Capacity());
@@ -247,7 +246,7 @@ struct ReserverCore {
                     block.IncreaseAvailable(size);
                     block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
                     reattachBlock(&block);
-                } else if ((block.Capacity() != current_block_size_) || blocks_.IsNotEmpty()) {
+                } else if ((block.Capacity() != BlockSize_T) || blocks_.IsNotEmpty()) {
                     // Block is large and atypical — release it outright.
                     releaseDetachedBlock(&block);
                 } else {
@@ -308,9 +307,6 @@ struct ReserverCore {
         // Drop all memory blocks from both active and retired lists.
         blocks_.Reset();
         exhausted_blocks_.Reset();
-
-        // Reset the size growth curve to its origin.
-        current_block_size_ = initial_block_size_;
     }
 
     /**
@@ -542,11 +538,23 @@ struct ReserverCore {
         exhausted_blocks_.DropFast(SizeT{1});
     }
 
+    /**
+     * @brief Active memory blocks currently serving allocation requests.
+     *
+     * Each block in this array participates in reservation attempts. When a block becomes full,
+     * it may be moved to `exhausted_blocks_`. The first block is usually the one with the largest
+     * usable capacity, aiding first-fit scans for performance.
+     */
     LiteArray<MemoryBlockT> blocks_{};
+
+    /**
+     * @brief Detached memory blocks that are temporarily exhausted or oversized.
+     *
+     * Blocks in this list are no longer serving active reservations. Depending on configuration
+     * and available capacity, they may be recycled, cleared, or released entirely. This array
+     * prevents waste by preserving reusable memory regions without incurring allocation cost.
+     */
     LiteArray<MemoryBlockT> exhausted_blocks_{};
-    SystemIntType           current_block_size_;
-    const SystemIntType     initial_block_size_;
-    const SystemIntType     max_block_size_;
 };
 
 /**
@@ -556,6 +564,8 @@ struct ReserverCore {
  * routed through per-core arenas for locality and thread-centric performance.
  */
 struct Reserver {
+    using Core = ReserverCore<>;
+
     /**
      * @brief Reserves a region for objects of the given type.
      *
@@ -591,7 +601,7 @@ struct Reserver {
         static constexpr SystemIntType DEFAULT_ALIGNMENT_N = ~DEFAULT_ALIGNMENT_M1;
 
         if (ptr != nullptr) {
-            ReserverCore<> &instance = GetCurrentInstance();
+            Core &instance = GetCurrentInstance();
             size *= sizeof(Type_T);
 
             // Round the size up to the alignment boundary.
@@ -605,7 +615,7 @@ struct Reserver {
             }
 
             // Attempt return to a sibling arena (cross-core recovery).
-            LiteArray<ReserverCore<>> &reservers = getReservers();
+            LiteArray<Core> &reservers = getReservers();
 
             for (auto &reserver : reservers) {
                 if ((&reserver != &instance) && reserver.Release(ptr, size)) {
@@ -644,8 +654,8 @@ struct Reserver {
      *
      * @return Reference to the active core’s memory management unit.
      */
-    QENTEM_INLINE static ReserverCore<> &GetCurrentInstance() noexcept {
-        static thread_local ReserverCore<> &instance = getReserver(CPUHelper::GetCurrentCore());
+    QENTEM_INLINE static Core &GetCurrentInstance() noexcept {
+        static thread_local Core &instance = getReserver(CPUHelper::GetCurrentCore());
         return instance;
     }
 
@@ -655,8 +665,8 @@ struct Reserver {
      *
      * The number of cores is queried at runtime, and each arena is initialized independently.
      */
-    QENTEM_INLINE static LiteArray<ReserverCore<>> initReservers() noexcept {
-        return LiteArray<ReserverCore<>>{CPUHelper::GetCoreCount(), true};
+    QENTEM_INLINE static LiteArray<Core> initReservers() noexcept {
+        return LiteArray<Core>{CPUHelper::GetCoreCount(), true};
     }
 
     /**
@@ -665,12 +675,12 @@ struct Reserver {
      * @param core_id Logical CPU index as reported by the system.
      * @return Reference to the corresponding ReserverCore.
      */
-    QENTEM_INLINE static ReserverCore<> &getReserver(int core_id) noexcept {
+    QENTEM_INLINE static Core &getReserver(int core_id) noexcept {
 #if defined(__linux__) || defined(_WIN32)
         return getReservers().Storage()[core_id];
 #else
         (void)core_id;
-        static ReserverCore<> reserver{};
+        static Core reserver{};
         return reserver;
 #endif
     }

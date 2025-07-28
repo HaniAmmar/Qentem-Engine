@@ -136,35 +136,23 @@ union PtrCast_T {
 #endif
 
 /**
- * @brief Initial size of the first memory block reserved by the Reserver.
+ * @brief Fixed block size used by the Reserver memory allocator.
  *
- * A moderate default (64 KiB) that balances memory footprint and fragmentation,
- * especially suited for small-to-medium workloads.
+ * All allocations are drawn from fixed-size memory blocks of this size.
+ * Blocks are never resized or grown; memory expansion occurs only via the
+ * addition of new blocks of the same size.
+ *
+ * This design ensures:
+ *   - Predictable memory layout
+ *   - Improved cache behavior
+ *   - Easier fragmentation control
+ *
+ * Recommended sizes:
+ *   - 64 KiB for constrained embedded systems
+ *   - 128–256 KiB for desktop or server-class deployments
  */
-#ifndef QENTEM_RESERVER_INITIAL_BLOCK_SIZE
-#define QENTEM_RESERVER_INITIAL_BLOCK_SIZE (64U * 1024U) // 64 KiB
-#endif
-
-/**
- * @brief Maximum size of fully free memory blocks to retain.
- *
- * Blocks larger than this will be released back to the system once empty,
- * ensuring memory is returned aggressively. Smaller blocks may be reused.
- */
-#ifndef QENTEM_RESERVER_MAX_BLOCK_SIZE_TO_KEEP
-#define QENTEM_RESERVER_MAX_BLOCK_SIZE_TO_KEEP (256U * 1024U) // 256 KiB
-#endif
-
-/**
- * @brief Growth multiplier for reserving larger blocks after exhaustion.
- *
- * When a block cannot fulfill a reserve request, the next block size will be
- * increased by this factor (e.g., ×4) to reduce future fragmentation.
- *
- * Growth is capped by QENTEM_RESERVER_MAX_BLOCK_SIZE_TO_KEEP to avoid runaway memory use.
- */
-#ifndef QENTEM_RESERVER_BLOCK_GROWTH_FACTOR
-#define QENTEM_RESERVER_BLOCK_GROWTH_FACTOR 4
+#ifndef QENTEM_RESERVER_BLOCK_SIZE
+#define QENTEM_RESERVER_BLOCK_SIZE (256U * 1024U) // 256 KiB
 #endif
 
 ///////////////////////////////////////////////////////////////
