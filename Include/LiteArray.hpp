@@ -34,7 +34,7 @@ struct LiteArray {
             reserve(capacity);
 
             if (initialize) {
-                MemoryUtils::InitializeRange(storage_, (storage_ + capacity_));
+                MemoryUtils::ConstructRange(storage_, (storage_ + capacity_));
                 size_ = capacity_;
             }
         }
@@ -73,7 +73,7 @@ struct LiteArray {
 
             if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                MemoryUtils::Dispose(old_storage, (old_storage + old_size));
+                MemoryUtils::Destruct(old_storage, (old_storage + old_size));
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
                 release(old_raw_storage, old_capacity);
 #else
@@ -87,7 +87,7 @@ struct LiteArray {
 
     QENTEM_INLINE ~LiteArray() noexcept {
         if (storage_ != nullptr) {
-            MemoryUtils::Dispose(storage_, End());
+            MemoryUtils::Destruct(storage_, End());
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
             release(raw_storage_, capacity_);
@@ -102,7 +102,7 @@ struct LiteArray {
             expand((capacity_ != 0) ? (capacity_ * SizeT{2}) : SizeT{1});
         }
 
-        MemoryUtils::Initialize((storage_ + size_), QUtility::Move(item));
+        MemoryUtils::Construct((storage_ + size_), QUtility::Move(item));
         ++size_;
     }
 
@@ -118,7 +118,7 @@ struct LiteArray {
         if (size <= Size()) {
             const SizeT new_size = (Size() - size);
 
-            MemoryUtils::Dispose((Storage() + new_size), End());
+            MemoryUtils::Destruct((Storage() + new_size), End());
             size_ = new_size;
         }
     }
@@ -128,13 +128,13 @@ struct LiteArray {
     }
 
     QENTEM_INLINE void Clear() noexcept {
-        MemoryUtils::Dispose(storage_, End());
+        MemoryUtils::Destruct(storage_, End());
         size_ = 0;
     }
 
     QENTEM_INLINE void Reset() noexcept {
         if (storage_ != nullptr) {
-            MemoryUtils::Dispose(storage_, End());
+            MemoryUtils::Destruct(storage_, End());
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
             release(raw_storage_, capacity_);

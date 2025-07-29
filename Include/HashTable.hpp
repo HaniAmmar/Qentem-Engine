@@ -176,7 +176,7 @@ struct HashTable {
      */
     ~HashTable() {
         HItem_T *storage = Storage();
-        MemoryUtils::Dispose(storage, (storage + Size()));
+        MemoryUtils::Destruct(storage, (storage + Size()));
         release(storage, Capacity());
     }
 
@@ -206,8 +206,8 @@ struct HashTable {
             src.setSize(0);
             src.setCapacity(0);
 
-            // Dispose of the old memory (after transfer, in case of derived/child arrays).
-            MemoryUtils::Dispose(storage, (storage + size));
+            // Destruct of the old memory (after transfer, in case of derived/child arrays).
+            MemoryUtils::Destruct(storage, (storage + size));
             release(storage, old_capacity);
         }
 
@@ -238,8 +238,8 @@ struct HashTable {
             // Deep copy all items and hash table layout from src.
             copyTable(src);
 
-            // Dispose of the old memory (after transfer, in case of derived/child arrays).
-            MemoryUtils::Dispose(storage, (storage + size));
+            // Destruct of the old memory (after transfer, in case of derived/child arrays).
+            MemoryUtils::Destruct(storage, (storage + size));
             release(storage, old_capacity);
         }
 
@@ -555,9 +555,9 @@ struct HashTable {
     void Resize(const SizeT new_size) {
         if (new_size != 0) {
             if (Size() > new_size) {
-                // Shrink: Dispose of elements outside new bounds
+                // Shrink: Destruct of elements outside new bounds
                 HItem_T *storage = Storage();
-                MemoryUtils::Dispose((storage + new_size), (storage + Size()));
+                MemoryUtils::Destruct((storage + new_size), (storage + Size()));
                 setSize(new_size); // Adjust logical size
             }
 
@@ -618,8 +618,8 @@ struct HashTable {
     QENTEM_INLINE void Reset() noexcept {
         HItem_T *storage = Storage();
 
-        MemoryUtils::Dispose(storage, (storage + Size())); // Dispose all elements
-        release(Storage(), Capacity());                    // Free the hash table & storage block
+        MemoryUtils::Destruct(storage, (storage + Size())); // Destruct all elements
+        release(Storage(), Capacity());                     // Free the hash table & storage block
 
         clearStorage(); // Set pointer to nullptr
         setSize(0);     // Size is now zero

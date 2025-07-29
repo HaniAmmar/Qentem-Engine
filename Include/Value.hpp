@@ -52,17 +52,17 @@ struct Value {
     ~Value() {
         switch (Type()) {
             case ValueType::Object: {
-                MemoryUtils::Dispose(&object_);
+                MemoryUtils::Destruct(&object_);
                 break;
             }
 
             case ValueType::Array: {
-                MemoryUtils::Dispose(&array_);
+                MemoryUtils::Destruct(&array_);
                 break;
             }
 
             case ValueType::String: {
-                MemoryUtils::Dispose(&string_);
+                MemoryUtils::Destruct(&string_);
                 break;
             }
 

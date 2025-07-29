@@ -68,7 +68,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      */
     QENTEM_INLINE void MoveDoublecat(HAItem_T &item) {
         Value = QUtility::Move(item.Value);
-        MemoryUtils::Dispose(&(item.Key));
+        MemoryUtils::Destruct(&(item.Key));
     }
 
     /**
@@ -90,14 +90,14 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      */
     QENTEM_INLINE void Construct(const HAItem_T &item) {
         Hash = item.Hash;
-        MemoryUtils::Initialize(&Key, item.Key);
-        MemoryUtils::Initialize(&Value, item.Value);
+        MemoryUtils::Construct(&Key, item.Key);
+        MemoryUtils::Construct(&Value, item.Value);
     }
 
     QENTEM_INLINE void Construct(HAItem_T &&item) {
         Hash = item.Hash;
-        MemoryUtils::Initialize(&Key, QUtility::Move(item.Key));
-        MemoryUtils::Initialize(&Value, QUtility::Move(item.Value));
+        MemoryUtils::Construct(&Key, QUtility::Move(item.Key));
+        MemoryUtils::Construct(&Value, QUtility::Move(item.Value));
     }
 
     /**
@@ -106,7 +106,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      * Uses placement-new or custom Qentem initialization logic.
      */
     QENTEM_INLINE void InitValue() {
-        MemoryUtils::Initialize(&Value);
+        MemoryUtils::Construct(&Value);
     }
 };
 

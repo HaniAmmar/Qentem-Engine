@@ -131,7 +131,7 @@ struct TagBit {
 
     VariableTag *MakeVariableTag() {
         VariableTag *tag = Reserver::Reserve<VariableTag>(1);
-        MemoryUtils::Initialize(tag);
+        MemoryUtils::Construct(tag);
 
         type_    = TagType::Variable;
         storage_ = tag;
@@ -141,7 +141,7 @@ struct TagBit {
 
     VariableTag *MakeRawVariableTag() {
         VariableTag *tag = Reserver::Reserve<VariableTag>(1);
-        MemoryUtils::Initialize(tag);
+        MemoryUtils::Construct(tag);
 
         type_    = TagType::RawVariable;
         storage_ = tag;
@@ -151,7 +151,7 @@ struct TagBit {
 
     MathTag *MakeMathTag() {
         MathTag *tag = Reserver::Reserve<MathTag>(1);
-        MemoryUtils::Initialize(tag);
+        MemoryUtils::Construct(tag);
 
         type_    = TagType::Math;
         storage_ = tag;
@@ -161,7 +161,7 @@ struct TagBit {
 
     SuperVariableTag *MakeSuperVariableTag() {
         SuperVariableTag *tag = Reserver::Reserve<SuperVariableTag>(1);
-        MemoryUtils::Initialize(tag);
+        MemoryUtils::Construct(tag);
 
         type_    = TagType::SuperVariable;
         storage_ = tag;
@@ -171,7 +171,7 @@ struct TagBit {
 
     InLineIfTag *MakeInLineIfTag() {
         InLineIfTag *tag = Reserver::Reserve<InLineIfTag>(1);
-        MemoryUtils::Initialize(tag);
+        MemoryUtils::Construct(tag);
 
         type_    = TagType::InLineIf;
         storage_ = tag;
@@ -181,7 +181,7 @@ struct TagBit {
 
     LoopTag *MakeLoopTag() {
         LoopTag *tag = Reserver::Reserve<LoopTag>(1);
-        MemoryUtils::Initialize(tag);
+        MemoryUtils::Construct(tag);
 
         type_    = TagType::Loop;
         storage_ = tag;
@@ -191,7 +191,7 @@ struct TagBit {
 
     IfTag *MakeIfTag() {
         IfTag *tag = Reserver::Reserve<IfTag>(1);
-        MemoryUtils::Initialize(tag);
+        MemoryUtils::Construct(tag);
 
         type_    = TagType::If;
         storage_ = tag;
@@ -213,35 +213,35 @@ struct TagBit {
 
                 case TagType::Math: {
                     MathTag *ptr = &GetMathTag();
-                    MemoryUtils::Dispose(ptr);
+                    MemoryUtils::Destruct(ptr);
                     Reserver::Release(ptr, 1);
                     break;
                 }
 
                 case TagType::SuperVariable: {
                     SuperVariableTag *ptr = &GetSuperVariableTag();
-                    MemoryUtils::Dispose(ptr);
+                    MemoryUtils::Destruct(ptr);
                     Reserver::Release(ptr, 1);
                     break;
                 }
 
                 case TagType::InLineIf: {
                     InLineIfTag *ptr = &GetInLineIfTag();
-                    MemoryUtils::Dispose(ptr);
+                    MemoryUtils::Destruct(ptr);
                     Reserver::Release(ptr, 1);
                     break;
                 }
 
                 case TagType::Loop: {
                     LoopTag *ptr = &GetLoopTag();
-                    MemoryUtils::Dispose(ptr);
+                    MemoryUtils::Destruct(ptr);
                     Reserver::Release(ptr, 1);
                     break;
                 }
 
                 case TagType::If: {
                     IfTag *ptr = &GetIfTag();
-                    MemoryUtils::Dispose(ptr);
+                    MemoryUtils::Destruct(ptr);
                     Reserver::Release(ptr, 1);
                     break;
                 }

@@ -204,48 +204,88 @@ struct MemoryUtils {
     //               Construction / Initialization           //
     ///////////////////////////////////////////////////////////
 
+    ///////////////////////////////////////////////////////////
+    //                    Construction                      //
+    ///////////////////////////////////////////////////////////
+
     /**
      * @brief Constructs an object of type `Type_T` in-place at the given memory address.
      *
-     * This uses Qentem's internal placement-new operator unless disabled by `QENTEM_NO_CUSTOM_PLACEMENT_NEW`.
+     * Uses Qentem's internal placement-new operator unless `QENTEM_NO_CUSTOM_PLACEMENT_NEW` is defined.
+     * This safely constructs the object using perfect forwarding of constructor arguments.
      *
-     * @tparam Type_T    The type to construct.
-     * @tparam Values_T  Constructor argument types.
-     * @param pointer    The memory address to construct the object at.
-     * @param values     The arguments to pass to the constructor.
+     * @tparam Type_T   The type of object to construct.
+     * @tparam Values_T Constructor argument types (deduced).
+     * @param item      Pointer to the memory location where the object will be constructed.
+     * @param values    Arguments to forward to the constructor of `Type_T`.
+     *
+     * @note This function does not allocate memory. The caller must ensure `item` points to valid storage.
      */
     template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void Initialize(Type_T *pointer, Values_T &&...values) noexcept {
+    QENTEM_INLINE static void Construct(Type_T *item, Values_T &&...values) noexcept {
 #ifndef QENTEM_NO_CUSTOM_PLACEMENT_NEW
-        new (pointer, false) Type_T{QUtility::Forward<Values_T>(values)...};
+        new (item, false) Type_T{QUtility::Forward<Values_T>(values)...};
 #else
-        ::new (pointer) Type_T{QUtility::Forward<Values_T>(values)...};
+        ::new (item) Type_T{QUtility::Forward<Values_T>(values)...};
 #endif
     }
 
+    /**
+     * @brief Constructs a range of objects in-place, forwarding arguments to each.
+     *
+     * Constructs objects of type `Type_T` in the range [`item`, `end`), using the provided
+     * arguments for each element. Useful for array initialization or bulk construction.
+     *
+     * @tparam Type_T   The type of object to construct.
+     * @tparam Values_T Constructor argument types (deduced).
+     * @param item      Start of the memory range.
+     * @param end       One-past-the-end of the memory range.
+     * @param values    Arguments to forward to each object's constructor.
+     *
+     * @note The caller must ensure the range is valid and uninitialized.
+     */
     template <typename Type_T, typename... Values_T>
-    QENTEM_INLINE static void InitializeRange(Type_T *pointer, const Type_T *end, Values_T &&...values) {
-        while (pointer < end) {
-            Initialize(pointer, QUtility::Forward<Values_T>(values)...);
-            ++pointer;
+    QENTEM_INLINE static void ConstructRange(Type_T *item, const Type_T *end, Values_T &&...values) {
+        while (item < end) {
+            Construct(item, QUtility::Forward<Values_T>(values)...);
+            ++item;
         }
     }
 
     ///////////////////////////////////////////////////////////
-    //                      Destruction                      //
+    //                    Destruction                       //
     ///////////////////////////////////////////////////////////
 
+    /**
+     * @brief Explicitly destroys an object by invoking its destructor.
+     *
+     * Destroys the object pointed to by `item` by directly calling its destructor.
+     * Does not deallocate memory or null the pointer.
+     *
+     * @tparam Type_T The type of the object to destroy.
+     * @param item    Pointer to the object to destroy. If `nullptr`, does nothing.
+     */
     template <typename Type_T>
-    QENTEM_INLINE static void Dispose(Type_T *item) noexcept {
+    QENTEM_INLINE static void Destruct(Type_T *item) noexcept {
         if (item != nullptr) {
             item->~Type_T();
         }
     }
 
+    /**
+     * @brief Destroys a range of objects in-place.
+     *
+     * Iterates through the range [`item`, `end`) and invokes the destructor on each object.
+     * Used when releasing arrays or bulk-managed objects.
+     *
+     * @tparam Type_T The type of the objects to destroy.
+     * @param item    Start of the object range.
+     * @param end     One-past-the-end of the range.
+     */
     template <typename Type_T>
-    QENTEM_INLINE static void Dispose(Type_T *item, const Type_T *end) noexcept {
+    QENTEM_INLINE static void Destruct(Type_T *item, const Type_T *end) noexcept {
         while (item < end) {
-            Dispose(item);
+            Destruct(item);
             ++item;
         }
     }

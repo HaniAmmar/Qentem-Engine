@@ -33,7 +33,7 @@ struct Array {
             reserve();
 
             if (initialize) {
-                MemoryUtils::InitializeRange(Storage(), (Storage() + Capacity()));
+                MemoryUtils::ConstructRange(Storage(), (Storage() + Capacity()));
                 setSize(Capacity());
             }
         }
@@ -46,7 +46,7 @@ struct Array {
     }
 
     ~Array() {
-        MemoryUtils::Dispose(Storage(), End());
+        MemoryUtils::Destruct(Storage(), End());
         Reserver::Release(Storage(), Capacity());
     }
 
@@ -66,7 +66,7 @@ struct Array {
 
             if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                MemoryUtils::Dispose(old_storage, (old_storage + old_size));
+                MemoryUtils::Destruct(old_storage, (old_storage + old_size));
                 Reserver::Release(old_storage, old_capacity);
             }
         }
@@ -90,7 +90,7 @@ struct Array {
 
             if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
-                MemoryUtils::Dispose(old_storage, (old_storage + old_size));
+                MemoryUtils::Destruct(old_storage, (old_storage + old_size));
                 Reserver::Release(old_storage, old_capacity);
             }
         }
@@ -134,7 +134,7 @@ struct Array {
         const Type_T *src_end  = (src_item + src.Size());
 
         while (src_item < src_end) {
-            MemoryUtils::Initialize(storage, *src_item);
+            MemoryUtils::Construct(storage, *src_item);
             ++storage;
             ++src_item;
         }
@@ -145,7 +145,7 @@ struct Array {
             resize((Capacity() | SizeT{1}) * SizeT{2});
         }
 
-        MemoryUtils::Initialize((Storage() + Size()), QUtility::Move(item));
+        MemoryUtils::Construct((Storage() + Size()), QUtility::Move(item));
         ++size_;
     }
 
@@ -154,7 +154,7 @@ struct Array {
             resize((Capacity() | SizeT{1}) * SizeT{2});
         }
 
-        MemoryUtils::Initialize((Storage() + Size()), item);
+        MemoryUtils::Construct((Storage() + Size()), item);
         ++size_;
     }
 
@@ -203,13 +203,13 @@ struct Array {
     }
 
     QENTEM_INLINE void Clear() noexcept {
-        MemoryUtils::Dispose(Storage(), End());
+        MemoryUtils::Destruct(Storage(), End());
 
         setSize(0);
     }
 
     void Reset() noexcept {
-        MemoryUtils::Dispose(Storage(), End());
+        MemoryUtils::Destruct(Storage(), End());
         Reserver::Release(Storage(), Capacity());
 
         clearStorage();
@@ -235,7 +235,7 @@ struct Array {
             reserve();
 
             if (initialize) {
-                MemoryUtils::InitializeRange(Storage(), (Storage() + size));
+                MemoryUtils::ConstructRange(Storage(), (Storage() + size));
                 setSize(size);
             }
         }
@@ -245,7 +245,7 @@ struct Array {
         if (new_size != 0) {
             if (Size() > new_size) {
                 // Shrink
-                MemoryUtils::Dispose((Storage() + new_size), End());
+                MemoryUtils::Destruct((Storage() + new_size), End());
                 setSize(new_size);
             }
 
@@ -261,7 +261,7 @@ struct Array {
 
         if (new_size > Size()) {
             Type_T *current = Storage();
-            MemoryUtils::InitializeRange((current + Size()), (current + new_size));
+            MemoryUtils::ConstructRange((current + Size()), (current + new_size));
         }
 
         setSize(Capacity());
@@ -305,7 +305,7 @@ struct Array {
         if (size <= Size()) {
             const SizeT new_size = (Size() - size);
 
-            MemoryUtils::Dispose((Storage() + new_size), End());
+            MemoryUtils::Destruct((Storage() + new_size), End());
             setSize(new_size);
         }
     }
@@ -421,7 +421,7 @@ struct Array {
         const Type_T *src_end  = (src_item + src.Size());
 
         while (src_item < src_end) {
-            MemoryUtils::Initialize(storage, *src_item);
+            MemoryUtils::Construct(storage, *src_item);
             ++storage;
             ++src_item;
         }
