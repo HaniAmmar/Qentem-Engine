@@ -53,13 +53,13 @@ struct HLItem_T : public HTableItem_T<Key_T> {
      *
      * @param Unused Source item.
      */
-    QENTEM_INLINE const void CopyValue(HLItem_T const &) const {
+    QENTEM_INLINE void CopyValue(HLItem_T const &) const {
     }
 
     /**
      * @brief No-op initialization for key-only items (required for interface).
      */
-    QENTEM_INLINE const void InitValue() const {
+    QENTEM_INLINE void InitValue() const {
     }
 };
 
