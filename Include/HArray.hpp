@@ -41,6 +41,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      */
     using BaseT = HTableItem_T<Key_T>;
     using BaseT::BaseT;
+    using BaseT::Hash;
     using BaseT::Key;
 
     /**
@@ -77,6 +78,26 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      */
     QENTEM_INLINE void CopyValue(HAItem_T const &item) {
         Value = item.Value;
+    }
+
+    /**
+     * @brief Initializes key, value, and hash fields in-place.
+     *
+     * This method intentionally leaves linkage fields (`Position`, `Next`)
+     * untouched to preserve chain integrity during item insertion or move.
+     *
+     * Should only be used when writing to uninitialized or cleared item slots.
+     */
+    QENTEM_INLINE void Construct(const HAItem_T &item) {
+        Hash = item.Hash;
+        MemoryUtils::Initialize(&Key, item.Key);
+        MemoryUtils::Initialize(&Value, item.Value);
+    }
+
+    QENTEM_INLINE void Construct(HAItem_T &&item) {
+        Hash = item.Hash;
+        MemoryUtils::Initialize(&Key, QUtility::Move(item.Key));
+        MemoryUtils::Initialize(&Value, QUtility::Move(item.Value));
     }
 
     /**

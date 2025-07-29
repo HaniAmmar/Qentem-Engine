@@ -214,14 +214,12 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::Sort;
     using BaseT::Storage;
 
-    using BaseT::clearHashTable;
+    using BaseT::clearStorage;
     using BaseT::copyTable;
-    using BaseT::copyTableWithHash;
     using BaseT::expand;
     using BaseT::find;
     using BaseT::generateHash;
     using BaseT::getBase;
-    using BaseT::getHashTable;
     using BaseT::hashAndFind;
     using BaseT::insert;
     using BaseT::remove;
@@ -229,8 +227,8 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::reserveOnly;
     using BaseT::resize;
     using BaseT::setCapacity;
-    using BaseT::setHashTable;
     using BaseT::setSize;
+    using BaseT::setStorage;
     using BaseT::tryInsert;
 
     /**

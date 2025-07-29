@@ -35,6 +35,8 @@ struct HLItem_T : public HTableItem_T<Key_T> {
      */
     using BaseT = HTableItem_T<Key_T>;
     using BaseT::BaseT;
+    using BaseT::Hash;
+    using BaseT::Key;
 
     /**
      * @brief Moves and disposes of the key from another item.
@@ -54,6 +56,16 @@ struct HLItem_T : public HTableItem_T<Key_T> {
      * @param Unused Source item.
      */
     QENTEM_INLINE void CopyValue(HLItem_T const &) const {
+    }
+
+    QENTEM_INLINE void CopyAll(const HLItem_T &item) {
+        Hash = item.Hash;
+        Key  = item.Key;
+    }
+
+    QENTEM_INLINE void MoveAll(HLItem_T &&item) {
+        Hash = item.Hash;
+        Key  = QUtility::Move(item.Key);
     }
 
     /**
