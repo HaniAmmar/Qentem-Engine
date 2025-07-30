@@ -58,15 +58,32 @@ namespace Qentem {
 
 struct QUtility {
     ///////////////////////////////////////////////////////////
+    //                    Alignment                          //
+    ///////////////////////////////////////////////////////////
+    template <typename Number_T>
+    QENTEM_INLINE static constexpr Number_T AlignUp(Number_T size, Number_T alignment) noexcept {
+        return (size + (alignment - Number_T{1})) & ~(alignment - Number_T{1});
+    }
+
+    template <typename Number_T>
+    QENTEM_INLINE static constexpr Number_T AlignDown(Number_T size, Number_T alignment) noexcept {
+        return size & ~(alignment - Number_T{1});
+    }
+
+    template <typename Number_T>
+    QENTEM_INLINE static constexpr bool IsAligned(Number_T size, Number_T alignment) noexcept {
+        return (size & (alignment - Number_T{1})) == 0;
+    }
+    ///////////////////////////////////////////////////////////
     //                      Forward                          //
     ///////////////////////////////////////////////////////////
     template <typename Type_T>
-    static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &value) noexcept {
+    QENTEM_INLINE static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &value) noexcept {
         return (Type_T &&)(value);
     }
 
     template <typename Type_T>
-    static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &&value) noexcept {
+    QENTEM_INLINE static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &&value) noexcept {
         static_assert(!QTraits::IsLValueReference<Type_T>::Value, "Forward<T>(x): Cannot forward an lvalue as rvalue.");
         return (Type_T &&)(value);
     }
@@ -75,14 +92,14 @@ struct QUtility {
     //                      Move                             //
     ///////////////////////////////////////////////////////////
     template <typename Type_T>
-    static constexpr typename QTraits::ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
+    QENTEM_INLINE static constexpr typename QTraits::ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
         return (typename QTraits::ReferenceType<Type_T>::Type &&)(value);
     }
     ///////////////////////////////////////////////////////////
     //                      Swap                             //
     ///////////////////////////////////////////////////////////
     template <typename Type_T>
-    inline static void Swap(Type_T &item1, Type_T &item2) noexcept {
+    QENTEM_INLINE static void Swap(Type_T &item1, Type_T &item2) noexcept {
         Type_T item = Move(item1);
         item1       = Move(item2);
         item2       = Move(item);
