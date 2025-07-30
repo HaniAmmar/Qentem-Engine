@@ -21,6 +21,39 @@
 
 #include "QTraits.hpp"
 
+///////////////////////////////////////////////////////////////
+//               Compiler Intrinsic Macros                   //
+///////////////////////////////////////////////////////////////
+// clang-format off
+#ifdef QENTEM_DEBUG
+    #define QENTEM_INLINE
+
+    #ifdef _MSC_VER
+        #define QENTEM_NOINLINE
+        #define QENTEM_MAYBE_UNUSED
+    #else
+        #define QENTEM_NOINLINE __attribute__((noinline))
+        #define QENTEM_MAYBE_UNUSED __attribute__((unused))
+    #endif
+#else
+    #ifdef _MSC_VER
+        #define QENTEM_NOINLINE __declspec(noinline)
+        #define QENTEM_INLINE __forceinline
+        #define QENTEM_MAYBE_UNUSED
+    #else
+        #define QENTEM_NOINLINE __attribute__((noinline))
+        #define QENTEM_INLINE __attribute__((always_inline))
+        #define QENTEM_MAYBE_UNUSED __attribute__((unused))
+    #endif
+#endif
+
+#if (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L)) || (defined(__cplusplus) && (__cplusplus >= 201703L))
+    #define QENTEM_CONST_EXPRESSION constexpr
+#else
+    #define QENTEM_CONST_EXPRESSION
+#endif
+// clang-format on
+
 namespace Qentem {
 
 struct QUtility {
