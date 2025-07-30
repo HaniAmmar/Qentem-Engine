@@ -110,31 +110,28 @@ struct ReserverCore {
     }
 
     /**
-     * @brief Reserves a memory region for `Type_T`, aligned as requested, and sourced from the current core's
-     * fixed-size pool.
+     * @brief Reserves a memory region from the current core's fixed-size block pool.
      *
-     * The reservation proceeds in three stages:
-     *   1. Compute the required size in bytes (adjusted for alignment).
-     *   2. Search existing blocks using first-fit for a usable region.
-     *   3. If none are suitable, a new fixed-size block is created.
+     * This function reserves `size` bytes of memory, aligned to `CustomAlignment_T`, and sourced
+     * from the calling CPU core's `ReserverCore` instance. All memory is drawn from fixed-size
+     * blocks (defined by `QENTEM_RESERVER_BLOCK_SIZE`) and allocated without metadata.
      *
-     * Blocks are not resized or grown dynamically. All allocations are fulfilled
-     * from fixed-size blocks defined by `QENTEM_RESERVER_BLOCK_SIZE`.
+     * Allocation process:
+     *   1. The caller must precompute a rounded-up byte size using `RoundUpSize<T>()`.
+     *   2. The region is located using a first-fit scan over existing blocks.
+     *   3. If no space is found, a new block is allocated from system memory.
      *
-     * @tparam Type_T             Type whose size is multiplied by `size` to determine byte requirement.
-     * @tparam CustomAlignment_T Optional byte alignment override (defaults to Alignment_T).
-     * @param size                Number of `Type_T` instances to reserve space for.
-     * @return Pointer to a memory region suitable for holding `size` objects of `Type_T`.
+     * No block resizing or reallocation occurs. All regions are aligned and suitable
+     * for `CustomAlignment_T` or greater.
+     *
+     * @tparam CustomAlignment_T Desired byte alignment (defaults to engine's standard).
+     * @param size                Rounded-up size in bytes (not element count).
+     * @return Aligned pointer to reserved region, or nullptr if allocation failed.
+     *
+     * @note The size must already be aligned. Use `RoundUpSize<T>()` before calling.
      */
-    template <typename Type_T, SizeT32 CustomAlignment_T = Alignment_T>
-    QENTEM_INLINE Type_T *Reserve(SystemIntType size) {
-        // Convert count of objects to raw byte size.
-        size *= sizeof(Type_T);
-
-        // Round up to nearest alignment.
-        size += DEFAULT_ALIGNMENT_M1;
-        size &= DEFAULT_ALIGNMENT_N;
-
+    template <SizeT32 CustomAlignment_T = Alignment_T>
+    QENTEM_INLINE void *Reserve(SystemIntType size) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
         // Optionally track memory usage for debugging/statistics.
         MemoryRecord::Reserved(size);
@@ -157,7 +154,7 @@ struct ReserverCore {
                         detachBlock(&current_block);
                     }
 
-                    return static_cast<Type_T *>(ptr);
+                    return ptr;
                 }
             }
         }
@@ -187,12 +184,12 @@ struct ReserverCore {
                 QUtility::Swap(*(blocks_.Storage()), *new_block_ptr);
             }
 
-            return static_cast<Type_T *>(ptr);
+            return ptr;
         }
 
         // Phase 2b: The block can serve only this request — don't track it, just return the base.
         new_block_ptr = &(exhausted_blocks_.Insert(QUtility::Move(new_block)));
-        return static_cast<Type_T *>(new_block_ptr->Base());
+        return new_block_ptr->Base();
     }
 
     /**
@@ -214,10 +211,6 @@ struct ReserverCore {
      * @return True if successfully reclaimed, false if the pointer does not belong to any known block.
      */
     bool Release(void *ptr, SystemIntType size) {
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-        MemoryRecord::Released(size);
-#endif
-
         // Phase 1: Search within active blocks.
         for (auto &block : blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
@@ -229,6 +222,9 @@ struct ReserverCore {
                     releaseBlock(&block);
                 }
 
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+                MemoryRecord::Released(size);
+#endif
                 return true;
             }
         }
@@ -236,9 +232,7 @@ struct ReserverCore {
         // Phase 2: Search within exhausted (detached) blocks.
         for (auto &block : exhausted_blocks_) {
             if ((ptr >= block.Base()) && (ptr < block.End())) {
-                const bool region_within_block = (size < block.UsableSize());
-
-                if (region_within_block) {
+                if (size < block.UsableSize()) {
                     // Block still has value — return it to the active roster.
                     block.IncreaseAvailable(size);
                     block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
@@ -252,6 +246,9 @@ struct ReserverCore {
                     reattachBlock(&block);
                 }
 
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+                MemoryRecord::Released(size);
+#endif
                 return true;
             }
         }
@@ -564,11 +561,43 @@ struct ReserverCore {
 struct Reserver {
     using Core = ReserverCore<>;
 
+    static constexpr SystemIntType DEFAULT_ALIGNMENT_M1 =
+        static_cast<SystemIntType>(QENTEM_RESERVER_DEFAULT_ALIGNMENT - 1U);
+    static constexpr SystemIntType DEFAULT_ALIGNMENT_N = ~DEFAULT_ALIGNMENT_M1;
+
+    template <typename Type_T>
+    QENTEM_INLINE static void RoundUpSize(SystemIntType &size) noexcept {
+        size *= sizeof(Type_T);
+        // Round the size up to the alignment boundary.
+        size += DEFAULT_ALIGNMENT_M1;
+        size &= DEFAULT_ALIGNMENT_N;
+    }
+
+    /**
+     * @brief Reserves a raw memory region that has already been size-aligned.
+     *
+     * This function assumes the given `size` has already been rounded up using
+     * `RoundUpSize<Type_T>()` and returns an untyped memory region with the requested alignment.
+     * It is intended for internal use or advanced callers who manage size and alignment manually.
+     *
+     * @tparam CustomAlignment_T Desired alignment for the memory region (defaults to engine constant).
+     * @param size Size in bytes, already aligned to `CustomAlignment_T`.
+     * @return Pointer to aligned memory region, or nullptr if reservation failed.
+     *
+     * @see Reserve()
+     * @see RoundUpSize()
+     */
+    template <SizeT32 CustomAlignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT>
+    QENTEM_INLINE static void *ReserveRoundedUpBytes(SystemIntType size) noexcept {
+        return GetCurrentInstance().Reserve<CustomAlignment_T>(size);
+    }
+
     /**
      * @brief Reserves a region for objects of the given type.
      *
      * This function selects the arena tied to the current CPU core and requests space
      * sufficient to contain the specified number of elements with the given alignment.
+     * It automatically multiplies `size` by sizeof(Type_T) and rounds up to alignment.
      *
      * @tparam Type_T The type of object to be constructed within the memory region.
      * @param size    Number of elements desired.
@@ -577,33 +606,30 @@ struct Reserver {
      */
     template <typename Type_T, SizeT32 CustomAlignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT>
     QENTEM_INLINE static Type_T *Reserve(SystemIntType size) noexcept {
-        return GetCurrentInstance().Reserve<Type_T, CustomAlignment_T>(size);
+        RoundUpSize<Type_T>(size);
+        return static_cast<Type_T *>(ReserveRoundedUpBytes<CustomAlignment_T>(size));
     }
 
     /**
-     * @brief Returns a previously reserved region to the system.
+     * @brief Releases a previously reserved memory region back to the system.
      *
-     * Attempts to return the region to the arena it originated from. If it cannot
-     * be matched with the current CPU core’s pool, the system will consult others
-     * (where supported) for a graceful return.
+     * Assumes the `size` has already been rounded up via `RoundUpSize`. This method
+     * attempts to return the region to the arena it originated from. If that fails,
+     * and the platform supports multiple arenas (Linux/Windows), it will attempt to
+     * return the region to sibling arenas in the `getReservers()` list.
      *
-     * @tparam Type_T Type of the original contents.
-     * @param ptr     Pointer to the region.
-     * @param size    Number of Type_T elements the region was sized for.
+     * If the platform is single-core or non-symmetric (e.g., microcontroller),
+     * the region is returned to the sole `ReserverCore` instance.
+     *
+     * @param ptr   Pointer to the memory to release.
+     * @param size  Aligned size in bytes (must match reservation size).
+     *
+     * @see RoundUpSize()
+     * @see getReservers()
      */
-    template <typename Type_T>
-    QENTEM_INLINE static void Release(Type_T *ptr, SystemIntType size) noexcept {
-        static constexpr SystemIntType DEFAULT_ALIGNMENT_M1 =
-            static_cast<SystemIntType>(QENTEM_RESERVER_DEFAULT_ALIGNMENT - 1U);
-        static constexpr SystemIntType DEFAULT_ALIGNMENT_N = ~DEFAULT_ALIGNMENT_M1;
-
+    QENTEM_INLINE static void ReleaseRoundedUpBytes(void *ptr, SystemIntType size) noexcept {
         if (ptr != nullptr) {
             Core &instance = GetCurrentInstance();
-            size *= sizeof(Type_T);
-
-            // Round the size up to the alignment boundary.
-            size += DEFAULT_ALIGNMENT_M1;
-            size &= DEFAULT_ALIGNMENT_N;
 
 #if defined(__linux__) || defined(_WIN32)
             // Prefer returning to the current arena.
@@ -625,6 +651,27 @@ struct Reserver {
 #endif
         }
     }
+
+    /**
+     * @brief Returns a previously reserved region to the system allocator.
+     *
+     * Adjusts the given `size` to match alignment requirements via `RoundUpSize()`,
+     * then forwards the call to `ReleaseRoundedUpBytes()`, which handles the
+     * actual memory return logic.
+     *
+     * @tparam Type_T The type of the original contents stored in the region.
+     * @param ptr     Pointer to the memory region to release.
+     * @param size    Number of elements of Type_T originally requested.
+     *
+     * @see RoundUpSize()
+     * @see ReleaseRoundedUpBytes()
+     */
+    template <typename Type_T>
+    QENTEM_INLINE static void Release(Type_T *ptr, SystemIntType size) noexcept {
+        RoundUpSize<Type_T>(size);
+        ReleaseRoundedUpBytes(ptr, size);
+    }
+
 
     /**
      * @brief Empties the current thread's arena and reclaims all reserved memory regions.

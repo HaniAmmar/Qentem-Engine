@@ -36,15 +36,15 @@ static void TestReserver1(QTest &test) {
 
     ReserverCore<(sizeof(void *) * 2), page_size> r{};
 
-    char *var1;
-    char *var2;
-    char *var3;
-    char *var4;
+    void *var1;
+    void *var2;
+    void *var3;
+    void *var4;
 
-    var1 = r.Reserve<char>(size);
-    var2 = r.Reserve<char>(size);
-    var3 = r.Reserve<char>(page_size * 2);
-    var4 = r.Reserve<char>(page_size * 2);
+    var1 = r.Reserve(size);
+    var2 = r.Reserve(size);
+    var3 = r.Reserve(page_size * 2);
+    var4 = r.Reserve(page_size * 2);
     r.Release(var3, page_size * 2);
     r.Release(var1, size);
     r.Release(var2, size);
@@ -61,20 +61,20 @@ static void TestReserver2(QTest &test) {
 
     ReserverCore<(sizeof(void *) * 2), page_size> r{};
 
-    char *var1;
-    char *var2;
-    char *var3;
-    char *var4;
+    void *var1;
+    void *var2;
+    void *var3;
+    void *var4;
 
-    var1 = r.Reserve<char>(size);
-    var2 = r.Reserve<char>(size);
-    var3 = r.Reserve<char>(page_size * 2);
-    var4 = r.Reserve<char>(page_size * 2);
+    var1 = r.Reserve(size);
+    var2 = r.Reserve(size);
+    var3 = r.Reserve(page_size * 2);
+    var4 = r.Reserve(page_size * 2);
     r.Release(var3, page_size * 2);
     r.Release(var1, size);
     r.Release(var2, size);
     r.Release(var4, page_size * 2);
-    var1 = r.Reserve<char>(page_size);
+    var1 = r.Reserve(page_size);
     r.Release(var1, page_size);
 
     test.IsTrue(r.IsEmpty(), __LINE__);
@@ -84,35 +84,35 @@ static void TestReserver2(QTest &test) {
 QENTEM_MAYBE_UNUSED
 static void TestReserver3(QTest &test) {
     ReserverCore<> r{};
-    char          *var1;
-    char          *var2;
-    char          *var3;
-    char          *var4;
-    char          *var5;
-    char          *var6;
-    char          *var7;
-    char          *var8;
-    char          *var9;
-    char          *var10;
+    void          *var1;
+    void          *var2;
+    void          *var3;
+    void          *var4;
+    void          *var5;
+    void          *var6;
+    void          *var7;
+    void          *var8;
+    void          *var9;
+    void          *var10;
 
-    var1 = r.Reserve<char>(16);
-    var2 = r.Reserve<char>(32);
+    var1 = r.Reserve(16);
+    var2 = r.Reserve(32);
     r.Release(var1, 16);
-    var4 = r.Reserve<char>(64);
+    var4 = r.Reserve(64);
     r.Release(var2, 32);
-    var3 = r.Reserve<char>(128);
+    var3 = r.Reserve(128);
     r.Release(var4, 64);
-    var5 = r.Reserve<char>(256);
+    var5 = r.Reserve(256);
     r.Release(var3, 128);
-    var6 = r.Reserve<char>(512);
+    var6 = r.Reserve(512);
     r.Release(var5, 256);
-    var7 = r.Reserve<char>(1024);
+    var7 = r.Reserve(1024);
     r.Release(var6, 512);
-    var8 = r.Reserve<char>(2048);
+    var8 = r.Reserve(2048);
     r.Release(var7, 1024);
-    var9 = r.Reserve<char>(4096);
+    var9 = r.Reserve(4096);
     r.Release(var8, 2048);
-    var10 = r.Reserve<char>(8192);
+    var10 = r.Reserve(8192);
     r.Release(var9, 4096);
     r.Release(var10, 8192);
 
