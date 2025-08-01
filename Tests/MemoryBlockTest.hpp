@@ -105,7 +105,7 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemIntType> &a_table, Syst
     test.IsEqual(mb.Available(), mb.UsableSize(), __LINE__);
     test.IsTrue(mb.Capacity() - mb.TableSize() >= mb.Available(), __LINE__);
 #ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Base(), MemoryBlockT::MIN_BASE_ALIGNMENT), __LINE__);
+    test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Base(), Alignment_T), __LINE__);
 #endif
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Data(), Alignment_T), __LINE__);
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Data(), mb.DataAlignment()), __LINE__);

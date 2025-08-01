@@ -36,7 +36,6 @@ namespace Qentem {
  */
 template <SizeT32 Alignment_T>
 struct MemoryBlock {
-    static constexpr SystemIntType MIN_BASE_ALIGNMENT  = 64;
     static constexpr SystemIntType BITS_IN_CHAR        = 8;
     static constexpr SystemIntType MAX_SYSTEM_INT_TYPE = ~SystemIntType{0};
     static constexpr SizeT32       PTR_SIZE            = sizeof(SystemIntType);
@@ -80,11 +79,9 @@ struct MemoryBlock {
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
         {
-            constexpr SystemIntType mb_alignment_m1 = SystemIntType{MIN_BASE_ALIGNMENT - 1};
-            constexpr SystemIntType mb_alignment_n  = ~mb_alignment_m1;
-            const SystemIntType     raw_address     = reinterpret_cast<SystemIntType>(base_raw_);
-            const SystemIntType     aligned_address = ((raw_address + mb_alignment_m1) & mb_alignment_n);
-            base_                                   = reinterpret_cast<void *>(aligned_address);
+            const SystemIntType aligned_address =
+                ((reinterpret_cast<SystemIntType>(base_raw_) + ALIGNMENT_M1) & ALIGNMENT_N);
+            base_ = reinterpret_cast<void *>(aligned_address);
         }
 #endif
 
