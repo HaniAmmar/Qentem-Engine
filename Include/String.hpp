@@ -1,11 +1,15 @@
 /**
  * @file String.hpp
- * @brief Defines the String class for string management in Qentem Engine.
+ * @brief High-performance dynamic string class for the Qentem Engine.
  *
- * This header provides a lightweight, high-performance string class optimized for
- * fast, and cross-platform text manipulation. String.hpp is a foundational
- * component of the Qentem Engine library, designed for dynamic template rendering,
- * JSON processing, and general-purpose string handling.
+ * This header defines `String`, a lightweight and efficient container for managing
+ * null-terminated character sequences. It is designed for high-performance scenarios
+ * such as template rendering, JSON processing, and general-purpose text manipulation.
+ *
+ * The implementation emphasizes speed, cross-platform consistency, and minimal
+ * overhead. As a foundational component of the Qentem Engine, `String` integrates
+ * tightly with the memory system and template architecture while offering a familiar
+ * interface for dynamic text operations.
  *
  * @author Hani Ammar
  * @date 2025
@@ -20,9 +24,12 @@
 
 namespace Qentem {
 /*
- * String container with null terminator.
+ * @brief A dynamic string container with null-termination.
+ *
+ * Provides an efficient, minimal-overhead abstraction for managing character sequences
+ * with built-in memory allocation and resizing. Suitable for use across template engines,
+ * parsers, and data serializers where performance and correctness are paramount.
  */
-
 template <typename Char_T>
 struct String {
     using CharType = Char_T;
@@ -30,19 +37,20 @@ struct String {
     QENTEM_INLINE String() = default;
 
     QENTEM_INLINE ~String() {
-        Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+        release(Storage(), Capacity());
     }
 
     explicit String(SizeT capacity) {
         if (capacity != 0) {
-            reserve(capacity);
+            setStorage(reserve(capacity));
+            setCapacity(capacity);
         }
     }
 
     String(String &&src) noexcept : storage_{src.Storage()}, capacity_{src.Capacity()}, length_{src.Length()} {
         src.clearStorage();
-        src.setLength(0);
         src.setCapacity(0);
+        src.setLength(0);
     }
 
     String(const String &src) {
@@ -61,10 +69,10 @@ struct String {
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
-            Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+            release(Storage(), Capacity());
 
-            setCapacity(src.Capacity());
             setStorage(src.Storage());
+            setCapacity(src.Capacity());
             setLength(src.Length());
 
             src.clearStorage();
@@ -242,6 +250,16 @@ struct String {
         }
     }
 
+    /**
+     * @brief Concatenates two strings into a new one.
+     *
+     * Allocates a new string large enough to hold the contents of `src1` and `src2`,
+     * and copies their characters sequentially into the new buffer.
+     *
+     * @param src1 First source string.
+     * @param src2 Second source string.
+     * @return A new string containing the merged result.
+     */
     static String Merge(const String &src1, const String &src2) {
         return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
     }
@@ -254,11 +272,12 @@ struct String {
         }
     }
 
-    QENTEM_INLINE void Reserve(const SizeT size) {
+    QENTEM_INLINE void Reserve(const SizeT capacity) {
         Reset();
 
-        if (size != 0) {
-            reserve(size);
+        if (capacity != 0) {
+            setStorage(reserve(capacity));
+            setCapacity(capacity);
         }
     }
 
@@ -267,6 +286,7 @@ struct String {
             expand(length);
         }
 
+        Storage()[length] = '\0';
         setLength(length);
     }
 
@@ -275,18 +295,19 @@ struct String {
     }
 
     void Reset() noexcept {
-        Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+        release(Storage(), Capacity());
 
         clearStorage();
-        setLength(0);
         setCapacity(0);
+        setLength(0);
     }
 
+    // Returns view without null-terminator.
     QENTEM_INLINE StringView<Char_T> GetStringView() {
         return StringView<Char_T>{First(), Length()};
     }
 
-    // Without NULL terminator
+    // Returns view without null-terminator.
     QENTEM_INLINE StringView<Char_T> View() const noexcept {
         return StringView<Char_T>{First(), Length()};
     }
@@ -294,26 +315,36 @@ struct String {
     Char_T *Detach() noexcept {
         Char_T *str = Storage();
         clearStorage();
-
-        setLength(0);
         setCapacity(0);
+        setLength(0);
 
         return str;
     }
 
-    void Adopt(Char_T *str, SizeT length, SizeT capacity_with_out_null) {
-        // Clean up any existing storage
-        Reset();
+    /**
+     * @brief Takes ownership of an existing buffer with known length and capacity.
+     *
+     * The caller must ensure the provided buffer is properly allocated and aligned,
+     * and that the `capacity_without_null` reflects the size *excluding* the null terminator.
+     *
+     * @param str                   Pointer to the externally allocated character buffer.
+     * @param length                Number of characters used (excluding null terminator).
+     * @param capacity_without_null Total capacity of the buffer (excluding null terminator).
+     */
+    void Adopt(Char_T *str, SizeT length, SizeT capacity_without_null) {
+        // Release any previously owned memory
+        release(Storage(), Capacity());
 
-        // Take ownership of the new buffer
         setStorage(str);
+        setCapacity(capacity_without_null);
         setLength(length);
-        setCapacity(capacity_with_out_null);
+        Storage()[length] = '\0';
     }
 
     QENTEM_INLINE void StepBack(const SizeT length) noexcept {
         if (length <= Length()) {
             length_ -= length;
+            Storage()[Length()] = '\0';
         }
     }
 
@@ -340,9 +371,9 @@ struct String {
                 data[index] = ch;
                 setLength(new_length);
             } else {
-                // Not enough capacity: reserve a bigger buffer and copy in 3 steps.
-                SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
-                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_length);
+                // Insufficient capacity: allocate a larger buffer and copy in three stages.
+                SizeT   new_capacity = new_length;
+                Char_T *new_storage  = reserve(new_capacity);
 
                 // 1. Copy prefix [0, index)
                 if (index != 0) {
@@ -357,8 +388,10 @@ struct String {
                     MemoryUtils::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
                 }
 
+                new_storage[new_length] = '\0';
+
                 // Clean up old storage and set new storage/capacity
-                Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+                release(Storage(), Capacity());
                 setStorage(new_storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
@@ -384,17 +417,19 @@ struct String {
 
                 setLength(new_length);
             } else {
-                // Not enough capacity: reserve, then copy with the shift.
-                SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
-                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_capacity);
+                // Insufficient capacity: allocate a larger buffer and copy in three stages.
+                SizeT   new_capacity = new_length;
+                Char_T *new_storage  = reserve(new_capacity);
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length != 0) {
                     MemoryUtils::CopyTo(new_storage + shift, Storage(), old_length);
                 }
 
+                new_storage[new_length] = '\0';
+
                 // Clean up, set new pointers
-                Reserver::Release(Storage(), (Capacity() + SizeT{1}));
+                release(Storage(), Capacity());
                 setStorage(new_storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
@@ -402,7 +437,16 @@ struct String {
         }
     }
 
-    // Set the needed length to write directly to a returned buffer,
+    /**
+     * @brief Reserves space for a direct write of `length` characters.
+     *
+     * This function expands the string as needed, marks the extended length,
+     * and returns a writable buffer at the end of the current string.
+     * A null-terminator is automatically placed after the reserved space.
+     *
+     * @param length Number of characters to write.
+     * @return Pointer to the start of the writable region.
+     */
     Char_T *Buffer(SizeT length) {
         const SizeT new_length = (Length() + length);
 
@@ -412,6 +456,7 @@ struct String {
 
         Char_T *str = (Storage() + Length());
 
+        Storage()[new_length] = '\0';
         setLength(new_length);
 
         return str;
@@ -474,7 +519,7 @@ struct String {
         return !(IsEmpty());
     }
 
-    // For STL
+    // Iterator support (STL-compatible)
     QENTEM_INLINE const Char_T *begin() const noexcept {
         return First();
     }
@@ -491,7 +536,6 @@ struct String {
         return (Storage() + Length());
     }
 
-    //////////// Private ////////////
   private:
     QENTEM_INLINE void setStorage(Char_T *new_storage) noexcept {
         storage_ = new_storage;
@@ -519,7 +563,7 @@ struct String {
 
             MemoryUtils::CopyTo((Storage() + Length()), str, length);
 
-            Storage()[new_length] = 0;
+            Storage()[new_length] = '\0';
             setLength(new_length);
         }
     }
@@ -539,24 +583,43 @@ struct String {
             MemoryUtils::CopyTo((des + len1), str2, len2);
         }
 
-        des[length] = 0;
+        des[length] = '\0';
 
         return ns;
     }
 
-    void expand(const SizeT new_capacity) {
+    void expand(SizeT new_capacity) {
         Char_T *old_storage  = Storage();
         SizeT   old_capacity = Capacity();
 
-        reserve(new_capacity);
+        setStorage(reserve(new_capacity));
+        setCapacity(new_capacity);
 
         MemoryUtils::CopyTo(Storage(), old_storage, Length());
-        Reserver::Release(old_storage, (old_capacity + SizeT{1}));
+
+        release(old_storage, old_capacity);
     }
 
-    void reserve(SizeT capacity) {
-        setStorage(Reserver::Reserve<Char_T>(capacity + SizeT{1})); // 1 for the null terminator
-        setCapacity(capacity);
+    /**
+     * @brief Reserves an aligned memory region for `capacity + 1` characters (including null terminator).
+     *
+     * This helper computes the necessary byte size with alignment via `RoundUpBytes<Char_T>()`,
+     * then performs the actual allocation using `Reserver`. The final capacity (excluding the null terminator)
+     * is returned by reference via the `capacity` parameter.
+     *
+     * @param capacity  [in/out] Desired capacity before null-terminator. Updated with actual usable size.
+     * @return Pointer to an aligned buffer of at least `capacity + 1` characters.
+     */
+    QENTEM_INLINE static Char_T *reserve(SizeT &capacity) {
+        // Reserve enough space for (capacity + 1) characters, aligned and including null-terminator.
+        const SizeT capacity_in_bytes = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity + SizeT{1}));
+        void       *storage_in_bytes  = Reserver::Reserve<char>(capacity_in_bytes);
+        capacity                      = (capacity_in_bytes / sizeof(Char_T)) - SizeT{1};
+        return static_cast<Char_T *>(storage_in_bytes);
+    }
+
+    static void release(Char_T *storage, SizeT capacity) {
+        Reserver::Release(storage, (capacity + SizeT{1}));
     }
 
     Char_T *storage_{nullptr};
