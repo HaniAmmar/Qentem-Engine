@@ -160,37 +160,31 @@ struct SystemMemory {
 #endif
     }
 
-    /**
-     * @brief Releases a range of memory pages previously reserved by Reserve().
-     *
-     * Depending on the platform and policy, this may either unmap the memory entirely
-     * (via munmap) or mark it as discardable (via madvise). Use this only for page-aligned,
-     * page-sized regions you no longer intend to access.
-     *
-     * @param start Pointer to the start of the region (must be page-aligned).
-     * @param size  Size in bytes to release (must be multiple of page size).
-     * @param reclaim Completely release the memory (true = munmap, false = madvise).
-     */
-    QENTEM_INLINE static void ReleasePages(void *start, SystemIntType size, bool reclaim = false) noexcept {
+/**
+ * @brief Releases a range of memory pages previously reserved via Reserve().
+ *
+ * This function is used to return memory to the operating system. The specified region
+ * must be both page-aligned and a multiple of the system page size.
+ *
+ * On POSIX systems, `munmap()` is used to fully unmap the address space and release
+ * the memory back to the kernel.
+ *
+ * This function is excluded on Windows platforms.
+ *
+ * @param start  Pointer to the start of the region (must be page-aligned).
+ * @param size   Size in bytes to release (must be multiple of page size).
+ */
+#if !defined(_WIN32)
+    QENTEM_INLINE static void ReleasePages(void *start, SystemIntType size) noexcept {
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-#if defined(_WIN32)
-        (void)size;
-        (void)reclaim;
-        // Always hard-unmap on Windows — madvise not applicable
-        ::VirtualFree(start, 0, MEM_RELEASE);
+        ::munmap(start, size);
 #else
-        if (reclaim) {
-            ::munmap(start, size);
-        } else {
-            ::madvise(start, size, MADV_DONTNEED);
-        }
-#endif
-#else
+        // Fallback mode: platform does not support release; act as no-op.
         (void)start;
         (void)size;
-        (void)reclaim;
 #endif
     }
+#endif
 
   private:
     /**
