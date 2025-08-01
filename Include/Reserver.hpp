@@ -318,6 +318,31 @@ struct ReserverCore {
         return (blocks_.Size() + exhausted_blocks_.Size());
     }
 
+    /**
+     * @brief Returns a const reference to the active memory blocks array.
+     *
+     * This is intended for diagnostic or testing purposes. It exposes the internal
+     * array of active blocks currently managed by the ReserverCore instance.
+     *
+     * @return Reference to the array of active blocks.
+     */
+    const LiteArray<MemoryBlockT> &GetBlocks() const noexcept {
+        return blocks_;
+    }
+
+    /**
+     * @brief Returns a const reference to the exhausted (fully used or detached) blocks.
+     *
+     * These blocks are no longer serving allocation requests but may still hold
+     * usable regions for future reuse. This accessor is primarily intended for
+     * debugging, inspection, or unit testing.
+     *
+     * @return Reference to the array of exhausted blocks.
+     */
+    const LiteArray<MemoryBlockT> &GetExhaustedBlocks() const noexcept {
+        return exhausted_blocks_;
+    }
+
   private:
     /**
      * @brief Attempts to find the first suitable free region within a memory block.
