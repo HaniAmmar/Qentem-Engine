@@ -358,41 +358,42 @@ struct String {
 
             if (new_length <= Capacity()) {
                 // Enough capacity, shift tail right by one, insert in-place.
-                Char_T *data = Storage();
+                Char_T *storage = Storage();
 
                 // Shift right: move everything [index, length) -> [index+1, new_length)
-                SizeT i = Length();
+                SizeT offset = Length();
 
-                while (i > index) {
-                    data[i] = data[i - SizeT{1}];
-                    --i;
+                while (offset > index) {
+                    storage[offset] = storage[offset - SizeT{1}];
+                    --offset;
                 }
 
-                data[index] = ch;
+                storage[index]      = ch;
+                storage[new_length] = '\0';
                 setLength(new_length);
             } else {
                 // Insufficient capacity: allocate a larger buffer and copy in three stages.
                 SizeT   new_capacity = new_length;
-                Char_T *new_storage  = reserve(new_capacity);
+                Char_T *storage      = reserve(new_capacity);
 
                 // 1. Copy prefix [0, index)
                 if (index != 0) {
-                    MemoryUtils::CopyTo(new_storage, Storage(), index);
+                    MemoryUtils::CopyTo(storage, Storage(), index);
                 }
 
                 // 2. Insert new char at 'index'
-                new_storage[index] = ch;
+                storage[index] = ch;
 
                 // 3. Copy suffix [index, length)
                 if (index < Length()) {
-                    MemoryUtils::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
+                    MemoryUtils::CopyTo((storage + index + 1U), (Storage() + index), (Length() - index));
                 }
 
-                new_storage[new_length] = '\0';
+                storage[new_length] = '\0';
 
                 // Clean up old storage and set new storage/capacity
                 release(Storage(), Capacity());
-                setStorage(new_storage);
+                setStorage(storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
             }
@@ -406,31 +407,31 @@ struct String {
 
             if (new_length <= Capacity()) {
                 // Enough capacity, shift in place (backwards to avoid overlap).
-                Char_T *data = Storage();
-                SizeT   i    = old_length;
+                Char_T *storage = Storage();
+                SizeT   offset  = old_length;
 
-                while (i != 0) {
-                    data[i + (shift - SizeT{1})] = data[i - SizeT{1}];
-
-                    --i;
+                while (offset != 0) {
+                    storage[offset + (shift - SizeT{1})] = storage[offset - SizeT{1}];
+                    --offset;
                 }
 
+                storage[new_length] = '\0';
                 setLength(new_length);
             } else {
                 // Insufficient capacity: allocate a larger buffer and copy in three stages.
                 SizeT   new_capacity = new_length;
-                Char_T *new_storage  = reserve(new_capacity);
+                Char_T *storage      = reserve(new_capacity);
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length != 0) {
-                    MemoryUtils::CopyTo(new_storage + shift, Storage(), old_length);
+                    MemoryUtils::CopyTo(storage + shift, Storage(), old_length);
                 }
 
-                new_storage[new_length] = '\0';
+                storage[new_length] = '\0';
 
                 // Clean up, set new pointers
                 release(Storage(), Capacity());
-                setStorage(new_storage);
+                setStorage(storage);
                 setCapacity(new_capacity);
                 setLength(new_length);
             }
