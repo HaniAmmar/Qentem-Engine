@@ -19,7 +19,7 @@
 
 namespace Qentem {
 /*
- * String Stream struct without the null terminator.
+ * String Stream struct without null-termination.
  */
 template <typename Char_T>
 struct StringStream {
@@ -40,10 +40,10 @@ struct StringStream {
     }
 
     StringStream(StringStream &&src) noexcept
-        : storage_{src.Storage()}, length_{src.Length()}, capacity_{src.Capacity()} {
+        : storage_{src.Storage()}, capacity_{src.Capacity()}, length_{src.Length()} {
         src.clearStorage();
-        src.setLength(0);
         src.setCapacity(0);
+        src.setLength(0);
     }
 
     StringStream(const StringStream &src) {
@@ -68,8 +68,8 @@ struct StringStream {
         if (this != &src) {
             Reserver::Release(Storage(), Capacity());
 
-            setCapacity(src.Capacity());
             setStorage(src.Storage());
+            setCapacity(src.Capacity());
             setLength(src.Length());
 
             src.clearStorage();
@@ -258,8 +258,8 @@ struct StringStream {
         Reserver::Release(Storage(), Capacity());
 
         clearStorage();
-        setLength(0);
         setCapacity(0);
+        setLength(0);
     }
 
     void InsertNull() {
@@ -270,20 +270,21 @@ struct StringStream {
         Storage()[Length()] = Char_T{0};
     }
 
+    // Returns view without null-terminator.
     QENTEM_INLINE StringView<Char_T> GetStringView() {
         InsertNull();
         return StringView<Char_T>{First(), Length()};
     }
 
-    // Without NULL terminator
+    // Returns view without null-terminator.
     QENTEM_INLINE StringView<Char_T> View() const noexcept {
         return GetStringView();
     }
 
     String<Char_T> GetString() {
         if (Capacity() > Length()) {
-            const SizeT length   = Length();   // Detach() resets the length.
-            const SizeT capacity = Capacity(); // Detach() resets the length.
+            const SizeT length   = Length();   // Detach() resets Length.
+            const SizeT capacity = Capacity(); // Detach() resets Capacity.
             Storage()[Length()]  = Char_T{0};
             String<Char_T> a_string{};
             a_string.Adopt(Detach(), length, (capacity - SizeT{1}));
@@ -299,10 +300,10 @@ struct StringStream {
 
     Char_T *Detach() noexcept {
         Char_T *str = Storage();
-        clearStorage();
 
-        setLength(0);
+        clearStorage();
         setCapacity(0);
+        setLength(0);
 
         return str;
     }
@@ -461,7 +462,7 @@ struct StringStream {
         return !(IsEmpty());
     }
 
-    // For STL
+    // Iterator support (STL-compatible)
     QENTEM_INLINE const Char_T *begin() const noexcept {
         return First();
     }
@@ -527,8 +528,8 @@ struct StringStream {
     }
 
     Char_T *storage_{nullptr};
-    SizeT   length_{0};
     SizeT   capacity_{0};
+    SizeT   length_{0};
 };
 
 } // namespace Qentem
