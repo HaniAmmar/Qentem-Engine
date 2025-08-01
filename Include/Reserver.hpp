@@ -66,7 +66,7 @@ template <SizeT32       Alignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT,
           SystemIntType BlockSize_T = QENTEM_RESERVER_BLOCK_SIZE>
 struct ReserverCore {
     /// Alias for the managed memory block type, bound to the default alignment.
-    using MemoryBlockT = MemoryBlock<QENTEM_RESERVER_DEFAULT_ALIGNMENT>;
+    using MemoryBlockT = MemoryBlock<Alignment_T>;
 
     /// Maximum representable system integer value (used for limit checks or sentinels).
     static constexpr SystemIntType MAX_SYSTEM_INT_TYPE = ~SystemIntType{0};
