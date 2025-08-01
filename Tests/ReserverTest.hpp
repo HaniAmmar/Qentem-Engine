@@ -120,6 +120,57 @@ static void TestReserver3(QTest &test) {
     test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
 }
 
+QENTEM_MAYBE_UNUSED
+static void TestReserverShrink(QTest &test) {
+    // Initialize Reserver with 4 KiB block size and 16-byte alignment.
+    ReserverCore<16, 4 * 1024> r{};
+
+    char *var1;
+    char *var2;
+
+    // Allocate 48 bytes and shrink it to 16 bytes.
+    var1 = static_cast<char *>(r.Reserve(48));
+    r.Shrink(var1, 48, 16);
+
+    // Allocate 16 bytes — it should reuse the tail of the shrunk region.
+    var2 = static_cast<char *>(r.Reserve(16));
+    test.IsEqual(var1 + 16, var2, __LINE__); // Should follow immediately.
+
+    // Clean up both regions.
+    r.Release(var1, 16);
+    r.Release(var2, 16);
+
+    // Confirm memory is fully released, and only one block remains.
+    test.IsTrue(r.IsEmpty(), __LINE__);
+    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
+
+    // Full allocation from the top block.
+    SystemIntType max  = r.GetBlocks().First()->UsableSize();
+    SystemIntType half = max / 2;
+    var1               = static_cast<char *>(r.Reserve(max));
+
+    // Shrink the large allocation by half.
+    r.Shrink(var1, max, half);
+
+    test.IsFalse(r.IsEmpty(), __LINE__);
+    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
+
+    // Attempt to allocate more than remaining capacity — triggers new block.
+    var2 = static_cast<char *>(r.Reserve(8 * 1024));
+    test.IsEqual(r.TotalBlocks(), SizeT{2}, __LINE__);
+
+    // Release the second block's allocation.
+    r.Release(var2, 8 * 1024);
+    test.IsFalse(r.IsEmpty(), __LINE__);
+    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__); // Block count collapses.
+
+    // Finally release the remaining half of var1.
+    r.Release(var1, max - half);
+
+    test.IsTrue(r.IsEmpty(), __LINE__);
+    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
+}
+
 static int RunReserverTests() {
     QTest test{"Reserver.hpp", __FILE__};
 
@@ -128,6 +179,7 @@ static int RunReserverTests() {
     test.Test("Reserver Test 1", TestReserver1);
     test.Test("Reserver Test 2", TestReserver2);
     test.Test("Reserver Test 3", TestReserver3);
+    test.Test("Reserver Test Shrink", TestReserverShrink);
 
     return test.EndTests();
 }

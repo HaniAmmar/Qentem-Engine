@@ -55,6 +55,11 @@ struct MemoryRecord {
         }
     }
 
+    QENTEM_NOINLINE static void Shrink(SystemIntType size) noexcept {
+        static MemoryRecordData &storage = GetRecord();
+        storage.Size -= size;
+    }
+
     QENTEM_NOINLINE static void Released(SystemIntType size) noexcept {
         static MemoryRecordData &storage = GetRecord();
 

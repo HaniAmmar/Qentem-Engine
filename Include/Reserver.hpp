@@ -169,6 +169,8 @@ struct ReserverCore {
         MemoryRecord::ReservedBlock(new_block.Capacity());
 #endif
 
+        new_block.DecreaseAvailable(size);
+
         MemoryBlockT *new_block_ptr;
 
         // Phase 2a: The block can serve more than this request — add it to active pool.
@@ -177,7 +179,6 @@ struct ReserverCore {
             new_block_ptr->ClearTable(); // Reset internal region tracking.
 
             void *ptr = reserveFirstFit<CustomAlignment_T>(new_block_ptr, chunks);
-            new_block_ptr->DecreaseAvailable(size);
 
             // Keep the largest block first for optimal scanning.
             if (blocks_.First()->UsableSize() < new_block_ptr->UsableSize()) {
@@ -214,6 +215,9 @@ struct ReserverCore {
         // Phase 1: Search within active blocks.
         for (auto &block : blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+                MemoryRecord::Released(size);
+#endif
                 block.IncreaseAvailable(size);
                 block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
 
@@ -222,9 +226,6 @@ struct ReserverCore {
                     releaseBlock(&block);
                 }
 
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-                MemoryRecord::Released(size);
-#endif
                 return true;
             }
         }
@@ -232,7 +233,10 @@ struct ReserverCore {
         // Phase 2: Search within exhausted (detached) blocks.
         for (auto &block : exhausted_blocks_) {
             if ((ptr >= block.Base()) && (ptr < block.End())) {
-                if (size < block.UsableSize()) {
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+                MemoryRecord::Released(size);
+#endif
+                if (ptr >= block.Data()) {
                     // Block still has value — return it to the active roster.
                     block.IncreaseAvailable(size);
                     block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
@@ -243,12 +247,72 @@ struct ReserverCore {
                 } else {
                     // Block is normal-sized and we have no others — reset it.
                     block.ClearTable();
+                    block.IncreaseAvailable(size);
                     reattachBlock(&block);
                 }
 
+                return true;
+            }
+        }
+
+        // Unknown origin — pointer does not belong to any known region.
+        return false;
+    }
+
+    /**
+     * @brief Attempts to shrink a previously allocated memory region in-place.
+     *
+     * This function reduces the usable size of a given memory allocation by `diff = from_size - to_size`,
+     * reclaiming the unused tail and marking it as free for reuse. The pointer itself remains valid
+     * and unchanged, but only the first `to_size` bytes are considered retained.
+     *
+     * The function searches both active and exhausted blocks for the owning region:
+     *
+     * - If found in an active block, the unused region is released immediately.
+     * - If found in an exhausted block and the pointer falls within its usable region,
+     *   the block is optionally reattached to allow further reuse.
+     *
+     * @param ptr       Pointer to the original allocation.
+     * @param from_size The current size of the allocation in bytes.
+     * @param to_size   The desired new (smaller) size in bytes.
+     * @return True if the shrink operation succeeded and memory was reclaimed; false otherwise.
+     */
+    bool Shrink(void *ptr, SystemIntType from_size, SystemIntType to_size) {
+        char               *c_ptr = (static_cast<char *>(ptr) + to_size);
+        const SystemIntType diff  = (from_size - to_size);
+
+        // Phase 1: Search within active blocks.
+        for (auto &block : blocks_) {
+            if ((ptr >= block.Data()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
-                MemoryRecord::Released(size);
+                MemoryRecord::Shrink(diff);
 #endif
+
+                block.IncreaseAvailable(diff);
+                block.ReleaseRegion(c_ptr, (diff >> block.DefaultAlignmentBit()));
+
+                return true;
+            }
+        }
+
+        // Phase 2: Search within exhausted (detached) blocks.
+        for (auto &block : exhausted_blocks_) {
+            if ((ptr >= block.Base()) && (ptr < block.End())) {
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+                MemoryRecord::Shrink(diff);
+#endif
+
+                block.IncreaseAvailable(diff);
+
+                if (ptr >= block.Data()) {
+                    // Has table
+                    block.ReleaseRegion(c_ptr, (diff >> block.DefaultAlignmentBit()));
+                    reattachBlock(&block);
+                }
+
+                // Note: Bitfield table shrink is unsupported due to offset recalculation
+                // and platform-specific constraints (e.g., Windows page handling).
+
                 return true;
             }
         }
@@ -699,12 +763,9 @@ struct Reserver {
             to_size        = RoundUpBytes<Type_T>(to_size);
 
             if (from_size > to_size) {
-                char               *c_ptr = (static_cast<char *>(ptr) + to_size);
-                const SystemIntType diff  = (from_size - to_size);
-
 #if defined(__linux__) || defined(_WIN32)
                 // Prefer returning to the current arena.
-                if (instance.Release(c_ptr, diff)) {
+                if (instance.Shrink(ptr, from_size, to_size)) {
                     return;
                 }
 
@@ -712,7 +773,7 @@ struct Reserver {
                 LiteArray<Core> &reservers = getReservers();
 
                 for (auto &reserver : reservers) {
-                    if ((&reserver != &instance) && reserver.Release(c_ptr, diff)) {
+                    if ((&reserver != &instance) && reserver.Shrink(ptr, from_size, to_size)) {
                         return;
                     }
                 }
