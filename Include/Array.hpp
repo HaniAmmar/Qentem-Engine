@@ -22,52 +22,50 @@ template <typename Type_T>
 struct Array {
     QENTEM_INLINE Array() noexcept = default;
 
-    QENTEM_INLINE Array(Array &&src) noexcept : storage_{src.storage_}, size_{src.size_}, capacity_{src.capacity_} {
-        src.clearStorage();
-        src.setSize(0);
-        src.setCapacity(0);
-    }
+    explicit Array(SizeT capacity, bool initialize = false) {
+        reserve(capacity);
 
-    explicit Array(SizeT capacity, bool initialize = false) : capacity_{capacity} {
-        if (capacity != 0) {
-            reserve();
-
-            if (initialize) {
-                MemoryUtils::ConstructRange(Storage(), (Storage() + Capacity()));
-                setSize(Capacity());
-            }
-        }
-    }
-
-    QENTEM_INLINE Array(const Array &src) : size_{src.Size()}, capacity_{src.Size()} {
-        if (src.IsNotEmpty()) {
-            copyArray(src);
+        if (initialize) {
+            MemoryUtils::ConstructRange(Storage(), (Storage() + Capacity()));
+            setSize(Capacity());
         }
     }
 
     ~Array() {
         MemoryUtils::Destruct(Storage(), End());
-        Reserver::Release(Storage(), Capacity());
+        release(Storage(), Capacity());
+    }
+
+    QENTEM_INLINE Array(Array &&src) noexcept : storage_{src.storage_}, capacity_{src.capacity_}, size_{src.size_} {
+        src.clearStorage();
+        src.setCapacity(0);
+        src.setSize(0);
+    }
+
+    QENTEM_INLINE Array(const Array &src) : size_{src.Size()} {
+        if (src.IsNotEmpty()) {
+            copyArray(src);
+        }
     }
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
             Type_T     *old_storage  = Storage();
-            const SizeT old_size     = Size();
             const SizeT old_capacity = Capacity();
+            const SizeT old_size     = Size();
 
             setStorage(src.Storage());
-            setSize(src.Size());
             setCapacity(src.Capacity());
+            setSize(src.Size());
 
             src.clearStorage();
-            src.setSize(0);
             src.setCapacity(0);
+            src.setSize(0);
 
             if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
                 MemoryUtils::Destruct(old_storage, (old_storage + old_size));
-                Reserver::Release(old_storage, old_capacity);
+                release(old_storage, old_capacity);
             }
         }
 
@@ -77,12 +75,11 @@ struct Array {
     Array &operator=(const Array &src) {
         if (this != &src) {
             Type_T     *old_storage  = Storage();
-            const SizeT old_size     = Size();
             const SizeT old_capacity = Capacity();
+            const SizeT old_size     = Size();
 
             clearStorage();
             setSize(src.Size());
-            setCapacity(src.Size());
 
             if (src.IsNotEmpty()) {
                 copyArray(src);
@@ -91,7 +88,7 @@ struct Array {
             if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
                 MemoryUtils::Destruct(old_storage, (old_storage + old_size));
-                Reserver::Release(old_storage, old_capacity);
+                release(old_storage, old_capacity);
             }
         }
 
@@ -101,8 +98,8 @@ struct Array {
     void operator+=(Array &&src) {
         if (Capacity() == 0) {
             setStorage(src.Storage());
-            setSize(src.Size());
             setCapacity(src.Capacity());
+            setSize(src.Size());
         } else {
             const SizeT n_size = (Size() + src.Size());
 
@@ -111,13 +108,13 @@ struct Array {
             }
 
             MemoryUtils::CopyTo((Storage() + Size()), src.Storage(), src.Size());
-            Reserver::Release(src.Storage(), src.Capacity());
+            release(src.Storage(), src.Capacity());
             setSize(n_size);
         }
 
         src.clearStorage();
-        src.setSize(0);
         src.setCapacity(0);
+        src.setSize(0);
     }
 
     void operator+=(const Array &src) {
@@ -174,8 +171,8 @@ struct Array {
 
         // Take ownership of the new buffer
         setStorage(ptr);
-        setSize(size);
         setCapacity(capacity);
+        setSize(size);
     }
 
     QENTEM_INLINE void Insert(Array &&src) {
@@ -210,50 +207,42 @@ struct Array {
 
     void Reset() noexcept {
         MemoryUtils::Destruct(Storage(), End());
-        Reserver::Release(Storage(), Capacity());
+        release(Storage(), Capacity());
 
         clearStorage();
-        setSize(0);
         setCapacity(0);
+        setSize(0);
     }
 
     Type_T *Detach() noexcept {
         Type_T *tmp = Storage();
 
         clearStorage();
-        setSize(0);
         setCapacity(0);
+        setSize(0);
 
         return tmp;
     }
 
-    void Reserve(const SizeT size, bool initialize = false) {
+    void Reserve(const SizeT capacity, bool initialize = false) {
         Reset();
 
-        if (size != 0) {
-            setCapacity(size);
-            reserve();
+        reserve(capacity);
 
-            if (initialize) {
-                MemoryUtils::ConstructRange(Storage(), (Storage() + size));
-                setSize(size);
-            }
+        if (initialize) {
+            MemoryUtils::ConstructRange(Storage(), (Storage() + capacity));
+            setSize(capacity);
         }
     }
 
     void Resize(SizeT new_size) {
-        if (new_size != 0) {
-            if (Size() > new_size) {
-                // Shrink
-                MemoryUtils::Destruct((Storage() + new_size), End());
-                setSize(new_size);
-            }
-
-            resize(new_size);
-            return;
+        if (Size() > new_size) {
+            // Shrink
+            MemoryUtils::Destruct((Storage() + new_size), End());
+            setSize(new_size);
         }
 
-        Reset();
+        resize(new_size);
     }
 
     void ResizeWithDefaultInit(SizeT new_size) {
@@ -262,9 +251,8 @@ struct Array {
         if (new_size > Size()) {
             Type_T *current = Storage();
             MemoryUtils::ConstructRange((current + Size()), (current + new_size));
+            setSize(new_size);
         }
-
-        setSize(Capacity());
     }
 
     QENTEM_INLINE void Expect(SizeT size) {
@@ -382,10 +370,6 @@ struct Array {
         storage_ = ptr;
     }
 
-    QENTEM_INLINE void reserve() {
-        storage_ = Reserver::Reserve<Type_T>(Capacity());
-    }
-
     QENTEM_INLINE void clearStorage() noexcept {
         storage_ = nullptr;
     }
@@ -402,18 +386,16 @@ struct Array {
         Type_T     *old_storage  = Storage();
         const SizeT old_capacity = Capacity();
 
-        setCapacity(new_capacity);
-
-        reserve();
+        reserve(new_capacity);
 
         if (old_storage != nullptr) {
             MemoryUtils::CopyTo(Storage(), old_storage, Size());
-            Reserver::Release(old_storage, old_capacity);
+            release(old_storage, old_capacity);
         }
     }
 
     void copyArray(const Array &src) {
-        reserve();
+        reserve(src.Size());
 
         Type_T *storage = Storage();
 
@@ -427,9 +409,18 @@ struct Array {
         }
     }
 
+    QENTEM_INLINE void reserve(SizeT capacity) {
+        setStorage(Reserver::Reserve<Type_T>(capacity));
+        setCapacity(capacity);
+    }
+
+    static void release(Type_T *storage, SizeT capacity) {
+        Reserver::Release(storage, capacity);
+    }
+
     Type_T *storage_{nullptr};
-    SizeT   size_{0};
     SizeT   capacity_{0};
+    SizeT   size_{0};
 };
 
 } // namespace Qentem
