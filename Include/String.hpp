@@ -42,8 +42,7 @@ struct String {
 
     explicit String(SizeT capacity) {
         if (capacity != 0) {
-            setStorage(reserve(capacity));
-            setCapacity(capacity);
+            reserve(capacity);
         }
     }
 
@@ -276,8 +275,7 @@ struct String {
         Reset();
 
         if (capacity != 0) {
-            setStorage(reserve(capacity));
-            setCapacity(capacity);
+            reserve(capacity);
         }
     }
 
@@ -286,7 +284,7 @@ struct String {
             expand(length);
         }
 
-        Storage()[length] = '\0';
+        Storage()[length] = Char_T{0};
         setLength(length);
     }
 
@@ -338,13 +336,13 @@ struct String {
         setStorage(str);
         setCapacity(capacity_without_null);
         setLength(length);
-        Storage()[length] = '\0';
+        Storage()[length] = Char_T{0};
     }
 
     QENTEM_INLINE void StepBack(const SizeT length) noexcept {
         if (length <= Length()) {
             length_ -= length;
-            Storage()[Length()] = '\0';
+            Storage()[Length()] = Char_T{0};
         }
     }
 
@@ -369,32 +367,32 @@ struct String {
                 }
 
                 storage[index]      = ch;
-                storage[new_length] = '\0';
+                storage[new_length] = Char_T{0};
                 setLength(new_length);
             } else {
-                // Insufficient capacity: allocate a larger buffer and copy in three stages.
-                SizeT   new_capacity = new_length;
-                Char_T *storage      = reserve(new_capacity);
+                Char_T     *old_storage  = Storage();
+                const SizeT old_capacity = Capacity();
+
+                // Not enough capacity: reserve a bigger buffer and copy in 3 steps.
+                reserve(new_length);
 
                 // 1. Copy prefix [0, index)
                 if (index != 0) {
-                    MemoryUtils::CopyTo(storage, Storage(), index);
+                    MemoryUtils::CopyTo(Storage(), old_storage, index);
                 }
 
                 // 2. Insert new char at 'index'
-                storage[index] = ch;
+                Storage()[index] = ch;
 
                 // 3. Copy suffix [index, length)
                 if (index < Length()) {
-                    MemoryUtils::CopyTo((storage + index + 1U), (Storage() + index), (Length() - index));
+                    MemoryUtils::CopyTo((Storage() + index + SizeT{1}), (old_storage + index), (Length() - index));
                 }
 
-                storage[new_length] = '\0';
+                Storage()[new_length] = Char_T{0};
 
                 // Clean up old storage and set new storage/capacity
-                release(Storage(), Capacity());
-                setStorage(storage);
-                setCapacity(new_capacity);
+                release(old_storage, old_capacity);
                 setLength(new_length);
             }
         }
@@ -415,24 +413,24 @@ struct String {
                     --offset;
                 }
 
-                storage[new_length] = '\0';
+                storage[new_length] = Char_T{0};
                 setLength(new_length);
             } else {
-                // Insufficient capacity: allocate a larger buffer and copy in three stages.
-                SizeT   new_capacity = new_length;
-                Char_T *storage      = reserve(new_capacity);
+                Char_T     *old_storage  = Storage();
+                const SizeT old_capacity = Capacity();
+
+                // Not enough capacity: reserve, then copy with the shift.
+                reserve(new_length);
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length != 0) {
-                    MemoryUtils::CopyTo(storage + shift, Storage(), old_length);
+                    MemoryUtils::CopyTo(Storage() + shift, old_storage, old_length);
                 }
 
-                storage[new_length] = '\0';
+                Storage()[new_length] = Char_T{0};
 
                 // Clean up, set new pointers
-                release(Storage(), Capacity());
-                setStorage(storage);
-                setCapacity(new_capacity);
+                release(old_storage, old_capacity);
                 setLength(new_length);
             }
         }
@@ -457,7 +455,7 @@ struct String {
 
         Char_T *str = (Storage() + Length());
 
-        Storage()[new_length] = '\0';
+        Storage()[new_length] = Char_T{0};
         setLength(new_length);
 
         return str;
@@ -564,7 +562,7 @@ struct String {
 
             MemoryUtils::CopyTo((Storage() + Length()), str, length);
 
-            Storage()[new_length] = '\0';
+            Storage()[new_length] = Char_T{0};
             setLength(new_length);
         }
     }
@@ -584,7 +582,7 @@ struct String {
             MemoryUtils::CopyTo((des + len1), str2, len2);
         }
 
-        des[length] = '\0';
+        des[length] = Char_T{0};
 
         return ns;
     }
@@ -593,8 +591,7 @@ struct String {
         Char_T *old_storage  = Storage();
         SizeT   old_capacity = Capacity();
 
-        setStorage(reserve(new_capacity));
-        setCapacity(new_capacity);
+        reserve(new_capacity);
 
         if (old_storage != nullptr) {
             MemoryUtils::CopyTo(Storage(), old_storage, Length());
@@ -602,25 +599,14 @@ struct String {
         }
     }
 
-    /**
-     * @brief Reserves an aligned memory region for `capacity + 1` characters (including null terminator).
-     *
-     * This helper computes the necessary byte size with alignment via `RoundUpBytes<Char_T>()`,
-     * then performs the actual allocation using `Reserver`. The final capacity (excluding the null terminator)
-     * is returned by reference via the `capacity` parameter.
-     *
-     * @param capacity  [in/out] Desired capacity before null-terminator. Updated with actual usable size.
-     * @return Pointer to an aligned buffer of at least `capacity + 1` characters.
-     */
-    QENTEM_INLINE static Char_T *reserve(SizeT &capacity) {
-        // Reserve enough space for (capacity + 1) characters, aligned and including null-terminator.
-        const SizeT capacity_in_bytes = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity + SizeT{1}));
-        void       *storage_in_bytes  = Reserver::Reserve<char>(capacity_in_bytes);
-        capacity                      = (capacity_in_bytes / sizeof(Char_T)) - SizeT{1};
-        return static_cast<Char_T *>(storage_in_bytes);
+    void reserve(SizeT capacity) {
+        capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity + SizeT{1}) / sizeof(Char_T));
+        setStorage(Reserver::Reserve<Char_T>(capacity));
+        --capacity;
+        setCapacity((capacity));
     }
 
-    static void release(Char_T *storage, SizeT capacity) {
+    QENTEM_INLINE static void release(Char_T *storage, SizeT capacity) {
         Reserver::Release(storage, (capacity + SizeT{1}));
     }
 

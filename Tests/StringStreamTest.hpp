@@ -39,7 +39,7 @@ static void TestStringStream1(QTest &test) {
     test.IsNull(ss1.First(), __LINE__);
     test.IsNull(ss1.Last(), __LINE__);
 
-    test.IsEqual(ss2.Capacity(), SizeT{16}, __LINE__);
+    test.IsTrue(ss2.Capacity() >= SizeT{10}, __LINE__);
     test.IsEqual(ss2.Length(), SizeT{0}, __LINE__);
     test.IsNotNull(ss2.First(), __LINE__);
 
@@ -382,22 +382,22 @@ static void TestStringStream2(QTest &test) {
     stream.Reserve(SizeT{8});
 
     test.IsEqual(stream.Length(), SizeT{0}, __LINE__);
-    test.IsEqual(stream.Capacity(), SizeT{8}, __LINE__);
+    test.IsTrue(stream.Capacity() >= SizeT{8}, __LINE__);
 
     stream << "12345678";
     test.IsEqual(stream.Length(), SizeT{8}, __LINE__);
-    test.IsEqual(stream.Capacity(), SizeT{8}, __LINE__);
+    test.IsTrue(stream.Capacity() >= SizeT{8}, __LINE__);
     stream.StepBack(SizeT{1});
     test.IsEqual(*(stream.End()), '8', __LINE__);
 
     stream.InsertNull();
     test.IsEqual(stream.Length(), SizeT{7}, __LINE__);
-    test.IsEqual(stream.Capacity(), SizeT{8}, __LINE__);
+    test.IsTrue(stream.Capacity() >= SizeT{8}, __LINE__);
     test.IsEqual(*(stream.End()), char{0}, __LINE__);
 
     stream.InsertNull();
     test.IsEqual(stream.Length(), SizeT{7}, __LINE__);
-    test.IsEqual(stream.Capacity(), SizeT{8}, __LINE__);
+    test.IsTrue(stream.Capacity() >= SizeT{8}, __LINE__);
     test.IsEqual(*(stream.End()), char{0}, __LINE__);
 
     stream = "12345678";

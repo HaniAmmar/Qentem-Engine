@@ -30,7 +30,7 @@ struct StringStream {
     QENTEM_INLINE StringStream() = default;
 
     QENTEM_INLINE ~StringStream() {
-        Reserver::Release(Storage(), Capacity());
+        release(Storage(), Capacity());
     }
 
     explicit StringStream(SizeT capacity) {
@@ -66,7 +66,7 @@ struct StringStream {
 
     StringStream &operator=(StringStream &&src) noexcept {
         if (this != &src) {
-            Reserver::Release(Storage(), Capacity());
+            release(Storage(), Capacity());
 
             setStorage(src.Storage());
             setCapacity(src.Capacity());
@@ -255,7 +255,7 @@ struct StringStream {
     }
 
     void Reset() noexcept {
-        Reserver::Release(Storage(), Capacity());
+        release(Storage(), Capacity());
 
         clearStorage();
         setCapacity(0);
@@ -264,7 +264,7 @@ struct StringStream {
 
     void InsertNull() {
         if (Capacity() == Length()) {
-            expand(Length() + SizeT{1});
+            expand(Capacity() + SizeT{1});
         }
 
         Storage()[Length()] = Char_T{0};
@@ -327,40 +327,40 @@ struct StringStream {
 
             if (new_length <= Capacity()) {
                 // Enough capacity, shift tail right by one, insert in-place.
-                Char_T *data = Storage();
+                Char_T *storage = Storage();
 
                 // Shift right: move everything [index, length) -> [index+1, new_length)
-                SizeT i = Length();
+                SizeT offset = Length();
 
-                while (i > index) {
-                    data[i] = data[i - SizeT{1}];
-                    --i;
+                while (offset > index) {
+                    storage[offset] = storage[offset - SizeT{1}];
+                    --offset;
                 }
 
-                data[index] = ch;
+                storage[index] = ch;
                 setLength(new_length);
             } else {
+                Char_T     *old_storage  = Storage();
+                const SizeT old_capacity = Capacity();
+
                 // Not enough capacity: reserve a bigger buffer and copy in 3 steps.
-                SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
-                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_capacity);
+                reserve(new_length);
 
                 // 1. Copy prefix [0, index)
                 if (index != 0) {
-                    MemoryUtils::CopyTo(new_storage, Storage(), index);
+                    MemoryUtils::CopyTo(Storage(), old_storage, index);
                 }
 
                 // 2. Insert new char at 'index'
-                new_storage[index] = ch;
+                Storage()[index] = ch;
 
                 // 3. Copy suffix [index, length)
                 if (index < Length()) {
-                    MemoryUtils::CopyTo(new_storage + index + 1, (Storage() + index), (Length() - index));
+                    MemoryUtils::CopyTo((Storage() + index + SizeT{1}), (old_storage + index), (Length() - index));
                 }
 
                 // Clean up old storage and set new storage/capacity
-                Reserver::Release(Storage(), Capacity());
-                setStorage(new_storage);
-                setCapacity(new_capacity);
+                release(old_storage, old_capacity);
                 setLength(new_length);
             }
         }
@@ -373,30 +373,29 @@ struct StringStream {
 
             if (new_length <= Capacity()) {
                 // Enough capacity, shift in place (backwards to avoid overlap).
-                Char_T *data = Storage();
-                SizeT   i    = old_length;
+                Char_T *storage = Storage();
+                SizeT   offset  = old_length;
 
-                while (i != 0) {
-                    data[i + (shift - SizeT{1})] = data[i - SizeT{1}];
-
-                    --i;
+                while (offset != 0) {
+                    storage[offset + (shift - SizeT{1})] = storage[offset - SizeT{1}];
+                    --offset;
                 }
 
                 setLength(new_length);
             } else {
+                Char_T     *old_storage  = Storage();
+                const SizeT old_capacity = Capacity();
+
                 // Not enough capacity: reserve, then copy with the shift.
-                SizeT   new_capacity = MemoryUtils::AlignToPow2(new_length);
-                Char_T *new_storage  = Reserver::Reserve<Char_T>(new_capacity);
+                reserve(new_length);
 
                 // 2. Copy old data to the right position in new storage
                 if (old_length != 0) {
-                    MemoryUtils::CopyTo(new_storage + shift, Storage(), old_length);
+                    MemoryUtils::CopyTo(Storage() + shift, old_storage, old_length);
                 }
 
                 // Clean up, set new pointers
-                Reserver::Release(Storage(), Capacity());
-                setStorage(new_storage);
-                setCapacity(new_capacity);
+                release(old_storage, old_capacity);
                 setLength(new_length);
             }
         }
@@ -521,13 +520,18 @@ struct StringStream {
         reserve(new_capacity);
 
         MemoryUtils::CopyTo(Storage(), old_storage, Length());
-        Reserver::Release(old_storage, old_capacity);
+        release(old_storage, old_capacity);
     }
 
     void reserve(SizeT capacity) {
         capacity = MemoryUtils::AlignToPow2(capacity);
+        // capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity) / sizeof(Char_T));
         setStorage(Reserver::Reserve<Char_T>(capacity));
-        setCapacity(capacity);
+        setCapacity((capacity));
+    }
+
+    QENTEM_INLINE static void release(Char_T *storage, SizeT capacity) {
+        Reserver::Release(storage, capacity);
     }
 
     Char_T *storage_{nullptr};
