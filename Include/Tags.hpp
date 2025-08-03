@@ -109,12 +109,73 @@ struct IfTag {
 
 struct TagBit {
   public:
-    TagBit()                          = default;
-    TagBit &operator=(const TagBit &) = delete;
-    TagBit(const TagBit &)            = delete;
+    TagBit() = default;
 
     TagBit(TagBit &&src) noexcept : storage_{src.storage_}, type_{src.type_} {
         src.type_ = TagType::None;
+    }
+
+    TagBit(const TagBit &src) : type_{src.type_} {
+        switch (src.type_) {
+            case TagType::Variable:
+            case TagType::RawVariable: {
+                const VariableTag &tag = src.GetVariableTag();
+
+                VariableTag *new_tag = Reserver::Reserve<VariableTag>(1);
+                MemoryUtils::Construct<VariableTag>(new_tag, tag);
+                storage_ = new_tag;
+
+                break;
+            }
+
+            case TagType::Math: {
+                const MathTag &tag = src.GetMathTag();
+
+                MathTag *new_tag = Reserver::Reserve<MathTag>(1);
+                MemoryUtils::Construct<MathTag>(new_tag, tag);
+                storage_ = new_tag;
+                break;
+            }
+
+            case TagType::SuperVariable: {
+                const SuperVariableTag &tag = src.GetSuperVariableTag();
+
+                SuperVariableTag *new_tag = Reserver::Reserve<SuperVariableTag>(1);
+                MemoryUtils::Construct<SuperVariableTag>(new_tag, tag);
+                storage_ = new_tag;
+                break;
+            }
+
+            case TagType::InLineIf: {
+                const InLineIfTag &tag = src.GetInLineIfTag();
+
+                InLineIfTag *new_tag = Reserver::Reserve<InLineIfTag>(1);
+                MemoryUtils::Construct<InLineIfTag>(new_tag, tag);
+                storage_ = new_tag;
+                break;
+            }
+
+            case TagType::Loop: {
+                const LoopTag &tag = src.GetLoopTag();
+
+                LoopTag *new_tag = Reserver::Reserve<LoopTag>(1);
+                MemoryUtils::Construct<LoopTag>(new_tag, tag);
+                storage_ = new_tag;
+                break;
+            }
+
+            case TagType::If: {
+                const IfTag &tag = src.GetIfTag();
+
+                IfTag *new_tag = Reserver::Reserve<IfTag>(1);
+                MemoryUtils::Construct<IfTag>(new_tag, tag);
+                storage_ = new_tag;
+                break;
+            }
+
+            default: {
+            }
+        }
     }
 
     TagBit &operator=(TagBit &&src) noexcept {
@@ -124,6 +185,15 @@ struct TagBit {
             storage_  = src.storage_;
             type_     = src.type_;
             src.type_ = TagType::None;
+        }
+
+        return *this;
+    }
+
+    TagBit &operator=(const TagBit &src) noexcept {
+        if (this != &src) {
+            this->~TagBit();
+            MemoryUtils::Construct(this, src);
         }
 
         return *this;
