@@ -23,11 +23,13 @@ struct Array {
     QENTEM_INLINE Array() noexcept = default;
 
     explicit Array(SizeT capacity, bool initialize = false) {
-        reserve(capacity);
+        if (capacity != 0) {
+            reserve(capacity);
 
-        if (initialize) {
-            MemoryUtils::ConstructRange(Storage(), (Storage() + Capacity()));
-            setSize(Capacity());
+            if (initialize) {
+                MemoryUtils::ConstructRange(Storage(), (Storage() + Capacity()));
+                setSize(Capacity());
+            }
         }
     }
 
@@ -227,22 +229,29 @@ struct Array {
     void Reserve(const SizeT capacity, bool initialize = false) {
         Reset();
 
-        reserve(capacity);
+        if (capacity != 0) {
+            reserve(capacity);
 
-        if (initialize) {
-            MemoryUtils::ConstructRange(Storage(), (Storage() + capacity));
-            setSize(capacity);
+            if (initialize) {
+                MemoryUtils::ConstructRange(Storage(), (Storage() + capacity));
+                setSize(capacity);
+            }
         }
     }
 
-    void Resize(SizeT new_size) {
-        if (Size() > new_size) {
-            // Shrink
-            MemoryUtils::Destruct((Storage() + new_size), End());
-            setSize(new_size);
+    void Resize(SizeT new_capacity) {
+        if (new_capacity != 0) {
+            if (Size() > new_capacity) {
+                // Shrink
+                MemoryUtils::Destruct((Storage() + new_capacity), End());
+                setSize(new_capacity);
+            }
+
+            resize(new_capacity);
+            return;
         }
 
-        resize(new_size);
+        Reset();
     }
 
     void ResizeWithDefaultInit(SizeT new_size) {

@@ -83,8 +83,15 @@ static void TestArray1(QTest &test) {
     test.IsEqual(numbers2.Capacity(), 2U, __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
 
-    numbers1.Reset();
-    numbers2.Reset();
+    numbers2.Resize(0);
+    test.IsEqual(numbers2.Size(), 0U, __LINE__);
+    test.IsEqual(numbers2.Capacity(), 0U, __LINE__);
+    test.IsNull(numbers2.First(), __LINE__);
+
+    numbers1.Reserve(0);
+    test.IsEqual(numbers1.Size(), 0U, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 0U, __LINE__);
+    test.IsNull(numbers1.First(), __LINE__);
 
     numbers1.ResizeWithDefaultInit(8);
     storage = numbers1.First();
