@@ -593,21 +593,24 @@ struct HashTable {
      */
     QENTEM_INLINE void Clear() noexcept {
         if (IsNotEmpty()) {
-            HItem_T       *item = Storage();
-            const HItem_T *end  = (item + Capacity());
+            HItem_T       *item      = Storage();
+            const HItem_T *end_items = (item + Size());
+            const HItem_T *end_table = (item + Capacity());
 
-            while (item < end) {
+            while (item < end_items) {
                 item->Position = Capacity();
                 item->Next     = Capacity();
-
-                if (item->Hash != 0) {
-                    item->Clear();
-                }
-
+                item->Clear();
                 ++item;
             }
 
-            setSize(0); // Logical size is now zero
+            while (item < end_table) {
+                item->Position = Capacity();
+                // item->Next     = Capacity();
+                ++item;
+            }
+
+            setSize(0);
         }
     }
 
