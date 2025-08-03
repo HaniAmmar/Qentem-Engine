@@ -204,10 +204,6 @@ struct MemoryUtils {
     //               Construction / Initialization           //
     ///////////////////////////////////////////////////////////
 
-    ///////////////////////////////////////////////////////////
-    //                    Construction                      //
-    ///////////////////////////////////////////////////////////
-
     /**
      * @brief Constructs an object of type `Type_T` in-place at the given memory address.
      *
