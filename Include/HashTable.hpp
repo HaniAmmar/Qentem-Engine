@@ -594,12 +594,16 @@ struct HashTable {
     QENTEM_INLINE void Clear() noexcept {
         if (IsNotEmpty()) {
             HItem_T       *item = Storage();
-            const HItem_T *end  = (Storage() + Size());
+            const HItem_T *end  = (item + Capacity());
 
             while (item < end) {
                 item->Position = Capacity();
                 item->Next     = Capacity();
-                item->Clear();
+
+                if (item->Hash != 0) {
+                    item->Clear();
+                }
+
                 ++item;
             }
 
