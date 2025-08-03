@@ -596,9 +596,10 @@ struct String {
         setStorage(reserve(new_capacity));
         setCapacity(new_capacity);
 
-        MemoryUtils::CopyTo(Storage(), old_storage, Length());
-
-        release(old_storage, old_capacity);
+        if (old_storage != nullptr) {
+            MemoryUtils::CopyTo(Storage(), old_storage, Length());
+            release(old_storage, old_capacity);
+        }
     }
 
     /**
