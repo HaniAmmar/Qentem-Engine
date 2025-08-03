@@ -283,11 +283,14 @@ struct StringStream {
 
     String<Char_T> GetString() {
         if (Capacity() > Length()) {
-            const SizeT length   = Length();   // Detach() resets Length.
-            const SizeT capacity = Capacity(); // Detach() resets Capacity.
-            Storage()[Length()]  = Char_T{0};
+            const SizeT length  = Length(); // Detach() resets Length.
+            Storage()[Length()] = Char_T{0};
+
+            Reserver::Shrink(Storage(), Capacity(), (Length() + SizeT{1}));
+
             String<Char_T> a_string{};
-            a_string.Adopt(Detach(), length, (capacity - SizeT{1}));
+            a_string.Adopt(Detach(), length, length);
+
             return a_string;
         }
 
