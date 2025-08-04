@@ -524,8 +524,7 @@ struct StringStream {
     }
 
     void reserve(SizeT capacity) {
-        capacity = MemoryUtils::AlignToPow2(capacity);
-        // capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity) / sizeof(Char_T));
+        capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity) / sizeof(Char_T));
         setStorage(Reserver::Reserve<Char_T>(capacity));
         setCapacity((capacity));
     }
