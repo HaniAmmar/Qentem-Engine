@@ -227,31 +227,42 @@ struct Array {
     }
 
     void Reserve(const SizeT capacity, bool initialize = false) {
-        Reset();
-
         if (capacity != 0) {
-            reserve(capacity);
+            Clear();
+
+            if (capacity > Capacity()) {
+                release(Storage(), Capacity());
+                reserve(capacity);
+            } else if (capacity < Capacity()) {
+                Reserver::Shrink(Storage(), Capacity(), capacity);
+                setCapacity(capacity);
+            }
 
             if (initialize) {
                 MemoryUtils::ConstructRange(Storage(), (Storage() + capacity));
                 setSize(capacity);
             }
+        } else {
+            Reset();
         }
     }
 
     void Resize(SizeT new_capacity) {
         if (new_capacity != 0) {
-            if (Size() > new_capacity) {
-                // Shrink
-                MemoryUtils::Destruct((Storage() + new_capacity), End());
-                setSize(new_capacity);
+            if (new_capacity < Capacity()) {
+                if (Size() > new_capacity) {
+                    MemoryUtils::Destruct((Storage() + new_capacity), End());
+                    setSize(new_capacity);
+                }
+
+                Reserver::Shrink(Storage(), Capacity(), new_capacity);
+                setCapacity(new_capacity);
+            } else if (new_capacity > Capacity()) {
+                resize(new_capacity);
             }
-
-            resize(new_capacity);
-            return;
+        } else {
+            Reset();
         }
-
-        Reset();
     }
 
     void ResizeWithDefaultInit(SizeT new_size) {

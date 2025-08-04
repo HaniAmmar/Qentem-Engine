@@ -285,11 +285,20 @@ struct String {
         }
     }
 
-    QENTEM_INLINE void Reserve(const SizeT capacity) {
-        Reset();
-
+    QENTEM_INLINE void Reserve(SizeT capacity) {
         if (capacity != 0) {
-            reserve(capacity);
+            setLength(0);
+
+            if (capacity > Capacity()) {
+                reserve(capacity);
+            } else if (capacity < Capacity()) {
+                capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity + SizeT{1}) / sizeof(Char_T));
+                Reserver::Shrink(Storage(), Capacity(), capacity);
+                --capacity;
+                setCapacity(capacity);
+            }
+        } else {
+            Reset();
         }
     }
 
@@ -602,7 +611,7 @@ struct String {
         capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity + SizeT{1}) / sizeof(Char_T));
         setStorage(Reserver::Reserve<Char_T>(capacity));
         --capacity;
-        setCapacity((capacity));
+        setCapacity(capacity);
     }
 
     QENTEM_INLINE static void release(Char_T *storage, SizeT capacity) {

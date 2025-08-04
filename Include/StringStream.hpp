@@ -244,11 +244,19 @@ struct StringStream {
         }
     }
 
-    QENTEM_INLINE void Reserve(const SizeT size) {
-        Reset();
+    QENTEM_INLINE void Reserve(SizeT capacity) {
+        if (capacity != 0) {
+            setLength(0);
 
-        if (size != 0) {
-            reserve(size);
+            if (capacity > Capacity()) {
+                reserve(capacity);
+            } else if (capacity < Capacity()) {
+                capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity) / sizeof(Char_T));
+                Reserver::Shrink(Storage(), Capacity(), capacity);
+                setCapacity(capacity);
+            }
+        } else {
+            Reset();
         }
     }
 

@@ -543,31 +543,6 @@ struct HashTable {
     }
 
     /**
-     * @brief Adjusts the table's capacity to match exactly @p new_size elements.
-     *
-     * If @p new_size is less than the current number of stored items, excess entries
-     * are discarded. If greater, a new buffer is reserved with sufficient space to
-     * accommodate the requested size. When set to zero, the table is fully reset
-     * and its memory is released.
-     *
-     * @param new_size The target number of items the table should support.
-     */
-    void Resize(const SizeT new_size) {
-        if (new_size != 0) {
-            if (Size() > new_size) {
-                // Shrink: Destruct of elements outside new bounds
-                HItem_T *storage = Storage();
-                MemoryUtils::Destruct((storage + new_size), (storage + Size()));
-                setSize(new_size); // Adjust logical size
-            }
-
-            resize(new_size); // Internal grow/shrink logic
-        } else {
-            Reset();
-        }
-    }
-
-    /**
      * @brief Ensures the hash table has at least the requested capacity and clears existing contents.
      *
      * Resets the table and reserves internal storage sufficient to hold at least @p size items.
@@ -575,11 +550,58 @@ struct HashTable {
      *
      * @param size The number of elements to reserve space for.
      */
-    QENTEM_INLINE void Reserve(SizeT size) {
-        Reset(); // Release any current storage and reset size/capacity
+    void Reserve(SizeT capacity) {
+        if (capacity != 0) {
+            Clear();
+            capacity = MemoryUtils::AlignToPow2(capacity);
 
-        if (size != 0) {
-            reserve(size); // Reserves storage for at least 'size' items
+            if (capacity > Capacity()) {
+                release(Storage(), Capacity());
+                reserve(capacity);
+            } else if (capacity < Capacity()) {
+                HItem_T *storage = Storage();
+                Reserver::Shrink(storage, Capacity(), capacity);
+                setCapacity(capacity);
+                resetLinks(storage, (storage + Capacity()), Capacity());
+            }
+        } else {
+            Reset();
+        }
+    }
+
+    /**
+     * @brief Adjusts the table's capacity to match exactly @p new_size elements.
+     *
+     * If @p new_size is less than the current number of stored items, excess entries
+     * are discarded. If greater, a new buffer is reserved with sufficient space to
+     * accommodate the requested size. When set to zero, the table is fully reset
+     * and its memory is released.
+     *
+     * @param new_capacity The target number of items the table should support.
+     */
+    void Resize(SizeT new_capacity) {
+        if (new_capacity != 0) {
+            if (new_capacity < Capacity()) {
+                HItem_T    *storage      = Storage();
+                const SizeT old_capacity = Capacity();
+
+                if (Size() > new_capacity) {
+                    // Shrink: Destruct of elements outside new bounds
+                    MemoryUtils::Destruct((storage + new_capacity), (storage + Size()));
+                    setSize(new_capacity); // Adjust logical size
+                }
+
+                reorder();
+                setCapacity(MemoryUtils::AlignToPow2(new_capacity));
+                resetLinks(storage, (storage + Capacity()), Capacity());
+                generateHash();
+
+                Reserver::Shrink(storage, old_capacity, Capacity());
+            } else if (new_capacity > Capacity()) {
+                resize(new_capacity);
+            }
+        } else {
+            Reset();
         }
     }
 
@@ -655,7 +677,6 @@ struct HashTable {
 
         // Reset hash table mapping and rebuild
         resetLinks(storage, (storage + Capacity()), Capacity());
-
         generateHash();
     }
 
@@ -670,16 +691,21 @@ struct HashTable {
      * This operation can be used after bulk removals to optimize memory use.
      */
     QENTEM_INLINE void Compress() {
-        const SizeT size = ActualSize(); // Count of truly valid items
+        const SizeT old_size = Size(); // Count of truly valid items
+        reorder();
 
-        if (size != 0) {
-            if (size < Size()) {
-                resize(size); // Shrink to fit
+        if (Size() != 0) {
+            if (old_size != Size()) {
+                HItem_T    *storage      = Storage();
+                const SizeT old_capacity = Capacity();
+                setCapacity(MemoryUtils::AlignToPow2(Size()));
+                resetLinks(storage, (storage + Capacity()), Capacity());
+                generateHash();
+                Reserver::Shrink(storage, old_capacity, Capacity());
             }
-            return;
+        } else {
+            Reset(); // If nothing remains, free all memory
         }
-
-        Reset(); // If nothing remains, free all memory
     }
 
     /**
@@ -701,32 +727,15 @@ struct HashTable {
      *   Use with caution if external code relies on storage layout or indices.
      */
     void Reorder() {
-        HItem_T *storage = Storage(); // Pointer to start of item storage array
-        SizeT    index   = 0;         // Current scan position in the array
-        SizeT    size    = 0;         // Next position to place a live item (and final live count)
+        HItem_T    *storage  = Storage(); // Pointer to start of item storage array
+        const SizeT old_size = Size();    // Next position to place a live item (and final live count)
 
-        // Scan all current items in storage
-        while (index < Size()) {
-            // If current slot contains a live item
-            if (storage[index].Hash != 0) {
-                if (index != size) {
-                    HItem_T *item = (storage + index);
-                    storage[size] = QUtility::Move(*item); // Move live item to compacted position
-                    item->Hash    = 0;                     // Mark old slot as dead/tombstone
-                }
+        reorder();
 
-                ++size; // Increment count of live items and next slot for compaction
-            }
-
-            ++index; // Advance to next storage slot
+        if (Size() != old_size) {
+            resetLinks(storage, (storage + Capacity()), Capacity());
+            generateHash(); // Rebuild hash table mapping to match new item layout
         }
-
-        setSize(size); // Update logical size to match number of live entries
-
-        resetLinks(storage, (storage + Capacity()), Capacity());
-
-        // Rebuild hash table mapping to match new item layout
-        generateHash();
     }
 
     /**
@@ -963,7 +972,7 @@ struct HashTable {
      * @return Pointer to the start of the hash table segment.
      */
     HItem_T *reserveOnly(SizeT capacity) {
-        capacity = MemoryUtils::AlignToPow2(capacity); // Align to power-of-two
+        capacity = MemoryUtils::AlignToPow2(capacity);
 
         setCapacity(capacity); // Record new capacity
 
@@ -1448,6 +1457,30 @@ struct HashTable {
 
             setSize(index); // Set the new item count
             generateHash(); // Rebuild hash links for new memory block
+        }
+    }
+
+    QENTEM_INLINE void reorder() {
+        HItem_T    *storage  = Storage(); // Pointer to start of item storage array
+        SizeT       index    = 0;         // Current scan position in the array
+        const SizeT old_size = Size();    // Next position to place a live item (and final live count)
+
+        size_ = 0;
+
+        // Scan all current items in storage
+        while (index < old_size) {
+            // If current slot contains a live item
+            if (storage[index].Hash != 0) {
+                if (index != size_) {
+                    HItem_T *item  = (storage + index);
+                    storage[size_] = QUtility::Move(*item); // Move live item to compacted position
+                    item->Hash     = 0;                     // Mark old slot as dead/tombstone
+                }
+
+                ++size_; // Increment count of live items and next slot for compaction
+            }
+
+            ++index; // Advance to next storage slot
         }
     }
 
