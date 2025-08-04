@@ -54,16 +54,16 @@ struct String {
 
     String(const String &src) {
         if (src.Length() != 0) {
-            write(src.First(), src.Length());
+            Write(src.First(), src.Length());
         }
     }
 
     String(const Char_T *str, SizeT length) {
-        write(str, length);
+        Write(str, length);
     }
 
     String(const Char_T *str) {
-        write(str, StringUtils::Count(str));
+        Write(str, StringUtils::Count(str));
     }
 
     String &operator=(String &&src) noexcept {
@@ -82,16 +82,12 @@ struct String {
         return *this;
     }
 
-    String &operator=(const Char_T *str) {
-        Clear();
-        write(str, StringUtils::Count(str));
-
-        return *this;
-    }
-
     String &operator=(const String &src) {
-        Clear();
-        write(src.First(), src.Length());
+        if (this != &src) {
+            Clear();
+            Write(src.First(), src.Length());
+        }
+
         return *this;
     }
 
@@ -102,27 +98,34 @@ struct String {
         return *this;
     }
 
-    QENTEM_INLINE void operator+=(Char_T ch) {
-        Write(ch);
+    String &operator=(const Char_T *str) {
+        Clear();
+        Write(str, StringUtils::Count(str));
+
+        return *this;
     }
 
-    QENTEM_INLINE void operator+=(const String &r) {
-        write(r.First(), r.Length());
+    QENTEM_INLINE void operator+=(const String &src) {
+        Write(src.First(), src.Length());
     }
 
     String &operator+=(String &&src) {
-        write(src.First(), src.Length());
+        Write(src.First(), src.Length());
         src.Reset();
 
         return *this;
     }
 
     QENTEM_INLINE void operator+=(const StringView<char> &string_view) {
-        write(string_view.First(), string_view.Length());
+        Write(string_view.First(), string_view.Length());
+    }
+
+    QENTEM_INLINE void operator+=(Char_T ch) {
+        Write(ch);
     }
 
     QENTEM_INLINE void operator+=(const Char_T *str) {
-        write(str, StringUtils::Count(str));
+        Write(str, StringUtils::Count(str));
     }
 
     String operator+(String &&src) const {
@@ -147,12 +150,12 @@ struct String {
     }
 
     QENTEM_INLINE friend String &operator<<(String &out, const String &string) {
-        out.write(string.First(), string.Length());
+        out.Write(string.First(), string.Length());
         return out;
     }
 
     QENTEM_INLINE friend String &operator<<(String &out, const StringView<Char_T> &string) {
-        out.write(string.First(), string.Length());
+        out.Write(string.First(), string.Length());
         return out;
     }
 
@@ -162,7 +165,7 @@ struct String {
     }
 
     QENTEM_INLINE friend String &operator<<(String &out, const Char_T *str) {
-        out.write(str, StringUtils::Count(str));
+        out.Write(str, StringUtils::Count(str));
         return out;
     }
 
@@ -239,8 +242,19 @@ struct String {
         setLength(new_length);
     }
 
-    QENTEM_INLINE void Write(const Char_T *str, const SizeT length) {
-        write(str, length);
+    void Write(const Char_T *str, const SizeT length) {
+        if (length != 0) {
+            const SizeT new_length = (Length() + length);
+
+            if (Capacity() < new_length) {
+                expand(new_length);
+            }
+
+            MemoryUtils::CopyTo((Storage() + Length()), str, length);
+
+            Storage()[new_length] = Char_T{0};
+            setLength(new_length);
+        }
     }
 
     QENTEM_INLINE void WriteAt(const SizeT index, const Char_T *str, const SizeT length) {
@@ -550,21 +564,6 @@ struct String {
 
     QENTEM_INLINE void setCapacity(const SizeT new_capacity) noexcept {
         capacity_ = new_capacity;
-    }
-
-    void write(const Char_T *str, const SizeT length) {
-        if (length != 0) {
-            const SizeT new_length = (Length() + length);
-
-            if (Capacity() < new_length) {
-                expand(new_length);
-            }
-
-            MemoryUtils::CopyTo((Storage() + Length()), str, length);
-
-            Storage()[new_length] = Char_T{0};
-            setLength(new_length);
-        }
     }
 
     static String merge(const Char_T *str1, const SizeT len1, const Char_T *str2, const SizeT len2) {

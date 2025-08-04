@@ -25,7 +25,7 @@ template <typename Char_T>
 struct StringStream {
     using CharType = Char_T;
 
-    static constexpr SizeT ExpandFactor{4};
+    static constexpr SizeT ExpandShift{2};
 
     QENTEM_INLINE StringStream() = default;
 
@@ -49,19 +49,19 @@ struct StringStream {
     StringStream(const StringStream &src) {
         if (src.Length() != 0) {
             reserve(src.Length());
-            write(src.First(), src.Length());
+            Write(src.First(), src.Length());
         }
     }
 
     StringStream(const Char_T *str, SizeT length) {
         reserve(length);
-        write(str, length);
+        Write(str, length);
     }
 
     StringStream(const Char_T *str) {
         const SizeT length = StringUtils::Count(str);
         reserve(length);
-        write(str, length);
+        Write(str, length);
     }
 
     StringStream &operator=(StringStream &&src) noexcept {
@@ -83,50 +83,50 @@ struct StringStream {
     StringStream &operator=(const StringStream &src) {
         if (this != &src) {
             Clear();
-            write(src.First(), src.Length());
+            Write(src.First(), src.Length());
         }
-
-        return *this;
-    }
-
-    StringStream &operator=(const Char_T *str) {
-        Clear();
-        write(str, StringUtils::Count(str));
 
         return *this;
     }
 
     StringStream &operator=(const String<Char_T> &string) {
         Clear();
-        write(string.First(), string.Length());
+        Write(string.First(), string.Length());
         return *this;
     }
 
     StringStream &operator=(const StringView<Char_T> &string) {
         Clear();
-        write(string.First(), string.Length());
+        Write(string.First(), string.Length());
 
         return *this;
+    }
+
+    StringStream &operator=(const Char_T *str) {
+        Clear();
+        Write(str, StringUtils::Count(str));
+
+        return *this;
+    }
+
+    QENTEM_INLINE void operator+=(const StringStream<Char_T> &stream) {
+        Write(stream.First(), stream.Length());
+    }
+
+    QENTEM_INLINE void operator+=(const String<Char_T> &string) {
+        Write(string.First(), string.Length());
+    }
+
+    QENTEM_INLINE void operator+=(const StringView<char> &string_view) {
+        Write(string_view.First(), string_view.Length());
     }
 
     QENTEM_INLINE void operator+=(Char_T ch) {
         Write(ch);
     }
 
-    QENTEM_INLINE void operator+=(const StringStream<Char_T> &stream) {
-        write(stream.First(), stream.Length());
-    }
-
-    QENTEM_INLINE void operator+=(const String<Char_T> &string) {
-        write(string.First(), string.Length());
-    }
-
-    QENTEM_INLINE void operator+=(const StringView<char> &string_view) {
-        write(string_view.First(), string_view.Length());
-    }
-
     QENTEM_INLINE void operator+=(const Char_T *str) {
-        write(str, StringUtils::Count(str));
+        Write(str, StringUtils::Count(str));
     }
 
     template <typename Stream_T>
@@ -143,17 +143,17 @@ struct StringStream {
     }
 
     QENTEM_INLINE friend StringStream &operator<<(StringStream &out, const StringStream &stream) {
-        out.write(stream.First(), stream.Length());
+        out.Write(stream.First(), stream.Length());
         return out;
     }
 
     QENTEM_INLINE friend StringStream &operator<<(StringStream &out, const String<Char_T> &string) {
-        out.write(string.First(), string.Length());
+        out.Write(string.First(), string.Length());
         return out;
     }
 
     QENTEM_INLINE friend StringStream &operator<<(StringStream &out, const StringView<Char_T> &string) {
-        out.write(string.First(), string.Length());
+        out.Write(string.First(), string.Length());
         return out;
     }
 
@@ -163,7 +163,7 @@ struct StringStream {
     }
 
     QENTEM_INLINE friend StringStream &operator<<(StringStream &out, const Char_T *str) {
-        out.write(str, StringUtils::Count(str));
+        out.Write(str, StringUtils::Count(str));
         return out;
     }
 
@@ -209,15 +209,25 @@ struct StringStream {
         const SizeT new_length = (Length() + SizeT{1});
 
         if (Capacity() == Length()) {
-            expand(new_length * ExpandFactor);
+            expand(new_length << ExpandShift);
         }
 
         Storage()[Length()] = ch;
         setLength(new_length);
     }
 
-    QENTEM_INLINE void Write(const Char_T *str, const SizeT length) {
-        write(str, length);
+    void Write(const Char_T *str, const SizeT length) {
+        if (length != 0) {
+            const SizeT new_length = (Length() + length);
+
+            if (Capacity() < new_length) {
+                expand(new_length << ExpandShift);
+            }
+
+            MemoryUtils::CopyTo((Storage() + Length()), str, length);
+
+            setLength(new_length);
+        }
     }
 
     QENTEM_INLINE void WriteAt(const SizeT index, const Char_T *str, const SizeT length) {
@@ -497,20 +507,6 @@ struct StringStream {
 
     QENTEM_INLINE void setCapacity(const SizeT new_capacity) noexcept {
         capacity_ = new_capacity;
-    }
-
-    void write(const Char_T *str, const SizeT length) {
-        if (length != 0) {
-            const SizeT new_length = (Length() + length);
-
-            if (Capacity() < new_length) {
-                expand(new_length * ExpandFactor);
-            }
-
-            MemoryUtils::CopyTo((Storage() + Length()), str, length);
-
-            setLength(new_length);
-        }
     }
 
     void expand(const SizeT new_capacity) {
