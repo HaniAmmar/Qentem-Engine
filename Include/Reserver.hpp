@@ -92,12 +92,12 @@ struct ReserverCore {
      * Begins with a smaller-than-target block to allow gradual scaling.
      * Each block obtained is internally subdivided, zero-overhead, and alignment-aware.
      */
-    ReserverCore() noexcept {
+    QENTEM_INLINE ReserverCore() noexcept {
         static_assert(Alignment_T >= sizeof(void *),
                       "Alignment_T must be at least the size of a pointer to ensure correct placement.");
     }
 
-    ~ReserverCore() noexcept {
+    QENTEM_INLINE ~ReserverCore() noexcept {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
         for (auto &block : blocks_) {
             MemoryRecord::ReleasedBlock(block.Capacity());
@@ -131,7 +131,7 @@ struct ReserverCore {
      * @note The size must already be aligned. Use `RoundUpBytes<T>()` before calling.
      */
     template <SizeT32 CustomAlignment_T = Alignment_T>
-    QENTEM_INLINE void *Reserve(SystemIntType size) {
+    void *Reserve(SystemIntType size) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
         // Optionally track memory usage for debugging/statistics.
         MemoryRecord::Reserved(size);
@@ -330,7 +330,7 @@ struct ReserverCore {
      *
      * @return True if no reserved memory exists, false otherwise.
      */
-    bool IsEmpty() const noexcept {
+    QENTEM_INLINE bool IsEmpty() const noexcept {
         // Scan all active blocks. Any used memory voids emptiness.
         for (const auto &block : blocks_) {
             if (!(block.IsEmpty())) {
@@ -351,7 +351,7 @@ struct ReserverCore {
      *
      * MemoryRecord hooks (if enabled) report the total release for audit.
      */
-    void Reset() noexcept {
+    QENTEM_INLINE void Reset() noexcept {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
         for (const auto &block : blocks_) {
             MemoryRecord::ReleasedBlock(block.Capacity());
@@ -378,7 +378,7 @@ struct ReserverCore {
      *
      * @return Total count of both active and exhausted memory blocks.
      */
-    SizeT TotalBlocks() const noexcept {
+    QENTEM_INLINE SizeT TotalBlocks() const noexcept {
         return (blocks_.Size() + exhausted_blocks_.Size());
     }
 
@@ -390,7 +390,7 @@ struct ReserverCore {
      *
      * @return Reference to the array of active blocks.
      */
-    const LiteArray<MemoryBlockT> &GetBlocks() const noexcept {
+    QENTEM_INLINE const LiteArray<MemoryBlockT> &GetBlocks() const noexcept {
         return blocks_;
     }
 
@@ -403,7 +403,7 @@ struct ReserverCore {
      *
      * @return Reference to the array of exhausted blocks.
      */
-    const LiteArray<MemoryBlockT> &GetExhaustedBlocks() const noexcept {
+    QENTEM_INLINE const LiteArray<MemoryBlockT> &GetExhaustedBlocks() const noexcept {
         return exhausted_blocks_;
     }
 
@@ -705,7 +705,7 @@ struct Reserver {
      * @see getReservers
      */
     template <typename Type_T>
-    QENTEM_INLINE static void Release(Type_T *ptr, SystemIntType size) noexcept {
+    static void Release(Type_T *ptr, SystemIntType size) noexcept {
         if (ptr != nullptr) {
             Core &instance = GetCurrentInstance();
             size           = RoundUpBytes<Type_T>(size);
@@ -756,7 +756,7 @@ struct Reserver {
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    QENTEM_INLINE static void Shrink(Type_T *ptr, SystemIntType from_size, SystemIntType to_size) noexcept {
+    static void Shrink(Type_T *ptr, SystemIntType from_size, SystemIntType to_size) noexcept {
         if (ptr != nullptr) {
             Core &instance = GetCurrentInstance();
             from_size      = RoundUpBytes<Type_T>(from_size);

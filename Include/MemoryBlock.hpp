@@ -43,7 +43,7 @@ struct MemoryBlock {
     static constexpr SystemIntType ALIGNMENT_M1        = static_cast<SystemIntType>(Alignment_T - 1U);
     static constexpr SystemIntType ALIGNMENT_N         = ~ALIGNMENT_M1;
 
-    MemoryBlock() noexcept                      = default;
+    QENTEM_INLINE MemoryBlock() noexcept        = default;
     MemoryBlock(const MemoryBlock &)            = delete;
     MemoryBlock &operator=(const MemoryBlock &) = delete;
 
@@ -57,7 +57,7 @@ struct MemoryBlock {
      *
      * @param capacity Minimum number of bytes to reserve (may be rounded up).
      */
-    QENTEM_INLINE explicit MemoryBlock(SystemIntType capacity) noexcept : capacity_{capacity} {
+    explicit MemoryBlock(SystemIntType capacity) noexcept : capacity_{capacity} {
         static_assert((Alignment_T > 0) && ((Alignment_T & (Alignment_T - 1)) == 0),
                       "Alignment_T must be power-of-two");
 
@@ -248,7 +248,7 @@ struct MemoryBlock {
      * Final table entry is masked to prevent allocation beyond usable capacity,
      * accounting for padding and unusable tail regions.
      */
-    QENTEM_INLINE void ClearTable() noexcept {
+    void ClearTable() noexcept {
         SystemIntType      *table         = static_cast<SystemIntType *>(base_);
         const SystemIntType table_size_m1 = (table_size_ - SystemIntType{1});
         const SystemIntType table_mask =
@@ -338,7 +338,7 @@ struct MemoryBlock {
     }
 
   private:
-    void release() {
+    QENTEM_INLINE void release() {
         if (base_raw_ != nullptr) {
             SystemMemory::Release(base_raw_, capacity_);
         }
