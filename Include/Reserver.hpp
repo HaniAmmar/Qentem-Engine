@@ -278,8 +278,8 @@ struct ReserverCore {
      * @return True if the shrink operation succeeded and memory was reclaimed; false otherwise.
      */
     bool Shrink(void *ptr, SystemIntType from_size, SystemIntType to_size) {
-        char               *c_ptr = (static_cast<char *>(ptr) + to_size);
-        const SystemIntType diff  = (from_size - to_size);
+        char               *shrink_from = (static_cast<char *>(ptr) + to_size);
+        const SystemIntType diff        = (from_size - to_size);
 
         // Phase 1: Search within active blocks.
         for (auto &block : blocks_) {
@@ -289,7 +289,7 @@ struct ReserverCore {
 #endif
 
                 block.IncreaseAvailable(diff);
-                block.ReleaseRegion(c_ptr, (diff >> block.DefaultAlignmentBit()));
+                block.ReleaseRegion(shrink_from, (diff >> block.DefaultAlignmentBit()));
 
                 return true;
             }
@@ -306,7 +306,7 @@ struct ReserverCore {
 
                 if (ptr >= block.Data()) {
                     // Has table
-                    block.ReleaseRegion(c_ptr, (diff >> block.DefaultAlignmentBit()));
+                    block.ReleaseRegion(shrink_from, (diff >> block.DefaultAlignmentBit()));
                     reattachBlock(&block);
                 }
 
