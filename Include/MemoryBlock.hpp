@@ -302,6 +302,24 @@ struct MemoryBlock {
         return ptr;
     }
 
+    void ReserveRegion(SystemIntType table_index, SystemIntType bit_index, SystemIntType chunks) noexcept {
+        SystemIntType *table = static_cast<SystemIntType *>(Base());
+        SystemIntType  mask  = MAX_SYSTEM_INT_TYPE;
+        mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
+        mask >>= bit_index;
+        table[table_index] |= mask;
+
+        chunks += bit_index;
+
+        while (chunks > BIT_WIDTH) {
+            chunks -= BIT_WIDTH;
+            mask = MAX_SYSTEM_INT_TYPE;
+            mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
+            ++table_index;
+            table[table_index] |= mask;
+        }
+    }
+
     /**
      * @brief Releases a previously reserved memory region.
      *
@@ -312,12 +330,12 @@ struct MemoryBlock {
      * @param chunks Number of chunks originally reserved.
      */
     void ReleaseRegion(void *ptr, SystemIntType chunks) noexcept {
-        SystemIntType *table    = static_cast<SystemIntType *>(Base());
-        SystemIntType bit_index = (static_cast<SystemIntType>(static_cast<char *>(ptr) - static_cast<char *>(Data())) >>
-                                   DefaultAlignmentBit());
+        SystemIntType *table = static_cast<SystemIntType *>(Base());
+        SystemIntType  table_index;
+        SystemIntType  bit_index;
 
-        SystemIntType table_index = (bit_index >> TableFirstBit());
-        bit_index -= (table_index << TableFirstBit());
+        DecodeBitmapPosition(static_cast<SystemIntType>(static_cast<char *>(ptr) - static_cast<char *>(Data())),
+                             table_index, bit_index);
 
         SystemIntType mask = MAX_SYSTEM_INT_TYPE;
         mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
@@ -335,6 +353,31 @@ struct MemoryBlock {
             ++table_index;
             table[table_index] &= ~mask;
         }
+    }
+
+    /**
+     * @brief Decodes a relative pointer offset into its corresponding bitmap coordinates.
+     *
+     * This function calculates the exact bit-level location within the allocation bitmap
+     * where a memory region begins. The pointer offset is first aligned to the allocation
+     * unit size, then split into:
+     * - `table_index`: the index of the 64-bit word in the bitmap table.
+     * - `bit_index`: the bit offset within that word.
+     *
+     * @param ptr_int     The relative pointer offset (i.e., `ptr - block.Data()`).
+     * @param table_index [out] Index into the bitmap table (each entry is a 64-bit word).
+     * @param bit_index   [out] Bit offset within the selected word.
+     */
+    QENTEM_INLINE static void DecodeBitmapPosition(SystemIntType ptr_int, SystemIntType &table_index,
+                                                   SystemIntType &bit_index) {
+        // Convert byte offset into allocation unit index.
+        bit_index = (ptr_int >> DefaultAlignmentBit());
+
+        // Divide bit index by BIT_WIDTH (i.e., 64) to find table word index.
+        table_index = (bit_index >> TableFirstBit());
+
+        // Compute residual bit position within the selected 64-bit word.
+        bit_index -= (table_index << TableFirstBit());
     }
 
   private:
