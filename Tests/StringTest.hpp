@@ -136,6 +136,11 @@ static void TestString1(QTest &test) {
     str_size_2.Adopt(tmp_size_2, SizeT{0}, SizeT{2});
 
     test.IsEqual(str_size_2.First(), tmp_size_2, __LINE__);
+
+    str2.Reset();
+    str2.Reserve(16);
+    str2.Reserve(64);
+    test.IsTrue(str2.Capacity() >= SizeT{64}, __LINE__);
 }
 
 static void TestStringCompare(QTest &test) {

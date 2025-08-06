@@ -448,6 +448,11 @@ static void TestStringStream2(QTest &test) {
 
     test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
     test.IsEqual(stream, "0123456789", __LINE__);
+
+    stream.Reset();
+    stream.Reserve(64);
+    stream.Reserve(128);
+    test.IsTrue(stream.Capacity() >= SizeT{128}, __LINE__);
 }
 
 static int RunStringStreamTests() {

@@ -249,7 +249,7 @@ struct StringStream {
             setLength(0);
 
             if (capacity > Capacity()) {
-                reserve(capacity);
+                expand(capacity);
             } else if (capacity < Capacity()) {
                 capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity) / sizeof(Char_T));
                 Reserver::Shrink(Storage(), Capacity(), capacity);
@@ -517,7 +517,13 @@ struct StringStream {
         capacity_ = new_capacity;
     }
 
-    void expand(const SizeT new_capacity) {
+    void expand(SizeT new_capacity) {
+        if (Reserver::TryExpand(Storage(), Capacity(), new_capacity)) {
+            new_capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(new_capacity) / sizeof(Char_T));
+            setCapacity(new_capacity);
+            return;
+        }
+
         Char_T *old_storage  = Storage();
         SizeT   old_capacity = Capacity();
 

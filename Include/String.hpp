@@ -290,7 +290,7 @@ struct String {
             setLength(0);
 
             if (capacity > Capacity()) {
-                reserve(capacity);
+                expand(capacity);
             } else if (capacity < Capacity()) {
                 capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity + SizeT{1}) / sizeof(Char_T));
                 Reserver::Shrink(Storage(), Capacity(), capacity);
@@ -596,6 +596,13 @@ struct String {
     }
 
     void expand(SizeT new_capacity) {
+        if (Reserver::TryExpand(Storage(), Capacity(), new_capacity + SizeT{1})) {
+            new_capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(new_capacity + SizeT{1}) / sizeof(Char_T));
+            --new_capacity;
+            setCapacity(new_capacity);
+            return;
+        }
+
         Char_T *old_storage  = Storage();
         SizeT   old_capacity = Capacity();
 
