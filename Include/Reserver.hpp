@@ -967,6 +967,8 @@ struct Reserver {
 
             return true;
         }
+
+        return false;
     }
 
     /**
