@@ -171,12 +171,10 @@ static void TestArray1(QTest &test) {
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotEqual(numbers1.First(), storage, __LINE__);
 
-    storage = numbers1.First();
     numbers1 += QUtility::Move(numbers2);
     test.IsEqual(numbers1.Size(), 13U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 13U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
-    test.IsNotEqual(numbers1.First(), storage, __LINE__);
     test.IsEqual(numbers2.Size(), 0U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 0U, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
