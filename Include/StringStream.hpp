@@ -343,7 +343,7 @@ struct StringStream {
         if (index < Length()) {
             const SizeT new_length = (Length() + SizeT{1});
 
-            if (new_length <= Capacity()) {
+            if ((new_length <= Capacity()) || tryInplaceExpand(new_length)) {
                 // Enough capacity, shift tail right by one, insert in-place.
                 Char_T *storage = Storage();
 
@@ -389,7 +389,7 @@ struct StringStream {
             const SizeT old_length = Length();
             const SizeT new_length = (old_length + shift);
 
-            if (new_length <= Capacity()) {
+            if ((new_length <= Capacity()) || tryInplaceExpand(new_length)) {
                 // Enough capacity, shift in place (backwards to avoid overlap).
                 Char_T *storage = Storage();
                 SizeT   offset  = old_length;
@@ -518,9 +518,7 @@ struct StringStream {
     }
 
     void expand(SizeT new_capacity) {
-        if (Reserver::TryExpand(Storage(), Capacity(), new_capacity)) {
-            new_capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(new_capacity) / sizeof(Char_T));
-            setCapacity(new_capacity);
+        if (tryInplaceExpand(new_capacity)) {
             return;
         }
 
@@ -531,6 +529,16 @@ struct StringStream {
 
         MemoryUtils::CopyTo(Storage(), old_storage, Length());
         release(old_storage, old_capacity);
+    }
+
+    bool tryInplaceExpand(SizeT new_capacity) {
+        if (Reserver::TryExpand(Storage(), Capacity(), new_capacity)) {
+            new_capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(new_capacity) / sizeof(Char_T));
+            setCapacity(new_capacity);
+            return true;
+        }
+
+        return false;
     }
 
     void reserve(SizeT capacity) {
