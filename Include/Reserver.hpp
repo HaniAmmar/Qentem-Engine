@@ -322,6 +322,56 @@ struct ReserverCore {
     }
 
     /**
+     * @brief Attempts to expand a previously reserved region in-place.
+     *
+     * This function checks whether the allocation pointed to by `ptr` can be
+     * safely expanded from `from_size` to `to_size` **without relocation**.
+     * It searches all local memory blocks to find the containing region and
+     * verifies whether the additional memory following the allocation is
+     * available for immediate reservation.
+     *
+     * If the expansion succeeds:
+     * - The additional region is marked as reserved.
+     * - The available space in the block is reduced.
+     * - MemoryRecord::Expand is called (if enabled).
+     *
+     * If the expansion fails:
+     * - The allocation remains unchanged.
+     * - The function returns `from_size` to signal no growth occurred.
+     *
+     * If the pointer is not recognized (not within any known block):
+     * - Returns 0 to indicate an invalid or external pointer.
+     *
+     * @param ptr        Pointer to the beginning of an existing allocation.
+     * @param from_size  The current size of the allocation (in bytes).
+     * @param to_size    The desired expanded size of the allocation (in bytes).
+     * @return The new size of the allocation if expanded successfully,
+     *         `from_size` if expansion failed, or 0 if the pointer is unrecognized.
+     */
+    SystemIntType TryExpand(void *ptr, SystemIntType from_size, SystemIntType to_size) {
+        const SystemIntType diff = (to_size - from_size);
+
+        for (auto &block : blocks_) {
+            if ((ptr >= block.Data()) && (ptr < block.End())) {
+                if (reserveAt(&block, (static_cast<char *>(ptr) + from_size),
+                              (diff >> MemoryBlockT::DefaultAlignmentBit()))) {
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+                    MemoryRecord::Expand(diff);
+#endif
+                    block.DecreaseAvailable(diff);
+
+                    return to_size;
+                }
+
+                return from_size;
+            }
+        }
+
+        // Unknown origin — pointer does not belong to any known region.
+        return 0;
+    }
+
+    /**
      * @brief Determines whether all memory blocks are currently unused.
      *
      * This check ensures that:
@@ -528,6 +578,89 @@ struct ReserverCore {
         }
 
         return nullptr;
+    }
+
+    /**
+     * @brief Attempts to reserve a specific region within a memory block at the given pointer.
+     *
+     * This function checks if `chunks` contiguous allocation units can be reserved
+     * starting precisely at `ptr`. It decodes the pointer into bitmap coordinates,
+     * scans forward through the bitmap to verify availability, and reserves the region
+     * if sufficient space is found. No relocation or shifting occurs — this is a strictly
+     * in-place reservation.
+     *
+     * Typical usage: expanding an allocation in-place (e.g., via `TryExpand()`).
+     *
+     * @param block   Pointer to the memory block to operate on.
+     * @param ptr     The exact address at which the new region must begin.
+     * @param chunks  The number of allocation units (aligned blocks) to reserve.
+     * @return true if the region was successfully reserved; false otherwise.
+     */
+    bool reserveAt(MemoryBlockT *block, void *ptr, SystemIntType chunks) {
+        constexpr SizeT32 bit_width_m1 = (BIT_WIDTH - 1U);
+
+        SystemIntType *table = static_cast<SystemIntType *>(block->Base());
+        SystemIntType  table_index;
+        SystemIntType  shifted;
+
+        MemoryBlockT::DecodeBitmapPosition(
+            static_cast<SystemIntType>(static_cast<char *>(ptr) - static_cast<char *>(block->Data())), table_index,
+            shifted);
+
+        const SystemIntType start_index = table_index;
+        const SystemIntType start_bit   = shifted;
+        SystemIntType       current     = table[table_index];
+        SystemIntType       available   = (BIT_WIDTH - shifted);
+
+        current = ~current;
+        current <<= shifted;
+        current = ~current;
+
+        if (current != 0) {
+            shifted = (bit_width_m1 - Platform::FindLastBit(current));
+
+            if (shifted >= chunks) {
+                block->ReserveRegion(start_index, start_bit, chunks);
+                return true;
+            }
+
+            if ((shifted + start_bit) != BIT_WIDTH) {
+                return false;
+            }
+
+            available = shifted;
+        }
+
+        const SystemIntType table_size = block->TableSize();
+
+        ++table_index;
+
+        while (table_index < table_size) {
+            current = table[table_index];
+
+            if (current == 0) {
+                available += BIT_WIDTH;
+
+                if (available >= chunks) {
+                    block->ReserveRegion(start_index, start_bit, chunks);
+                    return true;
+                }
+
+                ++table_index;
+                continue;
+            }
+
+            available += (bit_width_m1 - Platform::FindLastBit(current));
+
+            if (available >= chunks) {
+                block->ReserveRegion(start_index, start_bit, chunks);
+                return true;
+            }
+
+            return false;
+        }
+
+        return false;
     }
 
     /**
@@ -782,6 +915,57 @@ struct Reserver {
                 instance.Shrink(ptr, from_size, to_size);
 #endif
             }
+        }
+    }
+
+    /**
+     * @brief Attempt to expand a previously reserved region in-place.
+     *
+     * This performs an in-place expansion of memory from `from_size` to `to_size`,
+     * provided the additional memory directly after `ptr` is free. No relocation
+     * occurs. If expansion is not possible, the original reservation remains untouched.
+     *
+     * @param ptr        Pointer to the existing allocation.
+     * @param from_size  Current allocation size in bytes.
+     * @param to_size    Desired allocation size in bytes.
+     * @return true if the allocation was expanded in-place; false otherwise.
+     */
+    template <typename Type_T>
+    static bool TryExpand(Type_T *ptr, SystemIntType from_size, SystemIntType to_size) noexcept {
+        if (ptr != nullptr) {
+            Core &instance = GetCurrentInstance();
+            from_size      = RoundUpBytes<Type_T>(from_size);
+            to_size        = RoundUpBytes<Type_T>(to_size);
+
+            if (from_size < to_size) {
+#if defined(__linux__) || defined(_WIN32)
+                // Prefer returning to the current arena.
+
+                const SystemIntType new_size = instance.TryExpand(ptr, from_size, to_size);
+
+                if (new_size == to_size) {
+                    return true;
+                }
+
+                if (new_size == 0) {
+                    // Attempt return to a sibling arena (cross-core recovery).
+                    LiteArray<Core> &reservers = getReservers();
+
+                    for (auto &reserver : reservers) {
+                        if ((&reserver != &instance) && reserver.TryExpand(ptr, from_size, to_size) == to_size) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+#else
+                // Single-arena fallback path.
+                return (instance.TryExpand(ptr, from_size, to_size) == to_size);
+#endif
+            }
+
+            return true;
         }
     }
 

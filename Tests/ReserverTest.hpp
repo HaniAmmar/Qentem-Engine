@@ -29,7 +29,6 @@
 namespace Qentem {
 namespace Test {
 
-QENTEM_MAYBE_UNUSED
 static void TestReserver1(QTest &test) {
     constexpr SizeT32 size      = (sizeof(void *) * 2);
     constexpr SizeT32 page_size = 4096;
@@ -54,7 +53,6 @@ static void TestReserver1(QTest &test) {
     test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
 }
 
-QENTEM_MAYBE_UNUSED
 static void TestReserver2(QTest &test) {
     constexpr SizeT32 size      = (sizeof(void *) * 2);
     constexpr SizeT32 page_size = 4096;
@@ -81,7 +79,6 @@ static void TestReserver2(QTest &test) {
     test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
 }
 
-QENTEM_MAYBE_UNUSED
 static void TestReserver3(QTest &test) {
     ReserverCore<> r{};
     void          *var1;
@@ -120,17 +117,16 @@ static void TestReserver3(QTest &test) {
     test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
 }
 
-QENTEM_MAYBE_UNUSED
 static void TestReserverShrink(QTest &test) {
     // Initialize Reserver with 4 KiB block size and 16-byte alignment.
-    ReserverCore<16, 4 * 1024> r{};
+    ReserverCore<16, (4 * 1024)> r{};
 
     char *var1;
     char *var2;
 
     // Allocate 48 bytes and shrink it to 16 bytes.
     var1 = static_cast<char *>(r.Reserve(48));
-    r.Shrink(var1, 48, 16);
+    test.IsTrue(r.Shrink(var1, 48, 16), __LINE__);
 
     // Allocate 16 bytes — it should reuse the tail of the shrunk region.
     var2 = static_cast<char *>(r.Reserve(16));
@@ -150,7 +146,7 @@ static void TestReserverShrink(QTest &test) {
     var1               = static_cast<char *>(r.Reserve(max));
 
     // Shrink the large allocation by half.
-    r.Shrink(var1, max, half);
+    test.IsTrue(r.Shrink(var1, max, half), __LINE__);
 
     test.IsFalse(r.IsEmpty(), __LINE__);
     test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
@@ -171,6 +167,68 @@ static void TestReserverShrink(QTest &test) {
     test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
 }
 
+static void TestReserverExpand(QTest &test) {
+    ReserverCore<16, (8 * 1024)> r{};
+    constexpr SystemIntType      full_bit_region = sizeof(void *) * 8 * 16;
+
+    char *var1;
+    char *var2;
+
+    var1 = static_cast<char *>(r.Reserve(16));
+    test.IsEqual(r.TryExpand(var1, 16, 32), SystemIntType{32}, __LINE__);
+    r.Release(var1, 32);
+    test.IsTrue(r.IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(r.Reserve(64));
+    test.IsEqual(r.TryExpand(var1, 64, 128), SystemIntType{128}, __LINE__);
+    r.Release(var1, 128);
+    test.IsTrue(r.IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(r.Reserve(full_bit_region - 16));
+    test.IsEqual(r.TryExpand(var1, (full_bit_region - 16), full_bit_region), full_bit_region, __LINE__);
+    test.IsEqual(r.TryExpand(var1, full_bit_region, (full_bit_region * 2)), SystemIntType(full_bit_region * 2),
+                 __LINE__);
+    r.Release(var1, full_bit_region * 2);
+    test.IsTrue(r.IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(r.Reserve(64));
+    var2 = static_cast<char *>(r.Reserve(64));
+
+    test.IsTrue(r.Shrink(var1, 64, 16), __LINE__);
+    test.IsEqual(r.TryExpand(var1, 16, 128), SystemIntType{16}, __LINE__);
+    test.IsTrue(r.TryExpand(var1, 16, 64), __LINE__);
+    r.Release(var1, 64);
+    r.Release(var2, 64);
+    test.IsTrue(r.IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(r.Reserve(full_bit_region / 2));
+    test.IsEqual(r.TryExpand(var1, (full_bit_region / 2), ((full_bit_region / 2) + full_bit_region)),
+                 ((full_bit_region / 2) + full_bit_region), __LINE__);
+    r.Release(var1, ((full_bit_region / 2) + full_bit_region));
+    test.IsTrue(r.IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(r.Reserve(2 * 1024));
+    var2 = static_cast<char *>(r.Reserve(2 * 1024));
+
+    test.IsTrue(r.Shrink(var1, 2 * 1024, 16), __LINE__);
+    test.IsEqual(r.TryExpand(var1, 16, 2 * 1024), SystemIntType{2 * 1024}, __LINE__);
+
+    r.Release(var1, 2 * 1024);
+    r.Release(var2, 2 * 1024);
+
+    var1 = static_cast<char *>(r.Reserve(((2 * 1024) + 512)));
+    var2 = static_cast<char *>(r.Reserve(1536));
+
+    test.IsTrue(r.Shrink(var1, ((2 * 1024) + 512), 512), __LINE__);
+    test.IsEqual(r.TryExpand(var1, 512, ((2 * 1024) + 512)), SystemIntType((2 * 1024) + 512), __LINE__);
+
+    r.Release(var2, 1536);
+    r.Release(var1, ((2 * 1024) + 512));
+
+    test.IsTrue(r.IsEmpty(), __LINE__);
+    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
+}
+
 static int RunReserverTests() {
     QTest test{"Reserver.hpp", __FILE__};
 
@@ -180,6 +238,7 @@ static int RunReserverTests() {
     test.Test("Reserver Test 2", TestReserver2);
     test.Test("Reserver Test 3", TestReserver3);
     test.Test("Reserver Test Shrink", TestReserverShrink);
+    test.Test("Reserver Test Expand", TestReserverExpand);
 
     return test.EndTests();
 }
