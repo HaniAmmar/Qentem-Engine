@@ -279,6 +279,7 @@ struct HashTable {
                     storage_item->MoveDoublecat(*src_item);
                 }
             }
+
             ++src_item;
         }
 
@@ -318,6 +319,7 @@ struct HashTable {
                 if (storage_item == nullptr) {
                     storage_item = insert(index, *src_item);
                 }
+
                 storage_item->CopyValue(*src_item);
             }
             ++src_item;
@@ -929,62 +931,6 @@ struct HashTable {
     }
 
     /**
-     * @brief Reset all hash roots and collision links to the sentinel value.
-     *
-     * Postion is used as the root slot for each hash bucket,
-     * Next is used for chaining. 'value' is always Capacity() here,
-     * which acts as the invalid index marker.
-     */
-    QENTEM_INLINE static void resetLinks(HItem_T *item, const HItem_T *end, SizeT value) {
-        while (item < end) {
-            item->Position = value;
-            item->Next     = value;
-            ++item;
-        }
-    }
-
-    /**
-     * @brief Reserves storage for the hash table and item array.
-     *
-     * Requests a contiguous memory block large enough to contain both
-     * the hash table and the item storage.
-     *
-     * @param capacity Number of items to reserve space for.
-     * @return Pointer to the first item slot (immediately after hash table).
-     */
-    QENTEM_INLINE HItem_T *reserve(SizeT capacity) {
-        HItem_T *storage = reserveOnly(capacity); // reserves raw memory and updates capacity_
-
-        resetLinks(storage, (storage + Capacity()), Capacity());
-
-        // Item storage comes directly after hash table in memory.
-        return storage;
-    }
-
-    /**
-     * @brief Reserves a contiguous memory block for the hash table.
-     *
-     * This reserves enough space for both the hash buckets and the item array.
-     * The block is arranged as [hash table | items], enabling
-     * cache-friendly access and efficient pointer arithmetic.
-     *
-     * @param capacity The number of items to reserve.
-     * @return Pointer to the start of the hash table segment.
-     */
-    HItem_T *reserveOnly(SizeT capacity) {
-        capacity = MemoryUtils::AlignToPow2(capacity);
-
-        setCapacity(capacity); // Record new capacity
-
-        // Reserve a single block for [hash table][items]
-        HItem_T *storage = Reserver::Reserve<HItem_T>(capacity);
-
-        setStorage(storage); // Set hash table pointer
-
-        return storage; // Return pointer to start of hash table
-    }
-
-    /**
      * @brief Set the internal hash table pointer.
      *
      * @param ptr Pointer to the start of the hash table segment.
@@ -1018,47 +964,6 @@ struct HashTable {
      */
     QENTEM_INLINE void setCapacity(const SizeT capacity) noexcept {
         capacity_ = capacity;
-    }
-
-    /**
-     * @brief Reserves a new storage block and migrates all live items into it.
-     *
-     * When increasing size, a fresh memory region is reserved, all live entries (where Hash ≠ 0)
-     * are migrated, and the hash table is rebuilt accordingly. Deleted or empty keys
-     * are excluded from the transfer.
-     *
-     * The previous storage is released after migration.
-     *
-     * @param new_size The new capacity (number of items) to reserve.
-     */
-    void resize(const SizeT new_size) {
-        HItem_T       *old_storage  = Storage();
-        HItem_T       *item         = old_storage; // Pointer to old item storage
-        const SizeT    old_capacity = Capacity();
-        const HItem_T *end          = (old_storage + Size()); // End of old storage
-        HItem_T       *new_item     = reserve(new_size);      // Reserve a new storage+table
-
-        setSize(0); // Reset size to repopulate with only live entries
-
-        while (item < end) {
-            if (item->Hash != 0) { // Only copy live items
-                new_item->Construct(QUtility::Move(*item));
-                ++new_item;
-                ++size_; // Increment current count
-            }
-
-            ++item;
-        }
-
-        release(old_storage, old_capacity); // Free old hash table+storage
-        generateHash();                     // Rebuild hash table from migrated entries
-    }
-
-    /**
-     * @brief Double the capacity of the table, growing it to the next aligned power of two.
-     */
-    QENTEM_INLINE void expand() {
-        resize(Capacity() * SizeT{2});
     }
 
     /**
@@ -1518,6 +1423,98 @@ struct HashTable {
             ++i;
             ++item;
         }
+    }
+
+    /**
+     * @brief Reset all hash roots and collision links to the sentinel value.
+     *
+     * Postion is used as the root slot for each hash bucket,
+     * Next is used for chaining. 'value' is always Capacity() here,
+     * which acts as the invalid index marker.
+     */
+    QENTEM_INLINE static void resetLinks(HItem_T *item, const HItem_T *end, SizeT value) {
+        while (item < end) {
+            item->Position = value;
+            item->Next     = value;
+            ++item;
+        }
+    }
+
+    /**
+     * @brief Reserves storage for the hash table and item array.
+     *
+     * Requests a contiguous memory block large enough to contain both
+     * the hash table and the item storage.
+     *
+     * @param capacity Number of items to reserve space for.
+     * @return Pointer to the first item slot (immediately after hash table).
+     */
+    QENTEM_INLINE HItem_T *reserve(SizeT capacity) {
+        HItem_T *storage = reserveOnly(capacity); // reserves raw memory and updates capacity_
+        resetLinks(storage, (storage + Capacity()), Capacity());
+
+        return storage;
+    }
+
+    /**
+     * @brief Reserves a contiguous memory block for the hash table.
+     *
+     * This reserves enough space for both the hash buckets and the item array.
+     * The block is arranged as [hash table | items], enabling
+     * cache-friendly access and efficient pointer arithmetic.
+     *
+     * @param capacity The number of items to reserve.
+     * @return Pointer to the start of the hash table segment.
+     */
+    HItem_T *reserveOnly(SizeT capacity) {
+        capacity         = MemoryUtils::AlignToPow2(capacity);
+        HItem_T *storage = Reserver::Reserve<HItem_T>(capacity);
+
+        setCapacity(capacity); // Record new capacity
+        setStorage(storage);   // Set hash table pointer
+
+        return storage; // Return pointer to start of hash table
+    }
+
+    /**
+     * @brief Reserves a new storage block and migrates all live items into it.
+     *
+     * When increasing size, a fresh memory region is reserved, all live entries (where Hash ≠ 0)
+     * are migrated, and the hash table is rebuilt accordingly. Deleted or empty keys
+     * are excluded from the transfer.
+     *
+     * The previous storage is released after migration.
+     *
+     * @param new_size The new capacity (number of items) to reserve.
+     */
+    void resize(const SizeT new_size) {
+        HItem_T       *old_storage  = Storage();
+        HItem_T       *item         = old_storage; // Pointer to old item storage
+        const SizeT    old_capacity = Capacity();
+        const HItem_T *end          = (old_storage + Size()); // End of old storage
+        HItem_T       *new_item     = reserve(new_size);      // Reserve a new storage+table
+
+        setSize(0); // Reset size to repopulate with only live entries
+
+        while (item < end) {
+            if (item->Hash != 0) { // Only copy live items
+                new_item->Construct(QUtility::Move(*item));
+                ++new_item;
+                ++size_; // Increment current count
+            }
+
+            ++item;
+        }
+
+        release(old_storage, old_capacity); // Free old hash table+storage
+        generateHash();                     // Rebuild hash table from migrated entries
+    }
+
+    /**
+     * @brief Double the capacity of the table, growing it to the next aligned power of two.
+     */
+    QENTEM_INLINE void expand() {
+        resize(Capacity() * SizeT{2});
     }
 
     QENTEM_INLINE static void release(HItem_T *storage, SizeT capacity) {
