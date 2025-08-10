@@ -926,7 +926,7 @@ static void TestHArray9(QTest &test) {
         test.IsNull(list.GetValue(key), __LINE__);
     }
 
-    // No clear
+    list.Reorder();
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");

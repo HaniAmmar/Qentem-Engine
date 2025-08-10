@@ -127,8 +127,9 @@ struct HashTable {
      *
      * @param capacity Initial capacity (number of items to prepare for).
      */
-    QENTEM_INLINE explicit HashTable(const SizeT capacity) {
+    QENTEM_INLINE explicit HashTable(SizeT capacity) {
         if (capacity != 0) {
+            capacity = MemoryUtils::AlignToPow2(capacity);
             reserve(capacity);
         }
     }
@@ -236,7 +237,25 @@ struct HashTable {
             setCapacity(0);
 
             // Deep copy all items and hash table layout from src.
-            copyTable(src);
+            if (src.IsNotEmpty()) {
+                const HItem_T *src_item = src.First();
+                const HItem_T *src_end  = (src_item + src.Size());
+                HItem_T       *new_item = reserve(MemoryUtils::AlignToPow2(src.Size()));
+                SizeT          index{0};
+
+                do {
+                    if (src_item->Hash != 0) { // Only copy valid entries
+                        new_item->Construct(*src_item);
+                        ++new_item;
+                        ++index;
+                    }
+
+                    ++src_item;
+                } while (src_item < src_end);
+
+                setSize(index); // Set the new item count
+                generateHash(); // Rebuild hash links for new memory block
+            }
 
             // Destruct of the old memory (after transfer, in case of derived/child arrays).
             MemoryUtils::Destruct(storage, (storage + size));
@@ -700,6 +719,7 @@ struct HashTable {
             if (old_size != Size()) {
                 HItem_T    *storage      = Storage();
                 const SizeT old_capacity = Capacity();
+
                 setCapacity(MemoryUtils::AlignToPow2(Size()));
                 resetLinks(storage, (storage + Capacity()), Capacity());
                 generateHash();
@@ -1334,37 +1354,6 @@ struct HashTable {
         return nullptr;
     }
 
-    /**
-     * @brief Deep-copies all valid items from another hash table, rebuilding internal links.
-     *
-     * Allocates new storage with capacity equal to src.Size(), and selectively copies
-     * valid entries (where Hash ≠ 0) using Construct(). Linkage fields are re-generated
-     * after all items are placed. Used for assignment and bulk copy.
-     *
-     * @param[in] src The source hash table to copy from.
-     */
-    void copyTable(const HashTable &src) {
-        if (src.IsNotEmpty()) {
-            const HItem_T *src_item = src.First();
-            const HItem_T *src_end  = (src_item + src.Size());
-            HItem_T       *new_item = reserve(src.Size());
-            SizeT          index{0};
-
-            do {
-                if (src_item->Hash != 0) { // Only copy valid entries
-                    new_item->Construct(*src_item);
-                    ++new_item;
-                    ++index;
-                }
-
-                ++src_item;
-            } while (src_item < src_end);
-
-            setSize(index); // Set the new item count
-            generateHash(); // Rebuild hash links for new memory block
-        }
-    }
-
     QENTEM_INLINE void reorder() {
         HItem_T    *storage  = Storage(); // Pointer to start of item storage array
         SizeT       index    = 0;         // Current scan position in the array
@@ -1467,7 +1456,6 @@ struct HashTable {
      * @return Pointer to the start of the hash table segment.
      */
     HItem_T *reserveOnly(SizeT capacity) {
-        capacity         = MemoryUtils::AlignToPow2(capacity);
         HItem_T *storage = Reserver::Reserve<HItem_T>(capacity);
 
         setCapacity(capacity); // Record new capacity
@@ -1487,27 +1475,35 @@ struct HashTable {
      *
      * @param new_size The new capacity (number of items) to reserve.
      */
-    void expand(const SizeT new_size) {
-        HItem_T       *old_storage  = Storage();
-        HItem_T       *item         = old_storage; // Pointer to old item storage
-        const SizeT    old_capacity = Capacity();
-        const HItem_T *end          = (old_storage + Size()); // End of old storage
-        HItem_T       *new_item     = reserve(new_size);      // Reserve a new storage+table
+    void expand(SizeT new_capacity) {
+        HItem_T *storage = Storage();
+        new_capacity     = MemoryUtils::AlignToPow2(new_capacity);
 
-        setSize(0); // Reset size to repopulate with only live entries
+        if (Reserver::TryExpand(storage, Capacity(), new_capacity)) {
+            setCapacity(new_capacity);
+            resetLinks(storage, (storage + Capacity()), Capacity());
+        } else {
+            HItem_T       *item         = storage;               // Pointer to old item storage
+            const HItem_T *end          = (storage + Size());    // End of old storage
+            const SizeT    old_capacity = Capacity();            // reserve() will change capacity_ value
+            HItem_T       *new_item     = reserve(new_capacity); // Reserve a new storage+table
 
-        while (item < end) {
-            if (item->Hash != 0) { // Only copy live items
-                new_item->Construct(QUtility::Move(*item));
-                ++new_item;
-                ++size_; // Increment current count
+            setSize(0); // Reset size to repopulate with only live entries
+
+            while (item < end) {
+                if (item->Hash != 0) { // Only copy live items
+                    new_item->Construct(QUtility::Move(*item));
+                    ++new_item;
+                    ++size_; // Increment current count
+                }
+
+                ++item;
             }
 
-            ++item;
+            release(storage, old_capacity); // Free old hash table+storage
         }
 
-        release(old_storage, old_capacity); // Free old hash table+storage
-        generateHash();                     // Rebuild hash table from migrated entries
+        generateHash(); // Rebuild hash table from migrated entries
     }
 
     QENTEM_INLINE static void release(HItem_T *storage, SizeT capacity) {
