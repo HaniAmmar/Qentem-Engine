@@ -263,7 +263,7 @@ struct HashTable {
 
         // Expand capacity if needed to fit all items.
         if (n_size > Capacity()) {
-            resize(n_size);
+            expand(n_size);
         }
 
         // Move each valid item (Hash != 0) from src to this table.
@@ -306,7 +306,7 @@ struct HashTable {
 
         // Expand capacity if necessary.
         if (n_size > Capacity()) {
-            resize(n_size);
+            expand(n_size);
         }
 
         // Insert or update each valid item from src.
@@ -540,7 +540,7 @@ struct HashTable {
         const SizeT new_size = (count + Size()); // Total required size after 'count' more elements
 
         if (new_size > Capacity()) {
-            resize(new_size); // Expand underlying storage if needed
+            expand(new_size); // Expand underlying storage if needed
         }
     }
 
@@ -600,7 +600,7 @@ struct HashTable {
 
                 Reserver::Shrink(storage, old_capacity, Capacity());
             } else if (new_capacity > Capacity()) {
-                resize(new_capacity);
+                expand(new_capacity);
             }
         } else {
             Reset();
@@ -1203,7 +1203,7 @@ struct HashTable {
      */
     HItem_T *tryInsert(const Key_T &key) noexcept {
         if (Size() == Capacity()) {
-            expand(); // Grow the table if needed
+            expand(Capacity() * SizeT{2}); // Grow the table if needed
         }
 
         SizeT    hash;
@@ -1229,7 +1229,7 @@ struct HashTable {
      */
     HItem_T *tryInsert(Key_T &&key) noexcept {
         if (Size() == Capacity()) {
-            expand(); // Grow the table if needed
+            expand(Capacity() * SizeT{2}); // Grow the table if needed
         }
 
         SizeT    hash;
@@ -1487,7 +1487,7 @@ struct HashTable {
      *
      * @param new_size The new capacity (number of items) to reserve.
      */
-    void resize(const SizeT new_size) {
+    void expand(const SizeT new_size) {
         HItem_T       *old_storage  = Storage();
         HItem_T       *item         = old_storage; // Pointer to old item storage
         const SizeT    old_capacity = Capacity();
@@ -1508,13 +1508,6 @@ struct HashTable {
 
         release(old_storage, old_capacity); // Free old hash table+storage
         generateHash();                     // Rebuild hash table from migrated entries
-    }
-
-    /**
-     * @brief Double the capacity of the table, growing it to the next aligned power of two.
-     */
-    QENTEM_INLINE void expand() {
-        resize(Capacity() * SizeT{2});
     }
 
     QENTEM_INLINE static void release(HItem_T *storage, SizeT capacity) {

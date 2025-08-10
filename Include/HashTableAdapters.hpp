@@ -225,7 +225,6 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::remove;
     using BaseT::reserve;
     using BaseT::reserveOnly;
-    using BaseT::resize;
     using BaseT::setCapacity;
     using BaseT::setSize;
     using BaseT::setStorage;
@@ -433,7 +432,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      */
     inline HItem_T *tryInsert(const Char_T *str, const SizeT length) noexcept {
         if (Size() == Capacity()) {
-            expand();
+            expand(Capacity() * SizeT{2});
         }
 
         const SizeT hash = KeyUtilsT::Hash(str, length);
