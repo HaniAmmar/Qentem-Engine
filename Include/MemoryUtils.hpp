@@ -190,7 +190,7 @@ struct MemoryUtils {
     }
     /////////////////////////////////////////////////////////////////////
     template <typename Number_T>
-    QENTEM_INLINE static Number_T AlignToPow2(Number_T n_size) noexcept {
+    QENTEM_INLINE static QENTEM_CONST_EXPRESSION Number_T AlignToPow2(Number_T n_size) noexcept {
         // Ensure scanned n_size is >= 2, so msb >= 1.
         Number_T size = static_cast<Number_T>(Number_T{1} << Platform::FindLastBit(n_size | Number_T{2}));
 
