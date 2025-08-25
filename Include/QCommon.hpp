@@ -149,7 +149,7 @@ union PtrCast_T {
  *
  * Recommended sizes:
  *   - 64 KiB for constrained embedded systems
- *   - 128–256 KiB for desktop or server-class deployments
+ *   - 128–1024 KiB for desktop or server-class deployments
  */
 #ifndef QENTEM_RESERVER_BLOCK_SIZE
 #define QENTEM_RESERVER_BLOCK_SIZE (256U * 1024U) // 256 KiB
@@ -158,6 +158,9 @@ union PtrCast_T {
 ///////////////////////////////////////////////////////////////
 //              Configuration Macros (Overridable)           //
 ///////////////////////////////////////////////////////////////
+#ifndef QENTEM_MAX_CPU_CORES
+#define QENTEM_MAX_CPU_CORES 1024
+#endif
 
 #ifndef QENTEM_ENABLE_FLOAT_16
 #define QENTEM_ENABLE_FLOAT_16 0
