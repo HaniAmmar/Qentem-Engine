@@ -192,6 +192,7 @@ struct CPUHelper {
      */
     QENTEM_INLINE static bool OnlineCoresMask(CPUSet &mask) noexcept {
         mask.Clear();
+
 #if defined(__linux__)
         if (SystemCall(__NR_sched_getaffinity, 0, mask.Size(), mask.Data()) >= 0) {
             return true;
@@ -221,6 +222,7 @@ struct CPUHelper {
         (void)pid;
         (void)cpusetsize;
         (void)mask;
+        return -1;
 #endif
     }
 
