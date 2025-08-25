@@ -272,12 +272,12 @@ struct SystemMemory {
     #if defined(_WIN32)
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     #else
-        constexpr int private_map	= 2;
-        constexpr int anonymous_map	= 32;
-        constexpr int read	        = 1;
-        constexpr int write	        = 2;
-
         #if defined(__linux__)
+            constexpr int private_map	= 2;
+            constexpr int anonymous_map	= 32;
+            constexpr int read	        = 1;
+            constexpr int write	        = 2;
+
             // MAP_STACK was added in Linux 2.6.27; define manually if missing
             #if !defined(MAP_STACK)
                 #define QENTEM_LINUX_MAP_STACK 0x20000
@@ -302,7 +302,7 @@ struct SystemMemory {
                         0)
             );
         #else
-            return ::mmap(nullptr, size, (read | write), (private_map | anonymous_map,) -1, 0);
+            return ::mmap(nullptr, size, (PROT_READ | PROT_WRITE), (MAP_PRIVATE | MAP_ANONYMOUS), -1, 0);
         #endif
     #endif
 #else
