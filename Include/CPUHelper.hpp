@@ -1,11 +1,14 @@
 /**
  * @file CPUHelper.hpp
- * @brief Provides low-level utilities for querying and managing CPU affinity.
+ * @brief Low-level utilities for querying CPU topology and managing thread affinity.
  *
- * This header defines the CPUHelper struct, which offers STL-free, cross-platform
- * methods for retrieving the number of logical CPU cores and pinning threads to
- * specific cores. These functions are useful for systems that require per-core
- * affinity (such as thread pools, fiber schedulers, or NUMA-aware designs).
+ * This header defines the `CPUHelper` struct, providing functions to:
+ *   - Retrieve the number of online logical CPU cores.
+ *   - Pin threads to specific cores for fine-grained control.
+ *
+ * These utilities are particularly useful in systems requiring per-core
+ * affinity, such as high-performance thread pools, fiber schedulers,
+ * or NUMA-aware applications.
  *
  * @author Hani Ammar
  * @date 2025
@@ -15,11 +18,13 @@
 #ifndef QENTEM_CPU_HELPER_HPP
 #define QENTEM_CPU_HELPER_HPP
 
-#include "QCommon.hpp" // Defines SizeT32 and other basic types
+#include "Platform.hpp"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #define NOMINMAX
 #include <windows.h> // GetSystemInfo
+#elif defined(__linux__)
+#include "SystemCall.hpp"
 #else
 #include <sched.h>  // sched_setaffinity
 #include <unistd.h> // sysconf
@@ -27,32 +32,86 @@
 
 namespace Qentem {
 
-/**
- * @brief Platform-agnostic CPU utility class.
- *
- * CPUHelper provides access to the number of available CPU cores and supports
- * thread affinity pinning. It avoids STL and standard library dependencies,
- * relying only on native system calls and headers.
- */
+struct CPUSet {
+    static constexpr SystemIntType MAX_CORE  = QENTEM_MAX_CPU_CORES;
+    static constexpr SystemIntType BIT_WIDTH = (sizeof(SystemIntType) * SystemIntType{8});
+    static constexpr SystemIntType SIZE      = ((MAX_CORE + (BIT_WIDTH - 1U)) / BIT_WIDTH);
+    static constexpr SizeT32       SHIFT     = (BIT_WIDTH == SystemIntType{64} ? 6U : 5U);
+
+    QENTEM_INLINE void Clear() noexcept {
+        for (SystemIntType i = 0; i < SIZE; ++i) {
+            mask_[i] = 0;
+        }
+    }
+
+    QENTEM_INLINE void Set(SystemIntType core) noexcept {
+        if (core < MAX_CORE) {
+            SystemIntType index;
+            SystemIntType offset;
+
+            setIndexOffset(index, offset, core);
+
+            mask_[index] |= (SystemIntType{1} << offset);
+        }
+    }
+
+    QENTEM_INLINE void Reset(SystemIntType core) noexcept {
+        if (core < MAX_CORE) {
+            SystemIntType index;
+            SystemIntType offset;
+
+            setIndexOffset(index, offset, core);
+
+            mask_[index] &= ~(SystemIntType{1} << offset);
+        }
+    }
+
+    QENTEM_INLINE bool IsSet(SystemIntType core) const noexcept {
+        if (core < MAX_CORE) {
+            SystemIntType index;
+            SystemIntType offset;
+
+            setIndexOffset(index, offset, core);
+
+            return (mask_[index] & (SystemIntType{1} << offset)) != 0;
+        }
+
+        return false;
+    }
+
+    QENTEM_INLINE const SystemIntType *Data() const noexcept {
+        return &(mask_[0]);
+    }
+
+    QENTEM_INLINE constexpr SystemIntType Size() const noexcept {
+        return SIZE;
+    }
+
+  private:
+    QENTEM_INLINE static void setIndexOffset(SystemIntType &index, SystemIntType &offset, SystemIntType core) {
+        index  = (core >> SHIFT);
+        offset = (core & (BIT_WIDTH - 1U));
+    }
+
+    SystemIntType mask_[SIZE]{};
+};
+
 struct CPUHelper {
     /**
      * @brief Returns the number of logical CPU cores available to the process.
      *
      * This method queries the system once and caches the result for future calls.
-     * On Linux and Unix-like systems, it uses `sysconf(_SC_NPROCESSORS_ONLN)`.
-     * On Windows, it uses `GetSystemInfo()`.
+     * On Linux, it returns the number of logical cores currently available to this
+     * process according to its CPU affinity (via `sched_getaffinity`).
+     * On Windows, it returns the total number of logical cores in the system,
+     * across all processor groups, regardless of the calling thread's affinity.
      *
-     * @return Number of online logical CPU cores. Guaranteed to be at least 1.
+     * @return Number of logical CPU cores. Guaranteed to be at least 1.
      */
-    static SizeT32 GetCoreCount() noexcept {
-#ifdef _WIN32
-        SYSTEM_INFO sysinfo;
-        GetSystemInfo(&sysinfo);
-        return SizeT32(sysinfo.dwNumberOfProcessors);
-#else
-        auto count = sysconf(_SC_NPROCESSORS_ONLN);
-        return (count > 0) ? static_cast<SizeT32>(count) : 1U;
-#endif
+    QENTEM_INLINE static SizeT32 GetCoreCount() noexcept {
+        const static SizeT32 count = coreCount();
+
+        return count;
     }
 
     /**
@@ -62,45 +121,152 @@ struct CPUHelper {
      * CPU core of the calling thread. It may return different results over time
      * if the thread is not pinned and is scheduled to run on various cores.
      *
-     * @return The zero-based index of the current CPU core, or -1 if unsupported.
+     * @return The zero-based index of the current CPU core, or 0 if unsupported.
      */
-    static int GetCurrentCore() noexcept {
+    static SizeT32 GetCurrentCore() noexcept {
 #if defined(__linux__)
-        // Uses GNU-specific syscall to get current processor
-        return ::sched_getcpu();
+        long core = 0;
+
+        SystemCall(__NR_getcpu, &core, 0, 0);
+
+        return static_cast<SizeT32>(core);
 #elif defined(_WIN32)
         // Uses Windows API to get the index of the processor the thread is running on
-        return static_cast<int>(::GetCurrentProcessorNumber());
+        return static_cast<SizeT32>(::GetCurrentProcessorNumber());
 #else
-        // Unsupported platform: returns -1 as a sentinel value
-        return -1;
+        return 0;
 #endif
     }
 
     /**
-     * @brief Pins the current thread to the specified CPU core.
+     * @brief Pins the calling thread to a specific logical CPU core.
      *
-     * This function sets thread affinity so that the calling thread will execute
-     * only on the given logical core. Core IDs start at 0.
+     * This function enforces CPU affinity so that the current thread will execute
+     * exclusively on the designated logical core. Core indices begin at 0.
      *
-     * On Linux, uses `sched_setaffinity()` with a `cpu_set_t`.
-     * On Windows, uses `SetThreadAffinityMask()` with a bitmask.
-     * On other platforms, this function is a no-op.
+     * - **Linux:** Uses `sched_setaffinity()` with a `cpu_set_t` mask.
+     * - **Windows:** Uses `SetThreadGroupAffinity()` with a `GROUP_AFFINITY`
+     *   structure, supporting processors across multiple groups.
+     * - **Other platforms:** No effect; always returns `false`.
      *
-     * @param core_id Zero-based index of the CPU core to pin to.
+     * @param core_id Zero-based index of the target logical CPU core.
+     * @return `true` if affinity was successfully applied, `false` otherwise.
      */
-    static void PinToCore(SizeT32 core_id) {
+    static bool PinToCore(SizeT32 core_id) {
 #if defined(__linux__)
-        cpu_set_t cpuset;
-        CPU_ZERO(&cpuset);                               // Clear all bits
-        CPU_SET(core_id, &cpuset);                       // Enable target core
-        ::sched_setaffinity(0, sizeof(cpuset), &cpuset); // Apply affinity to calling thread
+        CPUSet cores;
+        cores.Clear();
+        cores.Set(core_id);
+
+        // 0 = current thread
+        const long ret = setAffinity(0, static_cast<SystemIntType>(cores.Size()), cores.Data());
+
+        return (ret == 0);
 #elif defined(_WIN32)
-        DWORD_PTR mask = 1ULL << core_id;                  // Create bitmask for the desired core
-        ::SetThreadAffinityMask(GetCurrentThread(), mask); // Apply to current thread
+        GROUP_AFFINITY affinity{};
+        affinity.Mask  = (KAFFINITY(1) << (core_id % 64));
+        affinity.Group = static_cast<WORD>(core_id / 64);
+
+        return ::SetThreadGroupAffinity(GetCurrentThread(), &affinity, nullptr);
 #else
         (void)core_id; // Platform is not supported
+        return false;
 #endif
+    }
+
+    /**
+     * @brief Retrieves the affinity mask of online CPU cores.
+     *
+     * Queries the operating system for the set of logical cores available
+     * to the calling thread. The resulting mask indicates which cores are
+     * currently online and eligible for scheduling.
+     *
+     * On Linux, this invokes the `sched_getaffinity` system call.
+     * On unsupported platforms, the mask will remain cleared and the
+     * function will return `false`.
+     *
+     * @param mask Reference to a CPUSet that will be populated with the
+     *             online core mask.
+     * @return `true` if the query succeeds and the mask is populated,
+     *         `false` otherwise.
+     */
+    QENTEM_INLINE static bool OnlineCoresMask(CPUSet &mask) noexcept {
+        mask.Clear();
+
+        if (SystemCall(__NR_sched_getaffinity, 0, mask.Size(), mask.Data()) >= 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+  private:
+    /**
+     * @brief Set the CPU affinity mask for a process or thread.
+     *
+     * This function directly invokes the Linux `sched_setaffinity` system call,
+     * binding the process (or thread, if `pid` is a thread ID) to the CPUs
+     * specified in `mask`.
+     *
+     * @param pid         Target process ID (0 applies to the calling thread).
+     * @param cpusetsize  Size of the CPU mask in bytes (typically `sizeof(cpu_set_t)`).
+     * @param mask        Pointer to the CPU set bitmask indicating allowed CPUs.
+     */
+    QENTEM_INLINE inline static long setAffinity(int pid, long cpusetsize, const void *mask) noexcept {
+        return SystemCall(__NR_sched_setaffinity, pid, cpusetsize, mask);
+    }
+
+    /**
+     * @brief Returns the number of available CPU cores for this process.
+     *
+     * Detects the number of logical processors using platform-appropriate APIs:
+     *
+     * @return Number of logical CPU cores (at least 1).
+     */
+    static SizeT32 coreCount() noexcept {
+#if defined(__linux__)
+        const SizeT32 count = onlineCoresCount();
+#elif defined(_WIN32)
+        const SizeT32 count = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
+#else
+        const SizeT32        tmp   = sysconf(_SC_NPROCESSORS_ONLN);
+        static const SizeT32 count = ((tmp > 0) ? static_cast<SizeT32>(tmp) : 1U);
+#endif
+
+        return count;
+    }
+
+    /**
+     * @brief Counts the number of currently online CPU cores on Linux.
+     *
+     * This function queries the kernel for the CPU affinity mask of the current process
+     * using `sched_getaffinity`. It then iterates through the CPUSet, summing the
+     * number of bits set to determine how many cores are currently available.
+     *
+     * Each set bit corresponds to a logical CPU core the process is allowed to run on.
+     * Returns 1 if the affinity query fails or no cores are detected.
+     *
+     * @return Number of online logical cores available to the process (>= 1).
+     */
+    QENTEM_INLINE static SizeT32 onlineCoresCount() noexcept {
+        CPUSet cores;
+
+        if (OnlineCoresMask(cores)) {
+            SizeT32 count = 0;
+            SizeT32 index = 0;
+
+            while (index < cores.Size()) {
+                if (cores.Data()[index] != 0) {
+                    count += Platform::PopCount(cores.Data()[index]);
+                }
+
+                ++index;
+            }
+
+            return count;
+        }
+
+        return 1;
     }
 };
 
