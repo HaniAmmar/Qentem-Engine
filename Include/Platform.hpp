@@ -232,15 +232,15 @@ struct Platform {
 #endif // QENTEM_AVX2 // QENTEM_SSE2 // QENTEM_SSE2
 
 #ifdef _MSC_VER
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 PopCount(unsigned int value) {
+    QENTEM_INLINE static SizeT32 PopCount(unsigned int value) {
         return static_cast<SizeT32>(__popcnt(value));
     }
 #ifdef _M_X64
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 PopCount(unsigned long long value) {
+    QENTEM_INLINE static SizeT32 PopCount(unsigned long long value) {
         return static_cast<SizeT32>(__popcnt64(value));
     }
 #else
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 PopCount(unsigned long long value) {
+    QENTEM_INLINE static SizeT32 PopCount(unsigned long long value) {
         return (static_cast<SizeT32>(__popcnt(static_cast<SizeT32>(value))) +
                 static_cast<SizeT32>(__popcnt(static_cast<SizeT32>(value >> 32U))));
     }
