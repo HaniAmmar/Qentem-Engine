@@ -369,7 +369,7 @@ The test suite includes over 23k lines of code, more than five times the size of
 
 ## Why C++11?
 
-Qentem Engine uses C++11 as a baseline to ensure it compiles cleanly on all platforms, including Arduino and other embedded environments, where support for newer C++ standards can be inconsistent. Where possible, extra features (`constexpr`, etc.) are enabled via macros for compilers that support them.
+Qentem Engine currently targets C++11 to ensure clean compilation across all platforms, including Arduino and other embedded systems where support for newer standards may be limited. Optional modern features such as `constexpr` are enabled via macros when supported. Starting in 2026, Qentem will migrate to C++17, simplifying the codebase, improving performance, and leveraging modern language features.
 
 ## License
 
