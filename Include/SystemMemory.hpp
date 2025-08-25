@@ -27,24 +27,14 @@
     #define NOMINMAX
     #include <windows.h>
 
-#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || \
-      defined(__NetBSD__) || defined(__OpenBSD__)
-    // POSIX-style platforms: mmap, sysconf, etc.
-    #include <sys/mman.h>
-    #include <unistd.h>
-
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #if defined(__linux__)
-        // MAP_STACK was added in Linux 2.6.27; define manually if missing
-        #if !defined(MAP_STACK)
-            #define QENTEM_LINUX_MAP_STACK 0x20000
-        #else
-            #define QENTEM_LINUX_MAP_STACK MAP_STACK
-        #endif
+        #include "SystemCall.hpp"
     #else
-        // Non-Linux POSIX platforms don’t use MAP_STACK
-        #define QENTEM_LINUX_MAP_STACK 0
+        // POSIX-style platforms: mmap, sysconf, etc.
+        #include <sys/mman.h>
+        #include <unistd.h>
     #endif
-
 #elif !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     // Unknown, unsupported, or freestanding platform — fallback to malloc
     #define QENTEM_SYSTEM_MEMORY_FALLBACK 1
@@ -65,28 +55,8 @@ struct SystemMemory {
      *
      * @return Size of a memory page in bytes.
      */
-    static SystemIntType PageSize() noexcept {
-        // clang-format off
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-    #if defined(_WIN32)
-            SYSTEM_INFO info;
-            GetSystemInfo(&info);
-            static const SystemIntType page_size = static_cast<SystemIntType>(info.dwPageSize);
-    #else
-            static const SystemIntType page_size = static_cast<SystemIntType>(::sysconf(
-        #if defined(_SC_PAGESIZE)
-                    _SC_PAGESIZE
-        #else
-                    _SC_PAGE_SIZE
-        #endif
-                ));
-    #endif
-#else
-        // Fallback for freestanding
-        static constexpr SystemIntType page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
-#endif
-        // clang-format on
-
+    QENTEM_INLINE static SystemIntType PageSize() noexcept {
+        static const SystemIntType page_size = pageSize();
         return page_size;
     }
 
@@ -100,18 +70,25 @@ struct SystemMemory {
      * @return True on success, false on failure.
      */
     static bool ProtectGuardPage(void *ptr, SystemIntType size) noexcept {
+        // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-#if defined(_WIN32)
-        DWORD old_protect;
-        return (::VirtualProtect(ptr, static_cast<SystemIntType>(size), PAGE_NOACCESS, &old_protect) != 0);
-#else
-        return (::mprotect(ptr, size, PROT_NONE) == 0);
-#endif
+    #if defined(_WIN32)
+            DWORD old_protect;
+            return (::VirtualProtect(ptr, static_cast<SystemIntType>(size), PAGE_NOACCESS, &old_protect) != 0);
+    #else
+            #if defined(__linux__)
+                constexpr int no_access = 0;
+                return (SystemCall(__NR_mprotect, ptr, size, no_access) == 0);
+            #else
+                return (::mprotect(ptr, size, PROT_NONE) == 0);
+            #endif
+    #endif
 #else
         (void)ptr;
         (void)size;
         return false;
 #endif
+        // clang-format on
     }
 
     /**
@@ -122,7 +99,7 @@ struct SystemMemory {
      * @param size Number of bytes to reserve. Should be a multiple of the system page size.
      * @return Pointer to memory on success, or nullptr on failure.
      */
-    static void *Reserve(SystemIntType size) noexcept {
+    QENTEM_INLINE static void *Reserve(SystemIntType size) noexcept {
         return reserve<false>(size);
     }
 
@@ -135,7 +112,7 @@ struct SystemMemory {
      * @param size Number of bytes to reserve. Should be a multiple of the system page size.
      * @return Pointer to memory on success, or nullptr on failure.
      */
-    static void *ReserveStack(SystemIntType size) noexcept {
+    QENTEM_INLINE static void *ReserveStack(SystemIntType size) noexcept {
         return reserve<true>(size);
     }
 
@@ -146,18 +123,24 @@ struct SystemMemory {
      * @param size Size in bytes (same value passed to Reserve).
      */
     static void Release(void *ptr, SystemIntType size) noexcept {
+        // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-#if defined(_WIN32)
-        (void)size;
-        ::VirtualFree(ptr, 0, MEM_RELEASE);
-#else
-        ::munmap(ptr, size);
-#endif
+    #if defined(_WIN32)
+            (void)size;
+            ::VirtualFree(ptr, 0, MEM_RELEASE);
+    #else
+        #if defined(__linux__)
+            SystemCall(__NR_munmap,ptr, size);
+        #else
+            ::munmap(ptr, size);
+        #endif
+    #endif
 #else
         // Size ignored when using malloc-based fallback.
         (void)size;
         __builtin_free(ptr);
 #endif
+        // clang-format on
     }
 
 /**
@@ -176,17 +159,102 @@ struct SystemMemory {
  */
 #if !defined(_WIN32)
     QENTEM_INLINE static void ReleasePages(void *start, SystemIntType size) noexcept {
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-        ::munmap(start, size);
-#else
-        // Fallback mode: platform does not support release; act as no-op.
-        (void)start;
-        (void)size;
-#endif
+        // clang-format off
+    #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+        #if defined(__linux__)
+            SystemCall(__NR_munmap,start, size);
+        #else
+            ::munmap(start, size);
+        #endif
+    #else
+            // Fallback mode: platform does not support release; act as no-op.
+            (void)start;
+            (void)size;
+    #endif
+        // clang-format on
     }
 #endif
 
   private:
+    /**
+     * @brief Returns the native system page size (e.g., 4096 bytes on x86).
+     *
+     * @return Size of a memory page in bytes.
+     */
+    static SystemIntType pageSize() noexcept {
+        struct AUX {
+            SystemIntType Type;
+            SystemIntType Value;
+        };
+
+        // clang-format off
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+    #if defined(_WIN32)
+        SYSTEM_INFO info;
+        GetSystemInfo(&info);
+        return static_cast<SystemIntType>(info.dwPageSize);
+    #else
+        #if defined(__linux__)
+            constexpr int at_fdcwd      = -100; // AT_FDCWD
+            constexpr int read_only     = 0;    // O_RDONLY
+            constexpr int page_size_id  = 6;    // AT_PAGESZ
+            constexpr const char AUXV_PATH[] = "/proc/self/auxv";
+
+            AUX aux;
+            SystemIntType page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
+
+            const int fd = static_cast<int>(SystemCall(__NR_openat, at_fdcwd,
+                                                reinterpret_cast<long>(AUXV_PATH),
+                                                read_only, 0));
+            if (fd >= 0) {
+                unsigned char *ptr = reinterpret_cast<unsigned char*>(&aux);
+                SizeT32 filled = 0;
+
+                while (true) {
+                    long ret = SystemCall(__NR_read, fd,
+                                          reinterpret_cast<long>(ptr + filled),
+                                          sizeof(aux) - filled);
+
+                    if (ret <= 0) {
+                        // EOF or error — stop
+                        break;
+                    }
+
+                    filled += static_cast<SizeT32>(ret);
+
+                    if (filled == sizeof(aux)) {
+                        // Got one full AUX record
+                        if (aux.Type == page_size_id) {
+                            page_size = aux.Value;
+                            break;
+                        }
+
+                        // Reset buffer for next record
+                        filled = 0;
+                    }
+                }
+
+                SystemCall(__NR_close, fd);
+            }
+
+            return page_size;
+        #else
+            return static_cast<SystemIntType>(::sysconf(
+                #if defined(_SC_PAGESIZE)
+                            _SC_PAGESIZE
+                #else
+                            _SC_PAGE_SIZE
+                #endif
+                ));
+        #endif
+    #endif
+#else
+    // Fallback for freestanding
+    return QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
+#endif
+        // clang-format on
+    }
+
     /**
      * @brief Internal implementation of memory allocation.
      *
@@ -199,16 +267,48 @@ struct SystemMemory {
      */
     template <bool IS_STACK_MEMORY_T>
     static void *reserve(SystemIntType size) noexcept {
+        // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-#if defined(_WIN32)
+    #if defined(_WIN32)
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-#else
-        constexpr auto flags = MAP_PRIVATE | MAP_ANONYMOUS | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
-        return ::mmap(nullptr, size, PROT_READ | PROT_WRITE, flags, -1, 0);
-#endif
+    #else
+        constexpr int private_map	= 2;
+        constexpr int anonymous_map	= 32;
+        constexpr int read	        = 1;
+        constexpr int write	        = 2;
+
+        #if defined(__linux__)
+            // MAP_STACK was added in Linux 2.6.27; define manually if missing
+            #if !defined(MAP_STACK)
+                #define QENTEM_LINUX_MAP_STACK 0x20000
+            #else
+                #define QENTEM_LINUX_MAP_STACK MAP_STACK
+            #endif
+
+            constexpr auto flags = private_map | anonymous_map | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
+
+            return reinterpret_cast<void *>(
+                SystemCall(
+                    #if defined(__i386__) || defined(__arm__) || defined(__ARM_EABI__)
+                        __NR_mmap2,
+                    #else
+                        __NR_mmap,
+                    #endif
+                        0, // null
+                        size,
+                        read | write,
+                        flags,
+                        -1,
+                        0)
+            );
+        #else
+            return ::mmap(nullptr, size, (read | write), (private_map | anonymous_map,) -1, 0);
+        #endif
+    #endif
 #else
         return __builtin_malloc(size);
 #endif
+        // clang-format on
     }
 };
 
