@@ -34,9 +34,9 @@
 #ifndef QENTEM_RESERVER_HPP
 #define QENTEM_RESERVER_HPP
 
+#include "MemoryBlock.hpp"
 #include "LiteArray.hpp"
 #include "CPUHelper.hpp"
-#include "MemoryBlock.hpp"
 
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
 #include "MemoryRecord.hpp"
@@ -814,9 +814,17 @@ struct Reserver {
      *
      * @see RoundUpBytes
      */
-    template <typename Type_T, SizeT32 CustomAlignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT>
+    template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
     QENTEM_INLINE static Type_T *Reserve(SystemIntType size) noexcept {
-        return static_cast<Type_T *>(GetCurrentInstance().Reserve<CustomAlignment_T>(RoundUpBytes<Type_T>(size)));
+        if QENTEM_CONST_EXPRESSION (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
+            // QENTEM_CONST_EXPRESSION SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
+            // (align>=CustomAlignment_T?align:(align+1))
+
+            return static_cast<Type_T *>(GetCurrentInstance().Reserve<CustomAlignment_T>(RoundUpBytes<Type_T>(size)));
+        }
+
+        return static_cast<Type_T *>(
+            GetCurrentInstance().Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(RoundUpBytes<Type_T>(size)));
     }
 
     /**
@@ -1018,7 +1026,7 @@ struct Reserver {
      * @param core_id Logical CPU index as reported by the system.
      * @return Reference to the corresponding ReserverCore.
      */
-    QENTEM_INLINE static Core &getReserver(int core_id) noexcept {
+    QENTEM_INLINE static Core &getReserver(SizeT32 core_id) noexcept {
 #if defined(__linux__) || defined(_WIN32)
         return getReservers().Storage()[core_id];
 #else
