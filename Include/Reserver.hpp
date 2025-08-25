@@ -821,10 +821,10 @@ struct Reserver {
             // (align>=CustomAlignment_T?align:(align+1))
 
             return static_cast<Type_T *>(GetCurrentInstance().Reserve<CustomAlignment_T>(RoundUpBytes<Type_T>(size)));
+        } else {
+            return static_cast<Type_T *>(
+                GetCurrentInstance().Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(RoundUpBytes<Type_T>(size)));
         }
-
-        return static_cast<Type_T *>(
-            GetCurrentInstance().Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(RoundUpBytes<Type_T>(size)));
     }
 
     /**

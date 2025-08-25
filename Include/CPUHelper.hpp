@@ -192,11 +192,13 @@ struct CPUHelper {
      */
     QENTEM_INLINE static bool OnlineCoresMask(CPUSet &mask) noexcept {
         mask.Clear();
-
+#if defined(__linux__)
         if (SystemCall(__NR_sched_getaffinity, 0, mask.Size(), mask.Data()) >= 0) {
             return true;
         }
-
+#else
+        (void)mask;
+#endif
         return false;
     }
 
@@ -213,7 +215,13 @@ struct CPUHelper {
      * @param mask        Pointer to the CPU set bitmask indicating allowed CPUs.
      */
     QENTEM_INLINE inline static long setAffinity(int pid, long cpusetsize, const void *mask) noexcept {
+#if defined(__linux__)
         return SystemCall(__NR_sched_setaffinity, pid, cpusetsize, mask);
+#else
+        (void)pid;
+        (void)cpusetsize;
+        (void)mask;
+#endif
     }
 
     /**
