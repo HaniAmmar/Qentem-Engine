@@ -99,11 +99,11 @@ struct ReserverCore {
 
     QENTEM_INLINE ~ReserverCore() noexcept {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
-        for (auto &block : blocks_) {
+        for (MemoryBlockT &block : blocks_) {
             MemoryRecord::ReleasedBlock(block.Capacity());
         }
 
-        // for (auto &block : exhausted_blocks_) {
+        // for (MemoryBlockT &block : exhausted_blocks_) {
         //     MemoryRecord::ReleasedBlock(block.Capacity());
         // }
 #endif
@@ -142,7 +142,7 @@ struct ReserverCore {
 
         const SystemIntType chunks = (size >> MemoryBlockT::DefaultAlignmentBit());
 
-        for (auto &current_block : blocks_) {
+        for (MemoryBlockT &current_block : blocks_) {
             if (current_block.Available() >= size) {
                 void *ptr = reserveFirstFit<CustomAlignment_T>(&current_block, chunks);
 
@@ -213,7 +213,7 @@ struct ReserverCore {
      */
     bool Release(void *ptr, SystemIntType size) {
         // Phase 1: Search within active blocks.
-        for (auto &block : blocks_) {
+        for (MemoryBlockT &block : blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Released(size);
@@ -231,7 +231,7 @@ struct ReserverCore {
         }
 
         // Phase 2: Search within exhausted (detached) blocks.
-        for (auto &block : exhausted_blocks_) {
+        for (MemoryBlockT &block : exhausted_blocks_) {
             if ((ptr >= block.Base()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Released(size);
@@ -282,7 +282,7 @@ struct ReserverCore {
         const SystemIntType diff        = (from_size - to_size);
 
         // Phase 1: Search within active blocks.
-        for (auto &block : blocks_) {
+        for (MemoryBlockT &block : blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Shrink(diff);
@@ -296,7 +296,7 @@ struct ReserverCore {
         }
 
         // Phase 2: Search within exhausted (detached) blocks.
-        for (auto &block : exhausted_blocks_) {
+        for (MemoryBlockT &block : exhausted_blocks_) {
             if ((ptr >= block.Base()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Shrink(diff);
@@ -351,7 +351,7 @@ struct ReserverCore {
     SystemIntType TryExpand(void *ptr, SystemIntType from_size, SystemIntType to_size) {
         const SystemIntType diff = (to_size - from_size);
 
-        for (auto &block : blocks_) {
+        for (MemoryBlockT &block : blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
                 if (reserveAt(&block, (static_cast<char *>(ptr) + from_size),
                               (diff >> MemoryBlockT::DefaultAlignmentBit()))) {
@@ -382,7 +382,7 @@ struct ReserverCore {
      */
     QENTEM_INLINE bool IsEmpty() const noexcept {
         // Scan all active blocks. Any used memory voids emptiness.
-        for (const auto &block : blocks_) {
+        for (const MemoryBlockT &block : blocks_) {
             if (!(block.IsEmpty())) {
                 return false;
             }
@@ -403,11 +403,11 @@ struct ReserverCore {
      */
     QENTEM_INLINE void Reset() noexcept {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
-        for (const auto &block : blocks_) {
+        for (const MemoryBlockT &block : blocks_) {
             MemoryRecord::ReleasedBlock(block.Capacity());
         }
 
-        for (const auto &block : exhausted_blocks_) {
+        for (const MemoryBlockT &block : exhausted_blocks_) {
             MemoryRecord::ReleasedBlock(block.Capacity());
         }
 #endif
@@ -860,7 +860,7 @@ struct Reserver {
             // Attempt return to a sibling arena (cross-core recovery).
             LiteArray<Core> &reservers = getReservers();
 
-            for (auto &reserver : reservers) {
+            for (Core &reserver : reservers) {
                 if ((&reserver != &instance) && reserver.Release(ptr, size)) {
                     return;
                 }
@@ -913,7 +913,7 @@ struct Reserver {
                 // Attempt return to a sibling arena (cross-core recovery).
                 LiteArray<Core> &reservers = getReservers();
 
-                for (auto &reserver : reservers) {
+                for (Core &reserver : reservers) {
                     if ((&reserver != &instance) && reserver.Shrink(ptr, from_size, to_size)) {
                         return;
                     }
@@ -959,7 +959,7 @@ struct Reserver {
                     // Attempt return to a sibling arena (cross-core recovery).
                     LiteArray<Core> &reservers = getReservers();
 
-                    for (auto &reserver : reservers) {
+                    for (Core &reserver : reservers) {
                         if ((&reserver != &instance) && reserver.TryExpand(ptr, from_size, to_size) == to_size) {
                             return true;
                         }
@@ -989,12 +989,31 @@ struct Reserver {
     }
 
     /**
-     * @brief Checks whether the current core's arena has any remaining regions in use.
+     * @brief Reports whether all arenas are empty.
      *
-     * @return true if the current arena holds no active allocations.
+     * On Linux and Windows, this checks every core’s arena to ensure no active
+     * allocations remain. On other platforms, it only inspects the primary arena.
+     *
+     * @return true if (a) all per-core arenas are empty on supported platforms,
+     *         or (b) the primary arena is empty elsewhere.
      */
     QENTEM_INLINE static bool IsEmpty() noexcept {
         return GetCurrentInstance().IsEmpty();
+
+#if defined(__linux__) || defined(_WIN32)
+        LiteArray<Core> &reservers = getReservers();
+
+        for (const Core &reserver : reservers) {
+            if (!(reserver.IsEmpty())) {
+                return false;
+            }
+        }
+
+        return true;
+
+#else
+        return getReserver(0).IsEmpty();
+#endif
     }
 
     /**
