@@ -22,7 +22,8 @@
 
 #include "QCommon.hpp"
 
-#include <asm/unistd.h>
+#include <linux/unistd.h>
+#include <linux/errno.h>
 
 #if defined(__i386__) && !defined(QENTEM_NO_i386_SYSCALL)
 #include <unistd.h>
