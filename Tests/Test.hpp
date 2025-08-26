@@ -103,7 +103,7 @@ static void SelfTest() {
     }
 
     QConsole::IsColored() = is_colored;
-    QConsole::GetStreamCache().Clear();
+    QConsole::GetBuffer().Clear();
     QConsole::EnableOutput();
 }
 

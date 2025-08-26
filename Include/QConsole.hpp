@@ -52,7 +52,7 @@ struct QConsole {
 
     template <typename... Values_T>
     QENTEM_NOINLINE static void Print(const Values_T &...values) {
-        LiteStream &ss = GetStreamCache();
+        LiteStream &ss = GetBuffer();
         ToCharsHelper::Write(ss, values...);
 
         if (IsOutputEnabled() && (ss.Length() >= SizeT{512})) {
@@ -62,7 +62,7 @@ struct QConsole {
     }
 
     QENTEM_NOINLINE static void Flush() noexcept {
-        LiteStream &ss = GetStreamCache();
+        LiteStream &ss = GetBuffer();
 
         if (IsOutputEnabled() && (ss.Length() != 0)) {
             write(ss.First(), ss.Length());
@@ -71,7 +71,7 @@ struct QConsole {
     }
 
     QENTEM_NOINLINE static void Clear() noexcept {
-        GetStreamCache().Clear();
+        GetBuffer().Clear();
     }
 
     QENTEM_NOINLINE static void DisableOutput() noexcept {
@@ -92,12 +92,12 @@ struct QConsole {
     // QENTEM_NOINLINE static void ResetDoubleFormat() noexcept {
     // }
 
-    QENTEM_NOINLINE static LiteStream &GetStreamCache() noexcept {
+    QENTEM_NOINLINE static LiteStream &GetBuffer() noexcept {
         static LiteStream ss{32};
 
         struct OnExit {
             ~OnExit() {
-                Flush(); // Now safe
+                Flush(); // flush buffer on exit;
             }
         };
 
