@@ -56,28 +56,24 @@ struct QConsole {
         ToCharsHelper::Write(ss, values...);
 
         if (IsOutputEnabled() && (ss.Length() >= SizeT{512})) {
-            Write(ss.First(), ss.Length());
-            ss.Clear();
+            flush();
         }
     }
 
     QENTEM_NOINLINE static void Write(const char *data, unsigned length) noexcept {
-#if defined(_WIN32)
-        DWORD written = 0;
-        ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), data, length, &written, nullptr);
-#elif defined(__linux__)
-        SystemCall(__NR_write, 1, data, length);
-#else
-        ::write(1, data, length); // stdout
-#endif
+        LiteStream &ss = GetBuffer();
+        ss.Write(data, length);
+
+        if (IsOutputEnabled() && (ss.Length() >= SizeT{512})) {
+            flush();
+        }
     }
 
     QENTEM_NOINLINE static void Flush() noexcept {
         LiteStream &ss = GetBuffer();
 
         if (IsOutputEnabled() && (ss.Length() != 0)) {
-            Write(ss.First(), ss.Length());
-            ss.Clear();
+            flush();
         }
     }
 
@@ -118,6 +114,24 @@ struct QConsole {
     }
 
   private:
+    QENTEM_NOINLINE static void write(const char *data, unsigned length) noexcept {
+#if defined(_WIN32)
+        DWORD written = 0;
+        ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), data, length, &written, nullptr);
+#elif defined(__linux__)
+        SystemCall(__NR_write, 1, data, length);
+#else
+        ::write(1, data, length); // stdout
+#endif
+    }
+
+    QENTEM_NOINLINE static void flush() noexcept {
+        LiteStream &ss = GetBuffer();
+
+        write(ss.First(), ss.Length());
+        ss.Clear();
+    }
+
     QENTEM_NOINLINE static bool &getOutputEnabledRef() noexcept {
         static bool enable_output_ = true;
 

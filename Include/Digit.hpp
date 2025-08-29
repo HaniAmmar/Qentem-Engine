@@ -21,9 +21,7 @@
 #include "StringUtils.hpp"
 
 namespace Qentem {
-/*
- * For converting numbers from and to strings.
- */
+
 struct Digit {
     // Default: same as std::defaultfloat.
     // Fixed: same as std::fixed.
@@ -84,8 +82,8 @@ struct Digit {
             if QENTEM_CONST_EXPRESSION (Reverse_V_T) {
                 stream.Write(&(storage[0]), IntToString<true>(&(storage[0]), qn.Natural));
             } else {
-                const SizeT offset = IntToString(&(storage[max_number_of_digits]), qn.Natural);
-                stream.Write(&(storage[max_number_of_digits - offset]), offset);
+                const SizeT length = IntToString(&(storage[max_number_of_digits]), qn.Natural);
+                stream.Write(&(storage[max_number_of_digits - length]), length);
             }
         }
     }
@@ -97,8 +95,9 @@ struct Digit {
 
         if QENTEM_CONST_EXPRESSION (!Reverse_V_T) {
             while (number >= Number_T{10}) {
-                const SizeT index = (SizeT(number % Number_T{100}) * SizeT{2});
+                SizeT index = SizeT(number % Number_T{100});
                 number /= Number_T{100};
+                index *= SizeT{2};
 
                 --storage;
                 *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
@@ -114,8 +113,9 @@ struct Digit {
             return SizeT(str - storage);
         } else {
             while (number >= Number_T{10}) {
-                const SizeT index = (SizeT(number % Number_T{100}) * SizeT{2});
+                SizeT index = SizeT(number % Number_T{100});
                 number /= Number_T{100};
+                index *= SizeT{2};
 
                 *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
                 ++storage;
@@ -365,16 +365,16 @@ struct Digit {
 
                         default: {
                             if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
-                                if ((number.Natural > 0x1999999999999999ULL) ||
-                                    ((number.Natural == 0x1999999999999999ULL) &&
+                                if ((number.Natural > Number_T{0x1999999999999999}) ||
+                                    ((number.Natural == Number_T{0x1999999999999999}) &&
                                      (digit > DigitUtils::DigitChar::Five))) {
                                     is_real = true;
                                     break;
                                 }
 
                                 number.Natural *= Number_T{10};
-                                number.Natural += Number_T(digit);
-                                number.Natural -= Number_T{DigitUtils::DigitChar::Zero};
+                                number.Natural += (Number_T(digit) - Number_T{DigitUtils::DigitChar::Zero});
+
                                 ++offset;
                                 ++tmp_offset;
 
@@ -408,11 +408,11 @@ struct Digit {
                     }
 
                     if (number.Natural == 0) {
-                        number.Natural |= 0x8000000000000000LL;
+                        number.Natural |= Number_T{0x8000000000000000};
                         return QNumberType::Real;
                     }
 
-                    if (number.Natural <= 0x7FFFFFFFFFFFFFFFULL) {
+                    if (number.Natural <= Number_T{0x7FFFFFFFFFFFFFFF}) {
                         number.Integer = -number.Integer;
                         return QNumberType::Integer;
                     }
@@ -425,11 +425,6 @@ struct Digit {
                     const SizeT32 e_n10_power =
                         (fraction_only ? (e_p10_power + (SizeT32(start_offset - dot_offset) - 1U))
                                        : (has_dot ? (SizeT32(offset - dot_offset) - 1U) : 0));
-
-                    // const SizeT32 e_n10_power =
-                    //     (fraction_only
-                    //          ? ((tmp_offset - start_offset) + (SizeT32(start_offset - dot_offset) - 1U))
-                    //          : (has_dot ? (SizeT32(offset - dot_offset) - 1U) : 0));
 
                     SizeT32 exponent        = 0;
                     bool    is_negative_exp = false;
@@ -618,8 +613,7 @@ struct Digit {
         number |= (SizeT64(exp) << 52U);
     }
     /////////////////////////////////////////
-    template <typename Number_T>
-    static void powerOfPositiveTen(Number_T &number, SizeT32 exponent) noexcept {
+    static void powerOfPositiveTen(SizeT64 &number, SizeT32 exponent) noexcept {
         using UNumber_T  = SystemIntType;
         using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
@@ -651,16 +645,16 @@ struct Digit {
         } else {
             b_int >>= (bit - 53U);
             number = SizeT64(b_int);
-            number += (number & Number_T{1});
+            number += (number & SizeT64{1});
             number >>= 1U;
-            shifted += SizeT32(number > Number_T{0x1FFFFFFFFFFFFF});
+            shifted += SizeT32(number > SizeT64{0x1FFFFFFFFFFFFF});
         }
         //////////////////////////////////////////////////////////////
         SizeT64 exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
         exp += bit;
         exp += shifted;
         exp <<= 52U;
-        number &= 0xFFFFFFFFFFFFFULL;
+        number &= SizeT64{0xFFFFFFFFFFFFF};
         number |= exp;
     }
     /////////////////////////////////////////
