@@ -206,7 +206,103 @@ struct Digit {
         return stringToNumber(number, content, offset, length);
     }
 
-    //////////// Private ////////////
+    /**
+     * @brief Formats a timestamp into a decimal string with sub-second precision.
+     *
+     * Converts a `(seconds, nanoseconds)` pair into human-readable form:
+     *     "<seconds>.<fraction>"
+     *
+     * The fractional part is generated from the nanoseconds value, respecting
+     * the requested precision (up to 9 digits, since nanoseconds are capped
+     * at 1e9).
+     *
+     * Example (precision = 6):
+     *     seconds = 12, nanoseconds = 345678900 → "12.345679"
+     *
+     * Rounding is applied at the cutoff digit, so "…6789" with precision 6
+     * becomes "…678900" → rounded to "…679".
+     *
+     * @tparam Stream_T   Output stream type; must provide `CharType`, `Write()`.
+     * @param stream      Target stream to write into.
+     * @param seconds     Whole seconds component.
+     * @param nanosecond  Nanoseconds component (0 ≤ ns < 1e9).
+     * @param precision   Desired fractional digits (default = 6, max = 9).
+     */
+    template <typename Stream_T>
+    QENTEM_INLINE static void FormatBenchmarkTime(Stream_T &stream, SizeT64I seconds, SizeT64I nanosecond,
+                                                  SizeT32 precision = 6) noexcept {
+        using Char_T = typename Stream_T::CharType;
+        constexpr SizeT32 max_nanosecond{9};       // maximum nanosecond digits
+        Char_T            storage[max_nanosecond]; // temporary digit buffer
+
+        // Ensure nanoseconds is within valid range
+        if (nanosecond < SizeT64I{1000000000}) {
+            // Convert nanoseconds to string (stored in reverse buffer layout).
+            SizeT length = IntToString(&(storage[max_nanosecond]), nanosecond);
+            SizeT start  = (max_nanosecond - length);
+
+            // Handle precision trimming and rounding
+            if (precision < max_nanosecond) {
+                if (start > precision) {
+                    // Entire fractional part is below requested precision
+                    start  = precision;
+                    length = 0;
+                } else {
+                    const SizeT og_length = length;
+                    length                = (precision - start);
+
+                    if (og_length > SizeT{1}) {
+                        // Look at digit immediately after cutoff to decide rounding
+                        SizeT index = precision;
+
+                        Char_T       *number = (storage + index);
+                        const Char_T *first  = (storage + start);
+
+                        // Standard rounding: if digit > 5, increment the previous
+                        if (*number > DigitUtils::DigitChar::Five) {
+                            --number;
+
+                            // Carry propagation: 999... rolls over
+                            while ((number >= first) && (*number == DigitUtils::DigitChar::Nine)) {
+                                --number;
+                                --length;
+                            }
+
+                            if (number < storage) {
+                                // All digits rolled over → increment seconds
+                                ++seconds;
+                                start  = precision;
+                                length = 0;
+                            } else if (number < first) {
+                                // Rounded into a new leading digit (e.g. .999 → .1000)
+                                *number = DigitUtils::DigitChar::One;
+                                length  = SizeT{1};
+                                --start;
+                            } else {
+                                // Normal carry increment
+                                ++(*number);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Emit seconds part
+            NumberToString(stream, seconds);
+            stream.Write(DigitUtils::DigitChar::Dot);
+
+            // Emit fractional part, padded with leading zeros
+            insertZeros(stream, start);
+            stream.Write(&(storage[start]), length);
+
+            // Pad with trailing zeros if requested precision not yet reached
+            const SizeT total = (start + length);
+            if (total < precision) {
+                insertZeros(stream, (precision - total));
+            }
+        }
+    }
+
   private:
     template <typename Char_T>
     static QNumberType stringToNumber(QNumber64 &number, const Char_T *content, SizeT &offset,
