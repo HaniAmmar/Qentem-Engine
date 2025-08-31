@@ -109,7 +109,7 @@ struct CPUHelper {
      * @return Number of logical CPU cores. Guaranteed to be at least 1.
      */
     QENTEM_INLINE static SizeT32 GetCoreCount() noexcept {
-        const static SizeT32 count = coreCount();
+        static const SizeT32 count = coreCount();
 
         return count;
     }
@@ -239,8 +239,8 @@ struct CPUHelper {
 #elif defined(_WIN32)
         const SizeT32 count = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
 #else
-        const SizeT32        tmp   = sysconf(_SC_NPROCESSORS_ONLN);
-        static const SizeT32 count = ((tmp > 0) ? static_cast<SizeT32>(tmp) : 1U);
+        const SizeT32 tmp   = sysconf(_SC_NPROCESSORS_ONLN);
+        const SizeT32 count = ((tmp > 0) ? static_cast<SizeT32>(tmp) : 1U);
 #endif
 
         return count;

@@ -117,7 +117,7 @@ struct HashTable {
     /**
      * @brief Default constructor. Initializes an empty hash table.
      */
-    QENTEM_INLINE HashTable() = default;
+    QENTEM_INLINE HashTable() noexcept : storage_{nullptr}, capacity_{0}, size_{0} {};
 
     /**
      * @brief Constructs a hash table with the given initial capacity.
@@ -127,7 +127,7 @@ struct HashTable {
      *
      * @param capacity Initial capacity (number of items to prepare for).
      */
-    QENTEM_INLINE explicit HashTable(SizeT capacity) {
+    QENTEM_INLINE explicit HashTable(SizeT capacity) : storage_{nullptr}, capacity_{0}, size_{0} {
         if (capacity != 0) {
             capacity = MemoryUtils::AlignToPow2(capacity);
             reserve(capacity);
@@ -142,10 +142,10 @@ struct HashTable {
      * @param src HashTable to move from.
      */
     QENTEM_INLINE HashTable(HashTable &&src) noexcept
-        : storage_{src.storage_}, size_{src.size_}, capacity_{src.capacity_} {
-        src.setSize(0);
-        src.setCapacity(0);
+        : storage_{src.storage_}, capacity_{src.capacity_}, size_{src.size_} {
         src.clearStorage();
+        src.setCapacity(0);
+        src.setSize(0);
     }
 
     /**
@@ -156,7 +156,7 @@ struct HashTable {
      *
      * @param src HashTable to copy from.
      */
-    QENTEM_INLINE HashTable(const HashTable &src) {
+    QENTEM_INLINE HashTable(const HashTable &src) : storage_{nullptr}, capacity_{0}, size_{0} {
         if (src.IsNotEmpty()) {
             const HItem_T *src_item = src.First();
             const HItem_T *src_end  = (src_item + src.Size());
@@ -199,13 +199,13 @@ struct HashTable {
 
             // Take ownership of src's memory and bookkeeping.
             setStorage(src.Storage());
-            setSize(src.Size());
             setCapacity(src.Capacity());
+            setSize(src.Size());
 
             // Reset src to an empty state so its destructor is safe.
             src.clearStorage();
-            src.setSize(0);
             src.setCapacity(0);
+            src.setSize(0);
 
             // Destruct of the old memory (after transfer, in case of derived/child arrays).
             MemoryUtils::Destruct(storage, (storage + size));
@@ -233,8 +233,8 @@ struct HashTable {
 
             // Clear current state before copying new data.
             clearStorage();
-            setSize(0);
             setCapacity(0);
+            setSize(0);
 
             // Deep copy all items and hash table layout from src.
             if (src.IsNotEmpty()) {
@@ -305,8 +305,8 @@ struct HashTable {
         // Release src's memory and reset its bookkeeping.
         release(src.Storage(), src.Capacity());
         src.clearStorage();
-        src.setSize(0);
         src.setCapacity(0);
+        src.setSize(0);
     }
 
     /**
@@ -672,8 +672,8 @@ struct HashTable {
         release(Storage(), Capacity());                     // Free the hash table & storage block
 
         clearStorage(); // Set pointer to nullptr
-        setSize(0);     // Size is now zero
-        setCapacity(0); // Capacity is now zero
+        setCapacity(0);
+        setSize(0);
     }
 
     /**
@@ -1458,8 +1458,8 @@ struct HashTable {
     HItem_T *reserveOnly(SizeT capacity) {
         HItem_T *storage = Reserver::Reserve<HItem_T>(capacity);
 
-        setCapacity(capacity); // Record new capacity
         setStorage(storage);   // Set hash table pointer
+        setCapacity(capacity); // Record new capacity
 
         return storage; // Return pointer to start of hash table
     }
@@ -1511,8 +1511,8 @@ struct HashTable {
     }
 
     HItem_T *storage_{nullptr};
-    SizeT    size_{0};
     SizeT    capacity_{0};
+    SizeT    size_{0};
 };
 
 } // namespace Qentem

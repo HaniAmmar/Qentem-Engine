@@ -27,13 +27,9 @@ struct StringStream {
 
     static constexpr SizeT ExpandShift{2};
 
-    QENTEM_INLINE StringStream() = default;
+    QENTEM_INLINE StringStream() noexcept : storage_{nullptr}, capacity_{0}, length_{0} {};
 
-    QENTEM_INLINE ~StringStream() {
-        release(Storage(), Capacity());
-    }
-
-    explicit StringStream(SizeT capacity) {
+    explicit StringStream(SizeT capacity) : storage_{nullptr}, capacity_{0}, length_{0} {
         if (capacity != 0) {
             reserve(capacity);
         }
@@ -46,22 +42,26 @@ struct StringStream {
         src.setLength(0);
     }
 
-    StringStream(const StringStream &src) {
+    StringStream(const StringStream &src) : storage_{nullptr}, capacity_{0}, length_{0} {
         if (src.Length() != 0) {
             reserve(src.Length());
             Write(src.First(), src.Length());
         }
     }
 
-    StringStream(const Char_T *str, SizeT length) {
+    StringStream(const Char_T *str, SizeT length) : storage_{nullptr}, capacity_{0}, length_{0} {
         reserve(length);
         Write(str, length);
     }
 
-    StringStream(const Char_T *str) {
+    StringStream(const Char_T *str) : storage_{nullptr}, capacity_{0}, length_{0} {
         const SizeT length = StringUtils::Count(str);
         reserve(length);
         Write(str, length);
+    }
+
+    QENTEM_INLINE ~StringStream() {
+        release(Storage(), Capacity());
     }
 
     StringStream &operator=(StringStream &&src) noexcept {
@@ -551,9 +551,9 @@ struct StringStream {
         Reserver::Release(storage, capacity);
     }
 
-    Char_T *storage_{nullptr};
-    SizeT   capacity_{0};
-    SizeT   length_{0};
+    Char_T *storage_;
+    SizeT   capacity_;
+    SizeT   length_;
 };
 
 } // namespace Qentem

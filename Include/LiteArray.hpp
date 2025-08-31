@@ -24,12 +24,14 @@ namespace Qentem {
 
 template <typename Type_T>
 struct LiteArray {
-    QENTEM_INLINE LiteArray() noexcept = default;
+    QENTEM_INLINE LiteArray() noexcept : storage_{nullptr}, size_{0}, capacity_{0} {
+    }
 
     LiteArray(const LiteArray &)            = delete;
     LiteArray &operator=(const LiteArray &) = delete;
 
-    QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) noexcept {
+    QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) noexcept
+        : storage_{nullptr}, size_{0}, capacity_{0} {
         if (capacity != 0) {
             reserve(capacity);
 
@@ -271,9 +273,9 @@ struct LiteArray {
     void *raw_storage_{nullptr};
 #endif
 
-    Type_T *storage_{nullptr};
-    SizeT   size_{0};
-    SizeT   capacity_{0};
+    Type_T *storage_;
+    SizeT   size_;
+    SizeT   capacity_;
 };
 
 } // namespace Qentem

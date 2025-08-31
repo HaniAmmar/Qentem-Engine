@@ -23,7 +23,8 @@ template <typename Char_T>
 struct StringView {
     using CharType = Char_T;
 
-    StringView() noexcept  = default;
+    QENTEM_CONST_EXPRESSION StringView() noexcept : storage_{}, length_{} {};
+
     ~StringView() noexcept = default;
 
     QENTEM_CONST_EXPRESSION StringView(StringView &&src) noexcept : storage_{src.First()}, length_{src.Length()} {
@@ -52,7 +53,7 @@ struct StringView {
         return *this;
     }
 
-    QENTEM_CONST_EXPRESSION StringView &operator=(const StringView &src) {
+    QENTEM_CONST_EXPRESSION StringView &operator=(const StringView &src) noexcept {
         if (this != &src) {
             setStorage(src.First());
             setLength(src.Length());
@@ -61,7 +62,7 @@ struct StringView {
         return *this;
     }
 
-    QENTEM_CONST_EXPRESSION StringView &operator=(const Char_T *str) {
+    QENTEM_CONST_EXPRESSION StringView &operator=(const Char_T *str) noexcept {
         setStorage(str);
         setLength(StringUtils::Count(str));
 
@@ -211,8 +212,8 @@ struct StringView {
         length_ = 0;
     }
 
-    const Char_T *storage_{nullptr};
-    SizeT         length_{0};
+    const Char_T *storage_;
+    SizeT         length_;
 };
 
 } // namespace Qentem

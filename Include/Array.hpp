@@ -20,9 +20,9 @@ namespace Qentem {
 
 template <typename Type_T>
 struct Array {
-    QENTEM_INLINE Array() noexcept = default;
+    QENTEM_INLINE Array() noexcept : storage_{nullptr}, capacity_{0}, size_{0} {};
 
-    explicit Array(SizeT capacity, bool initialize = false) {
+    explicit Array(SizeT capacity, bool initialize = false) : storage_{nullptr}, capacity_{0}, size_{0} {
         if (capacity != 0) {
             reserve(capacity);
 
@@ -33,21 +33,21 @@ struct Array {
         }
     }
 
-    ~Array() {
-        MemoryUtils::Destruct(Storage(), End());
-        release(Storage(), Capacity());
-    }
-
     QENTEM_INLINE Array(Array &&src) noexcept : storage_{src.storage_}, capacity_{src.capacity_}, size_{src.size_} {
         src.clearStorage();
         src.setCapacity(0);
         src.setSize(0);
     }
 
-    QENTEM_INLINE Array(const Array &src) : size_{src.Size()} {
+    QENTEM_INLINE Array(const Array &src) : storage_{nullptr}, capacity_{0}, size_{src.Size()} {
         if (src.IsNotEmpty()) {
             copyArray(src);
         }
+    }
+
+    ~Array() {
+        MemoryUtils::Destruct(Storage(), End());
+        release(Storage(), Capacity());
     }
 
     Array &operator=(Array &&src) noexcept {

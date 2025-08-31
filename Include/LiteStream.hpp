@@ -26,13 +26,14 @@ struct LiteStream {
     using CharType = char;
     static constexpr SizeT32 ExpandFactor{2};
 
-    LiteStream()                              = default;
     LiteStream(LiteStream &&)                 = delete;
     LiteStream(const LiteStream &)            = delete;
     LiteStream &operator=(LiteStream &&)      = delete;
     LiteStream &operator=(const LiteStream &) = delete;
 
-    explicit LiteStream(SizeT32 capacity) {
+    LiteStream() : storage_{nullptr}, capacity_{0}, length_{0} {};
+
+    explicit LiteStream(SizeT32 capacity) : storage_{nullptr}, capacity_{0}, length_{0} {
         if (capacity != 0) {
             reserve(capacity);
         }
@@ -216,9 +217,9 @@ struct LiteStream {
         capacity_ = capacity;
     }
 
-    char   *storage_{nullptr};
-    SizeT32 length_{0};
-    SizeT32 capacity_{0};
+    char   *storage_;
+    SizeT32 capacity_;
+    SizeT32 length_;
 };
 
 } // namespace Qentem

@@ -230,7 +230,7 @@ struct Digit {
      */
     template <typename Stream_T>
     QENTEM_INLINE static void FormatBenchmarkTime(Stream_T &stream, SizeT64I seconds, SizeT64I nanosecond,
-                                                  SizeT32 precision = 6) noexcept {
+                                                  SizeT32 precision = 4) noexcept {
         using Char_T = typename Stream_T::CharType;
         constexpr SizeT32 max_nanosecond{9};       // maximum nanosecond digits
         Char_T            storage[max_nanosecond]; // temporary digit buffer

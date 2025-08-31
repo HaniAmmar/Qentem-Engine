@@ -34,13 +34,9 @@ template <typename Char_T>
 struct String {
     using CharType = Char_T;
 
-    QENTEM_INLINE String() = default;
+    QENTEM_INLINE String() noexcept : storage_{nullptr}, capacity_{0}, length_{0} {};
 
-    QENTEM_INLINE ~String() {
-        release(Storage(), Capacity());
-    }
-
-    explicit String(SizeT capacity) {
+    explicit String(SizeT capacity) : storage_{nullptr}, capacity_{0}, length_{0} {
         if (capacity != 0) {
             reserve(capacity);
         }
@@ -52,18 +48,22 @@ struct String {
         src.setLength(0);
     }
 
-    String(const String &src) {
+    String(const String &src) : storage_{nullptr}, capacity_{0}, length_{0} {
         if (src.Length() != 0) {
             Write(src.First(), src.Length());
         }
     }
 
-    String(const Char_T *str, SizeT length) {
+    String(const Char_T *str, SizeT length) : storage_{nullptr}, capacity_{0}, length_{0} {
         Write(str, length);
     }
 
-    String(const Char_T *str) {
+    String(const Char_T *str) : storage_{nullptr}, capacity_{0}, length_{0} {
         Write(str, StringUtils::Count(str));
+    }
+
+    QENTEM_INLINE ~String() {
+        release(Storage(), Capacity());
     }
 
     String &operator=(String &&src) noexcept {
@@ -625,9 +625,9 @@ struct String {
         Reserver::Release(storage, (capacity + SizeT{1}));
     }
 
-    Char_T *storage_{nullptr};
-    SizeT   capacity_{0};
-    SizeT   length_{0};
+    Char_T *storage_;
+    SizeT   capacity_;
+    SizeT   length_;
 };
 
 } // namespace Qentem

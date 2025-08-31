@@ -46,7 +46,7 @@ struct Value {
     using StringT     = String<Char_T>;
     using StringViewT = StringView<Char_T>;
 
-    Value() noexcept : object_{} {
+    Value() noexcept : array_{} {
     }
 
     ~Value() {
@@ -71,7 +71,7 @@ struct Value {
         }
     }
 
-    Value(Value &&val) noexcept {
+    Value(Value &&val) noexcept : array_{} {
         switch (val.Type()) {
             case ValueType::Object: {
                 object_ = QUtility::Move(val.object_);
@@ -97,15 +97,15 @@ struct Value {
         val.setTypeToUndefined();
     }
 
-    Value(const Value &val) {
+    Value(const Value &val) : array_{} {
         copyValue(val);
     }
 
-    inline explicit Value(ValueType type) noexcept {
+    inline explicit Value(ValueType type) noexcept : array_{} {
         setType(type);
     }
 
-    inline explicit Value(ValueType type, SizeT size) noexcept {
+    inline explicit Value(ValueType type, SizeT size) noexcept : array_{} {
         switch (type) {
             case ValueType::Array: {
                 array_.Reserve(size);
@@ -183,11 +183,11 @@ struct Value {
         }
     }
 
-    explicit Value(NullType) noexcept {
+    explicit Value(NullType) noexcept : array_{} {
         setTypeToNull();
     }
 
-    explicit Value(bool bl) noexcept {
+    explicit Value(bool bl) noexcept : array_{} {
         if (bl) {
             setTypeToTrue();
         } else {
@@ -2313,7 +2313,7 @@ struct Value {
     }
 
     union {
-        ArrayT       array_{};
+        ArrayT       array_;
         ObjectT      object_;
         StringT      string_;
         QNumber64    number_;
