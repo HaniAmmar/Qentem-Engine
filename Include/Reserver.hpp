@@ -985,7 +985,30 @@ struct Reserver {
      * Should be used with care—this releases all memory regions tracked by the current core’s arena.
      */
     QENTEM_INLINE static void Reset() noexcept {
+#if defined(__linux__) || defined(_WIN32)
         GetCurrentInstance().Reset();
+#else
+        getReserver(0).Reset();
+#endif
+    }
+
+    /**
+     * @brief Empties all arenas across every core and reclaims their reserved memory regions.
+     *
+     * Unlike Reset(), which affects only the current thread's arena, this function traverses
+     * all per-core reservers and clears them. Use with extreme caution—this will invalidate
+     * every allocation managed by the system, regardless of the thread or core it originated from.
+     */
+    QENTEM_INLINE static void ResetAll() noexcept {
+#if defined(__linux__) || defined(_WIN32)
+        LiteArray<Core> &reservers = getReservers();
+
+        for (Core &reserver : reservers) {
+            reserver.Reset();
+        }
+#else
+        getReserver(0).Reset();
+#endif
     }
 
     /**
@@ -998,8 +1021,6 @@ struct Reserver {
      *         or (b) the primary arena is empty elsewhere.
      */
     QENTEM_INLINE static bool IsEmpty() noexcept {
-        return GetCurrentInstance().IsEmpty();
-
 #if defined(__linux__) || defined(_WIN32)
         LiteArray<Core> &reservers = getReservers();
 
@@ -1010,7 +1031,6 @@ struct Reserver {
         }
 
         return true;
-
 #else
         return getReserver(0).IsEmpty();
 #endif
