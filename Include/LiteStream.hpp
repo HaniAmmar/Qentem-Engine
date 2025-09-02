@@ -55,31 +55,21 @@ struct LiteStream {
     }
 
     void Write(const char *str, const SizeT32 length) {
-        if (length != 0) {
-            const SizeT32 new_length = (length_ + length);
+        const SizeT32 new_length = (length_ + length);
 
-            if (Capacity() < new_length) {
-                expand(new_length * ExpandFactor);
-            }
-
-            char   *des    = (storage_ + length_);
-            SizeT32 offset = 0;
-
-            while (offset < length) {
-                des[offset] = str[offset];
-                ++offset;
-            }
-
-            length_ = new_length;
+        if (Capacity() < new_length) {
+            expand(new_length * ExpandFactor);
         }
-    }
 
-    void operator<<(char ch) {
-        Write(ch);
-    }
+        char   *des    = (storage_ + length_);
+        SizeT32 offset = 0;
 
-    void operator<<(const char *str) {
-        Write(str, StringUtils::Count(str));
+        while (offset < length) {
+            des[offset] = str[offset];
+            ++offset;
+        }
+
+        length_ = new_length;
     }
 
     void Clear() noexcept {
@@ -93,10 +83,6 @@ struct LiteStream {
     }
 
     char *Storage() noexcept {
-        return storage_;
-    }
-
-    const char *Storage() const noexcept {
         return storage_;
     }
 
@@ -126,14 +112,6 @@ struct LiteStream {
 
     SizeT32 Capacity() const noexcept {
         return capacity_;
-    }
-
-    void InsertNull() {
-        if (Capacity() == length_) {
-            expand(length_ + 1U);
-        }
-
-        storage_[length_] = char{0};
     }
 
     void InsertAt(char ch, SizeT32 index) {

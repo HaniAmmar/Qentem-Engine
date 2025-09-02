@@ -1096,7 +1096,8 @@ struct Digit {
     static void formatStringNumberDefault(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                           const SizeT32 calculated_digits, SizeT32 fraction_length,
                                           const bool is_positive_exp, const bool round_up) {
-        using Char_T                = typename Stream_T::CharType;
+        using Char_T = typename Stream_T::CharType;
+
         Char_T     *storage         = stream.Storage();
         const SizeT number_length   = (stream.Length() - started_at);
         SizeT       index           = started_at;
@@ -1116,7 +1117,7 @@ struct Digit {
                           SizeT(!power_increased));
 
                 if (diff >= precision) {
-                    Char_T       *number = (storage + index);
+                    const Char_T *number = (storage + index);
                     const Char_T *last   = stream.Last();
 
                     while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
@@ -1131,7 +1132,7 @@ struct Digit {
         }
 
         if (fraction_length != 0) {
-            Char_T       *number        = (storage + index);
+            const Char_T *number        = (storage + index);
             const Char_T *last          = stream.Last();
             const SizeT   dot_index     = SizeT(started_at + fraction_length);
             const bool    fraction_only = (number_length <= fraction_length);
@@ -1198,7 +1199,8 @@ struct Digit {
     static void formatStringNumberFixed(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                         const SizeT32 calculated_digits, const SizeT32 fraction_length,
                                         const bool round_up) {
-        using Char_T              = typename Stream_T::CharType;
+        using Char_T = typename Stream_T::CharType;
+
         Char_T     *storage       = stream.Storage();
         const SizeT number_length = (stream.Length() - started_at);
         SizeT       index         = started_at;
@@ -1213,7 +1215,7 @@ struct Digit {
                     index += SizeT(fraction_length - (precision + SizeT{1}));
                     roundStringNumber(stream, index, power_increased, (round_up | (diff != 0)));
 
-                    Char_T       *number = (storage + index);
+                    const Char_T *number = (storage + index);
                     const Char_T *last   = stream.Last();
 
                     while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
@@ -1311,8 +1313,8 @@ struct Digit {
             }
 
             if ((number > last) || (*number == DigitUtils::DigitChar::Nine)) {
-                power_increased         = true;
-                stream.Storage()[index] = DigitUtils::DigitChar::One;
+                power_increased = true;
+                *number         = DigitUtils::DigitChar::One;
             } else {
                 ++(*number);
             }
