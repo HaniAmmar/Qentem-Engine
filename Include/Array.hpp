@@ -27,8 +27,8 @@ struct Array {
             reserve(capacity);
 
             if (initialize) {
-                MemoryUtils::ConstructRange(Storage(), (Storage() + Capacity()));
                 setSize(Capacity());
+                MemoryUtils::ConstructRange(Storage(), (Storage() + Capacity()));
             }
         }
     }

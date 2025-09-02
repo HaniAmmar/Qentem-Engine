@@ -24,34 +24,34 @@ namespace Qentem {
 
 template <typename Type_T>
 struct LiteArray {
-    QENTEM_INLINE LiteArray() noexcept : storage_{nullptr}, size_{0}, capacity_{0} {
+    QENTEM_INLINE LiteArray() noexcept : storage_{nullptr}, capacity_{0}, size_{0} {
     }
 
     LiteArray(const LiteArray &)            = delete;
     LiteArray &operator=(const LiteArray &) = delete;
 
     QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) noexcept
-        : storage_{nullptr}, size_{0}, capacity_{0} {
+        : storage_{nullptr}, capacity_{0}, size_{0} {
         if (capacity != 0) {
             reserve(capacity);
 
             if (initialize) {
-                MemoryUtils::ConstructRange(storage_, (storage_ + capacity_));
                 size_ = capacity_;
+                MemoryUtils::ConstructRange(storage_, (storage_ + size_));
             }
         }
     }
 
     QENTEM_INLINE LiteArray(LiteArray &&src) noexcept
-        : storage_{src.storage_}, size_{src.size_}, capacity_{src.capacity_} {
+        : storage_{src.storage_}, capacity_{src.capacity_}, size_{src.size_} {
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
         raw_storage_     = src.raw_storage_;
         src.raw_storage_ = nullptr;
 #endif
 
         src.storage_  = nullptr;
-        src.size_     = 0;
         src.capacity_ = 0;
+        src.size_     = 0;
     }
 
     QENTEM_INLINE LiteArray &operator=(LiteArray &&src) noexcept {
@@ -62,16 +62,16 @@ struct LiteArray {
             src.raw_storage_      = nullptr;
 #endif
             Type_T     *old_storage  = storage_;
-            const SizeT old_size     = size_;
             const SizeT old_capacity = capacity_;
+            const SizeT old_size     = size_;
 
             storage_  = src.storage_;
-            size_     = src.size_;
             capacity_ = src.capacity_;
+            size_     = src.size_;
 
             src.storage_  = nullptr;
-            src.size_     = 0;
             src.capacity_ = 0;
+            src.size_     = 0;
 
             if (old_storage != nullptr) {
                 // Just in case the copied array is not a child array, do this last.
@@ -146,8 +146,8 @@ struct LiteArray {
         }
 
         storage_  = nullptr;
-        size_     = 0;
         capacity_ = 0;
+        size_     = 0;
     }
 
     QENTEM_INLINE bool IsEmpty() const noexcept {
@@ -274,8 +274,8 @@ struct LiteArray {
 #endif
 
     Type_T *storage_;
-    SizeT   size_;
     SizeT   capacity_;
+    SizeT   size_;
 };
 
 } // namespace Qentem
