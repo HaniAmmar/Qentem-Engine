@@ -154,8 +154,15 @@ struct ToCharsHelper {
     template <typename Stream_T>
     struct Writer<Stream_T, void> {
         static void Write(Stream_T &stream, const void *ptr) {
+            constexpr SizeT       TOTAL_LENGTH{sizeof(void *) * 2U};
+            char                  buffer[TOTAL_LENGTH];
             PtrCast_T<const void> ptr_value{ptr};
-            Digit::NumberToString(stream, ptr_value.Number);
+            const SizeT           length = Digit::NumberToHex(&(buffer[0]), ptr_value.Number);
+            const SizeT           offset = (TOTAL_LENGTH - length);
+
+            stream.Write("0x", SizeT{2});
+            Digit::InsertZeros(stream, offset);
+            stream.Write(&(buffer[offset]), length);
         }
     };
 
