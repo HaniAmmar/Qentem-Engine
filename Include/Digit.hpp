@@ -169,6 +169,56 @@ struct Digit {
         return number;
     }
 
+    template <bool Lowercase = false, typename Number_T>
+    static SizeT NumberToHex(char *buffer, Number_T number) {
+        static constexpr char HexTable[]  = "0123456789ABCDEF";
+        static constexpr char HexTableL[] = "0123456789abcdef";
+        constexpr SizeT       length      = (sizeof(Number_T) * 2U);
+
+        SizeT index{length};
+
+        if QENTEM_CONST_EXPRESSION (Lowercase) {
+            while (index != 0) {
+                --index;
+                buffer[index] = HexTableL[static_cast<SizeT>(number & Number_T{0xF})];
+                number >>= 4U;
+
+                if (number != 0) {
+                    --index;
+                    buffer[index] = HexTableL[static_cast<SizeT>((number & Number_T{0xF}))];
+                    number >>= 4U;
+
+                    if (number != 0) {
+                        continue;
+                    }
+                }
+
+                break;
+            }
+
+            return (length - index);
+        } else {
+            while (index != 0) {
+                --index;
+                buffer[index] = HexTable[static_cast<SizeT>(number & Number_T{0xF})];
+                number >>= 4U;
+
+                if (number != 0) {
+                    --index;
+                    buffer[index] = HexTable[static_cast<SizeT>((number & Number_T{0xF}))];
+                    number >>= 4U;
+
+                    if (number != 0) {
+                        continue;
+                    }
+                }
+
+                break;
+            }
+
+            return (length - index);
+        }
+    }
 
     template <typename Number_T, typename Char_T>
     static Number_T HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
