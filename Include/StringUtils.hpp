@@ -45,7 +45,17 @@ struct StringUtils {
     }
 
     template <typename Char_T, typename Number_T>
-    inline static void Reverse(Char_T *str, Number_T start, Number_T length) noexcept {
+    QENTEM_INLINE static void Write(Char_T *&to, const Char_T *from, Number_T length) noexcept {
+        while (length != 0) {
+            --length;
+            *to = *from;
+            ++to;
+            ++from;
+        }
+    }
+
+    template <typename Char_T, typename Number_T>
+    QENTEM_INLINE static void Reverse(Char_T *str, Number_T start, Number_T length) noexcept {
         while (start < length) {
             const Char_T tmp = str[start];
 
@@ -57,7 +67,7 @@ struct StringUtils {
     }
 
     template <typename Char_T, typename Number_T>
-    static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
+    QENTEM_INLINE static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
         using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
 
         while (offset < end_offset) {
@@ -78,7 +88,7 @@ struct StringUtils {
     }
 
     template <typename Char_T, typename Number_T>
-    static void TrimRight(const Char_T *str, const Number_T offset, Number_T &end_offset) noexcept {
+    QENTEM_INLINE static void TrimRight(const Char_T *str, const Number_T offset, Number_T &end_offset) noexcept {
         using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
 
         if (end_offset > offset) {
@@ -155,7 +165,7 @@ struct StringUtils {
     }
 
     template <typename Char_T>
-    static bool IsEqual(const Char_T *left, const Char_T *right, SizeT length) noexcept {
+    QENTEM_INLINE static bool IsEqual(const Char_T *left, const Char_T *right, SizeT length) noexcept {
         SizeT offset = 0;
 
         // if ((left != nullptr) && (right != nullptr)) {
@@ -193,7 +203,7 @@ struct StringUtils {
     }
 
     template <typename Char_T>
-    static void ToLowerCase(Char_T *str, SizeT length) noexcept {
+    QENTEM_INLINE static void ToLowerCase(Char_T *str, SizeT length) noexcept {
         const Char_T *end = (str + length);
 
         while (str < end) {
