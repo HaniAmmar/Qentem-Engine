@@ -169,6 +169,7 @@ struct Digit {
         return number;
     }
 
+
     template <typename Number_T, typename Char_T>
     static Number_T HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
         SizeT offset{0};
@@ -292,15 +293,22 @@ struct Digit {
             stream.Write(DigitUtils::DigitChar::Dot);
 
             // Emit fractional part, padded with leading zeros
-            insertZeros(stream, start);
+            InsertZeros(stream, start);
             stream.Write(&(storage[start]), length);
 
             // Pad with trailing zeros if requested precision not yet reached
             const SizeT total = (start + length);
             if (total < precision) {
-                insertZeros(stream, (precision - total));
+                InsertZeros(stream, (precision - total));
             }
         }
+    }
+
+    template <typename Stream_T>
+    inline static void InsertZeros(Stream_T &stream, const SizeT length) {
+        using Char_T           = typename Stream_T::CharType;
+        constexpr SizeT32 size = sizeof(Char_T);
+        stream.Write(DigitUtils::DigitString<Char_T, size>::Zeros, length);
     }
 
   private:
@@ -991,13 +999,6 @@ struct Digit {
     }
 
     template <typename Stream_T>
-    inline static void insertZeros(Stream_T &stream, const SizeT length) {
-        using Char_T           = typename Stream_T::CharType;
-        constexpr SizeT32 size = sizeof(Char_T);
-        stream.Write(DigitUtils::DigitString<Char_T, size>::Zeros, length);
-    }
-
-    template <typename Stream_T>
     inline static void insertZerosLarge(Stream_T &stream, SizeT32 length) {
         using Char_T           = typename Stream_T::CharType;
         constexpr SizeT32 size = sizeof(Char_T);
@@ -1020,7 +1021,7 @@ struct Digit {
             NumberToString<true>(stream, b_int.Divide(DigitConst::MaxPowerOfTenValue));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            insertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
+            InsertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
         }
 
         if (b_int.NotZero()) {
@@ -1046,7 +1047,7 @@ struct Digit {
     //         NumberToString<true>(stream, (rem2 + rem1));
 
     //         // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-    //         insertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
+    //         InsertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
     //     }
 
     //     NumberToString<true>(stream, b_int.Number());
@@ -1147,7 +1148,7 @@ struct Digit {
 
                 if (!power_increased) {
                     if (diff < SizeT{4}) {
-                        insertZeros(stream, diff);
+                        InsertZeros(stream, diff);
                         stream.Write(DigitUtils::DigitChar::Dot);
                         stream.Write(DigitUtils::DigitChar::Zero);
                     } else {
@@ -1155,7 +1156,7 @@ struct Digit {
                         ++power;
                     }
                 } else if ((diff != 0) && (diff < SizeT{5})) {
-                    insertZeros(stream, (diff - SizeT{1}));
+                    InsertZeros(stream, (diff - SizeT{1}));
                     stream.Write(DigitUtils::DigitChar::Dot);
                     stream.Write(DigitUtils::DigitChar::Zero);
                 } else {
