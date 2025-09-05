@@ -72,7 +72,21 @@ struct LiteStream {
         length_ = new_length;
     }
 
-    void Clear() noexcept {
+    QENTEM_INLINE void SetLength(SizeT length) {
+        if (capacity_ < length) {
+            expand(length);
+        }
+
+        length_ = length;
+    }
+
+    QENTEM_INLINE void Expect(SizeT length) {
+        length += Length();
+
+        if (Capacity() < length) {
+            expand(length);
+        }
+    }
         length_ = 0;
     }
 
