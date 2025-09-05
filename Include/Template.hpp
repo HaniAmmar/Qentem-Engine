@@ -214,14 +214,14 @@ struct Template {
     ~Template()                           = delete;
 
     // template <typename Char_T, typename Value_T, typename StringStream_T>
-    // inline static void CachedRender(const StringView<Char_T> &content, const Value_T &value, StringStream_T &stream,
+    // static void CachedRender(const StringView<Char_T> &content, const Value_T &value, StringStream_T &stream,
     //                                 const StringView<Char_T> &template_name) {
     //     // See Examples/Template/Template17.cpp
     // }
 
     template <typename Char_T, typename Value_T, typename StringStream_T>
-    inline static StringStream_T &Render(const Char_T *content, SizeT length, const Value_T &value,
-                                         StringStream_T &stream, Array<Tags::TagBit> &tags_cache) {
+    QENTEM_INLINE static StringStream_T &Render(const Char_T *content, SizeT length, const Value_T &value,
+                                                StringStream_T &stream, Array<Tags::TagBit> &tags_cache) {
         TemplateCore<Char_T, Value_T, StringStream_T> temp{content, length};
 
         if (tags_cache.IsEmpty()) {
@@ -234,28 +234,28 @@ struct Template {
     }
 
     template <typename Char_T, typename Value_T, typename StringStream_T>
-    inline static StringStream_T &Render(const Char_T *content, const SizeT length, const Value_T &value,
-                                         StringStream_T &stream) {
+    QENTEM_INLINE static StringStream_T &Render(const Char_T *content, const SizeT length, const Value_T &value,
+                                                StringStream_T &stream) {
         Array<Tags::TagBit> tags_cache;
         Render(content, length, value, stream, tags_cache);
         return stream;
     }
 
     template <typename Char_T, typename Value_T, typename StringStream_T>
-    inline static StringStream_T &Render(const Char_T *content, const Value_T &value, StringStream_T &stream) {
+    QENTEM_INLINE static StringStream_T &Render(const Char_T *content, const Value_T &value, StringStream_T &stream) {
         Render(content, StringUtils::Count(content), value, stream);
         return stream;
     }
 
     template <typename StringStream_T, typename Char_T, typename Value_T>
-    inline static StringStream_T Render(const Char_T *content, const SizeT length, const Value_T &value) {
+    QENTEM_INLINE static StringStream_T Render(const Char_T *content, const SizeT length, const Value_T &value) {
         StringStream_T stream;
         Render(content, length, value, stream);
         return stream;
     }
 
     template <typename StringStream_T, typename Char_T, typename Value_T>
-    inline static StringStream_T Render(const Char_T *content, const Value_T &value) {
+    QENTEM_INLINE static StringStream_T Render(const Char_T *content, const Value_T &value) {
         return Render<StringStream_T>(content, StringUtils::Count(content), value);
     }
 };
@@ -289,11 +289,11 @@ struct TemplateCore {
     };
 
   public:
-    inline void Parse(Array<TagBit> &tags_cache) const {
+    QENTEM_INLINE void Parse(Array<TagBit> &tags_cache) const {
         parse(content_, length_, tags_cache);
     }
 
-    inline static void Parse(const Char_T *content, const SizeT length, Array<TagBit> &tags_cache) {
+    QENTEM_INLINE static void Parse(const Char_T *content, const SizeT length, Array<TagBit> &tags_cache) {
         parse(content, length, tags_cache);
     }
 
@@ -307,7 +307,7 @@ struct TemplateCore {
         render(tags_cache.First(), tags_cache.End(), 0, length_);
     }
 
-    inline bool Evaluate(QExpression &number, const QExpressions &exprs, const Value_T &value) noexcept {
+    QENTEM_INLINE bool Evaluate(QExpression &number, const QExpressions &exprs, const Value_T &value) noexcept {
         const QExpression *expr = exprs.First();
         value_                  = &value;
 
@@ -318,7 +318,7 @@ struct TemplateCore {
         return false;
     }
 
-    inline static QExpressions ParseExpressions(const Char_T *content, SizeT length) {
+    QENTEM_INLINE static QExpressions ParseExpressions(const Char_T *content, SizeT length) {
         return parseExpressions(content, 0, length, nullptr);
     }
 
@@ -842,7 +842,7 @@ struct TemplateCore {
         }
     }
 
-    inline static void checkLoopVariable(const Char_T *content, VariableTag &tag, const LoopTag *loop_tag) noexcept {
+    static void checkLoopVariable(const Char_T *content, VariableTag &tag, const LoopTag *loop_tag) noexcept {
         const Char_T *var = (content + tag.Offset);
 
         while (loop_tag != nullptr) {
@@ -858,7 +858,7 @@ struct TemplateCore {
         }
     }
 
-    inline static void parseLoopAttributes(const Char_T *content, const SizeT end_offset, LoopTag &tag) noexcept {
+    static void parseLoopAttributes(const Char_T *content, const SizeT end_offset, LoopTag &tag) noexcept {
         enum struct LoopAttributes : SizeT8 { None = 0, Set, Value, Sort, Group };
         SizeT offset = (tag.Offset + TagPatterns::LoopPrefixLength);
 
@@ -974,8 +974,8 @@ struct TemplateCore {
         } while (offset < end_offset);
     }
 
-    inline static void parseIfCase(const Char_T *content, SizeT &offset, const SizeT end_offset, SizeT &case_offset,
-                                   SizeT &case_end_offset) noexcept {
+    static void parseIfCase(const Char_T *content, SizeT &offset, const SizeT end_offset, SizeT &case_offset,
+                            SizeT &case_end_offset) noexcept {
         while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
             ++offset;
         }
@@ -1015,7 +1015,7 @@ struct TemplateCore {
     }
 
     // Render
-    void render(const TagBit *tag, const TagBit *end, SizeT offset, SizeT end_offset) const {
+    QENTEM_INLINE void render(const TagBit *tag, const TagBit *end, SizeT offset, SizeT end_offset) const {
         using HandlerFunc = void (TemplateCore::*)(const TagBit *tag, SizeT &) const;
 
         constexpr HandlerFunc handlers[SizeT8(TagType::None)] = {
@@ -1321,7 +1321,7 @@ struct TemplateCore {
         }
     }
 
-    inline const Value_T *getValue(const VariableTag &variable) const noexcept {
+    const Value_T *getValue(const VariableTag &variable) const noexcept {
         const Value_T *value     = nullptr;
         const Char_T  *id        = (content_ + variable.Offset);
         const SizeT    length    = variable.Length;
@@ -1754,8 +1754,8 @@ struct TemplateCore {
         return true;
     }
 
-    inline static QExpressions parseExpressions(const Char_T *content, SizeT offset, const SizeT end_offset,
-                                                const LoopTag *loop_tag) {
+    static QExpressions parseExpressions(const Char_T *content, SizeT offset, const SizeT end_offset,
+                                         const LoopTag *loop_tag) {
         QExpressions exprs;
         QOperation   last_oper = QOperation::NoOp;
 
@@ -2009,7 +2009,7 @@ struct TemplateCore {
         return QOperation::NoOp;
     }
 
-    static bool isExpression(const Char_T *content, SizeT offset) noexcept {
+    QENTEM_INLINE static bool isExpression(const Char_T *content, SizeT offset) noexcept {
         using QOperationSymbols = QOperationSymbols_T<Char_T>;
 
         while (offset != 0) {
