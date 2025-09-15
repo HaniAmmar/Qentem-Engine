@@ -30,6 +30,7 @@
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #if defined(__linux__)
         #include "SystemCall.hpp"
+        #include <linux/mman.h>
     #else
         // POSIX-style platforms: mmap, sysconf, etc.
         #include <sys/mman.h>
@@ -273,11 +274,6 @@ struct SystemMemory {
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     #else
         #if defined(__linux__)
-            constexpr int private_map	= 2;
-            constexpr int anonymous_map	= 32;
-            constexpr int read	        = 1;
-            constexpr int write	        = 2;
-
             // MAP_STACK was added in Linux 2.6.27; define manually if missing
             #if !defined(MAP_STACK)
                 #define QENTEM_LINUX_MAP_STACK 0x20000
@@ -285,7 +281,7 @@ struct SystemMemory {
                 #define QENTEM_LINUX_MAP_STACK MAP_STACK
             #endif
 
-            constexpr auto flags = private_map | anonymous_map | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
+            constexpr auto flags = MAP_PRIVATE | MAP_ANONYMOUS | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
 
             return reinterpret_cast<void *>(
                 SystemCall(
@@ -296,7 +292,7 @@ struct SystemMemory {
                     #endif
                         0, // null
                         size,
-                        read | write,
+                        (PROT_READ | PROT_WRITE),
                         flags,
                         -1,
                         0)
