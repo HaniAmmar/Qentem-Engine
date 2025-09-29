@@ -30,16 +30,16 @@ inline QENTEM_INLINE void operator delete(void *, void *, bool) noexcept {
 namespace Qentem {
 
 struct MemoryUtils {
-    template <typename Type_T>
-    QENTEM_INLINE static void SetToZeroByType(Type_T *des, SizeT size = 1) noexcept {
-        constexpr SizeT   type_size = sizeof(Type_T);
-        constexpr SizeT32 shift64   = 3U;
-        constexpr SizeT32 shift32   = 2U;
-        constexpr bool    is_mul8   = (type_size == ((type_size >> shift64) << shift64));
-        constexpr bool    is_mul4   = (type_size == ((type_size >> shift32) << shift32));
+    template <typename Type_T, typename Number_T = SizeT32>
+    QENTEM_INLINE static void SetToZeroByType(Type_T *des, Number_T size = 1) noexcept {
+        constexpr Number_T type_size = sizeof(Type_T);
+        constexpr SizeT32  shift64   = 3U;
+        constexpr SizeT32  shift32   = 2U;
+        constexpr bool     is_mul8   = (type_size == ((type_size >> shift64) << shift64));
+        constexpr bool     is_mul4   = (type_size == ((type_size >> shift32) << shift32));
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
-            SizeT    offset = 0;
+            Number_T offset = 0;
             SizeT64 *des64  = reinterpret_cast<SizeT64 *>(des);
 
             size *= type_size >> shift64;
@@ -49,7 +49,7 @@ struct MemoryUtils {
                 ++offset;
             }
         } else if QENTEM_CONST_EXPRESSION (is_mul4) {
-            SizeT    offset = 0;
+            Number_T offset = 0;
             SizeT32 *des32  = reinterpret_cast<SizeT32 *>(des);
 
             size *= type_size >> shift32;
@@ -59,8 +59,8 @@ struct MemoryUtils {
                 ++offset;
             }
         } else {
-            SizeT   offset = 0;
-            SizeT8 *des8   = reinterpret_cast<SizeT8 *>(des);
+            Number_T offset = 0;
+            SizeT8  *des8   = reinterpret_cast<SizeT8 *>(des);
 
             size *= type_size;
 
@@ -145,18 +145,18 @@ struct MemoryUtils {
     //     }
     // }
     /////////////////////////////////////////////////////////////////////
-    template <typename Type_T>
-    QENTEM_INLINE static void CopyTo(Type_T *to, const Type_T *from, SizeT size) noexcept {
-        constexpr SizeT   type_size = sizeof(Type_T);
-        constexpr SizeT32 shift64   = 3U;
-        constexpr SizeT32 shift32   = 2U;
-        constexpr bool    is_mul8   = (type_size == ((type_size >> shift64) << shift64));
-        constexpr bool    is_mul4   = (type_size == ((type_size >> shift32) << shift32));
+    template <typename Type_T, typename Number_T>
+    QENTEM_INLINE static void CopyTo(Type_T *to, const void *from, Number_T size) noexcept {
+        constexpr Number_T type_size = sizeof(Type_T);
+        constexpr SizeT32  shift64   = 3U;
+        constexpr SizeT32  shift32   = 2U;
+        constexpr bool     is_mul8   = (type_size == ((type_size >> shift64) << shift64));
+        constexpr bool     is_mul4   = (type_size == ((type_size >> shift32) << shift32));
 
         if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
-            SizeT          offset = 0;
+            Number_T       offset = 0;
             SizeT64       *des64  = reinterpret_cast<SizeT64 *>(to);
-            const SizeT64 *src64  = reinterpret_cast<const SizeT64 *>(from);
+            const SizeT64 *src64  = static_cast<const SizeT64 *>(from);
 
             size *= type_size >> shift64;
 
@@ -165,9 +165,9 @@ struct MemoryUtils {
                 ++offset;
             }
         } else if QENTEM_CONST_EXPRESSION (is_mul4) {
-            SizeT          offset = 0;
+            Number_T       offset = 0;
             SizeT32       *des32  = reinterpret_cast<SizeT32 *>(to);
-            const SizeT32 *src32  = reinterpret_cast<const SizeT32 *>(from);
+            const SizeT32 *src32  = static_cast<const SizeT32 *>(from);
 
             size *= type_size >> shift32;
 
@@ -176,9 +176,9 @@ struct MemoryUtils {
                 ++offset;
             }
         } else {
-            SizeT         offset = 0;
+            Number_T      offset = 0;
             SizeT8       *des8   = reinterpret_cast<SizeT8 *>(to);
-            const SizeT8 *src8   = reinterpret_cast<const SizeT8 *>(from);
+            const SizeT8 *src8   = static_cast<const SizeT8 *>(from);
 
             size *= type_size;
 
