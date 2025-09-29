@@ -167,7 +167,7 @@ struct QTest {
         static const auto &storage = MemoryRecord::GetRecord();
         PrintMemoryRecord();
 
-        const SystemIntType remaining = (storage.Reserved - storage.Released);
+        const SystemLong remaining = (storage.Reserved - storage.Released);
 
         if (remaining != 0) {
             QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Leak detected",
@@ -220,7 +220,7 @@ struct QTest {
         }
 
         if (test_for_leaks) {
-            const SystemIntType remaining = MemoryRecord::CheckSubRecord();
+            const SystemLong remaining = MemoryRecord::CheckSubRecord();
             MemoryRecord::EraseSubMemoryRecord();
 
             if (remaining != 0) {

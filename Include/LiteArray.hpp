@@ -256,10 +256,10 @@ struct LiteArray {
 
         storage_ = static_cast<Type_T *>(SystemMemory::Reserve(capacity_bytes));
 #else
-        raw_storage_                        = SystemMemory::Reserve(capacity_bytes + 64U);
-        const SystemIntType raw_address     = reinterpret_cast<SystemIntType>(raw_storage_);
-        const SystemIntType aligned_address = ((raw_address + SystemIntType{63}) & ~SystemIntType{63});
-        storage_                            = reinterpret_cast<Type_T *>(aligned_address);
+        raw_storage_                     = SystemMemory::Reserve(capacity_bytes + 64U);
+        const SystemLong raw_address     = reinterpret_cast<SystemLong>(raw_storage_);
+        const SystemLong aligned_address = ((raw_address + SystemLong{63}) & ~SystemLong{63});
+        storage_                         = reinterpret_cast<Type_T *>(aligned_address);
 #endif
 
         capacity_ = (capacity_bytes / sizeof(Type_T));

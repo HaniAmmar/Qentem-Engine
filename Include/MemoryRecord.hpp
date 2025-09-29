@@ -8,14 +8,14 @@ namespace Qentem {
 
 struct MemoryRecord {
     struct MemoryRecordData {
-        SystemIntType Reserved{0};
-        SystemIntType Released{0};
-        SystemIntType SubReserved{0};
-        SystemIntType subReleased{0};
-        SystemIntType Size{0};
-        SystemIntType PeakSize{0};
-        SystemIntType Blocks{0};
-        SystemIntType BlocksTotalSize{0};
+        SystemLong Reserved{0};
+        SystemLong Released{0};
+        SystemLong SubReserved{0};
+        SystemLong subReleased{0};
+        SystemLong Size{0};
+        SystemLong PeakSize{0};
+        SystemLong Blocks{0};
+        SystemLong BlocksTotalSize{0};
     };
 
     MemoryRecord()                                = delete;
@@ -36,13 +36,13 @@ struct MemoryRecord {
         storage.subReleased = 0;
     }
 
-    QENTEM_NOINLINE static SystemIntType CheckSubRecord() noexcept {
+    QENTEM_NOINLINE static SystemLong CheckSubRecord() noexcept {
         static const MemoryRecordData &storage = GetRecord();
 
         return (storage.SubReserved - storage.subReleased);
     }
 
-    QENTEM_NOINLINE static void Reserved(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void Reserved(SystemLong size) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
         ++(storage.Reserved);
@@ -55,15 +55,15 @@ struct MemoryRecord {
         }
     }
 
-    QENTEM_NOINLINE static void Shrink(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void Shrink(SystemLong size) noexcept {
         GetRecord().Size -= size;
     }
 
-    QENTEM_NOINLINE static void Expand(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void Expand(SystemLong size) noexcept {
         GetRecord().Size += size;
     }
 
-    QENTEM_NOINLINE static void Released(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void Released(SystemLong size) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
         ++(storage.Released);
@@ -72,14 +72,14 @@ struct MemoryRecord {
         storage.Size -= size;
     }
 
-    QENTEM_NOINLINE static void ReservedBlock(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void ReservedBlock(SystemLong size) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
         ++(storage.Blocks);
         storage.BlocksTotalSize += size;
     }
 
-    QENTEM_NOINLINE static void ReleasedBlock(SystemIntType size) noexcept {
+    QENTEM_NOINLINE static void ReleasedBlock(SystemLong size) noexcept {
         static MemoryRecordData &storage = GetRecord();
 
         --(storage.Blocks);

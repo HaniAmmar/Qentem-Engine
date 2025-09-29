@@ -82,15 +82,15 @@ struct SystemIntTypeT<4U> {
     using SizeType    = SizeT32;
 };
 
-using SystemIntType_All = SystemIntTypeT<sizeof(void *)>;
+using SystemIntTypes = SystemIntTypeT<sizeof(void *)>;
 
 #ifndef QENTEM_SIZE_T
-#define QENTEM_SIZE_T SystemIntType_All::SizeType
+#define QENTEM_SIZE_T SystemIntTypes::SizeType
 #endif
 
-using SizeT          = QENTEM_SIZE_T;
-using SystemIntType  = SystemIntType_All::NumberType;
-using SystemIntTypeI = SystemIntType_All::NumberTypeI;
+using SizeT       = QENTEM_SIZE_T;
+using SystemLong  = SystemIntTypes::NumberType;
+using SystemLongI = SystemIntTypes::NumberTypeI;
 
 ///////////////////////////////////////////////////////////////
 //                    Pointer Casting                        //
@@ -98,8 +98,8 @@ using SystemIntTypeI = SystemIntType_All::NumberTypeI;
 
 template <typename Type_T>
 union PtrCast_T {
-    Type_T       *Pointer;
-    SystemIntType Number;
+    Type_T    *Pointer;
+    SystemLong Number;
 };
 
 ///////////////////////////////////////////////////////////////

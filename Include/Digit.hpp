@@ -768,7 +768,7 @@ struct Digit {
     }
     /////////////////////////////////////////
     static void powerOfPositiveTen(SizeT64 &number, SizeT32 exponent) noexcept {
-        using UNumber_T  = SystemIntType;
+        using UNumber_T  = SystemLong;
         using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
         BigInt<UNumber_T, 256U> b_int{number};
@@ -869,7 +869,7 @@ struct Digit {
 
         using Info_T = DigitUtils::RealNumberInfo<Float_T, number_size>;
         // 4.9406564584124654e-324 needs about 1216 bits to store all its digits.
-        using BigIntSys  = BigInt<SystemIntType, ((Info_T::Bias + 1U) + (number_size * 8U * 3U))>;
+        using BigIntSys  = BigInt<SystemLong, ((Info_T::Bias + 1U) + (number_size * 8U * 3U))>;
         using DigitConst = DigitUtils::DigitConst<BigIntSys::ByteWidth()>;
 
         const Number_T bias = (number & Info_T::ExponentMask);

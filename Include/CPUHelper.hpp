@@ -33,67 +33,67 @@
 namespace Qentem {
 
 struct CPUSet {
-    static constexpr SystemIntType MAX_CORE  = QENTEM_MAX_CPU_CORES;
-    static constexpr SystemIntType BIT_WIDTH = (sizeof(SystemIntType) * SystemIntType{8});
-    static constexpr SystemIntType SIZE      = ((MAX_CORE + (BIT_WIDTH - 1U)) / BIT_WIDTH);
-    static constexpr SizeT32       SHIFT     = (BIT_WIDTH == SystemIntType{64} ? 6U : 5U);
+    static constexpr SystemLong MAX_CORE  = QENTEM_MAX_CPU_CORES;
+    static constexpr SystemLong BIT_WIDTH = (sizeof(SystemLong) * SystemLong{8});
+    static constexpr SystemLong SIZE      = ((MAX_CORE + (BIT_WIDTH - 1U)) / BIT_WIDTH);
+    static constexpr SizeT32    SHIFT     = (BIT_WIDTH == SystemLong{64} ? 6U : 5U);
 
     QENTEM_INLINE void Clear() noexcept {
-        for (SystemIntType i = 0; i < SIZE; ++i) {
+        for (SystemLong i = 0; i < SIZE; ++i) {
             mask_[i] = 0;
         }
     }
 
-    QENTEM_INLINE void Set(SystemIntType core) noexcept {
+    QENTEM_INLINE void Set(SystemLong core) noexcept {
         if (core < MAX_CORE) {
-            SystemIntType index;
-            SystemIntType offset;
+            SystemLong index;
+            SystemLong offset;
 
             setIndexOffset(index, offset, core);
 
-            mask_[index] |= (SystemIntType{1} << offset);
+            mask_[index] |= (SystemLong{1} << offset);
         }
     }
 
-    QENTEM_INLINE void Reset(SystemIntType core) noexcept {
+    QENTEM_INLINE void Reset(SystemLong core) noexcept {
         if (core < MAX_CORE) {
-            SystemIntType index;
-            SystemIntType offset;
+            SystemLong index;
+            SystemLong offset;
 
             setIndexOffset(index, offset, core);
 
-            mask_[index] &= ~(SystemIntType{1} << offset);
+            mask_[index] &= ~(SystemLong{1} << offset);
         }
     }
 
-    QENTEM_INLINE bool IsSet(SystemIntType core) const noexcept {
+    QENTEM_INLINE bool IsSet(SystemLong core) const noexcept {
         if (core < MAX_CORE) {
-            SystemIntType index;
-            SystemIntType offset;
+            SystemLong index;
+            SystemLong offset;
 
             setIndexOffset(index, offset, core);
 
-            return (mask_[index] & (SystemIntType{1} << offset)) != 0;
+            return (mask_[index] & (SystemLong{1} << offset)) != 0;
         }
 
         return false;
     }
 
-    QENTEM_INLINE const SystemIntType *Data() const noexcept {
+    QENTEM_INLINE const SystemLong *Data() const noexcept {
         return &(mask_[0]);
     }
 
-    QENTEM_INLINE constexpr SystemIntType Size() const noexcept {
+    QENTEM_INLINE constexpr SystemLong Size() const noexcept {
         return SIZE;
     }
 
   private:
-    QENTEM_INLINE static void setIndexOffset(SystemIntType &index, SystemIntType &offset, SystemIntType core) {
+    QENTEM_INLINE static void setIndexOffset(SystemLong &index, SystemLong &offset, SystemLong core) {
         index  = (core >> SHIFT);
         offset = (core & (BIT_WIDTH - 1U));
     }
 
-    SystemIntType mask_[SIZE]{};
+    SystemLong mask_[SIZE]{};
 };
 
 struct CPUHelper {
@@ -159,7 +159,7 @@ struct CPUHelper {
         cores.Set(core_id);
 
         // 0 = current thread
-        const long ret = setAffinity(0, static_cast<SystemIntType>(cores.Size()), cores.Data());
+        const long ret = setAffinity(0, static_cast<SystemLong>(cores.Size()), cores.Data());
 
         return (ret == 0);
 #elif defined(_WIN32)

@@ -36,12 +36,12 @@ namespace Qentem {
  */
 template <SizeT32 Alignment_T>
 struct MemoryBlock {
-    static constexpr SystemIntType BITS_IN_CHAR        = 8;
-    static constexpr SystemIntType MAX_SYSTEM_INT_TYPE = ~SystemIntType{0};
-    static constexpr SizeT32       PTR_SIZE            = sizeof(SystemIntType);
-    static constexpr SizeT32       BIT_WIDTH           = (PTR_SIZE * 8U);
-    static constexpr SystemIntType ALIGNMENT_M1        = static_cast<SystemIntType>(Alignment_T - 1U);
-    static constexpr SystemIntType ALIGNMENT_N         = ~ALIGNMENT_M1;
+    static constexpr SystemLong BITS_IN_CHAR        = 8;
+    static constexpr SystemLong MAX_SYSTEM_INT_TYPE = ~SystemLong{0};
+    static constexpr SizeT32    PTR_SIZE            = sizeof(SystemLong);
+    static constexpr SizeT32    BIT_WIDTH           = (PTR_SIZE * 8U);
+    static constexpr SystemLong ALIGNMENT_M1        = static_cast<SystemLong>(Alignment_T - 1U);
+    static constexpr SystemLong ALIGNMENT_N         = ~ALIGNMENT_M1;
 
     QENTEM_INLINE MemoryBlock() noexcept        = default;
     MemoryBlock(const MemoryBlock &)            = delete;
@@ -57,11 +57,11 @@ struct MemoryBlock {
      *
      * @param capacity Minimum number of bytes to reserve (may be rounded up).
      */
-    explicit MemoryBlock(SystemIntType capacity) noexcept : capacity_{capacity} {
+    explicit MemoryBlock(SystemLong capacity) noexcept : capacity_{capacity} {
         static_assert((Alignment_T > 0) && ((Alignment_T & (Alignment_T - 1)) == 0),
                       "Alignment_T must be power-of-two");
 
-        const SystemIntType page_size = SystemMemory::PageSize();
+        const SystemLong page_size = SystemMemory::PageSize();
 
         if (capacity_ > page_size) {
             // Round up to next page boundary
@@ -79,9 +79,8 @@ struct MemoryBlock {
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
         {
-            const SystemIntType aligned_address =
-                ((reinterpret_cast<SystemIntType>(base_raw_) + ALIGNMENT_M1) & ALIGNMENT_N);
-            base_ = reinterpret_cast<void *>(aligned_address);
+            const SystemLong aligned_address = ((reinterpret_cast<SystemLong>(base_raw_) + ALIGNMENT_M1) & ALIGNMENT_N);
+            base_                            = reinterpret_cast<void *>(aligned_address);
         }
 #endif
 
@@ -94,10 +93,9 @@ struct MemoryBlock {
             table_size_       = PTR_SIZE;
         }
 
-        const SystemIntType usable_base_raw =
-            reinterpret_cast<SystemIntType>((static_cast<char *>(base_) + table_size_));
-        const SystemIntType aligned_usable_base = ((usable_base_raw + ALIGNMENT_M1) & ALIGNMENT_N);
-        const SystemIntType unusable =
+        const SystemLong usable_base_raw     = reinterpret_cast<SystemLong>((static_cast<char *>(base_) + table_size_));
+        const SystemLong aligned_usable_base = ((usable_base_raw + ALIGNMENT_M1) & ALIGNMENT_N);
+        const SystemLong unusable =
             (((table_size_ + (aligned_usable_base - usable_base_raw)) + ALIGNMENT_M1) & ALIGNMENT_N);
 
         table_size_ /= PTR_SIZE;
@@ -205,11 +203,11 @@ struct MemoryBlock {
         return (static_cast<const char *>(base_) + capacity_);
     }
 
-    QENTEM_INLINE SystemIntType &GetRefNextIndex() noexcept {
+    QENTEM_INLINE SystemLong &GetRefNextIndex() noexcept {
         return next_index_;
     }
 
-    QENTEM_INLINE SystemIntType TableSize() const noexcept {
+    QENTEM_INLINE SystemLong TableSize() const noexcept {
         return table_size_;
     }
 
@@ -218,7 +216,7 @@ struct MemoryBlock {
         return Platform::FindFirstBit(BIT_WIDTH);
     }
 
-    QENTEM_INLINE SystemIntType Capacity() const noexcept {
+    QENTEM_INLINE SystemLong Capacity() const noexcept {
         return capacity_;
     }
 
@@ -226,19 +224,19 @@ struct MemoryBlock {
         return (available_ == usable_size_);
     }
 
-    QENTEM_INLINE SystemIntType Available() const noexcept {
+    QENTEM_INLINE SystemLong Available() const noexcept {
         return available_;
     }
 
-    QENTEM_INLINE SystemIntType UsableSize() const noexcept {
+    QENTEM_INLINE SystemLong UsableSize() const noexcept {
         return usable_size_;
     }
 
-    QENTEM_INLINE void IncreaseAvailable(SystemIntType size) noexcept {
+    QENTEM_INLINE void IncreaseAvailable(SystemLong size) noexcept {
         available_ += size;
     }
 
-    QENTEM_INLINE void DecreaseAvailable(SystemIntType size) noexcept {
+    QENTEM_INLINE void DecreaseAvailable(SystemLong size) noexcept {
         available_ -= size;
     }
 
@@ -249,13 +247,13 @@ struct MemoryBlock {
      * accounting for padding and unusable tail regions.
      */
     void ClearTable() noexcept {
-        SystemIntType      *table         = static_cast<SystemIntType *>(base_);
-        const SystemIntType table_size_m1 = (table_size_ - SystemIntType{1});
-        const SystemIntType table_mask =
+        SystemLong      *table         = static_cast<SystemLong *>(base_);
+        const SystemLong table_size_m1 = (table_size_ - SystemLong{1});
+        const SystemLong table_mask =
             ((table_mask_shift_ != BIT_WIDTH) ? (MAX_SYSTEM_INT_TYPE >> table_mask_shift_) : 0);
 
         {
-            SystemIntType index = 0;
+            SystemLong index = 0;
             while (index < table_size_m1) {
                 table[index] = 0;
                 ++index;
@@ -276,13 +274,13 @@ struct MemoryBlock {
      * @param chunks Number of chunks to reserve.
      * @return Aligned pointer to reserved memory region.
      */
-    void *ReserveRegion(SystemIntType bit_index, SystemIntType chunks) {
-        SystemIntType *table       = static_cast<SystemIntType *>(Base());
-        SystemIntType  table_index = (bit_index >> TableFirstBit());
+    void *ReserveRegion(SystemLong bit_index, SystemLong chunks) {
+        SystemLong *table       = static_cast<SystemLong *>(Base());
+        SystemLong  table_index = (bit_index >> TableFirstBit());
 
         void *ptr = (static_cast<char *>(Data()) + (bit_index << DefaultAlignmentBit()));
         bit_index -= (table_index << TableFirstBit());
-        SystemIntType mask = MAX_SYSTEM_INT_TYPE;
+        SystemLong mask = MAX_SYSTEM_INT_TYPE;
         mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
         mask >>= bit_index;
         table[table_index] |= mask;
@@ -297,14 +295,14 @@ struct MemoryBlock {
             table[table_index] |= mask;
         }
 
-        // next_index_ *= static_cast<SystemIntType>(table_index != (table_size_ - SystemIntType{1}));
+        // next_index_ *= static_cast<SystemLong>(table_index != (table_size_ - SystemLong{1}));
 
         return ptr;
     }
 
-    void ReserveRegion(SystemIntType table_index, SystemIntType bit_index, SystemIntType chunks) noexcept {
-        SystemIntType *table = static_cast<SystemIntType *>(Base());
-        SystemIntType  mask  = MAX_SYSTEM_INT_TYPE;
+    void ReserveRegion(SystemLong table_index, SystemLong bit_index, SystemLong chunks) noexcept {
+        SystemLong *table = static_cast<SystemLong *>(Base());
+        SystemLong  mask  = MAX_SYSTEM_INT_TYPE;
         mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
         mask >>= bit_index;
         table[table_index] |= mask;
@@ -329,15 +327,15 @@ struct MemoryBlock {
      * @param ptr    Pointer returned by ReserveRegion().
      * @param chunks Number of chunks originally reserved.
      */
-    void ReleaseRegion(void *ptr, SystemIntType chunks) noexcept {
-        SystemIntType *table = static_cast<SystemIntType *>(Base());
-        SystemIntType  table_index;
-        SystemIntType  bit_index;
+    void ReleaseRegion(void *ptr, SystemLong chunks) noexcept {
+        SystemLong *table = static_cast<SystemLong *>(Base());
+        SystemLong  table_index;
+        SystemLong  bit_index;
 
-        DecodeBitmapPosition(static_cast<SystemIntType>(static_cast<char *>(ptr) - static_cast<char *>(Data())),
+        DecodeBitmapPosition(static_cast<SystemLong>(static_cast<char *>(ptr) - static_cast<char *>(Data())),
                              table_index, bit_index);
 
-        SystemIntType mask = MAX_SYSTEM_INT_TYPE;
+        SystemLong mask = MAX_SYSTEM_INT_TYPE;
         mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
         mask >>= bit_index;
         table[table_index] &= ~mask;
@@ -368,8 +366,7 @@ struct MemoryBlock {
      * @param table_index [out] Index into the bitmap table (each entry is a 64-bit word).
      * @param bit_index   [out] Bit offset within the selected word.
      */
-    QENTEM_INLINE static void DecodeBitmapPosition(SystemIntType ptr_int, SystemIntType &table_index,
-                                                   SystemIntType &bit_index) {
+    QENTEM_INLINE static void DecodeBitmapPosition(SystemLong ptr_int, SystemLong &table_index, SystemLong &bit_index) {
         // Convert byte offset into allocation unit index.
         bit_index = (ptr_int >> DefaultAlignmentBit());
 
@@ -397,14 +394,14 @@ struct MemoryBlock {
     };
 #endif
 
-    void         *data_{nullptr};
-    SystemIntType usable_size_{0};
-    SystemIntType available_{0};
-    SystemIntType next_index_{0};
-    SystemIntType table_size_{0};
-    SizeT32       data_alignment_{0};
-    SizeT32       table_mask_shift_{0};
-    SystemIntType capacity_{0};
+    void      *data_{nullptr};
+    SystemLong usable_size_{0};
+    SystemLong available_{0};
+    SystemLong next_index_{0};
+    SystemLong table_size_{0};
+    SizeT32    data_alignment_{0};
+    SizeT32    table_mask_shift_{0};
+    SystemLong capacity_{0};
 };
 
 } // namespace Qentem

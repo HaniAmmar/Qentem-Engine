@@ -19,7 +19,7 @@
 #ifndef QENTEM_SYSTEM_MEMORY_HPP
 #define QENTEM_SYSTEM_MEMORY_HPP
 
-#include "QCommon.hpp"
+#include "Platform.hpp"
 
 // clang-format off
 #if defined(_WIN32)
@@ -56,8 +56,8 @@ struct SystemMemory {
      *
      * @return Size of a memory page in bytes.
      */
-    QENTEM_INLINE static SystemIntType PageSize() noexcept {
-        static const SystemIntType page_size = pageSize();
+    QENTEM_INLINE static SystemLong PageSize() noexcept {
+        static const SystemLong page_size = pageSize();
         return page_size;
     }
 
@@ -70,12 +70,12 @@ struct SystemMemory {
      * @param size Size of region to protect (should be a multiple of page size).
      * @return True on success, false on failure.
      */
-    static bool ProtectGuardPage(void *ptr, SystemIntType size) noexcept {
+    static bool ProtectGuardPage(void *ptr, SystemLong size) noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
             DWORD old_protect;
-            return (::VirtualProtect(ptr, static_cast<SystemIntType>(size), PAGE_NOACCESS, &old_protect) != 0);
+            return (::VirtualProtect(ptr, static_cast<SystemLong>(size), PAGE_NOACCESS, &old_protect) != 0);
     #else
             #if defined(__linux__)
                 constexpr int no_access = 0;
@@ -100,8 +100,8 @@ struct SystemMemory {
      * @param size Number of bytes to reserve. Should be a multiple of the system page size.
      * @return Pointer to memory on success, or nullptr on failure.
      */
-    QENTEM_INLINE static void *Reserve(SystemIntType size) noexcept {
-        return reserve<false>(size);
+    QENTEM_INLINE static void *Reserve(SystemLong size, SizeT32 flags = 0) noexcept {
+        return reserve<false>(size, flags);
     }
 
     /**
@@ -113,8 +113,8 @@ struct SystemMemory {
      * @param size Number of bytes to reserve. Should be a multiple of the system page size.
      * @return Pointer to memory on success, or nullptr on failure.
      */
-    QENTEM_INLINE static void *ReserveStack(SystemIntType size) noexcept {
-        return reserve<true>(size);
+    QENTEM_INLINE static void *ReserveStack(SystemLong size, SizeT32 flags = 0) noexcept {
+        return reserve<true>(size, flags);
     }
 
     /**
@@ -123,7 +123,7 @@ struct SystemMemory {
      * @param ptr  Pointer returned by Reserve().
      * @param size Size in bytes (same value passed to Reserve).
      */
-    static void Release(void *ptr, SystemIntType size) noexcept {
+    static void Release(void *ptr, SystemLong size) noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -159,7 +159,7 @@ struct SystemMemory {
  * @param size   Size in bytes to release (must be multiple of page size).
  */
 #if !defined(_WIN32)
-    QENTEM_INLINE static void ReleasePages(void *start, SystemIntType size) noexcept {
+    QENTEM_INLINE static void ReleasePages(void *start, SystemLong size) noexcept {
         // clang-format off
     #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
         #if defined(__linux__)
@@ -182,10 +182,10 @@ struct SystemMemory {
      *
      * @return Size of a memory page in bytes.
      */
-    static SystemIntType pageSize() noexcept {
+    static SystemLong pageSize() noexcept {
         struct AUX {
-            SystemIntType Type;
-            SystemIntType Value;
+            SystemLong Type;
+            SystemLong Value;
         };
 
         // clang-format off
@@ -193,7 +193,7 @@ struct SystemMemory {
     #if defined(_WIN32)
         SYSTEM_INFO info;
         GetSystemInfo(&info);
-        return static_cast<SystemIntType>(info.dwPageSize);
+        return static_cast<SystemLong>(info.dwPageSize);
     #else
         #if defined(__linux__)
             constexpr int at_fdcwd      = -100; // AT_FDCWD
@@ -202,7 +202,7 @@ struct SystemMemory {
             constexpr const char AUXV_PATH[] = "/proc/self/auxv";
 
             AUX aux;
-            SystemIntType page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
+            SystemLong page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
 
             const int fd = static_cast<int>(SystemCall(__NR_openat, at_fdcwd,
                                                 reinterpret_cast<long>(AUXV_PATH),
@@ -240,7 +240,7 @@ struct SystemMemory {
 
             return page_size;
         #else
-            return static_cast<SystemIntType>(::sysconf(
+            return static_cast<SystemLong>(::sysconf(
                 #if defined(_SC_PAGESIZE)
                             _SC_PAGESIZE
                 #else
@@ -267,7 +267,7 @@ struct SystemMemory {
      * @return Pointer to reserved memory, or nullptr on failure.
      */
     template <bool IS_STACK_MEMORY_T>
-    static void *reserve(SystemIntType size) noexcept {
+    static void *reserve(SystemLong size, SizeT32 flags) noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -281,7 +281,76 @@ struct SystemMemory {
                 #define QENTEM_LINUX_MAP_STACK MAP_STACK
             #endif
 
-            constexpr auto flags = MAP_PRIVATE | MAP_ANONYMOUS | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
+            flags |= MAP_PRIVATE | MAP_ANONYMOUS | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
+
+            // if (Platform::PopCount(size) == 1) {
+            //     SizeT32 index = (size >> 13U);
+
+            //     if (index != 0) {
+            //         index = Platform::FindLastBit(index);
+            //     }
+
+            //     switch (index) {
+            //         case 0: {
+            //             break;
+            //         }
+
+            //         case 1: // 16KiB
+            //         case 2: // 32KiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_16KB;
+            //             break;
+            //         }
+
+            //         case 3: // 64KiB
+            //         case 4: // 128KiB
+            //         case 5: // 256KiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_64KB;
+            //             break;
+            //         }
+
+            //         case 6: // 512KiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_512KB;
+            //             break;
+            //         }
+
+            //         case 7: // 1MiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_1MB;
+            //             break;
+            //         }
+
+            //         case 8: // 2MiB
+            //         case 9: // 4MiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_2MB;
+            //             break;
+            //         }
+
+            //         case 10: // 8MiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_8MB;
+            //             break;
+            //         }
+
+            //         case 11: // 16MiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_16MB;
+            //             break;
+            //         }
+
+            //         case 12: // 32MiB
+            //         {
+            //             flags |= MAP_HUGETLB | MAP_HUGE_32MB;
+            //             break;
+            //         }
+
+            //         default: {
+            //         }
+            //     }
+            // }
 
             return reinterpret_cast<void *>(
                 SystemCall(
@@ -298,7 +367,7 @@ struct SystemMemory {
                         0)
             );
         #else
-            return ::mmap(nullptr, size, (PROT_READ | PROT_WRITE), (MAP_PRIVATE | MAP_ANONYMOUS), -1, 0);
+            return ::mmap(nullptr, size, (PROT_READ | PROT_WRITE), (MAP_PRIVATE | MAP_ANONYMOUS | flags), -1, 0);
         #endif
     #endif
 #else

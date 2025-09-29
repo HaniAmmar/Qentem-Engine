@@ -18,7 +18,7 @@
 #include "Platform.hpp"
 
 #ifndef QENTEM_NO_CUSTOM_PLACEMENT_NEW
-inline QENTEM_INLINE void *operator new(Qentem::SystemIntType, void *pointer, bool) noexcept {
+inline QENTEM_INLINE void *operator new(Qentem::SystemLong, void *pointer, bool) noexcept {
     return pointer;
 }
 

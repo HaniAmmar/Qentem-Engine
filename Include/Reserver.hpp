@@ -62,23 +62,22 @@ namespace Qentem {
  * @tparam Alignment_T Minimum alignment for allocations (in bytes).
  * @tparam BlockSize_T Size of each memory block managed (default: QENTEM_RESERVER_BLOCK_SIZE).
  */
-template <SizeT32       Alignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT,
-          SystemIntType BlockSize_T = QENTEM_RESERVER_BLOCK_SIZE>
+template <SizeT32 Alignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT, SystemLong BlockSize_T = QENTEM_RESERVER_BLOCK_SIZE>
 struct ReserverCore {
     /// Alias for the managed memory block type, bound to the default alignment.
     using MemoryBlockT = MemoryBlock<Alignment_T>;
 
     /// Maximum representable system integer value (used for limit checks or sentinels).
-    static constexpr SystemIntType MAX_SYSTEM_INT_TYPE = ~SystemIntType{0};
+    static constexpr SystemLong MAX_SYSTEM_INT_TYPE = ~SystemLong{0};
 
     /// Alignment mask used to round up sizes to the nearest boundary.
-    static constexpr SystemIntType DEFAULT_ALIGNMENT_M1 = static_cast<SystemIntType>(Alignment_T - 1U);
+    static constexpr SystemLong DEFAULT_ALIGNMENT_M1 = static_cast<SystemLong>(Alignment_T - 1U);
 
     /// Inverse alignment mask for fast alignment rounding via bitwise operations.
-    static constexpr SystemIntType DEFAULT_ALIGNMENT_N = ~DEFAULT_ALIGNMENT_M1;
+    static constexpr SystemLong DEFAULT_ALIGNMENT_N = ~DEFAULT_ALIGNMENT_M1;
 
-    /// Native width of SystemIntType in bits — typically 32 or 64.
-    static constexpr SizeT32 BIT_WIDTH = (sizeof(SystemIntType) * 8U);
+    /// Native width of SystemLong in bits — typically 32 or 64.
+    static constexpr SizeT32 BIT_WIDTH = (sizeof(SystemLong) * 8U);
 
     // Deleted copy and move operations: instances are anchored per core and must not be copied.
     ReserverCore(ReserverCore &&)                 = delete;
@@ -131,7 +130,7 @@ struct ReserverCore {
      * @note The size must already be aligned. Use `RoundUpBytes<T>()` before calling.
      */
     template <SizeT32 CustomAlignment_T = Alignment_T>
-    void *Reserve(SystemIntType size) {
+    void *Reserve(SystemLong size) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
         // Optionally track memory usage for debugging/statistics.
         MemoryRecord::Reserved(size);
@@ -140,7 +139,7 @@ struct ReserverCore {
         ///////////////////////////////////////////////////////////
         // Phase 1: Try to serve from existing active blocks.
 
-        const SystemIntType chunks = (size >> MemoryBlockT::DefaultAlignmentBit());
+        const SystemLong chunks = (size >> MemoryBlockT::DefaultAlignmentBit());
 
         for (MemoryBlockT &current_block : blocks_) {
             if (current_block.Available() >= size) {
@@ -211,7 +210,7 @@ struct ReserverCore {
      * @param size Size in bytes of the region being returned.
      * @return True if successfully reclaimed, false if the pointer does not belong to any known block.
      */
-    bool Release(void *ptr, SystemIntType size) {
+    bool Release(void *ptr, SystemLong size) {
         // Phase 1: Search within active blocks.
         for (MemoryBlockT &block : blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
@@ -277,9 +276,9 @@ struct ReserverCore {
      * @param to_size   The desired new (smaller) size in bytes.
      * @return True if the shrink operation succeeded and memory was reclaimed; false otherwise.
      */
-    bool Shrink(void *ptr, SystemIntType from_size, SystemIntType to_size) {
-        char               *shrink_from = (static_cast<char *>(ptr) + to_size);
-        const SystemIntType diff        = (from_size - to_size);
+    bool Shrink(void *ptr, SystemLong from_size, SystemLong to_size) {
+        char            *shrink_from = (static_cast<char *>(ptr) + to_size);
+        const SystemLong diff        = (from_size - to_size);
 
         // Phase 1: Search within active blocks.
         for (MemoryBlockT &block : blocks_) {
@@ -348,8 +347,8 @@ struct ReserverCore {
      * @return The new size of the allocation if expanded successfully,
      *         `from_size` if expansion failed, or 0 if the pointer is unrecognized.
      */
-    SystemIntType TryExpand(void *ptr, SystemIntType from_size, SystemIntType to_size) {
-        const SystemIntType diff = (to_size - from_size);
+    SystemLong TryExpand(void *ptr, SystemLong from_size, SystemLong to_size) {
+        const SystemLong diff = (to_size - from_size);
 
         for (MemoryBlockT &block : blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
@@ -478,10 +477,10 @@ struct ReserverCore {
      * @see MemoryBlock::ReserveRegion
      */
     template <SizeT32 CustomAlignment_T>
-    void *reserveFirstFit(MemoryBlockT *block, SystemIntType chunks) noexcept {
-        constexpr SystemIntType alignment_m1 = static_cast<SystemIntType>(CustomAlignment_T - 1U);
-        constexpr SystemIntType alignment_n  = ~alignment_m1;
-        constexpr SizeT32       bit_width_m1 = (BIT_WIDTH - 1U);
+    void *reserveFirstFit(MemoryBlockT *block, SystemLong chunks) noexcept {
+        constexpr SystemLong alignment_m1 = static_cast<SystemLong>(CustomAlignment_T - 1U);
+        constexpr SystemLong alignment_n  = ~alignment_m1;
+        constexpr SizeT32    bit_width_m1 = (BIT_WIDTH - 1U);
 
         // -----------------------------------------------------------------------------
         // NOTE: This section is deliberately *undocumented* to deter misuse, imitation,
@@ -491,12 +490,12 @@ struct ReserverCore {
         // You are welcome to use this system — but you *will* credit the architect.
         // -----------------------------------------------------------------------------
 
-        SystemIntType      *table       = static_cast<SystemIntType *>(block->Base());
-        const SystemIntType table_size  = block->TableSize();
-        SystemIntType       table_index = block->GetRefNextIndex();
-        SystemIntType       start_index = block->GetRefNextIndex();
-        SystemIntType       start_bit   = 0;
-        SystemIntType       region_size = 0;
+        SystemLong      *table       = static_cast<SystemLong *>(block->Base());
+        const SystemLong table_size  = block->TableSize();
+        SystemLong       table_index = block->GetRefNextIndex();
+        SystemLong       start_index = block->GetRefNextIndex();
+        SystemLong       start_bit   = 0;
+        SystemLong       region_size = 0;
 
         while (table_index < table_size) {
             if (table[table_index] == MAX_SYSTEM_INT_TYPE) {
@@ -514,23 +513,23 @@ struct ReserverCore {
                 block->GetRefNextIndex() = table_index;
             }
 
-            SystemIntType shifted = 0;
-            SystemIntType current = table[table_index];
+            SystemLong shifted = 0;
+            SystemLong current = table[table_index];
 
             while (current != 0) {
                 SizeT32 available = (bit_width_m1 - Platform::FindLastBit(current));
                 region_size += available;
 
                 if (region_size >= chunks) {
-                    const SystemIntType bit_index = (start_bit + (BIT_WIDTH * start_index));
+                    const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
 
                     if QENTEM_CONST_EXPRESSION (CustomAlignment_T <= Alignment_T) {
                         return block->ReserveRegion(bit_index, chunks);
                     } else {
-                        const SystemIntType raw_index =
+                        const SystemLong raw_index =
                             (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
-                        const SystemIntType aligned_index = ((raw_index + alignment_m1) & alignment_n);
-                        const SystemIntType alignment_shift_count =
+                        const SystemLong aligned_index = ((raw_index + alignment_m1) & alignment_n);
+                        const SystemLong alignment_shift_count =
                             ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
 
                         if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
@@ -556,15 +555,15 @@ struct ReserverCore {
             region_size += (BIT_WIDTH - shifted);
 
             if (region_size >= chunks) {
-                const SystemIntType bit_index = (start_bit + (BIT_WIDTH * start_index));
+                const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
 
                 if QENTEM_CONST_EXPRESSION (CustomAlignment_T <= Alignment_T) {
                     return block->ReserveRegion(bit_index, chunks);
                 } else {
-                    const SystemIntType raw_index =
+                    const SystemLong raw_index =
                         (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
-                    const SystemIntType aligned_index = ((raw_index + alignment_m1) & alignment_n);
-                    const SystemIntType alignment_shift_count =
+                    const SystemLong aligned_index = ((raw_index + alignment_m1) & alignment_n);
+                    const SystemLong alignment_shift_count =
                         ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
 
                     if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
@@ -596,21 +595,21 @@ struct ReserverCore {
      * @param chunks  The number of allocation units (aligned blocks) to reserve.
      * @return true if the region was successfully reserved; false otherwise.
      */
-    bool reserveAt(MemoryBlockT *block, void *ptr, SystemIntType chunks) {
+    bool reserveAt(MemoryBlockT *block, void *ptr, SystemLong chunks) {
         constexpr SizeT32 bit_width_m1 = (BIT_WIDTH - 1U);
 
-        SystemIntType *table = static_cast<SystemIntType *>(block->Base());
-        SystemIntType  table_index;
-        SystemIntType  shifted;
+        SystemLong *table = static_cast<SystemLong *>(block->Base());
+        SystemLong  table_index;
+        SystemLong  shifted;
 
         MemoryBlockT::DecodeBitmapPosition(
-            static_cast<SystemIntType>(static_cast<char *>(ptr) - static_cast<char *>(block->Data())), table_index,
+            static_cast<SystemLong>(static_cast<char *>(ptr) - static_cast<char *>(block->Data())), table_index,
             shifted);
 
-        const SystemIntType start_index = table_index;
-        const SystemIntType start_bit   = shifted;
-        SystemIntType       current     = table[table_index];
-        SystemIntType       available   = (BIT_WIDTH - shifted);
+        const SystemLong start_index = table_index;
+        const SystemLong start_bit   = shifted;
+        SystemLong       current     = table[table_index];
+        SystemLong       available   = (BIT_WIDTH - shifted);
 
         current = ~current;
         current <<= shifted;
@@ -631,7 +630,7 @@ struct ReserverCore {
             available = shifted;
         }
 
-        const SystemIntType table_size = block->TableSize();
+        const SystemLong table_size = block->TableSize();
 
         ++table_index;
 
@@ -783,12 +782,11 @@ struct ReserverCore {
 struct Reserver {
     using Core = ReserverCore<>;
 
-    static constexpr SystemIntType DEFAULT_ALIGNMENT_M1 =
-        static_cast<SystemIntType>(QENTEM_RESERVER_DEFAULT_ALIGNMENT - 1U);
-    static constexpr SystemIntType DEFAULT_ALIGNMENT_N = ~DEFAULT_ALIGNMENT_M1;
+    static constexpr SystemLong DEFAULT_ALIGNMENT_M1 = static_cast<SystemLong>(QENTEM_RESERVER_DEFAULT_ALIGNMENT - 1U);
+    static constexpr SystemLong DEFAULT_ALIGNMENT_N  = ~DEFAULT_ALIGNMENT_M1;
 
     template <typename Type_T>
-    QENTEM_INLINE static SystemIntType RoundUpBytes(SystemIntType size) noexcept {
+    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong size) noexcept {
         size *= sizeof(Type_T);
         // Align the total byte size to the default alignment boundary.
         size += DEFAULT_ALIGNMENT_M1;
@@ -815,7 +813,7 @@ struct Reserver {
      * @see RoundUpBytes
      */
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
-    QENTEM_INLINE static Type_T *Reserve(SystemIntType size) noexcept {
+    QENTEM_INLINE static Type_T *Reserve(SystemLong size) noexcept {
         if QENTEM_CONST_EXPRESSION (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
             // QENTEM_CONST_EXPRESSION SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
             // (align>=CustomAlignment_T?align:(align+1))
@@ -846,7 +844,7 @@ struct Reserver {
      * @see getReservers
      */
     template <typename Type_T>
-    static void Release(Type_T *ptr, SystemIntType size) noexcept {
+    static void Release(Type_T *ptr, SystemLong size) noexcept {
         if (ptr != nullptr) {
             Core &instance = GetCurrentInstance();
             size           = RoundUpBytes<Type_T>(size);
@@ -897,7 +895,7 @@ struct Reserver {
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    static void Shrink(Type_T *ptr, SystemIntType from_size, SystemIntType to_size) noexcept {
+    static void Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         if (ptr != nullptr) {
             Core &instance = GetCurrentInstance();
             from_size      = RoundUpBytes<Type_T>(from_size);
@@ -939,7 +937,7 @@ struct Reserver {
      * @return true if the allocation was expanded in-place; false otherwise.
      */
     template <typename Type_T>
-    static bool TryExpand(Type_T *ptr, SystemIntType from_size, SystemIntType to_size) noexcept {
+    static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         if (ptr != nullptr) {
             Core &instance = GetCurrentInstance();
             from_size      = RoundUpBytes<Type_T>(from_size);
@@ -949,7 +947,7 @@ struct Reserver {
 #if defined(__linux__) || defined(_WIN32)
                 // Prefer returning to the current arena.
 
-                const SystemIntType new_size = instance.TryExpand(ptr, from_size, to_size);
+                const SystemLong new_size = instance.TryExpand(ptr, from_size, to_size);
 
                 if (new_size == to_size) {
                     return true;
