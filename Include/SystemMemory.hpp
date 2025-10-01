@@ -183,11 +183,6 @@ struct SystemMemory {
      * @return Size of a memory page in bytes.
      */
     static SystemLong pageSize() noexcept {
-        struct AUX {
-            SystemLong Type;
-            SystemLong Value;
-        };
-
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -195,13 +190,17 @@ struct SystemMemory {
         GetSystemInfo(&info);
         return static_cast<SystemLong>(info.dwPageSize);
     #else
+        struct {
+            SystemLong Type;
+            SystemLong Value;
+        } aux;
+
         #if defined(__linux__)
             constexpr int at_fdcwd      = -100; // AT_FDCWD
             constexpr int read_only     = 0;    // O_RDONLY
             constexpr int page_size_id  = 6;    // AT_PAGESZ
             constexpr const char AUXV_PATH[] = "/proc/self/auxv";
 
-            AUX aux;
             SystemLong page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
 
             const int fd = static_cast<int>(SystemCall(__NR_openat, at_fdcwd,
@@ -212,27 +211,29 @@ struct SystemMemory {
                 SizeT32 filled = 0;
 
                 while (true) {
-                    long ret = SystemCall(__NR_read, fd,
+                   const SystemLongI ret = SystemCall(__NR_read, fd,
                                           reinterpret_cast<long>(ptr + filled),
-                                          sizeof(aux) - filled);
+                                          (sizeof(aux) - filled));
 
-                    if (ret <= 0) {
-                        // EOF or error — stop
-                        break;
-                    }
+                    if (ret > 0) {
+                        filled += static_cast<SizeT32>(ret);
 
-                    filled += static_cast<SizeT32>(ret);
+                        if (filled == sizeof(aux)) {
+                            // Got one full AUX record
+                            if (aux.Type == page_size_id) {
+                                page_size = aux.Value;
+                                break;
+                            }
 
-                    if (filled == sizeof(aux)) {
-                        // Got one full AUX record
-                        if (aux.Type == page_size_id) {
-                            page_size = aux.Value;
-                            break;
+                            // Reset buffer for next record
+                            filled = 0;
                         }
 
-                        // Reset buffer for next record
-                        filled = 0;
+                        continue;
                     }
+
+                    // EOF or error — stop
+                    break;
                 }
 
                 SystemCall(__NR_close, fd);
