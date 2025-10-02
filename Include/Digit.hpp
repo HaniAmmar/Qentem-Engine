@@ -1213,7 +1213,7 @@ struct Digit {
                     power = diff;
                 }
             } else if (index < dot_index) {
-                stream.InsertAt(DigitUtils::DigitChar::Dot, dot_index);
+                StringUtils::InsertAt(stream, DigitUtils::DigitChar::Dot, dot_index);
             } else {
                 SizeT zeros = 0;
 
@@ -1241,7 +1241,7 @@ struct Digit {
         stream.StepBack(index - started_at);
 
         if (power != 0) {
-            stream.InsertAt(DigitUtils::DigitChar::Dot, (started_at + SizeT{1}));
+            StringUtils::InsertAt(stream, DigitUtils::DigitChar::Dot, (started_at + SizeT{1}));
             insertPowerOfTen(stream, power, is_positive_exp);
         }
     }
@@ -1296,7 +1296,7 @@ struct Digit {
                         storage[index] = DigitUtils::DigitChar::Zero;
                     }
                 } else if (index < dot_index) {
-                    stream.InsertAt(DigitUtils::DigitChar::Dot, dot_index);
+                    StringUtils::InsertAt(stream, DigitUtils::DigitChar::Dot, dot_index);
                 } else {
                     SizeT zeros = 0;
 

@@ -130,46 +130,6 @@ struct LiteStream {
         return capacity_;
     }
 
-    void InsertAt(char ch, SizeT32 index) {
-        if (index < length_) {
-            const SizeT32 new_length = (length_ + 1U);
-
-            if (new_length <= Capacity()) {
-                char   *data = storage_;
-                SizeT32 i    = length_;
-
-                while (i > index) {
-                    data[i] = data[i - 1U];
-                    --i;
-                }
-
-                data[index] = ch;
-                length_     = new_length;
-            } else {
-                char *new_storage = static_cast<char *>(SystemMemory::Reserve(new_length));
-
-                SizeT32 i = 0;
-                while (i < index) {
-                    new_storage[i] = storage_[i];
-                    ++i;
-                }
-
-                new_storage[index] = ch;
-
-                SizeT32 j = index;
-                while (j < length_) {
-                    new_storage[j + 1] = storage_[j];
-                    ++j;
-                }
-
-                release(storage_, capacity_);
-                storage_  = new_storage;
-                capacity_ = new_length;
-                length_   = new_length;
-            }
-        }
-    }
-
   private:
     void expand(const SizeT32 new_capacity) {
         char         *str          = storage_;

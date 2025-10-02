@@ -236,14 +236,6 @@ struct StringStream {
         }
     }
 
-    QENTEM_INLINE void Expect(SizeT length) {
-        length += Length();
-
-        if (Capacity() < length) {
-            expand(length);
-        }
-    }
-
     QENTEM_INLINE void Reserve(SizeT capacity) {
         if (capacity != 0) {
             setLength(0);
@@ -257,6 +249,14 @@ struct StringStream {
             }
         } else {
             Reset();
+        }
+    }
+
+    QENTEM_INLINE void Expect(SizeT length) {
+        length += Length();
+
+        if (Capacity() < length) {
+            expand(length);
         }
     }
 
@@ -337,51 +337,6 @@ struct StringStream {
 
     QENTEM_INLINE void Reverse(SizeT start = 0) noexcept {
         StringUtils::Reverse(Storage(), start, Length());
-    }
-
-    void InsertAt(Char_T ch, SizeT index) {
-        if (index < Length()) {
-            const SizeT new_length = (Length() + SizeT{1});
-
-            if ((new_length <= Capacity()) || tryInplaceExpand(new_length)) {
-                // Enough capacity, shift tail right by one, insert in-place.
-                Char_T *storage = Storage();
-
-                // Shift right: move everything [index, length) -> [index+1, new_length)
-                SizeT offset = Length();
-
-                while (offset > index) {
-                    storage[offset] = storage[offset - SizeT{1}];
-                    --offset;
-                }
-
-                storage[index] = ch;
-                setLength(new_length);
-            } else {
-                Char_T     *old_storage  = Storage();
-                const SizeT old_capacity = Capacity();
-
-                // Not enough capacity: reserve a bigger buffer and copy in 3 steps.
-                reserve(new_length);
-
-                // 1. Copy prefix [0, index)
-                if (index != 0) {
-                    MemoryUtils::CopyTo(Storage(), old_storage, index);
-                }
-
-                // 2. Insert new char at 'index'
-                Storage()[index] = ch;
-
-                // 3. Copy suffix [index, length)
-                if (index < Length()) {
-                    MemoryUtils::CopyTo((Storage() + index + SizeT{1}), (old_storage + index), (Length() - index));
-                }
-
-                // Clean up old storage and set new storage/capacity
-                release(old_storage, old_capacity);
-                setLength(new_length);
-            }
-        }
     }
 
     void ShiftRight(SizeT shift) {

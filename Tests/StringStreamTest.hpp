@@ -338,33 +338,33 @@ static void TestStringStream2(QTest &test) {
     ///////////////////////////////
     stream = "9";
 
-    stream.InsertAt('0', 0);
+    StringUtils::InsertAt(stream, '0', 0);
     test.IsEqual(stream.Length(), SizeT{2}, __LINE__);
     test.IsEqual(stream, "09", __LINE__);
 
-    stream.InsertAt('4', 1);
+    StringUtils::InsertAt(stream, '4', 1);
     test.IsEqual(stream.Length(), SizeT{3}, __LINE__);
     test.IsEqual(stream, "049", __LINE__);
 
-    stream.InsertAt('4', 10); // Nothing will happened
+    StringUtils::InsertAt(stream, '4', 10); // Nothing will happened
     test.IsEqual(stream.Length(), SizeT{3}, __LINE__);
     test.IsEqual(stream, "049", __LINE__);
 
-    stream.InsertAt('2', 1);
-    stream.InsertAt('1', 1);
+    StringUtils::InsertAt(stream, '2', 1);
+    StringUtils::InsertAt(stream, '1', 1);
 
     test.IsEqual(stream.Length(), SizeT{5}, __LINE__);
     test.IsEqual(stream, "01249", __LINE__);
 
-    stream.InsertAt('3', 3);
-    stream.InsertAt('5', 5);
+    StringUtils::InsertAt(stream, '3', 3);
+    StringUtils::InsertAt(stream, '5', 5);
 
     test.IsEqual(stream.Length(), SizeT{7}, __LINE__);
     test.IsEqual(stream, "0123459", __LINE__);
 
-    stream.InsertAt('8', 6);
-    stream.InsertAt('7', 6);
-    stream.InsertAt('6', 6);
+    StringUtils::InsertAt(stream, '8', 6);
+    StringUtils::InsertAt(stream, '7', 6);
+    StringUtils::InsertAt(stream, '6', 6);
 
     test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
     test.IsEqual(stream, "0123456789", __LINE__);
@@ -372,9 +372,9 @@ static void TestStringStream2(QTest &test) {
     stream.Reset();
     stream = "01";
     stream += "23459";
-    stream.InsertAt('8', 6);
-    stream.InsertAt('7', 6);
-    stream.InsertAt('6', 6);
+    StringUtils::InsertAt(stream, '8', 6);
+    StringUtils::InsertAt(stream, '7', 6);
+    StringUtils::InsertAt(stream, '6', 6);
 
     test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
     test.IsEqual(stream, "0123456789", __LINE__);

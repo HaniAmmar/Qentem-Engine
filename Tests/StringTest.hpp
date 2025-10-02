@@ -487,33 +487,33 @@ static void TestString3(QTest &test) {
     ////////////////////////////////////////////
     str1 = "9";
 
-    str1.InsertAt('0', 0);
+    StringUtils::InsertAt(str1, '0', 0);
     test.IsEqual(str1.Length(), SizeT{2}, __LINE__);
     test.IsEqual(str1, "09", __LINE__);
 
-    str1.InsertAt('4', 1);
+    StringUtils::InsertAt(str1, '4', 1);
     test.IsEqual(str1.Length(), SizeT{3}, __LINE__);
     test.IsEqual(str1, "049", __LINE__);
 
-    str1.InsertAt('4', 10); // Nothing will happened
+    StringUtils::InsertAt(str1, '4', 10); // Nothing will happened
     test.IsEqual(str1.Length(), SizeT{3}, __LINE__);
     test.IsEqual(str1, "049", __LINE__);
 
-    str1.InsertAt('2', 1);
-    str1.InsertAt('1', 1);
+    StringUtils::InsertAt(str1, '2', 1);
+    StringUtils::InsertAt(str1, '1', 1);
 
     test.IsEqual(str1.Length(), SizeT{5}, __LINE__);
     test.IsEqual(str1, "01249", __LINE__);
 
-    str1.InsertAt('3', 3);
-    str1.InsertAt('5', 5);
+    StringUtils::InsertAt(str1, '3', 3);
+    StringUtils::InsertAt(str1, '5', 5);
 
     test.IsEqual(str1.Length(), SizeT{7}, __LINE__);
     test.IsEqual(str1, "0123459", __LINE__);
 
-    str1.InsertAt('8', 6);
-    str1.InsertAt('7', 6);
-    str1.InsertAt('6', 6);
+    StringUtils::InsertAt(str1, '8', 6);
+    StringUtils::InsertAt(str1, '7', 6);
+    StringUtils::InsertAt(str1, '6', 6);
 
     test.IsEqual(str1.Length(), SizeT{10}, __LINE__);
     test.IsEqual(str1, "0123456789", __LINE__);

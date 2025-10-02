@@ -66,6 +66,25 @@ struct StringUtils {
         }
     }
 
+    template <typename Stream_T>
+    static void InsertAt(Stream_T &stream, typename Stream_T::CharType ch, SizeT index) {
+        if (index < stream.Length()) {
+            stream.Write('\0');
+
+            typename Stream_T::CharType *storage = stream.Storage();
+
+            // Shift right: move everything [index, length) -> [index+1, new_length)
+            SizeT offset = stream.Length() - 1;
+
+            while (offset > index) {
+                storage[offset] = storage[offset - SizeT{1}];
+                --offset;
+            }
+
+            storage[index] = ch;
+        }
+    }
+
     template <typename Char_T, typename Number_T>
     QENTEM_INLINE static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
         using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
