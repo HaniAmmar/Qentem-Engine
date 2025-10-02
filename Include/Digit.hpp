@@ -1236,12 +1236,18 @@ struct Digit {
             }
         }
 
-        StringUtils::Reverse(stream.Storage(), started_at, stream.Length());
+        SizeT new_length = (stream.Length() - (index - started_at));
 
-        stream.StepBack(index - started_at);
+        if ((power != 0) && ((new_length - started_at) > SizeT{1})) {
+            StringUtils::InsertAt(stream, DigitUtils::DigitChar::Dot, stream.Length() - SizeT{1});
+            ++new_length;
+        }
+
+        StringUtils::Reverse(stream.Storage(), started_at, stream.Length(), (new_length - started_at));
+
+        stream.SetLength(new_length);
 
         if (power != 0) {
-            StringUtils::InsertAt(stream, DigitUtils::DigitChar::Dot, (started_at + SizeT{1}));
             insertPowerOfTen(stream, power, is_positive_exp);
         }
     }
@@ -1323,8 +1329,10 @@ struct Digit {
             }
         }
 
-        StringUtils::Reverse(stream.Storage(), started_at, stream.Length());
-        stream.StepBack(index - started_at);
+        const SizeT new_length = (stream.Length() - (index - started_at));
+
+        StringUtils::Reverse(stream.Storage(), started_at, stream.Length(), (new_length - started_at));
+        stream.SetLength(new_length);
 
         if QENTEM_CONST_EXPRESSION (Fixed_T) {
             if ((dot_index == index) || ((stream.Length() - started_at) == SizeT{1}) ||
