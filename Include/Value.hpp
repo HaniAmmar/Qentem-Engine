@@ -2105,7 +2105,7 @@ struct Value {
 
         Char_T *last = stream.Last();
 
-        if ((last != nullptr) && (*last == NotationConstants::CommaChar)) {
+        if (*last == NotationConstants::CommaChar) {
             *last = NotationConstants::ESquareChar;
         } else {
             stream.Write(NotationConstants::ESquareChar);

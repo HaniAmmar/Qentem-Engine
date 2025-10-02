@@ -31,19 +31,19 @@ struct LiteStream {
     LiteStream &operator=(LiteStream &&)      = delete;
     LiteStream &operator=(const LiteStream &) = delete;
 
-    QENTEM_INLINE LiteStream() : storage_{nullptr}, capacity_{0}, length_{0} {};
+    QENTEM_INLINE LiteStream() noexcept : storage_{nullptr}, capacity_{0}, length_{0} {};
 
-    QENTEM_INLINE explicit LiteStream(SizeT32 capacity) : storage_{nullptr}, capacity_{0}, length_{0} {
+    QENTEM_INLINE explicit LiteStream(SizeT32 capacity) noexcept : storage_{nullptr}, capacity_{0}, length_{0} {
         if (capacity != 0) {
             reserve(capacity);
         }
     }
 
-    QENTEM_INLINE ~LiteStream() {
+    QENTEM_INLINE ~LiteStream() noexcept {
         release(storage_, capacity_);
     }
 
-    void Write(char ch) {
+    void Write(char ch) noexcept {
         const SizeT32 new_length = (length_ + 1U);
 
         if (Capacity() == length_) {
@@ -54,7 +54,7 @@ struct LiteStream {
         length_           = new_length;
     }
 
-    void Write(const char *str, const SizeT32 length) {
+    void Write(const char *str, const SizeT32 length) noexcept {
         const SizeT32 new_length = (length_ + length);
 
         if (Capacity() < new_length) {
@@ -72,7 +72,7 @@ struct LiteStream {
         length_ = new_length;
     }
 
-    QENTEM_INLINE void SetLength(SizeT length) {
+    QENTEM_INLINE void SetLength(SizeT length) noexcept {
         if (capacity_ < length) {
             expand(length);
         }
@@ -80,22 +80,8 @@ struct LiteStream {
         length_ = length;
     }
 
-    QENTEM_INLINE void Expect(SizeT length) {
-        length += Length();
-
-        if (Capacity() < length) {
-            expand(length);
-        }
-    }
-
     QENTEM_INLINE QENTEM_INLINE void Clear() noexcept {
         length_ = 0;
-    }
-
-    QENTEM_INLINE void StepBack(const SizeT32 length) noexcept {
-        if (length <= length_) {
-            length_ -= length;
-        }
     }
 
     QENTEM_INLINE char *Storage() noexcept {
@@ -131,7 +117,7 @@ struct LiteStream {
     }
 
   private:
-    void expand(const SizeT32 new_capacity) {
+    void expand(const SizeT32 new_capacity) noexcept {
         char         *str          = storage_;
         const SizeT32 old_capacity = capacity_;
 
@@ -147,15 +133,15 @@ struct LiteStream {
         release(str, old_capacity);
     }
 
-    QENTEM_INLINE void release(char *storage, SizeT32 size) {
+    QENTEM_INLINE void release(char *storage, SizeT32 size) noexcept {
         if (storage != nullptr) {
             SystemMemory::Release(storage, size);
         }
     }
 
-    void reserve(SizeT32 capacity) {
+    void reserve(SizeT32 capacity) noexcept {
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-        const SizeT32 page_size    = static_cast<SizeT32>(SystemMemory::PageSize());
+        const SizeT32 page_size    = SystemMemory::PageSize();
         const SizeT32 page_size_m1 = (page_size - 1U);
 
         if (capacity < page_size) {

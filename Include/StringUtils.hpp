@@ -87,7 +87,7 @@ struct StringUtils {
             typename Stream_T::CharType *storage = stream.Storage();
 
             // Shift right: move everything [index, length) -> [index+1, new_length)
-            SizeT offset = stream.Length() - 1;
+            SizeT offset = (stream.Length() - SizeT{1});
 
             while (offset > index) {
                 storage[offset] = storage[offset - SizeT{1}];

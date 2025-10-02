@@ -56,8 +56,8 @@ struct SystemMemory {
      *
      * @return Size of a memory page in bytes.
      */
-    QENTEM_INLINE static SystemLong PageSize() noexcept {
-        static const SystemLong page_size = pageSize();
+    QENTEM_INLINE static SizeT32 PageSize() noexcept {
+        static const SizeT32 page_size = static_cast<SizeT32>(pageSize());
         return page_size;
     }
 
