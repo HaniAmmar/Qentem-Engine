@@ -66,6 +66,19 @@ struct StringUtils {
         }
     }
 
+    template <typename Char_T, typename Number_T>
+    QENTEM_INLINE static void Reverse(Char_T *str, Number_T offset, Number_T end, Number_T limit) noexcept {
+        while ((offset < end) && (limit != 0)) {
+            const Char_T tmp = str[offset];
+
+            --end;
+            str[offset] = str[end];
+            str[end]    = tmp;
+            ++offset;
+            --limit;
+        }
+    }
+
     template <typename Stream_T>
     static void InsertAt(Stream_T &stream, typename Stream_T::CharType ch, SizeT index) {
         if (index < stream.Length()) {
