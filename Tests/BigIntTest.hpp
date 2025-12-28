@@ -23,9 +23,9 @@
 #ifndef QENTEM_BIG_INT_TESTS_H
 #define QENTEM_BIG_INT_TESTS_H
 
-#include "QTest.hpp"
-#include "BigInt.hpp"
-#include "StringStream.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/BigInt.hpp"
+#include "Qentem/StringStream.hpp"
 
 namespace Qentem {
 namespace Test {

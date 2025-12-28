@@ -23,8 +23,8 @@
 #ifndef QENTEM_STRING_UTILS_TESTS_H
 #define QENTEM_STRING_UTILS_TESTS_H
 
-#include "QTest.hpp"
-#include "StringUtils.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/StringUtils.hpp"
 
 namespace Qentem {
 namespace Test {

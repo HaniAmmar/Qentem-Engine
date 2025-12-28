@@ -23,9 +23,9 @@
 #ifndef QENTEM_UNICODE_TESTS_H
 #define QENTEM_UNICODE_TESTS_H
 
-#include "QTest.hpp"
-#include "StringStream.hpp"
-#include "Unicode.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/StringStream.hpp"
+#include "Qentem/Unicode.hpp"
 
 namespace Qentem {
 namespace Test {

@@ -23,10 +23,10 @@
 #ifndef QENTEM_HARRAY_TESTS_H
 #define QENTEM_HARRAY_TESTS_H
 
-#include "QTest.hpp"
-#include "Digit.hpp"
-#include "HArray.hpp"
-#include "String.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/Digit.hpp"
+#include "Qentem/HArray.hpp"
+#include "Qentem/String.hpp"
 
 namespace Qentem {
 namespace Test {

@@ -23,8 +23,8 @@
 #ifndef QENTEM_VALUE_TESTS_H
 #define QENTEM_VALUE_TESTS_H
 
-#include "QTest.hpp"
-#include "Value.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/Value.hpp"
 
 namespace Qentem {
 namespace Test {

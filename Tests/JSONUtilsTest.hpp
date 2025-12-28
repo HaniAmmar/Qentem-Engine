@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-#include "QTest.hpp"
-#include "JSONUtils.hpp"
-#include "StringStream.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/JSONUtils.hpp"
+#include "Qentem/StringStream.hpp"
 
 #ifndef QENTEM_JSON_UTILS_TESTS_H
 #define QENTEM_JSON_UTILS_TESTS_H

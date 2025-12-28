@@ -31,9 +31,9 @@
 #include <string>
 #endif
 
-#include "QTest.hpp"
-#include "Digit.hpp"
-#include "StringStream.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/Digit.hpp"
+#include "Qentem/StringStream.hpp"
 
 namespace Qentem {
 namespace Test {

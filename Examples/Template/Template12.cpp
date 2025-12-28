@@ -1,5 +1,5 @@
-#include "JSON.hpp"
-#include "Template.hpp"
+#include "Qentem/JSON.hpp"
+#include "Qentem/Template.hpp"
 
 #include <iostream>
 

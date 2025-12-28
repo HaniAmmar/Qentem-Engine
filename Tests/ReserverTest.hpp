@@ -23,8 +23,8 @@
 #ifndef QENTEM_RESERVER_TESTS_H
 #define QENTEM_RESERVER_TESTS_H
 
-#include "QTest.hpp"
-#include "Reserver.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/Reserver.hpp"
 
 namespace Qentem {
 namespace Test {

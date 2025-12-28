@@ -18,8 +18,8 @@
 #define QENTEM_DEBUG
 #define QENTEM_ENABLE_MEMORY_RECORD
 
-#include "QConsole.hpp"
-#include "Reserver.hpp"
+#include "Qentem/QConsole.hpp"
+#include "Qentem/Reserver.hpp"
 
 #if defined(_WIN32)
 #define NOMINMAX

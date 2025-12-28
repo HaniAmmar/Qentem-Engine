@@ -23,10 +23,10 @@
 #ifndef QENTEM_TEMPLATE_L_TESTS_H
 #define QENTEM_TEMPLATE_L_TESTS_H
 
-#include "QTest.hpp"
-#include "StringStream.hpp"
-#include "JSON.hpp"
-#include "Template.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/StringStream.hpp"
+#include "Qentem/JSON.hpp"
+#include "Qentem/Template.hpp"
 
 namespace Qentem {
 namespace Test {

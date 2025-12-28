@@ -95,8 +95,8 @@ Test templates directly in your browser: [JQen Tool Live Demo](https://haniammar
 ## Template Example
 
 ```cpp
-#include "JSON.hpp"
-#include "Template.hpp"
+#include "Qentem/JSON.hpp"
+#include "Qentem/Template.hpp"
 
 #include <iostream>
 
@@ -174,7 +174,7 @@ _Note_: the template does not have to be HTML.
 ## JSON Example
 
 ```cpp
-#include "JSON.hpp"
+#include "Qentem/JSON.hpp"
 
 #include <iostream>
 

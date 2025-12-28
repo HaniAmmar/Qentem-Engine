@@ -1,12 +1,11 @@
-#include "JSON.hpp"
-#include "Template.hpp"
+#include "Qentem/JSON.hpp"
+#include "Qentem/Template.hpp"
 
 #include <iostream>
 
 using Qentem::JSON;
 using Qentem::StringStream;
 using Qentem::Template;
-using Qentem::Value;
 
 /*
 mkdir Build

@@ -23,9 +23,9 @@
 #ifndef QENTEM_DEQUE_TESTS_H
 #define QENTEM_DEQUE_TESTS_H
 
-#include "QTest.hpp"
-#include "Deque.hpp"
-#include "String.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/Deque.hpp"
+#include "Qentem/String.hpp"
 
 namespace Qentem {
 namespace Test {

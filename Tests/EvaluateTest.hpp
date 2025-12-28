@@ -23,10 +23,10 @@
 #ifndef QENTEM_EVALUATE_TESTS_H
 #define QENTEM_EVALUATE_TESTS_H
 
-#include "QTest.hpp"
-#include "Template.hpp"
-#include "Value.hpp"
-#include "StringStream.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/Template.hpp"
+#include "Qentem/Value.hpp"
+#include "Qentem/StringStream.hpp"
 
 namespace Qentem {
 namespace Test {

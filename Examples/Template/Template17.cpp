@@ -1,6 +1,6 @@
-#include "JSON.hpp"
-#include "Template.hpp"
-#include "StringView.hpp"
+#include "Qentem/JSON.hpp"
+#include "Qentem/Template.hpp"
+#include "Qentem/StringView.hpp"
 
 #include <iostream>
 

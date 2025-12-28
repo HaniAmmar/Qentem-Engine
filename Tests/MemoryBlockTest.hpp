@@ -23,9 +23,9 @@
 #ifndef QENTEM_MEMORY_BLOCK_TESTS_H
 #define QENTEM_MEMORY_BLOCK_TESTS_H
 
-#include "QTest.hpp"
-#include "MemoryBlock.hpp"
-#include "LiteArray.hpp"
+#include "Qentem/QTest.hpp"
+#include "Qentem/MemoryBlock.hpp"
+#include "Qentem/LiteArray.hpp"
 
 namespace Qentem {
 namespace Test {

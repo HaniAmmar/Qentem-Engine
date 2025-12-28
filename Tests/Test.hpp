@@ -24,7 +24,7 @@
 #define QENTEM_TEST_H
 
 // clang-format off
-#include "QTest.hpp"
+#include "Qentem/QTest.hpp"
 #include "MemoryBlockTest.hpp"
 #include "ReserverTest.hpp"
 #include "StringUtilsTest.hpp"
