@@ -65,7 +65,7 @@ struct NumberKeyUtils_T {
             return hash;
         }
 
-        if QENTEM_CONST_EXPRESSION (key_size > n_size) {
+        if constexpr (key_size > n_size) {
             return static_cast<SizeT>(SizeT(q_key >> ((key_size - n_size) * 8U)) | SizeT{1});
         } else {
             return ~SizeT{0};
@@ -238,7 +238,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      */
-    inline void Insert(const Char_T *str, const SizeT length) {
+    QENTEM_INLINE void Insert(const Char_T *str, const SizeT length) {
         tryInsert(str, length);
     }
 
@@ -249,7 +249,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return True if the key is present in the table, false otherwise.
      */
-    inline bool Has(const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE bool Has(const Char_T *str, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
             SizeT index;
             return (find(index, str, length) != nullptr);
@@ -266,7 +266,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param hash   Hash value to use for the lookup.
      * @return Pointer to the item if found, nullptr otherwise.
      */
-    inline HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) noexcept {
+    QENTEM_INLINE HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) noexcept {
         if (IsNotEmpty()) {
             SizeT *index;
             return find(index, str, length, hash);
@@ -283,7 +283,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param hash   Hash value to use for the lookup.
      * @return Const pointer to the item if found, nullptr otherwise.
      */
-    inline const HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
         if (IsNotEmpty()) {
             SizeT index;
             return find(index, str, length, hash);
@@ -299,7 +299,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return Pointer to the item if found, nullptr otherwise.
      */
-    inline const HItem_T *GetItem(const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const SizeT length) noexcept {
         return GetItem(str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -310,7 +310,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return Const pointer to the item if found, nullptr otherwise.
      */
-    inline const HItem_T *GetItem(const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const SizeT length) const noexcept {
         return GetItem(str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -322,7 +322,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return True if the key was found and index is set, false otherwise.
      */
-    inline bool GetIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE bool GetIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
             find(index, str, length);
             return (index != Capacity());
@@ -337,7 +337,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      */
-    inline void Remove(const Char_T *str, SizeT length) noexcept {
+    QENTEM_INLINE void Remove(const Char_T *str, SizeT length) noexcept {
         remove(str, length);
     }
 
@@ -348,7 +348,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      *
      * @param str Pointer to the null-terminated character array representing the key.
      */
-    inline void Remove(const Char_T *str) noexcept {
+    QENTEM_INLINE void Remove(const Char_T *str) noexcept {
         Remove(str, StringUtils::Count(str));
     }
 
@@ -368,7 +368,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      *
      * @note If the item is not found, @p index is set to the appropriate insertion point in the chain.
      */
-    HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length, const SizeT hash) noexcept {
+    QENTEM_INLINE HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length, const SizeT hash) noexcept {
         return find(index, StringView<Char_T>{str, length}, hash);
     }
 
@@ -384,7 +384,8 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param hash        Precomputed hash value of the key.
      * @return Const pointer to the found item, or nullptr if not found.
      */
-    const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+    QENTEM_INLINE const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length,
+                                      const SizeT hash) const noexcept {
         return find(index, StringView<Char_T>{str, length}, hash);
     }
 
@@ -398,7 +399,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length    Number of characters in the key array.
      * @return Pointer to the found item, or nullptr if not found.
      */
-    inline HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length) noexcept {
         return find(index, str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -412,7 +413,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length    Number of characters in the key array.
      * @return Const pointer to the found item, or nullptr if not found.
      */
-    inline const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
         return find(index, str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -429,7 +430,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters in the key array.
      * @return Pointer to the found or newly inserted item.
      */
-    inline HItem_T *tryInsert(const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE HItem_T *tryInsert(const Char_T *str, const SizeT length) noexcept {
         if (Size() == Capacity()) {
             expand(Capacity() * SizeT{2});
         }
@@ -455,7 +456,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param str    Pointer to the character array representing the key to remove.
      * @param length Number of characters in the key array.
      */
-    void remove(const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE void remove(const Char_T *str, const SizeT length) noexcept {
         if (IsNotEmpty()) {
             SizeT   *index;
             HItem_T *item = find(index, str, length);

@@ -119,35 +119,23 @@ struct DigitConst<2U> {
     static constexpr SizeT32 MaxPowerOfTen      = 4U;
     static constexpr SizeT32 MaxPowerOfTenValue = 10000U;
 
-    static SizeT16 GetPowerOfFive(SizeT32 index) noexcept {
-        static const SizeT16 PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
+    inline static constexpr SizeT16 PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
 
-        return PowerOfFive[index];
-    }
+    inline static constexpr SizeT16 PowerOfOneOverFive[] = {
 
-    static SizeT16 GetPowerOfOneOverFive(SizeT32 index) noexcept {
-        static const SizeT16 PowerOfOneOverFive[] = {
+        // 2^N/5
+        1U,     52429U, 41944U, 33555U,
+        53688U, 42950U, 34360U
 
-            // 2^N/5
-            1U,     52429U, 41944U, 33555U,
-            53688U, 42950U, 34360U
+    };
 
-        };
+    inline static constexpr SizeT16 PowerOfOneOverFiveShift[] = {
 
-        return PowerOfOneOverFive[index];
-    }
+        // 2^N/5
+        0U, 2U,  4U, 6U,
+        9U, 11U, 13U
 
-    static SizeT16 GetPowerOfOneOverFiveShift(SizeT32 index) noexcept {
-        static const SizeT16 PowerOfOneOverFiveShift[] = {
-
-            // 2^N/5
-            0U, 2U,  4U, 6U,
-            9U, 11U, 13U
-
-        };
-
-        return PowerOfOneOverFiveShift[index];
-    }
+    };
 };
 
 // uint32_t
@@ -158,41 +146,29 @@ struct DigitConst<4U> {
     static constexpr SizeT32 MaxPowerOfTen      = 9U;
     static constexpr SizeT32 MaxPowerOfTenValue = 1000000000U;
 
-    static SizeT32 GetPowerOfFive(SizeT32 index) noexcept {
-        static const SizeT32 PowerOfFive[] = {
-            // clang-format off
+    inline static constexpr SizeT32 PowerOfFive[] = {
+        // clang-format off
             1U,       5U,        25U,        125U,       625U,
             3125U,    15625U,    78125U,     390625U,    1953125U,
             9765625U, 48828125U, 244140625U, 1220703125U
-            // clang-format on
-        };
+        // clang-format on
+    };
 
-        return PowerOfFive[index];
-    }
-
-    static SizeT32 GetPowerOfOneOverFive(SizeT32 index) noexcept {
-        static const SizeT32 PowerOfOneOverFive[] = {
-            // 2^N/5
-            // clang-format off
+    inline static constexpr SizeT32 PowerOfOneOverFive[] = {
+        // 2^N/5
+        // clang-format off
             1U,          3435973837U, 2748779070U, 2199023256U, 3518437209U, 2814749768U, 2251799814U, 3602879702U,
             2882303762U, 2305843010U, 3689348815U, 2951479052U, 2361183242U, 3777893187U
-            // clang-format on
-        };
+        // clang-format on
+    };
 
-        return PowerOfOneOverFive[index];
-    }
-
-    static SizeT32 GetPowerOfOneOverFiveShift(SizeT32 index) noexcept {
-        static const SizeT32 PowerOfOneOverFiveShift[] = {
-            // 2^N/5
-            // clang-format off
+    inline static constexpr SizeT32 PowerOfOneOverFiveShift[] = {
+        // 2^N/5
+        // clang-format off
             0U,  2U,  4U,  6U,  9U,  11U, 13U, 16U,
             18U, 20U, 23U, 25U, 27U, 30U
-            // clang-format on
-        };
-
-        return PowerOfOneOverFiveShift[index];
-    }
+        // clang-format on
+    };
 };
 
 // uint64_t
@@ -203,24 +179,19 @@ struct DigitConst<8U> {
     static constexpr SizeT32 MaxPowerOfTen      = 19U;
     static constexpr SizeT64 MaxPowerOfTenValue = 10000000000000000000ULL;
 
-    static SizeT64 GetPowerOfFive(SizeT32 index) noexcept {
-        static const SizeT64 PowerOfFive[] = {
-            // clang-format off
+    inline static constexpr SizeT64 PowerOfFive[] = {
+        // clang-format off
             1ULL,5ULL,25ULL,125ULL,625ULL,3125ULL,15625ULL,78125ULL,390625ULL,1953125ULL,
             9765625ULL,48828125ULL,244140625ULL,1220703125ULL,6103515625ULL,30517578125ULL,
             152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
             476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
             298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
-            // clang-format on
-        };
+        // clang-format on
+    };
 
-        return PowerOfFive[index];
-    }
-
-    static SizeT64 GetPowerOfOneOverFive(SizeT32 index) noexcept {
-        static const SizeT64 PowerOfOneOverFive[] = {
-            // 2^N/5
-            // clang-format off
+    inline static constexpr SizeT64 PowerOfOneOverFive[] = {
+        // 2^N/5
+        // clang-format off
             1ULL,
             14757395258967641293ULL, 11805916207174113035ULL, 9444732965739290428ULL,
             15111572745182864684ULL, 12089258196146291748ULL, 9671406556917033398ULL,
@@ -231,24 +202,17 @@ struct DigitConst<8U> {
             17014118346046923174ULL, 13611294676837538539ULL, 10889035741470030831ULL,
             17422457186352049330ULL, 13937965749081639464ULL, 11150372599265311571ULL,
             17840596158824498514ULL, 14272476927059598811ULL, 11417981541647679048ULL
-            // clang-format on
-        };
+        // clang-format on
+    };
 
-        return PowerOfOneOverFive[index];
-    }
-
-    static SizeT32 GetPowerOfOneOverFiveShift(SizeT32 index) noexcept {
-        static const SizeT32 PowerOfOneOverFiveShift[] = {
-            // 2^N/5
-            // clang-format off
+    inline static constexpr SizeT32 PowerOfOneOverFiveShift[] = {
+        // 2^N/5
+        // clang-format off
             0U,  2U,  4U,  6U,  9U,  11U, 13U, 16U, 18U, 20U,
             23U, 25U, 27U, 30U, 32U, 34U, 37U, 39U, 41U, 44U,
             46U, 48U, 51U, 53U, 55U, 58U, 60U, 62U
-            // clang-format on
-        };
-
-        return PowerOfOneOverFiveShift[index];
-    }
+        // clang-format on
+    };
 };
 ///////////////////////////////////////////////////
 template <typename, SizeT32>

@@ -523,7 +523,7 @@ struct ReserverCore {
                 if (region_size >= chunks) {
                     const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
 
-                    if QENTEM_CONST_EXPRESSION (CustomAlignment_T <= Alignment_T) {
+                    if constexpr (CustomAlignment_T <= Alignment_T) {
                         return block->ReserveRegion(bit_index, chunks);
                     } else {
                         const SystemLong raw_index =
@@ -557,7 +557,7 @@ struct ReserverCore {
             if (region_size >= chunks) {
                 const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
 
-                if QENTEM_CONST_EXPRESSION (CustomAlignment_T <= Alignment_T) {
+                if constexpr (CustomAlignment_T <= Alignment_T) {
                     return block->ReserveRegion(bit_index, chunks);
                 } else {
                     const SystemLong raw_index =
@@ -814,8 +814,8 @@ struct Reserver {
      */
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
     QENTEM_INLINE static Type_T *Reserve(SystemLong size) noexcept {
-        if QENTEM_CONST_EXPRESSION (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
-            // QENTEM_CONST_EXPRESSION SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
+        if constexpr (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
+            // constexpr SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
             // (align>=CustomAlignment_T?align:(align+1))
 
             return static_cast<Type_T *>(GetCurrentInstance().Reserve<CustomAlignment_T>(RoundUpBytes<Type_T>(size)));
@@ -855,10 +855,7 @@ struct Reserver {
                 return;
             }
 
-            // Attempt return to a sibling arena (cross-core recovery).
-            LiteArray<Core> &reservers = getReservers();
-
-            for (Core &reserver : reservers) {
+            for (Core &reserver : reservers_) {
                 if ((&reserver != &instance) && reserver.Release(ptr, size)) {
                     return;
                 }
@@ -908,10 +905,7 @@ struct Reserver {
                     return;
                 }
 
-                // Attempt return to a sibling arena (cross-core recovery).
-                LiteArray<Core> &reservers = getReservers();
-
-                for (Core &reserver : reservers) {
+                for (Core &reserver : reservers_) {
                     if ((&reserver != &instance) && reserver.Shrink(ptr, from_size, to_size)) {
                         return;
                     }
@@ -954,10 +948,7 @@ struct Reserver {
                 }
 
                 if (new_size == 0) {
-                    // Attempt return to a sibling arena (cross-core recovery).
-                    LiteArray<Core> &reservers = getReservers();
-
-                    for (Core &reserver : reservers) {
+                    for (Core &reserver : reservers_) {
                         if ((&reserver != &instance) && reserver.TryExpand(ptr, from_size, to_size) == to_size) {
                             return true;
                         }
@@ -983,11 +974,7 @@ struct Reserver {
      * Should be used with care—this releases all memory regions tracked by the current core’s arena.
      */
     QENTEM_INLINE static void Reset() noexcept {
-#if defined(__linux__) || defined(_WIN32)
         GetCurrentInstance().Reset();
-#else
-        getReserver(0).Reset();
-#endif
     }
 
     /**
@@ -999,13 +986,11 @@ struct Reserver {
      */
     QENTEM_INLINE static void ResetAll() noexcept {
 #if defined(__linux__) || defined(_WIN32)
-        LiteArray<Core> &reservers = getReservers();
-
-        for (Core &reserver : reservers) {
+        for (Core &reserver : reservers_) {
             reserver.Reset();
         }
 #else
-        getReserver(0).Reset();
+        reserver_.Reset();
 #endif
     }
 
@@ -1020,9 +1005,7 @@ struct Reserver {
      */
     QENTEM_INLINE static bool IsEmpty() noexcept {
 #if defined(__linux__) || defined(_WIN32)
-        LiteArray<Core> &reservers = getReservers();
-
-        for (const Core &reserver : reservers) {
+        for (const Core &reserver : reservers_) {
             if (!(reserver.IsEmpty())) {
                 return false;
             }
@@ -1030,7 +1013,7 @@ struct Reserver {
 
         return true;
 #else
-        return getReserver(0).IsEmpty();
+        return reserver_.IsEmpty();
 #endif
     }
 
@@ -1043,44 +1026,22 @@ struct Reserver {
      * @return Reference to the active core’s memory management unit.
      */
     QENTEM_INLINE static Core &GetCurrentInstance() noexcept {
-        static thread_local Core &instance = getReserver(CPUHelper::GetCurrentCore());
-        return instance;
-    }
-
-  private:
-    /**
-     * @brief Constructs all core-local arenas based on detected hardware topology.
-     *
-     * The number of cores is queried at runtime, and each arena is initialized independently.
-     */
-    QENTEM_INLINE static LiteArray<Core> initReservers() noexcept {
-        return LiteArray<Core>{CPUHelper::GetCoreCount(), true};
-    }
-
-    /**
-     * @brief Retrieves the arena corresponding to a given core index.
-     *
-     * @param core_id Logical CPU index as reported by the system.
-     * @return Reference to the corresponding ReserverCore.
-     */
-    QENTEM_INLINE static Core &getReserver(SizeT32 core_id) noexcept {
 #if defined(__linux__) || defined(_WIN32)
-        return getReservers().Storage()[core_id];
+        // static thread_local Core &instance = reservers_.Storage()[CPUHelper::GetCurrentCore()];
+        // return instance;
+
+        static thread_local SizeT32 core_id = CPUHelper::GetCurrentCore();
+        return reservers_.Storage()[core_id];
 #else
-        (void)core_id; // Unused on non-pinned or single-arena systems
-        static Core reserver{};
-        return reserver;
+        return reserver_;
 #endif
     }
 
+  private:
 #if defined(__linux__) || defined(_WIN32)
-    /**
-     * @brief Grants access to the complete set of ReserverCore instances.
-     */
-    QENTEM_INLINE static LiteArray<ReserverCore<>> &getReservers() noexcept {
-        static LiteArray<ReserverCore<>> reservers{initReservers()};
-        return reservers;
-    }
+    inline static LiteArray<ReserverCore<>> reservers_{CPUHelper::GetCoreCount(), true};
+#else
+    inline static ReserverCore<> reserver_{};
 #endif
 };
 

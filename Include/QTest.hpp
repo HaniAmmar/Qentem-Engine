@@ -140,20 +140,20 @@ struct QTest {
         }
     }
 
-    inline void ContinueOnError(bool continue_on_error) noexcept {
+    QENTEM_INLINE void ContinueOnError(bool continue_on_error) noexcept {
         continue_on_error_ = continue_on_error;
     }
 
-    inline bool HasError() const noexcept {
+    QENTEM_INLINE bool HasError() const noexcept {
         return error_;
     }
 
-    inline bool ContinueOnErrorEnabled() const noexcept {
+    QENTEM_INLINE bool ContinueOnErrorEnabled() const noexcept {
         return continue_on_error_;
     }
 
     QENTEM_NOINLINE static void PrintMemoryRecord() {
-        static const auto &storage = MemoryRecord::GetRecord();
+        const auto &storage = MemoryRecord::GetRecord();
 
         QConsole::Print("Memory: ", (double(storage.Size) / 1024), " KiB, Peak: ", (double(storage.PeakSize) / 1024),
                         " KiB.\n");
@@ -164,7 +164,8 @@ struct QTest {
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
-        static const auto &storage = MemoryRecord::GetRecord();
+        const auto &storage = MemoryRecord::GetRecord();
+
         PrintMemoryRecord();
 
         const SystemLong remaining = (storage.Reserved - storage.Released);
@@ -178,7 +179,7 @@ struct QTest {
     QENTEM_NOINLINE static void PrintInfo(bool template_engine_info = true) {
         QConsole::Print(QConsole::GetColor(QConsole::Color::TitleColor), "Configurations",
                         QConsole::GetColor(QConsole::Color::EndColor), ":\n");
-        if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
+        if constexpr (QentemConfig::Is64bit) {
             QConsole::Print("Arch: 64-bit\n");
         } else {
             QConsole::Print("Arch: 32-bit\n");
@@ -186,7 +187,7 @@ struct QTest {
 
         QConsole::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
 
-        if QENTEM_CONST_EXPRESSION (QentemConfig::IsBigEndian) {
+        if constexpr (QentemConfig::IsBigEndian) {
             QConsole::Print("Endianness: Big-Endian\n");
         } else {
             QConsole::Print("Endianness: Little-Endian\n");
@@ -203,7 +204,7 @@ struct QTest {
         QConsole::Print("WASM SIMD128: On\n");
 #endif
 
-        if QENTEM_CONST_EXPRESSION (QentemConfig::AutoEscapeHTML) {
+        if constexpr (QentemConfig::AutoEscapeHTML) {
             if (template_engine_info) {
                 QConsole::Print("Auto Escape HTML: On\n");
             }

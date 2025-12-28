@@ -38,7 +38,7 @@ struct MemoryUtils {
         constexpr bool     is_mul8   = (type_size == ((type_size >> shift64) << shift64));
         constexpr bool     is_mul4   = (type_size == ((type_size >> shift32) << shift32));
 
-        if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
+        if constexpr (QentemConfig::Is64bit && is_mul8) {
             Number_T offset = 0;
             SizeT64 *des64  = reinterpret_cast<SizeT64 *>(des);
 
@@ -48,7 +48,7 @@ struct MemoryUtils {
                 des64[offset] = SizeT64{0};
                 ++offset;
             }
-        } else if QENTEM_CONST_EXPRESSION (is_mul4) {
+        } else if constexpr (is_mul4) {
             Number_T offset = 0;
             SizeT32 *des32  = reinterpret_cast<SizeT32 *>(des);
 
@@ -153,7 +153,7 @@ struct MemoryUtils {
         constexpr bool     is_mul8   = (type_size == ((type_size >> shift64) << shift64));
         constexpr bool     is_mul4   = (type_size == ((type_size >> shift32) << shift32));
 
-        if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit && is_mul8) {
+        if constexpr (QentemConfig::Is64bit && is_mul8) {
             Number_T       offset = 0;
             SizeT64       *des64  = reinterpret_cast<SizeT64 *>(to);
             const SizeT64 *src64  = static_cast<const SizeT64 *>(from);
@@ -164,7 +164,7 @@ struct MemoryUtils {
                 des64[offset] = src64[offset];
                 ++offset;
             }
-        } else if QENTEM_CONST_EXPRESSION (is_mul4) {
+        } else if constexpr (is_mul4) {
             Number_T       offset = 0;
             SizeT32       *des32  = reinterpret_cast<SizeT32 *>(to);
             const SizeT32 *src32  = static_cast<const SizeT32 *>(from);
@@ -190,7 +190,7 @@ struct MemoryUtils {
     }
     /////////////////////////////////////////////////////////////////////
     template <typename Number_T>
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION Number_T AlignToPow2(Number_T n_size) noexcept {
+    QENTEM_INLINE static constexpr Number_T AlignToPow2(Number_T n_size) noexcept {
         // Ensure scanned n_size is >= 2, so msb >= 1.
         Number_T size = static_cast<Number_T>(Number_T{1} << Platform::FindLastBit(n_size | Number_T{2}));
 

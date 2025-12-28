@@ -246,13 +246,13 @@ struct Platform {
     }
 #endif // _M_X64
     template <typename Number_T>
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindFirstBit(Number_T value) noexcept {
+    QENTEM_INLINE static constexpr SizeT32 FindFirstBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
         unsigned long  index     = 0;
 
 #ifdef _M_X64
-        if QENTEM_CONST_EXPRESSION (is_size_8) {
+        if constexpr (is_size_8) {
             _BitScanForward64(&index, static_cast<SizeT64>(value));
         } else {
             _BitScanForward(&index, static_cast<unsigned long>(value));
@@ -262,7 +262,7 @@ struct Platform {
 #else  // _M_X64
         constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-        if QENTEM_CONST_EXPRESSION (is_size_8) {
+        if constexpr (is_size_8) {
             // 01010101 <---
             const unsigned long lower_bits = static_cast<unsigned long>(value);
 
@@ -282,13 +282,13 @@ struct Platform {
     }
 
     template <typename Number_T>
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindLastBit(Number_T value) noexcept {
+    QENTEM_INLINE static constexpr SizeT32 FindLastBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
         unsigned long  index     = 0;
 
 #ifdef _M_X64
-        if QENTEM_CONST_EXPRESSION (is_size_8) {
+        if constexpr (is_size_8) {
             _BitScanReverse64(&index, static_cast<SizeT64>(value));
         } else {
             _BitScanReverse(&index, static_cast<unsigned long>(value));
@@ -298,7 +298,7 @@ struct Platform {
 #else  // _M_X64
         constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-        if QENTEM_CONST_EXPRESSION (is_size_8) {
+        if constexpr (is_size_8) {
             // 01010101 <---
             const unsigned long lower_bits = static_cast<unsigned long>(value);
             value >>= int_size;
@@ -318,25 +318,25 @@ struct Platform {
     }
 
 #else  // _MSC_VER
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 PopCount(unsigned int value) {
+    QENTEM_INLINE static constexpr SizeT32 PopCount(unsigned int value) {
         return static_cast<SizeT32>(__builtin_popcount(value));
     }
 
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 PopCount(unsigned long value) {
+    QENTEM_INLINE static constexpr SizeT32 PopCount(unsigned long value) {
         return static_cast<SizeT32>(__builtin_popcountl(value));
     }
 
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 PopCount(unsigned long long value) {
+    QENTEM_INLINE static constexpr SizeT32 PopCount(unsigned long long value) {
         return static_cast<SizeT32>(__builtin_popcountll(value));
     }
 
     template <typename Number_T>
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindFirstBit(Number_T value) noexcept {
+    QENTEM_INLINE static constexpr SizeT32 FindFirstBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
 
-        if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
-            if QENTEM_CONST_EXPRESSION (is_size_8) {
+        if constexpr (QentemConfig::Is64bit) {
+            if constexpr (is_size_8) {
                 return static_cast<SizeT32>(__builtin_ctzl(static_cast<unsigned long>(value)));
             }
 
@@ -344,7 +344,7 @@ struct Platform {
         } else {
             constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-            if QENTEM_CONST_EXPRESSION (is_size_8) {
+            if constexpr (is_size_8) {
                 // 01010101 <---
                 const SizeT32 lower_bits = static_cast<SizeT32>(value);
 
@@ -361,21 +361,21 @@ struct Platform {
     }
 
     template <typename Number_T>
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 FindLastBit(Number_T value) noexcept {
+    QENTEM_INLINE static constexpr SizeT32 FindLastBit(Number_T value) noexcept {
         // 'value' should be bigger than zero.
         constexpr SizeT32 int_size    = (sizeof(int) * 8U);
         constexpr SizeT32 taken_size  = (int_size - 1U);
         constexpr SizeT32 size        = ((sizeof(Number_T) * 8U) - 1U);
         constexpr bool    is_size_63b = (size == 63U);
 
-        if QENTEM_CONST_EXPRESSION (QentemConfig::Is64bit) {
-            if QENTEM_CONST_EXPRESSION (is_size_63b) {
+        if constexpr (QentemConfig::Is64bit) {
+            if constexpr (is_size_63b) {
                 return (size - static_cast<SizeT32>(__builtin_clzl(static_cast<unsigned long>(value))));
             }
 
             return (taken_size - static_cast<SizeT32>(__builtin_clz(static_cast<SizeT32>(value))));
         } else {
-            if QENTEM_CONST_EXPRESSION (is_size_63b) {
+            if constexpr (is_size_63b) {
                 const SizeT32 lower_bits = static_cast<SizeT32>(value);
                 value >>= int_size;
 
@@ -412,7 +412,7 @@ struct Platform {
     // char16
     template <typename Char_T, typename SIMDValue>
     struct SIMDCompare_T<Char_T, SIMDValue, 2U> {
-        inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+        QENTEM_INLINE static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
             Platform::SIMD::Number_T bits16 = Platform::SIMD::Compare16Bit(val1, val2);
             Platform::SIMD::Number_T bits   = 0;
             SizeT32                  count  = 0U;
@@ -436,7 +436,7 @@ struct Platform {
     // char32_t
     template <typename Char_T, typename SIMDValue>
     struct SIMDCompare_T<Char_T, SIMDValue, 4U> {
-        inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+        QENTEM_INLINE static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
             Platform::SIMD::Number_T bits32 = Platform::SIMD::Compare32Bit(val1, val2);
             Platform::SIMD::Number_T bits   = 0;
             SizeT32                  count  = 0U;

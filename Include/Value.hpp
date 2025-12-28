@@ -101,11 +101,11 @@ struct Value {
         copyValue(val);
     }
 
-    inline explicit Value(ValueType type) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(ValueType type) noexcept : array_{} {
         setType(type);
     }
 
-    inline explicit Value(ValueType type, SizeT size) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(ValueType type, SizeT size) noexcept : array_{} {
         switch (type) {
             case ValueType::Array: {
                 array_.Reserve(size);
@@ -124,70 +124,70 @@ struct Value {
         setType(type);
     }
 
-    inline explicit Value(ObjectT &&obj) noexcept : object_{QUtility::Move(obj)} {
+    QENTEM_INLINE explicit Value(ObjectT &&obj) noexcept : object_{QUtility::Move(obj)} {
         setTypeToObject();
     }
 
-    inline explicit Value(ArrayT &&arr) noexcept : array_{QUtility::Move(arr)} {
+    QENTEM_INLINE explicit Value(ArrayT &&arr) noexcept : array_{QUtility::Move(arr)} {
         setTypeToArray();
     }
 
-    inline explicit Value(StringT &&str) noexcept : string_{QUtility::Move(str)} {
+    QENTEM_INLINE explicit Value(StringT &&str) noexcept : string_{QUtility::Move(str)} {
         setTypeToString();
     }
 
-    inline explicit Value(const ObjectT &obj) noexcept : object_{obj} {
+    QENTEM_INLINE explicit Value(const ObjectT &obj) noexcept : object_{obj} {
         setTypeToObject();
     }
 
-    inline explicit Value(const ArrayT &arr) noexcept : array_{arr} {
+    QENTEM_INLINE explicit Value(const ArrayT &arr) noexcept : array_{arr} {
         setTypeToArray();
     }
 
-    inline explicit Value(const StringT &str) noexcept : string_{str} {
+    QENTEM_INLINE explicit Value(const StringT &str) noexcept : string_{str} {
         setTypeToString();
     }
 
-    inline explicit Value(const StringViewT &str) noexcept : string_{str.First(), str.Length()} {
+    QENTEM_INLINE explicit Value(const StringViewT &str) noexcept : string_{str.First(), str.Length()} {
         setTypeToString();
     }
 
-    inline explicit Value(const Char_T *str) : string_{str} {
+    QENTEM_INLINE explicit Value(const Char_T *str) : string_{str} {
         setTypeToString();
     }
 
-    inline explicit Value(const Char_T *str, SizeT length) : string_{str, length} {
+    QENTEM_INLINE explicit Value(const Char_T *str, SizeT length) : string_{str, length} {
         setTypeToString();
     }
 
-    inline explicit Value(SizeT64 num) noexcept : number_{num} {
+    QENTEM_INLINE explicit Value(SizeT64 num) noexcept : number_{num} {
         setTypeToUInt64();
     }
 
-    inline explicit Value(SizeT64I num) noexcept : number_{num} {
+    QENTEM_INLINE explicit Value(SizeT64I num) noexcept : number_{num} {
         setTypeToInt64();
     }
 
-    inline explicit Value(double num) noexcept : number_{num} {
+    QENTEM_INLINE explicit Value(double num) noexcept : number_{num} {
         setTypeToDouble();
     }
 
     template <typename Number_T>
-    explicit Value(Number_T num) noexcept : number_{num} {
-        if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
+    QENTEM_INLINE explicit Value(Number_T num) noexcept : number_{num} {
+        if constexpr (IsFloat<Number_T>()) {
             setTypeToDouble();
-        } else if QENTEM_CONST_EXPRESSION (IsUnsigned<Number_T>()) {
+        } else if constexpr (IsUnsigned<Number_T>()) {
             setTypeToUInt64();
         } else {
             setTypeToInt64();
         }
     }
 
-    explicit Value(NullType) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(NullType) noexcept : array_{} {
         setTypeToNull();
     }
 
-    explicit Value(bool bl) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(bool bl) noexcept : array_{} {
         if (bl) {
             setTypeToTrue();
         } else {
@@ -195,7 +195,7 @@ struct Value {
         }
     }
 
-    Value &operator=(ValueType type) noexcept {
+    QENTEM_INLINE Value &operator=(ValueType type) noexcept {
         setType(type);
         return *this;
     }
@@ -234,7 +234,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const Value &val) {
+    QENTEM_INLINE Value &operator=(const Value &val) {
         if (this != &val) {
             reset();
             copyValue(val);
@@ -377,9 +377,9 @@ struct Value {
         reset();
         number_ = num;
 
-        if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
+        if constexpr (IsFloat<Number_T>()) {
             setTypeToDouble();
-        } else if QENTEM_CONST_EXPRESSION (IsUnsigned<Number_T>()) {
+        } else if constexpr (IsUnsigned<Number_T>()) {
             setTypeToUInt64();
         } else {
             setTypeToInt64();
@@ -406,7 +406,7 @@ struct Value {
         return *this;
     }
 
-    inline void operator+=(Value &&val) {
+    void operator+=(Value &&val) {
         if (isObject() && val.isObject()) {
             object_ += QUtility::Move(val.object_);
             val.setTypeToUndefined();
@@ -420,7 +420,7 @@ struct Value {
         }
     }
 
-    inline void operator+=(const Value &val) {
+    void operator+=(const Value &val) {
         if (isObject() && val.isObject()) {
             object_ += val.object_;
         } else {
@@ -446,7 +446,7 @@ struct Value {
         array_ += QUtility::Move(val);
     }
 
-    inline void operator+=(ObjectT &&obj) {
+    void operator+=(ObjectT &&obj) {
         if (isObject()) {
             object_ += QUtility::Move(obj);
         } else {
@@ -459,11 +459,11 @@ struct Value {
         }
     }
 
-    inline void operator+=(const ObjectT &obj) {
+    QENTEM_INLINE void operator+=(const ObjectT &obj) {
         *this += ObjectT(obj);
     }
 
-    inline void operator+=(ArrayT &&arr) {
+    void operator+=(ArrayT &&arr) {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -476,11 +476,11 @@ struct Value {
         }
     }
 
-    inline void operator+=(const ArrayT &arr) {
+    QENTEM_INLINE void operator+=(const ArrayT &arr) {
         (*this) += ArrayT(arr);
     }
 
-    inline void operator+=(StringT &&str) {
+    void operator+=(StringT &&str) {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -489,20 +489,20 @@ struct Value {
         array_ += Value{QUtility::Move(str)};
     }
 
-    inline void operator+=(const StringT &str) {
+    QENTEM_INLINE void operator+=(const StringT &str) {
         *this += StringT(str);
     }
 
-    inline void operator+=(const StringViewT &str) {
+    QENTEM_INLINE void operator+=(const StringViewT &str) {
         *this += StringT(str.First(), str.Length());
     }
 
-    inline void operator+=(const Char_T *str) {
+    QENTEM_INLINE void operator+=(const Char_T *str) {
         *this += StringT(str);
     }
 
     template <typename Number_T>
-    inline void operator+=(Number_T num) {
+    void operator+=(Number_T num) {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -511,7 +511,7 @@ struct Value {
         array_ += Value{num};
     }
 
-    inline void operator+=(NullType) {
+    void operator+=(NullType) {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -520,7 +520,7 @@ struct Value {
         array_ += Value{nullptr};
     }
 
-    inline void operator+=(bool is_true) {
+    void operator+=(bool is_true) {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -535,7 +535,7 @@ struct Value {
         return out;
     }
 
-    inline Value &operator[](const Char_T *str) {
+    Value &operator[](const Char_T *str) {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -544,7 +544,7 @@ struct Value {
         return (object_[str]);
     }
 
-    inline Value &operator[](const StringViewT &key) {
+    Value &operator[](const StringViewT &key) {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -553,7 +553,7 @@ struct Value {
         return (object_.Get(key.First(), key.Length()));
     }
 
-    inline Value &operator[](StringT &&key) {
+    Value &operator[](StringT &&key) {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -562,7 +562,7 @@ struct Value {
         return (object_[QUtility::Move(key)]);
     }
 
-    inline Value &operator[](const StringT &key) {
+    Value &operator[](const StringT &key) {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -606,7 +606,7 @@ struct Value {
     }
 
     // Will insert the str if it does not exist.
-    inline Value &Get(const Char_T *str, SizeT length) {
+    Value &Get(const Char_T *str, SizeT length) {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -615,7 +615,7 @@ struct Value {
         return (object_.Get(str, length));
     }
 
-    inline Value &Get(const StringViewT &key) {
+    Value &Get(const StringViewT &key) {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -624,7 +624,7 @@ struct Value {
         return (object_.Get(key.First(), key.Length()));
     }
 
-    inline void Insert(const StringViewT &key, Value &&val) {
+    void Insert(const StringViewT &key, Value &&val) {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -633,7 +633,7 @@ struct Value {
         object_.Insert(key.First(), key.Length(), QUtility::Move(val));
     }
 
-    inline bool operator<(const Value &val) const noexcept {
+    bool operator<(const Value &val) const noexcept {
         const ValueType type = Type();
 
         if (type == val.Type()) {
@@ -680,7 +680,7 @@ struct Value {
         return (type < val.Type());
     }
 
-    inline bool operator>(const Value &val) const noexcept {
+    bool operator>(const Value &val) const noexcept {
         const ValueType type = Type();
 
         if (type == val.Type()) {
@@ -727,7 +727,7 @@ struct Value {
         return (type > val.Type());
     }
 
-    inline bool operator<=(const Value &val) const noexcept {
+    bool operator<=(const Value &val) const noexcept {
         const ValueType type = Type();
 
         if (type == val.Type()) {
@@ -774,7 +774,7 @@ struct Value {
         return (type < val.Type());
     }
 
-    inline bool operator>=(const Value &val) const noexcept {
+    bool operator>=(const Value &val) const noexcept {
         const ValueType type = Type();
 
         if (type == val.Type()) {
@@ -821,7 +821,7 @@ struct Value {
         return (type > val.Type());
     }
 
-    inline bool operator==(const Value &val) const noexcept {
+    bool operator==(const Value &val) const noexcept {
         const ValueType type = Type();
 
         if (type == val.Type()) {
@@ -912,7 +912,7 @@ struct Value {
         }
     }
 
-    inline bool IsNumber() const noexcept {
+    bool IsNumber() const noexcept {
         switch (Type()) {
             case ValueType::UIntLong:
             case ValueType::IntLong:
@@ -930,7 +930,7 @@ struct Value {
         }
     }
 
-    inline bool IsUndefined() const noexcept {
+    bool IsUndefined() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Undefined) {
@@ -944,7 +944,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsObject() const noexcept {
+    bool IsObject() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -958,7 +958,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsArray() const noexcept {
+    bool IsArray() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Array) {
@@ -972,7 +972,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsString() const noexcept {
+    bool IsString() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::String) {
@@ -986,7 +986,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsUInt64() const noexcept {
+    bool IsUInt64() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::UIntLong) {
@@ -1000,7 +1000,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsInt64() const noexcept {
+    bool IsInt64() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::IntLong) {
@@ -1014,7 +1014,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsDouble() const noexcept {
+    bool IsDouble() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Double) {
@@ -1028,7 +1028,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsTrue() const noexcept {
+    bool IsTrue() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::True) {
@@ -1042,7 +1042,7 @@ struct Value {
         return false;
     }
 
-    inline bool IsFalse() const noexcept {
+    bool IsFalse() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::False) {
@@ -1056,11 +1056,11 @@ struct Value {
         return false;
     }
 
-    inline bool IsBool() const noexcept {
+    QENTEM_INLINE bool IsBool() const noexcept {
         return (IsTrue() || IsFalse());
     }
 
-    inline bool IsNull() const noexcept {
+    bool IsNull() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Null) {
@@ -1074,11 +1074,11 @@ struct Value {
         return false;
     }
 
-    inline bool IsPointerToValue() const noexcept {
+    QENTEM_INLINE bool IsPointerToValue() const noexcept {
         return isPtrValue();
     }
 
-    inline QNumberType GetNumberType() const noexcept {
+    QNumberType GetNumberType() const noexcept {
         switch (Type()) {
             case ValueType::UIntLong: {
                 // unsigned number.
@@ -1262,11 +1262,11 @@ struct Value {
         }
     }
 
-    Value *GetValue(const StringViewT &key) noexcept {
+    QENTEM_INLINE Value *GetValue(const StringViewT &key) noexcept {
         return GetValue(key.First(), key.Length());
     }
 
-    const Value *GetValue(const StringViewT &key) const noexcept {
+    QENTEM_INLINE const Value *GetValue(const StringViewT &key) const noexcept {
         return GetValue(key.First(), key.Length());
     }
 
@@ -1847,17 +1847,17 @@ struct Value {
         return false;
     }
 
-    inline void Remove(const Char_T *str, SizeT length) noexcept {
+    QENTEM_INLINE void Remove(const Char_T *str, SizeT length) noexcept {
         if (isObject()) {
             object_.Remove(str, length);
         }
     }
 
-    inline void Remove(const StringT &key) noexcept {
+    QENTEM_INLINE void Remove(const StringT &key) noexcept {
         Remove(key.First(), key.Length());
     }
 
-    inline void Remove(const Char_T *str) noexcept {
+    QENTEM_INLINE void Remove(const Char_T *str) noexcept {
         Remove(str, StringUtils::Count(str));
     }
 
@@ -1870,7 +1870,7 @@ struct Value {
     }
 
     template <typename Number_T>
-    inline void RemoveAt(Number_T index) noexcept {
+    QENTEM_INLINE void RemoveAt(Number_T index) noexcept {
         RemoveAt(SizeT(index));
     }
 
@@ -1939,7 +1939,7 @@ struct Value {
         }
     }
 
-    inline ValueType Type() const noexcept {
+    QENTEM_INLINE ValueType Type() const noexcept {
         return type_;
     }
 
@@ -2009,7 +2009,7 @@ struct Value {
         return false;
     }
 
-    bool GroupBy(Value &groupedValue, const Char_T *str) const {
+    QENTEM_INLINE bool GroupBy(Value &groupedValue, const Char_T *str) const {
         return GroupBy(groupedValue, str, StringUtils::Count(str));
     }
 
@@ -2025,7 +2025,7 @@ struct Value {
     }
 
     template <typename Stream_T>
-    inline Stream_T &Stringify(Stream_T &stream, SizeT32 precision = QentemConfig::DoublePrecision) const {
+    Stream_T &Stringify(Stream_T &stream, SizeT32 precision = QentemConfig::DoublePrecision) const {
         const ValueType type = Type();
 
         switch (type) {
@@ -2051,7 +2051,7 @@ struct Value {
         return stream;
     }
 
-    inline StringT Stringify(SizeT32 precision = QentemConfig::DoublePrecision) const {
+    QENTEM_INLINE StringT Stringify(SizeT32 precision = QentemConfig::DoublePrecision) const {
         StringStream<Char_T> stream;
         return Stringify(stream, precision).GetString();
     }
@@ -2172,95 +2172,95 @@ struct Value {
         }
     }
 
-    inline bool isUndefined() const noexcept {
+    QENTEM_INLINE bool isUndefined() const noexcept {
         return (Type() == ValueType::Undefined);
     }
 
-    inline bool isObject() const noexcept {
+    QENTEM_INLINE bool isObject() const noexcept {
         return (Type() == ValueType::Object);
     }
 
-    inline bool isArray() const noexcept {
+    QENTEM_INLINE bool isArray() const noexcept {
         return (Type() == ValueType::Array);
     }
 
-    inline bool isString() const noexcept {
+    QENTEM_INLINE bool isString() const noexcept {
         return (Type() == ValueType::String);
     }
 
-    inline bool isUInt64() const noexcept {
+    QENTEM_INLINE bool isUInt64() const noexcept {
         return (Type() == ValueType::UIntLong);
     }
 
-    inline bool isInt64() const noexcept {
+    QENTEM_INLINE bool isInt64() const noexcept {
         return (Type() == ValueType::IntLong);
     }
 
-    inline bool isDouble() const noexcept {
+    QENTEM_INLINE bool isDouble() const noexcept {
         return (Type() == ValueType::Double);
     }
 
-    inline bool isTrue() const noexcept {
+    QENTEM_INLINE bool isTrue() const noexcept {
         return (Type() == ValueType::True);
     }
 
-    inline bool isFalse() const noexcept {
+    QENTEM_INLINE bool isFalse() const noexcept {
         return (Type() == ValueType::False);
     }
 
-    inline bool isNull() const noexcept {
+    QENTEM_INLINE bool isNull() const noexcept {
         return (Type() == ValueType::Null);
     }
 
-    inline bool isPtrValue() const noexcept {
+    QENTEM_INLINE bool isPtrValue() const noexcept {
         return (Type() == ValueType::ValuePtr);
     }
 
-    inline void setType(ValueType type) noexcept {
+    QENTEM_INLINE void setType(ValueType type) noexcept {
         type_ = type;
     }
 
-    inline void setTypeToUndefined() noexcept {
+    QENTEM_INLINE void setTypeToUndefined() noexcept {
         setType(ValueType::Undefined);
     }
 
-    inline void setTypeToObject() noexcept {
+    QENTEM_INLINE void setTypeToObject() noexcept {
         setType(ValueType::Object);
     }
 
-    inline void setTypeToArray() noexcept {
+    QENTEM_INLINE void setTypeToArray() noexcept {
         setType(ValueType::Array);
     }
 
-    inline void setTypeToString() noexcept {
+    QENTEM_INLINE void setTypeToString() noexcept {
         setType(ValueType::String);
     }
 
-    inline void setTypeToUInt64() noexcept {
+    QENTEM_INLINE void setTypeToUInt64() noexcept {
         setType(ValueType::UIntLong);
     }
 
-    inline void setTypeToInt64() noexcept {
+    QENTEM_INLINE void setTypeToInt64() noexcept {
         setType(ValueType::IntLong);
     }
 
-    inline void setTypeToDouble() noexcept {
+    QENTEM_INLINE void setTypeToDouble() noexcept {
         setType(ValueType::Double);
     }
 
-    inline void setTypeToTrue() noexcept {
+    QENTEM_INLINE void setTypeToTrue() noexcept {
         setType(ValueType::True);
     }
 
-    inline void setTypeToFalse() noexcept {
+    QENTEM_INLINE void setTypeToFalse() noexcept {
         setType(ValueType::False);
     }
 
-    inline void setTypeToNull() noexcept {
+    QENTEM_INLINE void setTypeToNull() noexcept {
         setType(ValueType::Null);
     }
 
-    inline void setTypeToPtrValue() noexcept {
+    QENTEM_INLINE void setTypeToPtrValue() noexcept {
         setType(ValueType::ValuePtr);
     }
 

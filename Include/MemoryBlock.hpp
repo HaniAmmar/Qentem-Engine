@@ -61,7 +61,7 @@ struct MemoryBlock {
         static_assert((Alignment_T > 0) && ((Alignment_T & (Alignment_T - 1)) == 0),
                       "Alignment_T must be power-of-two");
 
-        const SizeT32 page_size = SystemMemory::PageSize();
+        const SizeT32 page_size = SystemMemory::GetPageSize();
 
         if (capacity_ > page_size) {
             // Round up to next page boundary
@@ -195,7 +195,7 @@ struct MemoryBlock {
      *
      * For example, if Alignment_T is 16, returns 4.
      */
-    QENTEM_INLINE static QENTEM_CONST_EXPRESSION SizeT32 DefaultAlignmentBit() noexcept {
+    QENTEM_INLINE static constexpr SizeT32 DefaultAlignmentBit() noexcept {
         return Platform::FindFirstBit(Alignment_T);
     }
 

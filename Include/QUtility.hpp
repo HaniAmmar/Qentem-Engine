@@ -46,12 +46,6 @@
         #define QENTEM_MAYBE_UNUSED __attribute__((unused))
     #endif
 #endif
-
-#if (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L)) || (defined(__cplusplus) && (__cplusplus >= 201703L))
-    #define QENTEM_CONST_EXPRESSION constexpr
-#else
-    #define QENTEM_CONST_EXPRESSION
-#endif
 // clang-format on
 
 namespace Qentem {

@@ -105,13 +105,14 @@ struct BigInt {
      * @brief Move constructor.
      * @param src Source BigInt to move from. The source is cleared after move.
      */
-    BigInt(BigInt &&src) noexcept : index_{src.index_} {
+    QENTEM_INLINE BigInt(BigInt &&src) noexcept : index_{src.index_} {
         SizeT32 index = 0;
         // Move all limbs from src to this BigInt
         while (index <= index_) {
             storage_[index] = src.storage_[index];
             ++index;
         }
+
         src.Clear();
     }
 
@@ -119,7 +120,7 @@ struct BigInt {
      * @brief Copy constructor.
      * @param src Source BigInt to copy from.
      */
-    BigInt(const BigInt &src) noexcept : index_{src.index_} {
+    QENTEM_INLINE BigInt(const BigInt &src) noexcept : index_{src.index_} {
         SizeT32 index = 0;
         // Copy all limbs from src to this BigInt
         while (index <= index_) {
@@ -134,7 +135,7 @@ struct BigInt {
      * @param number Value to initialize with.
      */
     template <typename N_Number_T>
-    inline BigInt(const N_Number_T number) noexcept {
+    QENTEM_INLINE BigInt(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::Set>(number);
     }
 
@@ -147,7 +148,7 @@ struct BigInt {
      * Unused higher limbs are cleared.
      */
     template <typename N_Number_T>
-    inline BigInt &operator=(const N_Number_T number) noexcept {
+    QENTEM_INLINE BigInt &operator=(const N_Number_T number) noexcept {
         SizeT32 index = index_;
         doOperation<BigIntOperation::Set>(number);
 
@@ -165,7 +166,7 @@ struct BigInt {
      * @param src Source BigInt to move from. The source is cleared after assignment.
      * @return Reference to this BigInt.
      */
-    BigInt &operator=(BigInt &&src) noexcept {
+    QENTEM_INLINE BigInt &operator=(BigInt &&src) noexcept {
         if (this != &src) {
             copy(src);
             src.Clear();
@@ -179,7 +180,7 @@ struct BigInt {
      * @param src Source BigInt to copy from.
      * @return Reference to this BigInt.
      */
-    BigInt &operator=(const BigInt &src) noexcept {
+    QENTEM_INLINE BigInt &operator=(const BigInt &src) noexcept {
         if (this != &src) {
             copy(src);
         }
@@ -198,7 +199,7 @@ struct BigInt {
      *     uint32_t val = static_cast<uint32_t>(big); // Only the lowest 32 bits are used.
      */
     template <typename N_Number_T>
-    inline explicit operator N_Number_T() const noexcept {
+    explicit operator N_Number_T() const noexcept {
         // Number of bits in the target type
         constexpr SizeT32 n_width = (sizeof(N_Number_T) * 8U);
 
@@ -207,7 +208,7 @@ struct BigInt {
         constexpr bool is_smaller_size = (n_width < BitWidth());
 
         // Fast path: fits in a single limb, just return storage_[0] truncated
-        if QENTEM_CONST_EXPRESSION (is_smaller_size || is_same_size) {
+        if constexpr (is_smaller_size || is_same_size) {
             return N_Number_T(storage_[0]);
         } else {
             // Otherwise, need to assemble from multiple limbs
@@ -237,7 +238,7 @@ struct BigInt {
      *
      * Only true if the BigInt fits in a single limb.
      */
-    inline friend bool operator<(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator<(const BigInt &out, const Number_T number) noexcept {
         // If BigInt has only one limb, compare directly.
         return ((out.index_ == 0) && (out.storage_[0] < number));
     }
@@ -248,7 +249,7 @@ struct BigInt {
      * @param out    The BigInt instance (right operand).
      * @return True if number is less than BigInt.
      */
-    inline friend bool operator<(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator<(const Number_T number, const BigInt &out) noexcept {
         // Reuse the greater-than operator
         return (out > number);
     }
@@ -259,7 +260,7 @@ struct BigInt {
      * @param number The built-in integer (right operand).
      * @return True if BigInt is less than or equal to number.
      */
-    inline friend bool operator<=(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator<=(const BigInt &out, const Number_T number) noexcept {
         // If BigInt has only one limb, compare directly.
         return ((out.index_ == 0) && (out.storage_[0] <= number));
     }
@@ -270,7 +271,7 @@ struct BigInt {
      * @param out    The BigInt instance (right operand).
      * @return True if number is less than or equal to BigInt.
      */
-    inline friend bool operator<=(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator<=(const Number_T number, const BigInt &out) noexcept {
         // Reuse the greater-than-or-equal operator
         return (out >= number);
     }
@@ -283,7 +284,7 @@ struct BigInt {
      *
      * True if BigInt has more than one limb or the value is greater than number.
      */
-    inline friend bool operator>(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator>(const BigInt &out, const Number_T number) noexcept {
         // If any higher limb is used, BigInt is greater.
         return ((out.index_ != 0) || (out.storage_[0] > number));
     }
@@ -294,7 +295,7 @@ struct BigInt {
      * @param out    The BigInt instance (right operand).
      * @return True if number is greater than BigInt.
      */
-    inline friend bool operator>(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator>(const Number_T number, const BigInt &out) noexcept {
         // Reuse less-than operator
         return (out < number);
     }
@@ -305,7 +306,7 @@ struct BigInt {
      * @param number The built-in integer (right operand).
      * @return True if BigInt is greater than or equal to number.
      */
-    inline friend bool operator>=(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator>=(const BigInt &out, const Number_T number) noexcept {
         // If any higher limb is used, BigInt is greater, or equal if single limb equals number.
         return ((out.index_ != 0) || (out.storage_[0] >= number));
     }
@@ -316,7 +317,7 @@ struct BigInt {
      * @param out    The BigInt instance (right operand).
      * @return True if number is greater than or equal to BigInt.
      */
-    inline friend bool operator>=(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator>=(const Number_T number, const BigInt &out) noexcept {
         // Reuse less-than-or-equal operator
         return (out <= number);
     }
@@ -327,7 +328,7 @@ struct BigInt {
      * @param number The built-in integer (right operand).
      * @return True if BigInt equals number and uses only a single limb.
      */
-    inline friend bool operator==(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator==(const BigInt &out, const Number_T number) noexcept {
         // Only equal if BigInt fits in one limb and matches number.
         return ((out.index_ == 0) && (out.storage_[0] == number));
     }
@@ -338,7 +339,7 @@ struct BigInt {
      * @param out    The BigInt instance (right operand).
      * @return True if number equals BigInt.
      */
-    inline friend bool operator==(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator==(const Number_T number, const BigInt &out) noexcept {
         // Delegate to BigInt == number
         return (out == number);
     }
@@ -349,7 +350,7 @@ struct BigInt {
      * @param number The built-in integer (right operand).
      * @return True if BigInt is not equal to number or has more than one limb.
      */
-    inline friend bool operator!=(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator!=(const BigInt &out, const Number_T number) noexcept {
         // Not equal if higher limbs are used or value does not match number.
         return ((out.index_ != 0) || (out.storage_[0] != number));
     }
@@ -360,7 +361,7 @@ struct BigInt {
      * @param out    The BigInt instance (right operand).
      * @return True if number is not equal to BigInt.
      */
-    inline friend bool operator!=(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator!=(const Number_T number, const BigInt &out) noexcept {
         // Delegate to BigInt != number
         return (out != number);
     }
@@ -369,7 +370,7 @@ struct BigInt {
      * @brief Shifts this BigInt left by the specified number of bits.
      * @param number Number of bits to shift.
      */
-    inline void operator<<=(const SizeT32 number) noexcept {
+    QENTEM_INLINE void operator<<=(const SizeT32 number) noexcept {
         ShiftLeft(number);
     }
 
@@ -377,7 +378,7 @@ struct BigInt {
      * @brief Shifts this BigInt right by the specified number of bits.
      * @param number Number of bits to shift.
      */
-    inline void operator>>=(const SizeT32 number) noexcept {
+    QENTEM_INLINE void operator>>=(const SizeT32 number) noexcept {
         ShiftRight(number);
     }
 
@@ -387,7 +388,7 @@ struct BigInt {
      * @param number Value to OR with.
      */
     template <typename N_Number_T>
-    inline void operator|=(const N_Number_T number) noexcept {
+    QENTEM_INLINE void operator|=(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::Or>(number);
     }
 
@@ -397,7 +398,7 @@ struct BigInt {
      * @param number Value to AND with.
      */
     template <typename N_Number_T>
-    inline void operator&=(const N_Number_T number) noexcept {
+    QENTEM_INLINE void operator&=(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::And>(number);
     }
 
@@ -407,7 +408,7 @@ struct BigInt {
      * @param number Value to add.
      */
     template <typename N_Number_T>
-    inline void operator+=(const N_Number_T number) noexcept {
+    QENTEM_INLINE void operator+=(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::Add>(number);
     }
 
@@ -417,7 +418,7 @@ struct BigInt {
      * @param number Value to subtract.
      */
     template <typename N_Number_T>
-    inline void operator-=(const N_Number_T number) noexcept {
+    QENTEM_INLINE void operator-=(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::Subtract>(number);
     }
 
@@ -425,7 +426,7 @@ struct BigInt {
      * @brief Multiplies this BigInt by a built-in integer (in place).
      * @param number Multiplier.
      */
-    inline void operator*=(const Number_T number) noexcept {
+    QENTEM_INLINE void operator*=(const Number_T number) noexcept {
         Multiply(number);
     }
 
@@ -433,7 +434,7 @@ struct BigInt {
      * @brief Divides this BigInt by a built-in integer (in place).
      * @param number Divisor.
      */
-    inline void operator/=(const Number_T number) noexcept {
+    QENTEM_INLINE void operator/=(const Number_T number) noexcept {
         Divide(number);
     }
 
@@ -483,7 +484,7 @@ struct BigInt {
      * If the subtraction underflows a limb, a borrow is taken from the next limb.
      * Updates the internal limb count if higher limbs become zero.
      */
-    inline void Subtract(Number_T number, SizeT32 index = 0) noexcept {
+    void Subtract(Number_T number, SizeT32 index = 0) noexcept {
         if (number != 0) {
             // Propagate the subtraction and any borrow across limbs
             while (index <= MaxIndex()) {
@@ -520,7 +521,7 @@ struct BigInt {
      * Each limb is multiplied by the multiplier, and any overflow is
      * propagated and added to the next higher limb.
      */
-    inline void Multiply(Number_T multiplier) noexcept {
+    QENTEM_INLINE void Multiply(Number_T multiplier) noexcept {
         // Start from the highest limb and propagate carries to higher limbs.
         SizeT32 index = index_;
         ++index;
@@ -541,7 +542,7 @@ struct BigInt {
      * Each limb is divided, propagating the remainder to lower limbs.
      * After division, index_ is updated to reflect any leading zeros.
      */
-    inline Number_T Divide(const Number_T divisor) noexcept {
+    Number_T Divide(const Number_T divisor) noexcept {
         // True if the limb size is 64 bits (affects shift optimization)
         constexpr bool is_size_64b = (BitWidth() == 64U);
 
@@ -581,7 +582,7 @@ struct BigInt {
      *
      * Bits are shifted right across all limbs, and higher zero limbs are trimmed.
      */
-    inline void ShiftRight(SizeT32 offset) noexcept {
+    void ShiftRight(SizeT32 offset) noexcept {
         // If shifting more than one limb, move limb contents down
         if (offset >= BitWidth()) {
             SizeT32 move = (offset / BitWidth()); // Number of limbs to shift
@@ -638,7 +639,7 @@ struct BigInt {
      * Bits are shifted left across all limbs, expanding the BigInt as needed.
      * If shifting beyond the maximum storage, the result is zero.
      */
-    inline void ShiftLeft(SizeT32 offset) noexcept {
+    void ShiftLeft(SizeT32 offset) noexcept {
         // If shifting by one or more full limbs, move the data up
         if (offset >= BitWidth()) {
             SizeT32 move = (offset / BitWidth()); // Number of limbs to shift
@@ -712,7 +713,7 @@ struct BigInt {
      *
      * Scans from the lowest limb upwards and returns the bit index of the first non-zero bit.
      */
-    inline SizeT32 FindFirstBit() const noexcept {
+    QENTEM_INLINE SizeT32 FindFirstBit() const noexcept {
         SizeT32 index = 0;
 
         // Skip zero limbs from the least significant end
@@ -731,7 +732,7 @@ struct BigInt {
      *
      * Uses the highest non-zero limb and computes the position of its highest set bit.
      */
-    inline SizeT32 FindLastBit() const noexcept {
+    QENTEM_INLINE SizeT32 FindLastBit() const noexcept {
         // Bit index is (limb index * bits per limb) + offset within limb
         return (Platform::FindLastBit(storage_[index_]) + SizeT32(index_ * BitWidth()));
     }
@@ -743,7 +744,7 @@ struct BigInt {
      *
      * This does not convert the full BigInt to a built-in type; it just returns storage_[0].
      */
-    inline Number_T Number() const noexcept {
+    QENTEM_INLINE Number_T Number() const noexcept {
         return storage_[0];
     }
 
@@ -752,7 +753,7 @@ struct BigInt {
      *
      * Clears all limbs and resets the index.
      */
-    inline void Clear() noexcept {
+    QENTEM_INLINE void Clear() noexcept {
         // Zero out all used limbs from highest down to zero
         while (index_ != 0) {
             storage_[index_] = 0;
@@ -766,7 +767,7 @@ struct BigInt {
      * @brief Returns the current highest limb index in use.
      * @return The highest non-zero limb index.
      */
-    inline SizeT32 Index() const noexcept {
+    QENTEM_INLINE SizeT32 Index() const noexcept {
         return index_;
     }
 
@@ -776,7 +777,7 @@ struct BigInt {
      *
      * Calculated as (TotalBitWidth / bits per limb) - 1.
      */
-    inline static constexpr SizeT32 MaxIndex() noexcept {
+    QENTEM_INLINE static constexpr SizeT32 MaxIndex() noexcept {
         return ((TotalBitWidth() / BitWidth()) - 1U);
     }
 
@@ -784,7 +785,7 @@ struct BigInt {
      * @brief Returns the number of bits in each limb.
      * @return Bits per limb (e.g., 64 for uint64_t).
      */
-    inline static constexpr SizeT32 BitWidth() noexcept {
+    QENTEM_INLINE static constexpr SizeT32 BitWidth() noexcept {
         return (ByteWidth() * 8U);
     }
 
@@ -794,7 +795,7 @@ struct BigInt {
      *
      * If Width_T is not an exact multiple of BitWidth(), rounds up to the next full limb.
      */
-    inline static constexpr SizeT32 TotalBitWidth() noexcept {
+    QENTEM_INLINE static constexpr SizeT32 TotalBitWidth() noexcept {
         // If Width_T is a multiple of BitWidth(), just return Width_T.
         // Otherwise, add another limb to cover the excess bits.
         return (((BitWidth() * (Width_T / BitWidth())) == Width_T)
@@ -808,7 +809,7 @@ struct BigInt {
      * @brief Returns the size of the limb type in bytes.
      * @return Size of Number_T in bytes.
      */
-    inline static constexpr SizeT32 ByteWidth() noexcept {
+    QENTEM_INLINE static constexpr SizeT32 ByteWidth() noexcept {
         return sizeof(Number_T);
     }
 
@@ -816,7 +817,7 @@ struct BigInt {
      * @brief Checks if this BigInt uses more than one limb.
      * @return True if any higher limb is non-zero.
      */
-    inline bool IsBig() const noexcept {
+    QENTEM_INLINE bool IsBig() const noexcept {
         return (index_ != 0);
     }
 
@@ -824,7 +825,7 @@ struct BigInt {
      * @brief Checks if this BigInt is not zero.
      * @return True if value is not zero.
      */
-    inline bool NotZero() const noexcept {
+    QENTEM_INLINE bool NotZero() const noexcept {
         return (*this != 0);
     }
 
@@ -832,7 +833,7 @@ struct BigInt {
      * @brief Checks if this BigInt is zero.
      * @return True if value is zero.
      */
-    inline bool IsZero() const noexcept {
+    QENTEM_INLINE bool IsZero() const noexcept {
         return (*this == 0);
     }
 
@@ -842,7 +843,7 @@ struct BigInt {
      *
      * This function does not zero any unused higher limbs.
      */
-    inline void SetIndex(SizeT32 index) noexcept {
+    QENTEM_INLINE void SetIndex(SizeT32 index) noexcept {
         index_ = index;
     }
 
@@ -850,7 +851,7 @@ struct BigInt {
      * @brief Returns a mutable pointer to the underlying storage array.
      * @return Pointer to storage_ array.
      */
-    inline Number_T *Storage() noexcept {
+    QENTEM_INLINE Number_T *Storage() noexcept {
         return storage_;
     }
 
@@ -858,24 +859,11 @@ struct BigInt {
      * @brief Returns a const pointer to the underlying storage array.
      * @return Const pointer to storage_ array.
      */
-    inline const Number_T *Storage() const noexcept {
+    QENTEM_INLINE const Number_T *Storage() const noexcept {
         return storage_;
     }
 
   private:
-    /**
-     * @brief Internal storage for BigInt limbs.
-     *
-     * Each element represents a fixed-width chunk ("limb") of the overall value.
-     * Size is determined by MaxIndex() + 1 to cover all requested bits.
-     */
-    Number_T storage_[MaxIndex() + Number_T{1}]{0};
-
-    /**
-     * @brief Highest non-zero limb index currently used.
-     */
-    SizeT32 index_{0};
-
     /**
      * @brief Copies the value from another BigInt.
      * @param src The source BigInt to copy from.
@@ -909,7 +897,7 @@ struct BigInt {
      * Used by assignment and compound operators for efficient, in-place modification.
      */
     template <BigIntOperation Operation>
-    inline void doOperation(Number_T number) noexcept {
+    QENTEM_INLINE void doOperation(Number_T number) noexcept {
         switch (Operation) {
             case BigIntOperation::Set: {
                 // Assign a new value to this BigInt, clearing all higher limbs.
@@ -956,7 +944,7 @@ struct BigInt {
      * Used by assignment and compound operators for in-place modification.
      */
     template <BigIntOperation Operation, typename N_Number_T>
-    inline void doOperation(N_Number_T number) noexcept {
+    QENTEM_INLINE void doOperation(N_Number_T number) noexcept {
         // True if N_Number_T is wider than one limb.
         constexpr bool is_bigger_size = (((sizeof(N_Number_T) * 8U) / BitWidth()) > 1U);
 
@@ -996,7 +984,7 @@ struct BigInt {
         }
 
         // If the input is wider than a single limb, operate on all higher limb chunks
-        if QENTEM_CONST_EXPRESSION (is_bigger_size) {
+        if constexpr (is_bigger_size) {
             SizeT32 index = 1U;
             number >>= BitWidth();
 
@@ -1049,6 +1037,19 @@ struct BigInt {
             }
         }
     }
+
+    /**
+     * @brief Internal storage for BigInt limbs.
+     *
+     * Each element represents a fixed-width chunk ("limb") of the overall value.
+     * Size is determined by MaxIndex() + 1 to cover all requested bits.
+     */
+    Number_T storage_[MaxIndex() + Number_T{1}]{0};
+
+    /**
+     * @brief Highest non-zero limb index currently used.
+     */
+    SizeT32 index_{0};
 };
 
 /**
@@ -1069,8 +1070,8 @@ struct DoubleWidthArithmetic<Number_T, 8U> {
      *
      * Packs two 8-bit values into 16 bits, divides, then splits result.
      */
-    inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                              SizeT32) noexcept {
+    QENTEM_INLINE static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
+                                     SizeT32) noexcept {
         SizeT16 dividend16{dividend_high};              // Pack high byte
         dividend16 <<= shift_;                          // Shift up by 8 bits
         dividend16 |= dividend_low;                     // Pack in low byte
@@ -1087,7 +1088,7 @@ struct DoubleWidthArithmetic<Number_T, 8U> {
      *
      * Used for multi-limb multiplication.
      */
-    inline static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
+    QENTEM_INLINE static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
         SizeT16 number16{number};            // Promote to 16 bits
         number16 *= multiplier;              // Perform 16-bit multiplication
         number = Number_T(number16);         // Store the low 8 bits in 'number'
@@ -1116,8 +1117,8 @@ struct DoubleWidthArithmetic<Number_T, 16U> {
      *
      * Packs two 16-bit values into 32 bits, divides, then splits result.
      */
-    inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                              SizeT32) noexcept {
+    QENTEM_INLINE static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
+                                     SizeT32) noexcept {
         SizeT32 dividend32{dividend_high};              // Pack high 16 bits
         dividend32 <<= shift_;                          // Shift to high word
         dividend32 |= dividend_low;                     // Add in low 16 bits
@@ -1134,7 +1135,7 @@ struct DoubleWidthArithmetic<Number_T, 16U> {
      *
      * Used for multi-limb multiplication.
      */
-    inline static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
+    QENTEM_INLINE static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
         SizeT32 number32{number};            // Promote to 32 bits
         number32 *= multiplier;              // 32-bit multiplication
         number = Number_T(number32);         // Store low 16 bits
@@ -1163,8 +1164,8 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
      *
      * Packs two 32-bit values into 64 bits, divides, then splits result.
      */
-    inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                              SizeT32) noexcept {
+    QENTEM_INLINE static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
+                                     SizeT32) noexcept {
         SizeT64 dividend64{dividend_high};              // Pack high 32 bits
         dividend64 <<= shift_;                          // Shift to high dword
         dividend64 |= dividend_low;                     // Add in low 32 bits
@@ -1181,7 +1182,7 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
      *
      * Used for multi-limb multiplication.
      */
-    inline static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
+    QENTEM_INLINE static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
         SizeT64 number64{number};            // Promote to 64 bits
         number64 *= multiplier;              // 64-bit multiplication
         number = Number_T(number64);         // Store low 32 bits
@@ -1228,8 +1229,8 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      *   4. Unnormalize the remainder.
      *   5. Handle carries and overflows.
      */
-    inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                              const SizeT32 initial_shift) noexcept {
+    static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
+                       const SizeT32 initial_shift) noexcept {
         // Step 1: Save the remainder that results from dividing the low part
         const Number_T carry = (dividend_low % divisor);
         dividend_low /= divisor;
@@ -1335,7 +1336,7 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      *   2. Accumulate all cross-products in the correct positions.
      *   3. Return the high part as the carry.
      */
-    inline static Number_T Multiply(Number_T &number, Number_T multiplier) noexcept {
+    static Number_T Multiply(Number_T &number, Number_T multiplier) noexcept {
         // Split operands into low and high 32-bit parts
         const Number_T number_low     = (number & mask_);
         Number_T       number_high    = number;

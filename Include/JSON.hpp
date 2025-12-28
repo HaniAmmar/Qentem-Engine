@@ -24,18 +24,18 @@ struct JSON {
     struct Parser;
 
     template <typename Char_T, typename Number_T, typename Stream_T>
-    inline static Value<Char_T> Parse(Stream_T &stream, const Char_T *content, Number_T length) {
+    QENTEM_INLINE static Value<Char_T> Parse(Stream_T &stream, const Char_T *content, Number_T length) {
         return Parser<Char_T, Stream_T>::Parse(stream, content, SizeT(length));
     }
 
     template <typename Char_T, typename Number_T>
-    inline static Value<Char_T> Parse(const Char_T *content, Number_T length) {
+    QENTEM_INLINE static Value<Char_T> Parse(const Char_T *content, Number_T length) {
         StringStream<Char_T> stream;
         return Parse(stream, content, SizeT(length));
     }
 
     template <typename Char_T>
-    inline static Value<Char_T> Parse(const Char_T *content) {
+    QENTEM_INLINE static Value<Char_T> Parse(const Char_T *content) {
         return Parse(content, StringUtils::Count(content));
     }
 

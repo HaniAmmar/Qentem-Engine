@@ -31,7 +31,7 @@ struct StringUtils {
     };
 
     template <typename Char_T, typename Number_T = SizeT>
-    static QENTEM_CONST_EXPRESSION Number_T Count(const Char_T *str) noexcept {
+    static constexpr Number_T Count(const Char_T *str) noexcept {
         Number_T length = 0;
 
         if (str != nullptr) {

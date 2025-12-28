@@ -30,17 +30,16 @@ struct Digit {
     enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, SemiFixed = 2, Scientific = 3 };
 
     struct RealFormatInfo {
-        QENTEM_CONST_EXPRESSION RealFormatInfo() noexcept {
+        constexpr RealFormatInfo() noexcept {
         }
 
-        QENTEM_CONST_EXPRESSION RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
+        constexpr RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
         }
 
-        QENTEM_CONST_EXPRESSION RealFormatInfo(RealFormatType type) noexcept : Type{type} {
+        constexpr RealFormatInfo(RealFormatType type) noexcept : Type{type} {
         }
 
-        QENTEM_CONST_EXPRESSION RealFormatInfo(SizeT32 precision, RealFormatType type) noexcept
-            : Precision{precision}, Type{type} {
+        constexpr RealFormatInfo(SizeT32 precision, RealFormatType type) noexcept : Precision{precision}, Type{type} {
         }
 
         RealFormatInfo &operator=(SizeT32 precision) noexcept {
@@ -58,28 +57,28 @@ struct Digit {
     };
     /////////////////////////////////////////////////////////////////
     template <bool Reverse_V_T = false, typename Stream_T, typename Number_T>
-    inline static void NumberToString(Stream_T &stream, Number_T number,
-                                      const RealFormatInfo format = RealFormatInfo{}) {
+    QENTEM_INLINE static void NumberToString(Stream_T &stream, Number_T number,
+                                             const RealFormatInfo format = RealFormatInfo{}) {
         constexpr SizeT32 n_size = sizeof(Number_T);
         using Char_T             = typename Stream_T::CharType;
         using QNumberType_T      = typename QNumberAutoTypeT<Number_T, n_size>::QNumberType_T;
 
         QNumberType_T qn{number};
 
-        if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
+        if constexpr (IsFloat<Number_T>()) {
             realToString<Number_T>(stream, QNumberType_T{number}.Natural, format);
         } else {
             constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000) + 1U);
             Char_T            storage[max_number_of_digits];
 
-            if (!IsUnsigned<Number_T>()) {
+            if constexpr (!IsUnsigned<Number_T>()) {
                 if (number < 0) {
                     qn.Integer = -qn.Integer;
                     stream.Write(DigitUtils::DigitChar::Negative);
                 }
             }
 
-            if QENTEM_CONST_EXPRESSION (Reverse_V_T) {
+            if constexpr (Reverse_V_T) {
                 stream.Write(&(storage[0]), IntToString<true>(&(storage[0]), qn.Natural));
             } else {
                 const SizeT length = IntToString(&(storage[max_number_of_digits]), qn.Natural);
@@ -93,7 +92,7 @@ struct Digit {
     static SizeT IntToString(Char_T *storage, Number_T number) noexcept {
         const Char_T *str = storage;
 
-        if QENTEM_CONST_EXPRESSION (!Reverse_V_T) {
+        if constexpr (!Reverse_V_T) {
             while (number >= Number_T{10}) {
                 SizeT index = SizeT(number % Number_T{100});
                 number /= Number_T{100};
@@ -177,7 +176,7 @@ struct Digit {
 
         SizeT index{length};
 
-        if QENTEM_CONST_EXPRESSION (Lowercase) {
+        if constexpr (Lowercase) {
             while (index != 0) {
                 --index;
                 buffer[index] = HexTableL[static_cast<SizeT>(number & Number_T{0xF})];
@@ -221,7 +220,7 @@ struct Digit {
     }
 
     template <typename Number_T, typename Char_T>
-    static Number_T HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
+    QENTEM_INLINE static Number_T HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
         SizeT offset{0};
         return HexStringToNumber<Number_T>(value, offset, length);
     }
@@ -246,13 +245,13 @@ struct Digit {
     }
 
     template <typename Char_T>
-    inline static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT &offset,
-                                             SizeT end_offset) noexcept {
+    QENTEM_INLINE static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT &offset,
+                                                    SizeT end_offset) noexcept {
         return stringToNumber(number, content, offset, end_offset);
     }
 
     template <typename Char_T>
-    inline static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT length) noexcept {
+    QENTEM_INLINE static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT length) noexcept {
         SizeT offset{0};
         return stringToNumber(number, content, offset, length);
     }
@@ -280,8 +279,8 @@ struct Digit {
      * @param precision   Desired fractional digits (default = 6, max = 9).
      */
     template <typename Stream_T>
-    QENTEM_INLINE static void FormatBenchmarkTime(Stream_T &stream, SizeT64I seconds, SizeT64I nanosecond,
-                                                  SizeT32 precision = 4) noexcept {
+    static void FormatBenchmarkTime(Stream_T &stream, SizeT64I seconds, SizeT64I nanosecond,
+                                    SizeT32 precision = 4) noexcept {
         using Char_T = typename Stream_T::CharType;
         constexpr SizeT32 max_nanosecond{9};       // maximum nanosecond digits
         Char_T            storage[max_nanosecond]; // temporary digit buffer
@@ -355,7 +354,7 @@ struct Digit {
     }
 
     template <typename Stream_T>
-    inline static void InsertZeros(Stream_T &stream, const SizeT length) {
+    QENTEM_INLINE static void InsertZeros(Stream_T &stream, const SizeT length) {
         using Char_T           = typename Stream_T::CharType;
         constexpr SizeT32 size = sizeof(Char_T);
         stream.Write(DigitUtils::DigitString<Char_T, size>::Zeros, length);
@@ -694,35 +693,35 @@ struct Digit {
         b_int <<= 64U;
         //////////////////////////////////////////////////////////////
         constexpr bool is_size_8 = (sizeof(UNumber_T) == 8U);
-        if QENTEM_CONST_EXPRESSION (is_size_8) {
+        if constexpr (is_size_8) {
             while (exponent >= DigitConst::MaxPowerOfFive) {
                 // 2**126 = 85070591730234615865843651857942052864
                 // 5**27 = 7450580596923828125 (MaxPowerOfFive)
                 // 2**126 / 5**27 = 11417981541647679048.4
                 // 126-64=62; See 2**126 and 64 shift
 
-                b_int *= DigitConst::GetPowerOfOneOverFive(DigitConst::MaxPowerOfFive);
+                b_int *= DigitConst::PowerOfOneOverFive[DigitConst::MaxPowerOfFive];
                 b_int >>= DigitConst::MaxShift;
-                shifted += DigitConst::GetPowerOfOneOverFiveShift(DigitConst::MaxPowerOfFive);
+                shifted += DigitConst::PowerOfOneOverFiveShift[DigitConst::MaxPowerOfFive];
                 exponent -= DigitConst::MaxPowerOfFive;
             }
 
             if (exponent != 0) {
-                b_int *= DigitConst::GetPowerOfOneOverFive(exponent);
+                b_int *= DigitConst::PowerOfOneOverFive[exponent];
                 b_int >>= DigitConst::MaxShift;
-                shifted += DigitConst::GetPowerOfOneOverFiveShift(exponent);
+                shifted += DigitConst::PowerOfOneOverFiveShift[exponent];
             }
         } else {
             while (exponent >= DigitConst::MaxPowerOfFive) {
                 b_int <<= DigitConst::MaxShift;
-                b_int /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+                b_int /= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
                 shifted += DigitConst::MaxShift;
                 exponent -= DigitConst::MaxPowerOfFive;
             }
 
             if (exponent != 0) {
                 b_int <<= DigitConst::MaxShift;
-                b_int /= DigitConst::GetPowerOfFive(exponent);
+                b_int /= DigitConst::PowerOfFive[exponent];
                 shifted += DigitConst::MaxShift;
             }
         }
@@ -777,7 +776,7 @@ struct Digit {
         SizeT32           shifted{exponent};
         //////////////////////////////////////////////////////////////
         while (exponent >= DigitConst::MaxPowerOfFive) {
-            b_int *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+            b_int *= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
 
             if (b_int.Index() > b_int_limit) {
                 b_int >>= DigitConst::MaxShift;
@@ -788,7 +787,7 @@ struct Digit {
         }
 
         if (exponent != 0) {
-            b_int *= DigitConst::GetPowerOfFive(exponent);
+            b_int *= DigitConst::PowerOfFive[exponent];
         }
         //////////////////////////////////////////////////////////////
         const SizeT32 bit = b_int.FindLastBit();
@@ -965,7 +964,7 @@ struct Digit {
                                                       : b_int.MaxIndex();
 
                         do {
-                            b_int *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+                            b_int *= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
 
                             if ((b_int.Index() >= max_index) && (shift >= DigitConst::MaxShift)) {
                                 b_int >>= DigitConst::MaxShift;
@@ -977,7 +976,7 @@ struct Digit {
                     }
 
                     if (times != 0) {
-                        b_int *= DigitConst::GetPowerOfFive(times);
+                        b_int *= DigitConst::PowerOfFive[times];
                     }
 
                     b_int >>= shift;
@@ -1049,7 +1048,7 @@ struct Digit {
     }
 
     template <typename Stream_T>
-    inline static void insertZerosLarge(Stream_T &stream, SizeT32 length) {
+    static void insertZerosLarge(Stream_T &stream, SizeT32 length) {
         using Char_T           = typename Stream_T::CharType;
         constexpr SizeT32 size = sizeof(Char_T);
         using DigitString      = DigitUtils::DigitString<Char_T, size>;
@@ -1089,9 +1088,9 @@ struct Digit {
     //     while (b_int.IsBig()) {
     //         const SizeT length = stream.Length();
 
-    //         const NumberType rem1 = b_int.Divide(DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfTen));
+    //         const NumberType rem1 = b_int.Divide(DigitConst::PowerOfFive[DigitConst::MaxPowerOfTen]);
     //         NumberType       rem2 = (b_int.Number() & mask);
-    //         rem2 *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfTen);
+    //         rem2 *= DigitConst::PowerOfFive[DigitConst::MaxPowerOfTen];
     //         b_int >>= DigitConst::MaxPowerOfTen;
 
     //         NumberToString<true>(stream, (rem2 + rem1));
@@ -1104,40 +1103,40 @@ struct Digit {
     // }
 
     template <typename BigInt_T>
-    inline static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
+    QENTEM_INLINE static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
 
         while (drop >= DigitConst::MaxPowerOfFive) {
-            b_int /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+            b_int /= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
             drop -= DigitConst::MaxPowerOfFive;
         }
 
         if (drop != 0) {
-            b_int /= DigitConst::GetPowerOfFive(drop);
+            b_int /= DigitConst::PowerOfFive[drop];
         }
     }
 
     // TODO: needs more work for extremely large values (e100)
     // template <typename BigInt_T>
-    // inline static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
+    // QENTEM_INLINE static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
     //     using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
-    //     if QENTEM_CONST_EXPRESSION (BigInt_T::BitWidth()) {
+    //     if constexpr (BigInt_T::BitWidth()) {
     //         // Magic division using reciprocal multiply + shift (for 64-bit)
 
     //         while (drop > DigitConst::MaxPowerOfFive) {
-    //             b_int *= DigitConst::GetPowerOfOneOverFive(DigitConst::MaxPowerOfFive);
-    //             b_int >>= (DigitConst::GetPowerOfOneOverFiveShift(DigitConst::MaxPowerOfFive) + 64U);
+    //             b_int *= DigitConst::PowerOfOneOverFive[DigitConst::MaxPowerOfFive];
+    //             b_int >>= (DigitConst::PowerOfOneOverFiveShift[DigitConst::MaxPowerOfFive] + 64U);
     //             drop -= DigitConst::MaxPowerOfFive;
     //         }
     //     }
 
     //     while (drop >= DigitConst::MaxPowerOfFive) {
-    //         b_int /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+    //         b_int /= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
     //         drop -= DigitConst::MaxPowerOfFive;
     //     }
 
     //     if (drop != 0) {
-    //         b_int /= DigitConst::GetPowerOfFive(drop);
+    //         b_int /= DigitConst::PowerOfFive[drop];
     //     }
     // }
 
@@ -1334,7 +1333,7 @@ struct Digit {
         StringUtils::Reverse(stream.Storage(), started_at, stream.Length(), (new_length - started_at));
         stream.SetLength(new_length);
 
-        if QENTEM_CONST_EXPRESSION (Fixed_T) {
+        if constexpr (Fixed_T) {
             if ((dot_index == index) || ((stream.Length() - started_at) == SizeT{1}) ||
                 (!fraction_only && power_increased)) {
                 stream.Write(DigitUtils::DigitChar::Dot);

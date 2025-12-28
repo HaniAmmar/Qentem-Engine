@@ -326,55 +326,55 @@ struct TagBit {
         Clear();
     }
 
-    inline TagType GetType() const noexcept {
+    QENTEM_INLINE TagType GetType() const noexcept {
         return type_;
     }
 
-    inline const VariableTag &GetVariableTag() const noexcept {
+    QENTEM_INLINE const VariableTag &GetVariableTag() const noexcept {
         return *(static_cast<const VariableTag *>(storage_));
     }
 
-    inline const MathTag &GetMathTag() const noexcept {
+    QENTEM_INLINE const MathTag &GetMathTag() const noexcept {
         return *(static_cast<const MathTag *>(storage_));
     }
 
-    inline const SuperVariableTag &GetSuperVariableTag() const noexcept {
+    QENTEM_INLINE const SuperVariableTag &GetSuperVariableTag() const noexcept {
         return *(static_cast<const SuperVariableTag *>(storage_));
     }
 
-    inline const InLineIfTag &GetInLineIfTag() const noexcept {
+    QENTEM_INLINE const InLineIfTag &GetInLineIfTag() const noexcept {
         return *(static_cast<const InLineIfTag *>(storage_));
     }
 
-    inline const LoopTag &GetLoopTag() const noexcept {
+    QENTEM_INLINE const LoopTag &GetLoopTag() const noexcept {
         return *(static_cast<const LoopTag *>(storage_));
     }
 
-    inline const IfTag &GetIfTag() const noexcept {
+    QENTEM_INLINE const IfTag &GetIfTag() const noexcept {
         return *(static_cast<const IfTag *>(storage_));
     }
 
-    inline VariableTag &GetVariableTag() noexcept {
+    QENTEM_INLINE VariableTag &GetVariableTag() noexcept {
         return *(static_cast<VariableTag *>(storage_));
     }
 
-    inline MathTag &GetMathTag() noexcept {
+    QENTEM_INLINE MathTag &GetMathTag() noexcept {
         return *(static_cast<MathTag *>(storage_));
     }
 
-    inline SuperVariableTag &GetSuperVariableTag() noexcept {
+    QENTEM_INLINE SuperVariableTag &GetSuperVariableTag() noexcept {
         return *(static_cast<SuperVariableTag *>(storage_));
     }
 
-    inline InLineIfTag &GetInLineIfTag() noexcept {
+    QENTEM_INLINE InLineIfTag &GetInLineIfTag() noexcept {
         return *(static_cast<InLineIfTag *>(storage_));
     }
 
-    inline LoopTag &GetLoopTag() noexcept {
+    QENTEM_INLINE LoopTag &GetLoopTag() noexcept {
         return *(static_cast<LoopTag *>(storage_));
     }
 
-    inline IfTag &GetIfTag() noexcept {
+    QENTEM_INLINE IfTag &GetIfTag() noexcept {
         return *(static_cast<IfTag *>(storage_));
     }
 
@@ -667,37 +667,18 @@ template <typename Char_T>
 struct List {
     using TagPatterns = TagPatterns_T<Char_T>;
 
-    inline static const SizeT32 *GetGroupedByFirstChar(SizeT32 index) noexcept {
-        static const SizeT32 group[5][5] = {{1U, 2U, 3U, 4U, 5U}, {6U, 7U, 8U, 9U, 10U}};
+    static constexpr SizeT32 SingleCharsCount{};
+    static constexpr SizeT32 FirstCharsCount{2U};
 
-        return group[index];
-    }
+    inline static constexpr SizeT32 GroupedByFirstChar[5][5] = {{1U, 2U, 3U, 4U, 5U}, {6U, 7U, 8U, 9U, 10U}};
+    // Not used.
+    inline static constexpr SizeT32 SingleCharGroup[]     = {1U, 2U};
+    inline static constexpr SizeT32 GroupedByFirstCount[] = {5U, 5U};
 
-    static constexpr const SizeT32 SingleCharsCount{1U};
-    static constexpr const Char_T  SingleChar{TagPatterns::InLineLastChar};
+    static constexpr const Char_T SingleChar{TagPatterns::InLineLastChar};
 
-    // static constexpr SizeT32 SingleCharsCount{2U};
-
-    inline static const SizeT32 *GetSingleCharGroup() noexcept {
-        // Not used.
-        static const SizeT32 group[] = {1U, 2U};
-        return &(group[0]);
-    }
-
-    inline static SizeT32 GetGroupedByFirstCount(SizeT32 index) noexcept {
-        static const SizeT32 counts[] = {5U, 5U};
-
-        return counts[index];
-    }
-
-    static constexpr const SizeT32 FirstCharsCount{2U};
-
-    inline static Char_T GetFirstChar(SizeT32 index) noexcept {
-        // Only unique first chars.
-        static constexpr const Char_T first_chars[] = {TagPatterns::InLineFirstChar, TagPatterns::MultiLineFirstChar};
-
-        return first_chars[index];
-    }
+    // Only unique first chars.
+    inline static constexpr const Char_T FirstChar[] = {TagPatterns::InLineFirstChar, TagPatterns::MultiLineFirstChar};
 
     inline static SizeT32 GetFirstCharID(Char_T ch) noexcept {
         // Only unique first chars.
@@ -717,34 +698,26 @@ struct List {
         }
     }
 
-    inline static const Char_T *GetWord(SizeT32 index) noexcept {
-        // The maximum number of words is 15; four bits width.
+    // The maximum number of words is 15; four bits width.
 
-        // clang-format off
-        static const Char_T *list[] = {
-            // Single char spot
-            nullptr,
+    // clang-format off
+    inline static constexpr const Char_T *Word[] = {
+        // Single char spot
+        nullptr,
 
-            // First group starts with {
-            TagPatterns::VariablePrefix, TagPatterns::RawVariablePrefix, TagPatterns::MathPrefix,
-            TagPatterns::SuperVariablePrefix, TagPatterns::InLineIfPrefix,
+        // First group starts with {
+        TagPatterns::VariablePrefix, TagPatterns::RawVariablePrefix, TagPatterns::MathPrefix,
+        TagPatterns::SuperVariablePrefix, TagPatterns::InLineIfPrefix,
 
-            // Second group starts with <
-            TagPatterns::LoopPrefix, TagPatterns::LoopSuffix, TagPatterns::IfPrefix, TagPatterns::IfSuffix,
-            TagPatterns::ElsePrefix
-        };
-        // clang-format on
+        // Second group starts with <
+        TagPatterns::LoopPrefix, TagPatterns::LoopSuffix, TagPatterns::IfPrefix, TagPatterns::IfSuffix,
+        TagPatterns::ElsePrefix
+    };
+    // clang-format on
 
-        return &((list[index])[0]);
-    }
-
-    inline static SizeT32 GetWordLength(SizeT32 index) noexcept {
-        // length is the count of 'list[index] - 1'.
-        // The last char is user for checking the end of the word.
-        static const SizeT32 sizes[] = {1U, 3U, 3U, 4U, 4U, 1U, 3U, 5U, 1U, 3U, 3U};
-
-        return sizes[index];
-    }
+    // length is the count of 'list[index] - 1'.
+    // The last char is user for checking the end of the word.
+    inline static constexpr const SizeT32 WordLength[] = {1U, 3U, 3U, 4U, 4U, 1U, 3U, 5U, 1U, 3U, 3U};
 };
 
 } // namespace Tags

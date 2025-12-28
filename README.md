@@ -17,7 +17,6 @@
 -   [Modules](#modules)
 -   [JSON Example](#json-example)
 -   [Tests](#tests)
--   [Why C++11?](#why-c11)
 -   [License](#license)
 
 ## Introduction
@@ -52,7 +51,7 @@ Qentem Engine is a C++ library offering high-performance template rendering and 
 
 ## Requirements
 
-A C++11 or later compiler.
+A C++17 or later compiler.
 
 ## Embedded / Microcontroller Support
 
@@ -366,10 +365,6 @@ The test suite includes over 23k lines of code, more than five times the size of
     cmake --build .
     ctest -C Debug
     ```
-
-## Why C++11?
-
-Qentem Engine currently targets C++11 to ensure clean compilation across all platforms, including Arduino and other embedded systems where support for newer standards may be limited. Optional modern features such as `constexpr` are enabled via macros when supported. Starting in 2026, Qentem will migrate to C++17, simplifying the codebase, improving performance, and leveraging modern language features.
 
 ## License
 

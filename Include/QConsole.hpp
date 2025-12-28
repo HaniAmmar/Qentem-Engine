@@ -28,9 +28,7 @@ struct QConsole {
     enum struct Color : SizeT8 { TitleColor, ErrorColor, PassColor, EndColor };
 
     QENTEM_NOINLINE static bool &IsColored() noexcept {
-        static bool isColored{true};
-
-        return isColored;
+        return is_colored_;
     }
 
     QENTEM_NOINLINE static const char *GetColor(Color color) noexcept {
@@ -52,45 +50,41 @@ struct QConsole {
 
     template <typename... Values_T>
     QENTEM_NOINLINE static void Print(const Values_T &...values) {
-        LiteStream &ss = GetBuffer();
-        ToCharsHelper::Write(ss, values...);
+        ToCharsHelper::Write(buffer_, values...);
 
-        if (IsOutputEnabled() && (ss.Length() >= SizeT{512})) {
+        if (IsOutputEnabled() && (buffer_.Length() >= SizeT{512})) {
             flush();
         }
     }
 
     QENTEM_NOINLINE static void Write(const char *data, unsigned length) noexcept {
-        LiteStream &ss = GetBuffer();
-        ss.Write(data, length);
+        buffer_.Write(data, length);
 
-        if (IsOutputEnabled() && (ss.Length() >= SizeT{512})) {
+        if (IsOutputEnabled() && (buffer_.Length() >= SizeT{512})) {
             flush();
         }
     }
 
     QENTEM_NOINLINE static void Flush() noexcept {
-        LiteStream &ss = GetBuffer();
-
-        if (IsOutputEnabled() && (ss.Length() != 0)) {
+        if (IsOutputEnabled() && (buffer_.Length() != 0)) {
             flush();
         }
     }
 
     QENTEM_NOINLINE static void Clear() noexcept {
-        GetBuffer().Clear();
+        buffer_.Clear();
     }
 
     QENTEM_NOINLINE static void DisableOutput() noexcept {
-        getOutputEnabledRef() = false;
+        enable_output_ = false;
     }
 
     QENTEM_NOINLINE static void EnableOutput() noexcept {
-        getOutputEnabledRef() = true;
+        enable_output_ = true;
     }
 
     QENTEM_NOINLINE static bool IsOutputEnabled() noexcept {
-        return getOutputEnabledRef();
+        return enable_output_;
     }
 
     // QENTEM_NOINLINE static void SetDoubleFormat() noexcept {
@@ -100,17 +94,7 @@ struct QConsole {
     // }
 
     QENTEM_NOINLINE static LiteStream &GetBuffer() noexcept {
-        static LiteStream ss{32};
-
-        struct OnExit {
-            ~OnExit() {
-                Flush(); // flush buffer on exit;
-            }
-        };
-
-        static OnExit oe;
-
-        return ss;
+        return buffer_;
     }
 
   private:
@@ -126,17 +110,22 @@ struct QConsole {
     }
 
     QENTEM_NOINLINE static void flush() noexcept {
-        LiteStream &ss = GetBuffer();
-
-        write(ss.First(), ss.Length());
-        ss.Clear();
+        write(buffer_.First(), buffer_.Length());
+        buffer_.Clear();
     }
 
-    QENTEM_NOINLINE static bool &getOutputEnabledRef() noexcept {
-        static bool enable_output_ = true;
+    struct OnExit {
+        ~OnExit() {
+            Flush(); // flush buffer on exit;
+        }
+    };
 
-        return enable_output_;
-    }
+    inline static LiteStream buffer_{32};
+
+    inline static bool enable_output_{true};
+    inline static bool is_colored_{true};
+
+    inline static OnExit oe{};
 };
 
 } // namespace Qentem

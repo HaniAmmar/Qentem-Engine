@@ -109,9 +109,7 @@ struct CPUHelper {
      * @return Number of logical CPU cores. Guaranteed to be at least 1.
      */
     QENTEM_INLINE static SizeT32 GetCoreCount() noexcept {
-        static const SizeT32 count = coreCount();
-
-        return count;
+        return core_count_;
     }
 
     /**
@@ -215,7 +213,7 @@ struct CPUHelper {
      * @param cpusetsize  Size of the CPU mask in bytes (typically `sizeof(cpu_set_t)`).
      * @param mask        Pointer to the CPU set bitmask indicating allowed CPUs.
      */
-    QENTEM_INLINE inline static long setAffinity(int pid, long cpusetsize, const void *mask) noexcept {
+    QENTEM_INLINE static long setAffinity(int pid, long cpusetsize, const void *mask) noexcept {
 #if defined(__linux__)
         return SystemCall(__NR_sched_setaffinity, pid, cpusetsize, mask);
 #else
@@ -278,6 +276,8 @@ struct CPUHelper {
 
         return 1;
     }
+
+    inline static const SizeT32 core_count_{coreCount()};
 };
 
 } // namespace Qentem

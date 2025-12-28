@@ -56,9 +56,8 @@ struct SystemMemory {
      *
      * @return Size of a memory page in bytes.
      */
-    QENTEM_INLINE static SizeT32 PageSize() noexcept {
-        static const SizeT32 page_size = static_cast<SizeT32>(pageSize());
-        return page_size;
+    QENTEM_INLINE static SizeT32 GetPageSize() noexcept {
+        return page_size_;
     }
 
     /**
@@ -182,7 +181,7 @@ struct SystemMemory {
      *
      * @return Size of a memory page in bytes.
      */
-    static SystemLong pageSize() noexcept {
+    static SystemLong getPageSize() noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -376,6 +375,9 @@ struct SystemMemory {
 #endif
         // clang-format on
     }
+
+   inline static const SizeT32 page_size_ = static_cast<SizeT32>(getPageSize());
+
 };
 
 } // namespace Qentem

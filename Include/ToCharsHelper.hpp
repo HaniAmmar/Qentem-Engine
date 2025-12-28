@@ -35,7 +35,7 @@ struct ToCharsHelper {
     struct CharConverter_T;
 
     template <typename Stream_T, typename... Values_T>
-    inline static void Write(Stream_T &stream, const Values_T &...values) {
+    static void Write(Stream_T &stream, const Values_T &...values) {
 #if __cplusplus > 201402L
         (Writer<Stream_T, typename QTraits::Decay<Values_T>::Type>::Write(stream, values), ...);
 #else

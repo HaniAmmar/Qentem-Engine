@@ -110,7 +110,7 @@ struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>> {
      *
      * @param key The key object to move.
      */
-    inline void operator[](Key_T &&key) {
+    QENTEM_INLINE void operator[](Key_T &&key) {
         tryInsert(QUtility::Move(key));
     }
 
@@ -121,7 +121,7 @@ struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>> {
      *
      * @param key The key object.
      */
-    inline void operator[](const Key_T &key) {
+    QENTEM_INLINE void operator[](const Key_T &key) {
         tryInsert(key);
     }
 };

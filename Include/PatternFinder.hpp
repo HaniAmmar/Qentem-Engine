@@ -31,7 +31,7 @@ struct PatternFinder {
     PatternFinder(const Char_T *content, Number_T length) noexcept : content_{content}, length_{length} {
     }
 
-    inline void NextSegment() noexcept {
+    void NextSegment() noexcept {
         match_ = 0U;
 
         while (offset_ < length_) {
@@ -41,14 +41,14 @@ struct PatternFinder {
                 ++offset_;
 
                 const Number_T start_offset = offset_;
-                const SizeT32  group_count  = WordsList_T::GetGroupedByFirstCount(id);
-                const SizeT32 *group_list   = WordsList_T::GetGroupedByFirstChar(id);
+                const SizeT32  group_count  = WordsList_T::GroupedByFirstCount[id];
+                const SizeT32 *group_list   = WordsList_T::GroupedByFirstChar[id];
                 id                          = 0U; // Reuse for 'word index'.
 
                 do {
                     const SizeT32  word_id         = group_list[id];
-                    const SizeT32  word_length     = WordsList_T::GetWordLength(word_id);
-                    const Char_T  *word            = WordsList_T::GetWord(word_id);
+                    const SizeT32  word_length     = WordsList_T::WordLength[word_id];
+                    const Char_T  *word            = WordsList_T::Word[word_id];
                     const Number_T word_end_offset = Number_T(offset_ + word_length);
 
                     // Match the last char of the word.
@@ -85,9 +85,9 @@ struct PatternFinder {
             //     SizeT32 char_index{0U};
 
             //     while (char_index < WordsList_T::SingleCharsCount) {
-            //         const SizeT32 word_id = WordsList_T::GetSingleCharGroup()[char_index];
+            //         const SizeT32 word_id = WordsList_T::SingleCharGroup[char_index];
 
-            //         if (content_[offset_] == WordsList_T::GetWord(word_id)[0]) {
+            //         if (content_[offset_] == WordsList_T::Word[word_id][0]) {
             //             match_ = (word_id + SizeT32{1});
             //             ++offset_;
             //             return;
@@ -101,19 +101,19 @@ struct PatternFinder {
         }
     }
 
-    inline void SetOffset(Number_T offset) noexcept {
+    QENTEM_INLINE void SetOffset(Number_T offset) noexcept {
         offset_ = offset;
     }
 
-    inline Number_T GetOffset() const noexcept {
+    QENTEM_INLINE Number_T GetOffset() const noexcept {
         return offset_;
     }
 
-    inline Number_T GetLength() const noexcept {
+    QENTEM_INLINE Number_T GetLength() const noexcept {
         return length_;
     }
 
-    inline SizeT32 CurrentMatch() const noexcept {
+    QENTEM_INLINE SizeT32 CurrentMatch() const noexcept {
         // Call 'NextSegment()' before calling 'GetMatch()'.
         return match_;
     }
