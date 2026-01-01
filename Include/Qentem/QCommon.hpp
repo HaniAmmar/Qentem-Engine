@@ -159,7 +159,7 @@ union PtrCast_T {
 //              Configuration Macros (Overridable)           //
 ///////////////////////////////////////////////////////////////
 #ifndef QENTEM_MAX_CPU_CORES
-#define QENTEM_MAX_CPU_CORES 1024
+#define QENTEM_MAX_CPU_CORES 128
 #endif
 
 #ifndef QENTEM_ENABLE_FLOAT_16
