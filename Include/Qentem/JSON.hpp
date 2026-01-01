@@ -113,6 +113,8 @@ struct JSON {
 
                                 if (c == NotationConstants::ECurlyChar) {
                                     ++offset;
+                                    obj->RemoveExcessStorage();
+
                                     return value;
                                 }
                             }
@@ -155,6 +157,8 @@ struct JSON {
 
                         if (ch == NotationConstants::ESquareChar) {
                             ++offset;
+                            arr->Compress();
+
                             return value;
                         }
                     }

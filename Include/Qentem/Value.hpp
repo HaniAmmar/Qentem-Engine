@@ -41,10 +41,10 @@ struct Value {
     using NotationConstants = JSONUtils::NotationConstants_T<Char_T>;
     using VItem             = HAItem_T<String<Char_T>, Value>;
 
-    using ObjectT     = HArray<String<Char_T>, Value>;
-    using ArrayT      = Array<Value>;
     using StringT     = String<Char_T>;
     using StringViewT = StringView<Char_T>;
+    using ArrayT      = Array<Value, 8>;
+    using ObjectT     = HArray<StringT, Value, 8>;
 
     Value() noexcept : array_{} {
     }
@@ -1884,40 +1884,10 @@ struct Value {
 
     void Compress() {
         if (isArray()) {
+            array_.Compress(); // TODO: use reorder
+
             Value       *src_val = array_.Storage();
             const Value *src_end = array_.End();
-            SizeT        size    = 0;
-
-            while (src_val < src_end) {
-                if (!(src_val->isUndefined())) {
-                    ++size;
-                }
-
-                ++src_val;
-            }
-
-            if (size != array_.Capacity()) {
-                if (size == 0) {
-                    array_.Reset();
-                    return;
-                }
-
-                ArrayT new_array{size};
-                src_val = array_.Storage();
-
-                do {
-                    if (!(src_val->isUndefined())) {
-                        new_array += QUtility::Move(*src_val);
-                    }
-
-                    ++src_val;
-                } while (src_val < src_end);
-
-                array_ = QUtility::Move(new_array);
-            }
-
-            src_val = array_.Storage();
-            src_end = array_.End();
 
             while (src_val < src_end) {
                 if (src_val->isArray() || src_val->isObject()) {
