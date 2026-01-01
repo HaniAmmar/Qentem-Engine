@@ -160,15 +160,22 @@ struct HashTable {
         if (src.IsNotEmpty()) {
             const HItem_T *src_item = src.First();
             const HItem_T *src_end  = (src_item + src.Size());
-            HItem_T       *storage  = reserveOnly(src.Capacity());
+            const HItem_T *new_end  = (src_item + src.Capacity());
+            HItem_T       *new_item = reserveOnly(src.Capacity());
 
             setSize(src.Size());
 
             do {
-                storage->Construct(*src_item);
-                ++storage;
+                new_item->Construct(*src_item);
+                new_item->Position = src_item->Position;
+                ++new_item;
                 ++src_item;
             } while (src_item < src_end);
+
+            while (new_item < new_end) {
+                new_item->Position = src.Capacity();
+                ++new_item;
+            }
         }
     }
 
