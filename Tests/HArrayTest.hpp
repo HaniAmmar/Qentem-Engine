@@ -536,6 +536,15 @@ static void TestHArray5(QTest &test) {
         test.IsEqual(numbers1[key], i, __LINE__);
     }
 
+    HashArray2 numbers2{numbers1};
+
+    for (SizeT i = 1; i <= 120; i++) {
+        String<char> key;
+
+        Digit::NumberToString(key, i);
+        test.IsEqual(numbers2[key], i, __LINE__);
+    }
+
     value = numbers1.GetValue("10", 2);
     test.IsNotNull(value, __LINE__);
     test.IsEqual(*value, 10U, __LINE__);
