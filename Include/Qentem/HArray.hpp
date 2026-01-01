@@ -118,12 +118,20 @@ struct HAItem_T : public HTableItem_T<Key_T> {
  * string keys use an efficient string hashing policy, and number keys use direct hashing,
  * with all storage provided in a single contiguous block and minimal memory.
  *
+ * Growth behavior is controlled at compile time via an expansion multiplier, allowing
+ * capacity scaling to be tuned per instantiation without introducing runtime state or
+ * branching. Different multipliers result in distinct container types.
+ *
  * @tparam Key_T   The key type. Supports both string types and plain integral types.
  *                 The correct hash policy is selected automatically.
  * @tparam Value_T The value type to store for each key.
+ * @tparam Expansion_Multiplier_T
+ *                 Compile-time capacity growth factor used when reallocation is required.
+ *                 Must be greater than 1. The default policy favors exponential growth
+ *                 with zero runtime overhead.
  */
-template <typename Key_T, typename Value_T>
-struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
+template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T>
+struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>, Expansion_Multiplier_T> {
     /**
      * @brief Hash table item type storing key-value pairs.
      */
@@ -132,7 +140,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
     /**
      * @brief The parent type (string-adapted hash table).
      */
-    using BaseT = AutoHashTable<Key_T, HItem>;
+    using BaseT = AutoHashTable<Key_T, HItem, Expansion_Multiplier_T>;
 
     /**
      * @brief Inherit constructors from BaseT.
@@ -343,11 +351,18 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>> {
  * - Provides operator[] and Get/Insert methods for raw strings and key objects.
  * - Automatically selected by HArray if the key type is recognized as a string type.
  *
+ * Capacity growth behavior is inherited from HArrayBase and controlled at compile
+ * time via the expansion multiplier. This ensures identical storage layout and
+ * reallocation semantics to the base container, with no additional runtime cost.
+ *
  * @tparam Key_T   String key type (must provide CharType, .First(), .Length(), .IsEqual()).
  * @tparam Value_T The value type stored for each key.
+ * @tparam Expansion_Multiplier_T
+ *                 Compile-time capacity growth factor used during reallocation.
+ *                 Must be greater than 1 and is part of the container’s type.
  */
-template <typename Key_T, typename Value_T>
-struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
+template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T>
+struct HArrayStrings : public HArrayBase<Key_T, Value_T, Expansion_Multiplier_T> {
     /**
      * @brief Hash table item type storing key-value pairs.
      */
@@ -356,7 +371,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
     /**
      * @brief The parent type (string-adapted hash table).
      */
-    using BaseT = HArrayBase<Key_T, Value_T>;
+    using BaseT = HArrayBase<Key_T, Value_T, Expansion_Multiplier_T>;
     /**
      * @brief Character type for the key.
      */
@@ -509,39 +524,56 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T> {
  * @brief Type selector for HArray containers.
  *
  * HArraySelector chooses the correct HArray implementation based on the key type:
- *  - If Key_T is a number type (as determined by QTraits::IsNumber), use HArrayBase (fast numeric logic).
- *  - Otherwise, use HArrayStrings (enables raw string pointer overloads).
+ *  - If Key_T is a number type (as determined by QTraits::IsNumber), use HArrayBase
+ *    with fast numeric hashing and lookup logic.
+ *  - Otherwise, use HArrayStrings, enabling raw string pointer overloads and
+ *    string-optimized comparison.
+ *
+ * The expansion multiplier is forwarded unchanged to the selected implementation,
+ * ensuring that capacity growth policy is preserved consistently across all
+ * specializations and remains part of the resulting container type.
  *
  * @tparam Key_T   The key type.
  * @tparam Value_T The value type.
+ * @tparam Expansion_Multiplier_T
+ *                 Compile-time capacity growth factor propagated to the selected
+ *                 HArray implementation.
  * @tparam IsNum   (Implementation detail) Whether the key is a number.
  */
-template <typename Key_T, typename Value_T, bool = QTraits::IsNumber<Key_T>::value>
+template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T, bool = QTraits::IsNumber<Key_T>::value>
 struct HArraySelector;
 
 // Specialization for non-number keys: string-oriented version.
-template <typename Key_T, typename Value_T>
-struct HArraySelector<Key_T, Value_T, false> {
-    using Type = HArrayStrings<Key_T, Value_T>;
+template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T>
+struct HArraySelector<Key_T, Value_T, Expansion_Multiplier_T, false> {
+    using Type = HArrayStrings<Key_T, Value_T, Expansion_Multiplier_T>;
 };
 
 // Specialization for number keys: base version (numeric optimized).
-template <typename Key_T, typename Value_T>
-struct HArraySelector<Key_T, Value_T, true> {
-    using Type = HArrayBase<Key_T, Value_T>;
+template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T>
+struct HArraySelector<Key_T, Value_T, Expansion_Multiplier_T, true> {
+    using Type = HArrayBase<Key_T, Value_T, Expansion_Multiplier_T>;
 };
 
 /**
  * @brief Ordered associative array that adapts to string or number keys.
  *
  * HArray automatically chooses the most efficient implementation for the key type,
- * ensuring the best combination of performance and convenience, with a single API.
+ * ensuring the best combination of performance and convenience through a single API.
+ *
+ * The container’s capacity growth behavior is defined at compile time via an
+ * expansion multiplier, which is forwarded to the selected implementation and
+ * becomes part of the resulting type. This preserves consistent reallocation
+ * semantics with zero runtime overhead.
  *
  * @tparam Key_T   The key type (string or number).
  * @tparam Value_T The value type.
+ * @tparam Expansion_Multiplier_T
+ *                 Compile-time capacity growth factor used by the underlying
+ *                 HArray implementation. Defaults to exponential growth.
  */
-template <typename Key_T, typename Value_T>
-using HArray = typename HArraySelector<Key_T, Value_T>::Type;
+template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T = 2>
+using HArray = typename HArraySelector<Key_T, Value_T, Expansion_Multiplier_T>::Type;
 
 } // namespace Qentem
 

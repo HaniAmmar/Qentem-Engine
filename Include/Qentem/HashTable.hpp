@@ -108,11 +108,20 @@ struct HTableItem_T {
  * the basis for specialized containers (like StringHashTable or NumberHashTable)
  * by accepting custom key utilities and item structures.
  *
+ * Capacity growth behavior is defined at compile time via an expansion
+ * multiplier. This makes reallocation policy part of the type itself, avoids
+ * runtime configuration and branching, and ensures consistent growth semantics
+ * across all derived containers.
+ *
  * @tparam Key_T      Key type. Must provide comparison and access functions.
  * @tparam KeyUtils_T Policy type that defines static Hash() and IsEqual() for Key_T.
  * @tparam HItem_T    Storage type for each entry (must have members: Hash, Next, Key).
+ * @tparam Expansion_Multiplier_T
+ *                    Compile-time capacity growth factor used during reallocation.
+ *                    Must be greater than 1 and is propagated unchanged to all
+ *                    higher-level containers.
  */
-template <typename Key_T, typename KeyUtils_T, typename HItem_T>
+template <typename Key_T, typename KeyUtils_T, typename HItem_T, SizeT Expansion_Multiplier_T>
 struct HashTable {
     /**
      * @brief Default constructor. Initializes an empty hash table.
@@ -1263,7 +1272,7 @@ struct HashTable {
      */
     HItem_T *tryInsert(const Key_T &key) noexcept {
         if (Size() == Capacity()) {
-            expand(Capacity() * SizeT{2}); // Grow the table if needed
+            expand(Capacity() * Expansion_Multiplier_T); // Grow the table if needed
         }
 
         SizeT    hash;
@@ -1289,7 +1298,7 @@ struct HashTable {
      */
     HItem_T *tryInsert(Key_T &&key) noexcept {
         if (Size() == Capacity()) {
-            expand(Capacity() * SizeT{2}); // Grow the table if needed
+            expand(Capacity() * Expansion_Multiplier_T); // Grow the table if needed
         }
 
         SizeT    hash;

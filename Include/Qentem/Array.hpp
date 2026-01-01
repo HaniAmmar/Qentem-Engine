@@ -1,12 +1,25 @@
 /**
  * @file Array.hpp
- * @brief Defines a dynamic array container for Qentem Engine.
+ * @brief Implements a dynamic, contiguous array container for Qentem Engine.
  *
- * This header implements the Array container, providing dynamic, contiguous storage
- * for elements with efficient resizing, insertion, and removal. Array.hpp is a core
- * component for managing collections of data throughout the Qentem Engine library.
+ * Provides a resizable, ownership-aware array for elements of type `Type_T`,
+ * supporting efficient insertion, removal, and direct indexed access.
+ * Array stores elements in a contiguous memory block, with compile-time
+ * expansion policy, optional default initialization, and safe adoption of
+ * external buffers. It is designed for high performance, minimal overhead,
+ * and compatibility with embedded or native environments.
  *
- * @author Hani Ammar
+ * Key features:
+ *  - Contiguous memory storage for fast iteration and cache-friendly access.
+ *  - Dynamic resizing with compile-time expansion multiplier for predictable growth.
+ *  - Move- and copy-aware insertion, assignment, and buffer adoption.
+ *  - STL-style iteration with `begin()` and `end()`.
+ *  - Optional range construction for uninitialized or default-initialized elements.
+ *
+ * This container is a core component for managing collections of data
+ * throughout the Qentem Engine library.
+ *
+ * @author Hani
  * @date 2025
  * @copyright MIT License
  */
@@ -18,7 +31,34 @@
 
 namespace Qentem {
 
-template <typename Type_T>
+/**
+ * @brief Dynamic, contiguous array with compile-time growth control.
+ *
+ * Array provides a flexible, resizable container for elements of type `Type_T`,
+ * storing them in contiguous memory for efficient access, iteration, and manipulation.
+ *
+ * Key features:
+ *  - Contiguous storage: elements are stored in a single block of memory.
+ *  - Dynamic resizing: grows automatically when inserting beyond capacity.
+ *  - Compile-time growth policy: the expansion multiplier determines how capacity scales
+ *    when resizing, avoiding runtime branching and overhead.
+ *  - Ownership management: supports moving, copying, adopting external buffers, and
+ *    safe memory release.
+ *  - STL-compatible iteration: provides `begin()` and `end()` methods for const and
+ *    mutable access.
+ *
+ * @tparam Type_T
+ *         The element type stored in the array. Must be copyable and/or movable.
+ * @tparam Expansion_Multiplier_T
+ *         Compile-time factor controlling capacity growth when resizing.
+ *         Defaults to 2 (doubling). Must be greater than 1. Different multipliers
+ *         result in distinct container types with independent growth policies.
+ *
+ * Example:
+ *   Array<int> numbers;             // Default expansion multiplier (2)
+ *   Array<int, 4> large_growth;     // Expands 4× when capacity is exceeded
+ */
+template <typename Type_T, SizeT Expansion_Multiplier_T = 2>
 struct Array {
     QENTEM_INLINE Array() noexcept : storage_{nullptr}, capacity_{0}, size_{0} {};
 
@@ -141,7 +181,7 @@ struct Array {
 
     void operator+=(Type_T &&item) {
         if (Size() == Capacity()) {
-            expand((Capacity() | SizeT{1}) * SizeT{2});
+            expand((Capacity() | SizeT{1}) * Expansion_Multiplier_T);
         }
 
         MemoryUtils::Construct((Storage() + Size()), QUtility::Move(item));
@@ -150,7 +190,7 @@ struct Array {
 
     void operator+=(const Type_T &item) {
         if (Size() == Capacity()) {
-            expand((Capacity() | SizeT{1}) * SizeT{2});
+            expand((Capacity() | SizeT{1}) * Expansion_Multiplier_T);
         }
 
         MemoryUtils::Construct((Storage() + Size()), item);

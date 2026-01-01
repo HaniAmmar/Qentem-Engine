@@ -153,17 +153,23 @@ struct StringKeyUtils_T {
  * All key handling (hashing, comparison) is delegated to StringKeyUtils_T, ensuring
  * consistent behavior and maximum efficiency for string lookup.
  *
- * This struct inherits all core hash table functionality from the generic HashTable base,
- * and is intended for use with keys that implement CharType, First(), Length(), and IsEqual().
+ * This struct inherits all core hash table functionality from the generic HashTable
+ * base and does not alter storage layout or reallocation semantics. Capacity growth
+ * behavior is inherited unchanged and remains controlled at compile time via the
+ * expansion multiplier.
  *
- * @tparam Key_T       Key type. Must be copyable, movable, and support equality and less-than.
- * @tparam KeyUtils_T  Policy for key hashing and equality. Must provide static:
- *                       - SizeT Hash(const Key_T&)
- *                       - bool IsEqual(SizeT, SizeT, const Key_T&, const Key_T&)
- * @tparam HItem_T     Storage type. Must have SizeT Hash, SizeT Next, Key_T Key, plus Clear(), MoveDoublecat(), etc.
+ * It is intended for use with keys that implement CharType, First(), Length(),
+ * and IsEqual().
+ *
+ * @tparam StringKey_T Key type. Must be copyable, movable, and support equality.
+ * @tparam HItem_T     Storage type. Must have members: Hash, Next, Key, and provide
+ *                     Clear(), MoveDoublecat(), and related lifecycle operations.
+ * @tparam Expansion_Multiplier_T
+ *                     Compile-time capacity growth factor propagated to the base
+ *                     HashTable. Must be greater than 1.
  */
-template <typename StringKey_T, typename HItem_T>
-struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKey_T>, HItem_T> {
+template <typename StringKey_T, typename HItem_T, SizeT Expansion_Multiplier_T>
+struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKey_T>, HItem_T, Expansion_Multiplier_T> {
     /**
      * @brief Character type associated with the string key.
      */
@@ -177,7 +183,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     /**
      * @brief Base hash table type.
      */
-    using BaseT = HashTable<StringKey_T, KeyUtilsT, HItem_T>;
+    using BaseT = HashTable<StringKey_T, KeyUtilsT, HItem_T, Expansion_Multiplier_T>;
 
     /**
      * @brief Inherit all constructors from the base hash table.
@@ -472,35 +478,43 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
  * This set of templates chooses between StringHashTable and NumberHashTable based
  * on whether the key type is a recognized numeric type, using QTraits::IsNumber.
  *
- * Usage: Use AutoHashTable<Key_T, HItem_T> as a base class for associative containers.
+ * The expansion multiplier is forwarded unchanged to the selected adapter, ensuring
+ * that capacity growth behavior is preserved consistently and remains part of the
+ * resulting hash table type.
+ *
+ * Usage: Use AutoHashTable<Key_T, HItem_T, Expansion_Multiplier_T> as a base class
+ * for associative containers.
  *
  * @tparam Key_T   The key type.
- * @tparam HItem_T The hash table item type (must provide Key, Hash, Next, Clear, etc).
+ * @tparam HItem_T The hash table item type (must provide Key, Hash, Next, Clear, etc.).
+ * @tparam Expansion_Multiplier_T
+ *                 Compile-time capacity growth factor propagated to the selected
+ *                 hash table adapter.
  * @tparam is_number (internal) SFINAE: true for number types, false for string types.
  */
 
-// Primary template: does not define Type (will select via partial specialization)
-template <typename Key_T, typename HItem_T, bool = QTraits::IsNumber<Key_T>::value>
+// Primary template: does not define Type (selected via partial specialization)
+template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T, bool = QTraits::IsNumber<Key_T>::value>
 struct HashTableSelector;
 
 // Specialization for non-numeric (string-like) keys
 /**
  * @brief Specialization: selects StringHashTable for non-numeric key types.
  */
-template <typename Key_T, typename HItem_T>
-struct HashTableSelector<Key_T, HItem_T, false> {
+template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T>
+struct HashTableSelector<Key_T, HItem_T, Expansion_Multiplier_T, false> {
     /// Type alias for string-keyed hash table.
-    using Type = StringHashTable<Key_T, HItem_T>;
+    using Type = StringHashTable<Key_T, HItem_T, Expansion_Multiplier_T>;
 };
 
 // Specialization for numeric keys
 /**
  * @brief Specialization: selects NumberHashTable for numeric key types.
  */
-template <typename Key_T, typename HItem_T>
-struct HashTableSelector<Key_T, HItem_T, true> {
+template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T>
+struct HashTableSelector<Key_T, HItem_T, Expansion_Multiplier_T, true> {
     /// Type alias for number-keyed hash table.
-    using Type = HashTable<Key_T, NumberKeyUtils_T<Key_T>, HItem_T>;
+    using Type = HashTable<Key_T, NumberKeyUtils_T<Key_T>, HItem_T, Expansion_Multiplier_T>;
 };
 
 /**
@@ -509,11 +523,21 @@ struct HashTableSelector<Key_T, HItem_T, true> {
  * Resolves to StringHashTable if Key_T is not a recognized number type,
  * or NumberHashTable if Key_T is a recognized number type (per QTraits::IsNumber).
  *
+ * The selected hash table inherits its capacity growth behavior from the
+ * provided expansion multiplier, which is forwarded unchanged and becomes
+ * part of the resulting type. No runtime configuration is introduced.
+ *
  * Example:
  *   using Table = AutoHashTable<MyKeyType, MyItemType>;
+ *
+ * @tparam Key_T   The key type.
+ * @tparam HItem_T The hash table item type.
+ * @tparam Expansion_Multiplier_T
+ *                 Compile-time capacity growth factor used by the selected
+ *                 hash table implementation.
  */
-template <typename Key_T, typename HItem_T>
-using AutoHashTable = typename HashTableSelector<Key_T, HItem_T>::Type;
+template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T>
+using AutoHashTable = typename HashTableSelector<Key_T, HItem_T, Expansion_Multiplier_T>::Type;
 
 } // namespace Qentem
 
