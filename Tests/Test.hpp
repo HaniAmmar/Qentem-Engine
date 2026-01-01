@@ -35,6 +35,7 @@
 #include "BigIntTest.hpp"
 #include "DigitTest.hpp"
 #include "HArrayTest.hpp"
+#include "HListTest.hpp"
 #include "UnicodeTest.hpp"
 #include "JSONUtilsTest.hpp"
 #include "ValueTest.hpp"
@@ -121,6 +122,7 @@ static int RunTests() {
     ((Test::RunBigIntTests() == 0) ? ++passed : ++failed);
     ((Test::RunDigitTests() == 0) ? ++passed : ++failed);
     ((Test::RunHArrayTests() == 0) ? ++passed : ++failed);
+    ((Test::RunHListTests() == 0) ? ++passed : ++failed);
     ((Test::RunUnicodeTests() == 0) ? ++passed : ++failed);
     ((Test::RunJSONUtilsTests() == 0) ? ++passed : ++failed);
     ((Test::RunValueTests() == 0) ? ++passed : ++failed);

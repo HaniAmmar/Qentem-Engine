@@ -119,6 +119,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(HArrayTest --coverage)
 endif()
 
+# HList
+add_executable(HListTest Tests/HListTest.cpp)
+add_test(NAME HListTest COMMAND HListTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(HListTest --coverage)
+endif()
+
 # Unicode
 add_executable(UnicodeTest Tests/UnicodeTest.cpp)
 add_test(NAME UnicodeTest COMMAND UnicodeTest)

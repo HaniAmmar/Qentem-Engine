@@ -38,6 +38,7 @@ int main() {
     //     Test::RunBigIntTests();
     //     Test::RunDigitTests();
     //     Test::RunHArrayTests();
+    //     Test::RunHListTests();
     //     Test::RunUnicodeTests();
     //     Test::RunJSONUtilsTests();
     //     Test::RunValueTests();
