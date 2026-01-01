@@ -1066,6 +1066,43 @@ static void TestArrayValue(QTest &test) {
     test.IsNotNull(value2.GetArray(), __LINE__);
     test.IsEqual(value2.GetArray()->Capacity(), 0U, __LINE__);
     test.IsEqual(value2.GetArray()->Size(), 0U, __LINE__);
+
+    value1.Reset();
+
+    value1 += 0;
+    value1 += 1;
+    value1 += 2;
+    value1 += 3;
+    value1 += 4;
+    value1 += 5;
+    value1 += 6;
+    value1 += 7;
+    value1 += 8;
+    value1 += 9;
+
+    value1.RemoveAt(2U);
+    value1.RemoveAt(7U);
+    value1.RemoveAt(0U);
+    value1.RemoveAt(9U);
+    value1.RemoveAt(5U);
+
+    value1.Compress();
+
+    test.IsNotNull(value1.GetArray(), __LINE__);
+    test.IsEqual(value1.GetArray()->Capacity(), 5U, __LINE__);
+    test.IsEqual(value1.GetArray()->Size(), 5U, __LINE__);
+
+    test.IsEqual(value1[0].GetInt64(), 1, __LINE__);
+    test.IsEqual(value1[1].GetInt64(), 3, __LINE__);
+    test.IsEqual(value1[2].GetInt64(), 4, __LINE__);
+    test.IsEqual(value1[3].GetInt64(), 6, __LINE__);
+    test.IsEqual(value1[4].GetInt64(), 8, __LINE__);
+
+    test.IsNull(value1.GetValueAt(5), __LINE__);
+    test.IsNull(value1.GetValueAt(6), __LINE__);
+    test.IsNull(value1.GetValueAt(7), __LINE__);
+    test.IsNull(value1.GetValueAt(8), __LINE__);
+    test.IsNull(value1.GetValueAt(9), __LINE__);
 }
 
 static void TestObjectValue1(QTest &test) {
