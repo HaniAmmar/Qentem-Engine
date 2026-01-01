@@ -357,6 +357,10 @@ struct Array {
         }
     }
 
+    QENTEM_INLINE void DropFast(const SizeT count) noexcept {
+        size_ -= count;
+    }
+
     QENTEM_INLINE Type_T *Storage() noexcept {
         return storage_;
     }
