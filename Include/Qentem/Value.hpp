@@ -1884,10 +1884,32 @@ struct Value {
 
     void Compress() {
         if (isArray()) {
-            array_.Compress(); // TODO: use reorder
-
             Value       *src_val = array_.Storage();
             const Value *src_end = array_.End();
+
+            SizeT       index    = 0;
+            SizeT       new_size = 0;
+            const SizeT old_size = Size();
+
+            while (index < old_size) {
+                Value *val = (src_val + index);
+
+                if (!(val->isUndefined())) {
+                    if (index != new_size) {
+                        src_val[new_size] = QUtility::Move(*val);
+                    }
+
+                    ++new_size;
+                }
+
+                ++index;
+            }
+
+            array_.DropFast(old_size - new_size);
+            array_.Compress();
+
+            src_val = array_.Storage();
+            src_end = array_.End();
 
             while (src_val < src_end) {
                 if (src_val->isArray() || src_val->isObject()) {
