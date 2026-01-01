@@ -39,6 +39,15 @@ struct HLItem_T : public HTableItem_T<Key_T> {
     using BaseT::Key;
 
     /**
+     * @brief Clears both the key and value, resetting the item.
+     *
+     * Sets key and value to their default-constructed states.
+     */
+    QENTEM_INLINE void Clear() {
+        Key = Key_T{};
+    }
+
+    /**
      * @brief Moves and disposes of the key from another item.
      *
      * Used during hash table reorganization or item replacement.
@@ -58,14 +67,22 @@ struct HLItem_T : public HTableItem_T<Key_T> {
     QENTEM_INLINE void CopyValue(HLItem_T const &) const {
     }
 
-    QENTEM_INLINE void CopyAll(const HLItem_T &item) {
+    /**
+     * @brief Initializes key, and hash fields in-place.
+     *
+     * This method intentionally leaves linkage fields (`Position`, `Next`)
+     * untouched to preserve chain integrity during item insertion or move.
+     *
+     * Should only be used when writing to uninitialized or cleared item slots.
+     */
+    QENTEM_INLINE void Construct(const HLItem_T &item) {
         Hash = item.Hash;
-        Key  = item.Key;
+        MemoryUtils::Construct(&Key, item.Key);
     }
 
-    QENTEM_INLINE void MoveAll(HLItem_T &&item) {
+    QENTEM_INLINE void Construct(HLItem_T &&item) {
         Hash = item.Hash;
-        Key  = QUtility::Move(item.Key);
+        MemoryUtils::Construct(&Key, QUtility::Move(item.Key));
     }
 
     /**
