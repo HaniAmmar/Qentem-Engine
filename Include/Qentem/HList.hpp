@@ -84,9 +84,12 @@ struct HLItem_T : public HTableItem_T<Key_T> {
  * behavior from StringHashTable.
  *
  * @tparam Key_T The key type (must provide .First(), .Length(), and equality operators).
+ * @tparam Expansion_Multiplier_T
+ *                 Compile-time capacity growth factor used by the underlying
+ *                 HArray implementation. Defaults to exponential growth.
  */
-template <typename Key_T>
-struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>> {
+template <typename Key_T, SizeT Expansion_Multiplier_T = 2>
+struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>, Expansion_Multiplier_T> {
     /**
      * @brief Hash table item type storing only the key.
      */
@@ -95,7 +98,7 @@ struct HList : public AutoHashTable<Key_T, HLItem_T<Key_T>> {
     /**
      * @brief The parent type (string-adapted hash table for keys).
      */
-    using BaseT = AutoHashTable<Key_T, HItem>;
+    using BaseT = AutoHashTable<Key_T, HItem, Expansion_Multiplier_T>;
 
     /**
      * @brief Inherit constructors from BaseT.
