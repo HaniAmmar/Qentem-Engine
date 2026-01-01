@@ -738,6 +738,39 @@ struct HashTable {
     }
 
     /**
+     * @brief Trims the hash table’s allocated capacity to fit the current item count.
+     *
+     * Unlike `Compress()`, which removes deleted items and reorders the table,
+     * `RemoveExcessStorage()` preserves all existing items but reduces over-allocated
+     * capacity to minimize wasted memory. The new capacity is aligned to the nearest
+     * power of two for optimal allocation and hash distribution.
+     *
+     * If the table is empty, this function behaves like `Reset()`, releasing all memory.
+     *
+     * @note
+     * Useful when the allocated capacity exceeds the number of active items.
+     * For example, if the table was allocated for 1024 entries but only 256 are in use,
+     * this function will shrink the capacity to match the active item count.
+     */
+    QENTEM_INLINE void RemoveExcessStorage() {
+        if (Size() != 0) {
+            const SizeT old_capacity = Capacity();
+            const SizeT new_capacity = MemoryUtils::AlignToPow2(Size());
+
+            if (new_capacity != old_capacity) {
+                HItem_T *storage = Storage();
+                setCapacity(new_capacity);
+
+                resetLinks(storage, (storage + Capacity()), Capacity());
+                generateHash();
+                Reserver::Shrink(storage, old_capacity, Capacity());
+            }
+        } else {
+            Reset(); // If nothing remains, free all memory
+        }
+    }
+
+    /**
      * @brief Reorders hash table items so that all valid items occupy contiguous items at the start.
      *
      * Reorder() performs an in-place compaction of all non-deleted items (`Hash != 0`), shifting them
