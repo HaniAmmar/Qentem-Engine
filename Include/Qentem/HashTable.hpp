@@ -1412,10 +1412,11 @@ struct HashTable {
 
         // Scan all current items in storage
         while (index < old_size) {
+            HItem_T *item = (storage + index);
+
             // If current slot contains a live item
-            if (storage[index].Hash != 0) {
+            if (item->Hash != 0) {
                 if (index != size_) {
-                    HItem_T *item  = (storage + index);
                     storage[size_] = QUtility::Move(*item); // Move live item to compacted position
                     item->Hash     = 0;                     // Mark old slot as dead/tombstone
                 }
