@@ -1986,6 +1986,7 @@ struct Value {
                             return false;
                         }
 
+                        new_sub_obj.Compress();
                         groupedValue.object_.Get(str, str_len) += QUtility::Move(new_sub_obj);
 
                         ++item_;
@@ -1995,6 +1996,7 @@ struct Value {
                     return false;
                 }
 
+                groupedValue.Compress();
                 return true;
             }
         } else if (type == ValueType::ValuePtr) {
