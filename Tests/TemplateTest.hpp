@@ -2401,6 +2401,8 @@ static void TestSuperVariableTag2(QTest &test) {
 }
 
 static void TestInlineIfTag(QTest &test) {
+    using ArrayT = typename Value<char>::ArrayT;
+
     StringStream<char> ss;
     Value<char>        value;
     const char        *content;
@@ -2412,7 +2414,7 @@ static void TestInlineIfTag(QTest &test) {
     value += false;
     value += nullptr;
     value += R"(ABC)";
-    value += Array<Value<char>>();
+    value += ArrayT();
 
     content = R"({if case="0" true="T" false="F"})";
     test.IsEqual(Template::Render(content, value, ss), R"(F)", __LINE__);
@@ -2976,6 +2978,8 @@ static void TestLoopTag1(QTest &test) {
 }
 
 static void TestLoopTag2(QTest &test) {
+    using ArrayT = typename Value<char>::ArrayT;
+
     StringStream<char> ss;
     Value<char>        value;
     const char        *content;
@@ -3020,7 +3024,7 @@ static void TestLoopTag2(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), R"()", __LINE__);
     ss.Clear();
 
-    value[R"(in)"] = Array<Value<char>>();
+    value[R"(in)"] = ArrayT();
 
     content = R"(<loop value="v">{var:v}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), R"(in)", __LINE__);

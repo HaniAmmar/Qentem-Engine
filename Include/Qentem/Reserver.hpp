@@ -1027,10 +1027,7 @@ struct Reserver {
      */
     QENTEM_INLINE static Core &GetCurrentInstance() noexcept {
 #if defined(__linux__) || defined(_WIN32)
-        // static thread_local Core &instance = reservers_.Storage()[CPUHelper::GetCurrentCore()];
-        // return instance;
-
-        static thread_local SizeT32 core_id = CPUHelper::GetCurrentCore();
+        thread_local const SizeT32 core_id{CPUHelper::GetCurrentCore()};
         return reservers_.Storage()[core_id];
 #else
         return reserver_;

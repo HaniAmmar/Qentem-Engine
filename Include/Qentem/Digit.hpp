@@ -73,7 +73,7 @@ struct Digit {
 
             if constexpr (!IsUnsigned<Number_T>()) {
                 if (number < 0) {
-                    qn.Integer = -qn.Integer;
+                    qn.Integer = static_cast<Number_T>(-qn.Integer);
                     stream.Write(DigitUtils::DigitChar::Negative);
                 }
             }

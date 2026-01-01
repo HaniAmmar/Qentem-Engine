@@ -2403,6 +2403,8 @@ static void TestSuperVariableLTag2(QTest &test) {
 }
 
 static void TestInlineIfLTag(QTest &test) {
+    using ArrayT = typename Value<wchar_t>::ArrayT;
+
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -2414,7 +2416,7 @@ static void TestInlineIfLTag(QTest &test) {
     value += false;
     value += nullptr;
     value += LR"(ABC)";
-    value += Array<Value<wchar_t>>();
+    value += ArrayT();
 
     content = LR"({if case="0" true="T" false="F"})";
     test.IsEqual(Template::Render(content, value, ss), LR"(F)", __LINE__);
@@ -2975,6 +2977,8 @@ static void TestLoopLTag1(QTest &test) {
 }
 
 static void TestLoopLTag2(QTest &test) {
+    using ArrayT = typename Value<wchar_t>::ArrayT;
+
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -3019,7 +3023,7 @@ static void TestLoopLTag2(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
-    value[LR"(in)"] = Array<Value<wchar_t>>();
+    value[LR"(in)"] = ArrayT();
 
     content = LR"(<loop value="v">{var:v}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), LR"(in)", __LINE__);

@@ -69,7 +69,7 @@ struct SystemMemory {
      * @param size Size of region to protect (should be a multiple of page size).
      * @return True on success, false on failure.
      */
-    static bool ProtectGuardPage(void *ptr, SystemLong size) noexcept {
+    QENTEM_INLINE static bool ProtectGuardPage(void *ptr, SystemLong size) noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -122,7 +122,7 @@ struct SystemMemory {
      * @param ptr  Pointer returned by Reserve().
      * @param size Size in bytes (same value passed to Reserve).
      */
-    static void Release(void *ptr, SystemLong size) noexcept {
+    QENTEM_INLINE static void Release(void *ptr, SystemLong size) noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -376,8 +376,7 @@ struct SystemMemory {
         // clang-format on
     }
 
-   inline static const SizeT32 page_size_ = static_cast<SizeT32>(getPageSize());
-
+    inline static const SizeT32 page_size_{static_cast<SizeT32>(getPageSize())};
 };
 
 } // namespace Qentem

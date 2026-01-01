@@ -161,6 +161,8 @@ struct QTest {
         QConsole::Print("Reserves: ", storage.Reserved, ", Releases: ", storage.Released, ".\n");
         QConsole::Print("Kept Blocks: ", storage.Blocks, ", Total: ", (double(storage.BlocksTotalSize) / 1024),
                         " KiB.\n");
+
+        QConsole::Flush();
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
@@ -173,6 +175,8 @@ struct QTest {
         if (remaining != 0) {
             QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Leak detected",
                             QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining, " not released.\n\n");
+
+            QConsole::Flush();
         }
     }
 
@@ -211,6 +215,7 @@ struct QTest {
         }
 
         QConsole::Print('\n');
+        QConsole::Flush();
     }
 
   private:
@@ -227,6 +232,7 @@ struct QTest {
             if (remaining != 0) {
                 QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Leak detected",
                                 QConsole::GetColor(QConsole::Color::EndColor), ": ", remaining, " not released.\n");
+                QConsole::Flush();
             }
         }
     }

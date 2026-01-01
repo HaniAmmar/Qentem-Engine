@@ -254,65 +254,64 @@ struct Value {
 
     Value &operator=(ObjectT &&obj) noexcept {
         reset();
-        object_ = QUtility::Move(obj);
         setTypeToObject();
+
+        object_ = QUtility::Move(obj);
 
         return *this;
     }
 
     Value &operator=(const ObjectT &obj) {
-        ObjectT n_obj{obj};
-
         reset();
-        object_ = QUtility::Move(n_obj);
         setTypeToObject();
+
+        object_ = obj;
 
         return *this;
     }
 
     Value &operator=(ArrayT &&arr) noexcept {
         reset();
-        array_ = QUtility::Move(arr);
         setTypeToArray();
+
+        array_ = QUtility::Move(arr);
 
         return *this;
     }
 
     Value &operator=(const ArrayT &arr) {
-        ArrayT n_arr{arr};
-
         reset();
-        array_ = QUtility::Move(n_arr);
         setTypeToArray();
+
+        array_ = arr;
 
         return *this;
     }
 
     Value &operator=(StringT &&str) noexcept {
         reset();
-        string_ = QUtility::Move(str);
         setTypeToString();
+
+        string_ = QUtility::Move(str);
 
         return *this;
     }
 
     Value &operator=(const StringT &str) {
-        StringT n_str{str};
-
         reset();
-        string_ = QUtility::Move(n_str);
         setTypeToString();
+
+        string_ = str;
 
         return *this;
     }
 
     Value &operator=(const StringT *str) {
         if (str != nullptr) {
-            StringT n_str{*str};
-
             reset();
-            string_ = QUtility::Move(n_str);
             setTypeToString();
+
+            string_ = *str;
         }
 
         return *this;
@@ -320,54 +319,56 @@ struct Value {
 
     Value &operator=(StringT *str) {
         if (str != nullptr) {
-            StringT n_str{*str};
-
             reset();
-            string_ = QUtility::Move(n_str);
             setTypeToString();
+
+            string_ = *str;
         }
 
         return *this;
     }
 
     Value &operator=(const StringViewT &str_v) {
-        StringT str{str_v.First(), str_v.Length()};
-
         reset();
-        string_ = QUtility::Move(str);
         setTypeToString();
+
+        string_ = StringT{str_v.First(), str_v.Length()};
 
         return *this;
     }
 
     Value &operator=(const Char_T *str) {
         reset();
-        string_ = StringT{str};
         setTypeToString();
+
+        string_ = StringT{str};
 
         return *this;
     }
 
     Value &operator=(SizeT64 num) noexcept {
         reset();
-        number_ = num;
         setTypeToUInt64();
+
+        number_ = num;
 
         return *this;
     }
 
     Value &operator=(SizeT64I num) noexcept {
         reset();
-        number_ = num;
         setTypeToInt64();
+
+        number_ = num;
 
         return *this;
     }
 
     Value &operator=(double num) noexcept {
         reset();
-        number_ = num;
         setTypeToDouble();
+
+        number_ = num;
 
         return *this;
     }
@@ -375,7 +376,6 @@ struct Value {
     template <typename Number_T>
     Value &operator=(Number_T num) noexcept {
         reset();
-        number_ = num;
 
         if constexpr (IsFloat<Number_T>()) {
             setTypeToDouble();
@@ -385,12 +385,15 @@ struct Value {
             setTypeToInt64();
         }
 
+        number_ = num;
+
         return *this;
     }
 
     Value &operator=(NullType) noexcept {
         reset();
         setTypeToNull();
+
         return *this;
     }
 

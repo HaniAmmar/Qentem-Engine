@@ -173,6 +173,8 @@ static void TestReserverExpand(QTest &test) {
 
     char *var1;
     char *var2;
+    char *var3;
+    char *var4;
 
     var1 = static_cast<char *>(r.Reserve(16));
     test.IsEqual(r.TryExpand(var1, 16, 32), SystemLong{32}, __LINE__);
@@ -192,12 +194,16 @@ static void TestReserverExpand(QTest &test) {
 
     var1 = static_cast<char *>(r.Reserve(64));
     var2 = static_cast<char *>(r.Reserve(64));
+    var3 = static_cast<char *>(r.Reserve(2 * 1024));
+    var4 = static_cast<char *>(r.Reserve(2 * 1024));
+    r.Release(var4, 2 * 1024);
 
     test.IsTrue(r.Shrink(var1, 64, 16), __LINE__);
     test.IsEqual(r.TryExpand(var1, 16, 128), SystemLong{16}, __LINE__);
-    test.IsTrue(r.TryExpand(var1, 16, 64), __LINE__);
+    test.IsEqual(r.TryExpand(var1, 16, 64), SystemLong{64}, __LINE__);
     r.Release(var1, 64);
     r.Release(var2, 64);
+    r.Release(var3, 2 * 1024);
     test.IsTrue(r.IsEmpty(), __LINE__);
 
     var1 = static_cast<char *>(r.Reserve(full_bit_region / 2));

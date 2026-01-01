@@ -115,6 +115,8 @@ struct QConsole {
     }
 
     struct OnExit {
+        OnExit() = default;
+
         ~OnExit() {
             Flush(); // flush buffer on exit;
         }

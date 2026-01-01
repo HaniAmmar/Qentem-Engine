@@ -29,12 +29,14 @@
 namespace Qentem {
 namespace Test {
 
-using VString       = String<char>;
-using ValueC        = Value<char>;
+using ValueC = Value<char>;
+
+using StringT = typename ValueC::StringT;
+using ArrayT  = typename ValueC::ArrayT;
+using ObjectT = typename ValueC::ObjectT;
+using VItem   = typename ValueC::VItem;
+
 using VStringStream = StringStream<char>;
-using VHArray       = HArray<String<char>, ValueC>;
-using VArray        = Array<ValueC>;
-using ObjectItem    = HAItem_T<String<char>, ValueC>;
 
 static void TestEmptyValue(QTest &test) {
     ValueC value1;
@@ -722,7 +724,7 @@ static void TestStringValue(QTest &test) {
     ValueC value2;
 
     VStringStream ss_var;
-    VString       str_var;
+    StringT       str_var;
     QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
@@ -827,12 +829,12 @@ static void TestStringValue(QTest &test) {
     test.IsEqual(ss_var, "qen", __LINE__);
     test.IsNotEqual(value3.StringStorage(), c_str, __LINE__);
 
-    value3 = ValueC{VString("ABC")};
+    value3 = ValueC{StringT("ABC")};
     test.IsTrue(value3.IsString(), __LINE__);
     test.IsNotNull(value3.GetString(), __LINE__);
     test.IsEqual(*(value3.GetString()), "ABC", __LINE__);
 
-    value3 = VString("123");
+    value3 = StringT("123");
     ss_var.Clear();
     test.IsTrue(value3.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "123", __LINE__);
@@ -849,10 +851,10 @@ static void TestArrayValue(QTest &test) {
     ValueC value1;
     ValueC value2;
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *storage;
     VStringStream ss_var;
-    VString       str_var;
+    StringT       str_var;
     QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
@@ -895,7 +897,7 @@ static void TestArrayValue(QTest &test) {
     arr_var.ResizeWithDefaultInit(10);
     storage = arr_var.First();
 
-    VArray arr_var2;
+    ArrayT arr_var2;
     arr_var2.ResizeWithDefaultInit(10);
 
     value1 = QUtility::Move(arr_var); // Move
@@ -963,7 +965,7 @@ static void TestArrayValue(QTest &test) {
     test.IsNotNull(value3.GetArray(), __LINE__);
     test.IsEqual(value3.GetArray()->First(), storage, __LINE__);
 
-    value3 = ValueC{VArray(3)};
+    value3 = ValueC{ArrayT(3)};
     test.IsTrue(value3.IsArray(), __LINE__);
     test.IsNotNull(value3.GetArray(), __LINE__);
     test.IsNotNull(value3.GetArray()->First(), __LINE__);
@@ -1070,16 +1072,16 @@ static void TestObjectValue1(QTest &test) {
     ValueC value1;
     ValueC value2;
 
-    VHArray           h_arr_var;
-    const ObjectItem *storage;
-    VStringStream     ss_var;
-    QNumber64         num_var;
-    const char       *c_str_var;
-    SizeT             c_str_len;
-    bool              bool_var;
+    ObjectT       h_arr_var;
+    const VItem  *storage;
+    VStringStream ss_var;
+    QNumber64     num_var;
+    const char   *c_str_var;
+    SizeT         c_str_len;
+    bool          bool_var;
 
     for (SizeT32 i = 0; i < 5; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1121,7 +1123,7 @@ static void TestObjectValue1(QTest &test) {
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 10; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1144,7 +1146,7 @@ static void TestObjectValue1(QTest &test) {
     h_arr_var.Reset();
     // Testing empty values
     for (SizeT32 i = 0; i < 10; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key];
     }
@@ -1154,7 +1156,7 @@ static void TestObjectValue1(QTest &test) {
 
     h_arr_var.Reset();
     for (SizeT i = 0; i < 7; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1178,7 +1180,7 @@ static void TestObjectValue1(QTest &test) {
     test.IsTrue(value1.IsObject(), __LINE__);
 
     for (SizeT32 i = 0; i < 7; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1198,15 +1200,15 @@ static void TestObjectValue1(QTest &test) {
 }
 
 static void TestObjectValue2(QTest &test) {
-    ValueC            value1;
-    VHArray           h_arr_var;
-    const ObjectItem *storage;
-    VString           str_var;
-    const char       *c_str_var;
+    ValueC       value1;
+    ObjectT      h_arr_var;
+    const VItem *storage;
+    StringT      str_var;
+    const char  *c_str_var;
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 7; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1226,7 +1228,7 @@ static void TestObjectValue2(QTest &test) {
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1239,7 +1241,7 @@ static void TestObjectValue2(QTest &test) {
     test.IsNotEqual(value3.GetObject()->First(), storage, __LINE__);
 
     for (SizeT32 i = 0; i < 13; i++) {
-        VString key("Key_");
+        StringT key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1252,7 +1254,7 @@ static void TestObjectValue2(QTest &test) {
     test.IsNotNull(value3.GetObject()->First(), __LINE__);
     test.IsEqual(value3.GetObject()->First(), storage, __LINE__);
 
-    value3 = ValueC{VHArray(4)};
+    value3 = ValueC{ObjectT(4)};
     test.IsTrue(value3.IsObject(), __LINE__);
     test.IsNotNull(value3.GetObject(), __LINE__);
     test.IsNotNull(value3.GetObject()->First(), __LINE__);
@@ -1313,14 +1315,17 @@ static void TestObjectValue2(QTest &test) {
     test.IsNull(value3.GetValueAt(4), __LINE__);
 
     ////////////////////
-    h_arr_var[VString("w1")] = 10;
-    h_arr_var[VString("w2")] = 20;
-    h_arr_var[VString("w3")] = 30;
+    h_arr_var[StringT("w1")] = 10;
+    h_arr_var[StringT("w2")] = 20;
+    h_arr_var[StringT("w3")] = 30;
     str_var                  = "-ABCDEF0123456789ABCDEF0123456789-";
     c_str_var                = str_var.First();
-    h_arr_var[VString("w4")] = QUtility::Move(str_var);
+    h_arr_var[StringT("w4")] = QUtility::Move(str_var);
 
-    value3 = h_arr_var;
+    ObjectT h_arr_var_tmp{h_arr_var};
+    value3 = h_arr_var_tmp;
+    h_arr_var_tmp.Reset();
+
     test.IsEqual(value3.Size(), 4U, __LINE__);
     test.IsEqual(value3["w1"].GetNumber(), 10.0, __LINE__);
     test.IsEqual(value3["w2"].GetNumber(), 20.0, __LINE__);
@@ -1332,9 +1337,9 @@ static void TestObjectValue2(QTest &test) {
     ////////////////////
 
     h_arr_var.Reserve(10);
-    h_arr_var[VString("w1")] = 10;
-    h_arr_var[VString("w2")] = 20;
-    h_arr_var[VString("w3")] = 30;
+    h_arr_var[StringT("w1")] = 10;
+    h_arr_var[StringT("w2")] = 20;
+    h_arr_var[StringT("w3")] = 30;
 
     value3 = QUtility::Move(h_arr_var);
     test.IsEqual(value3.Size(), 3U, __LINE__);
@@ -1352,14 +1357,14 @@ static void TestMoveValue1(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray           h_arr_var;
-    const ObjectItem *h_arr_storage; // = h_arr_var.First();
+    ObjectT      h_arr_var;
+    const VItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -1387,7 +1392,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = true;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
@@ -1397,7 +1402,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = true;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -1409,7 +1414,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = true;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -1444,7 +1449,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = false;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
@@ -1454,7 +1459,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = false;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -1466,7 +1471,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = false;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -1501,7 +1506,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = nullptr;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
@@ -1511,7 +1516,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = nullptr;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -1523,7 +1528,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = nullptr;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -1557,7 +1562,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = 47;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
@@ -1567,7 +1572,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = 10e10;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -1579,7 +1584,7 @@ static void TestMoveValue1(QTest &test) {
     /////////////
     value1 = 9.1;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -1590,28 +1595,28 @@ static void TestMoveValue1(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = true;
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = false;
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = nullptr;
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = 4;
     test.IsTrue(value1.IsNumber(), __LINE__);
@@ -1619,9 +1624,9 @@ static void TestMoveValue1(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -1631,9 +1636,9 @@ static void TestMoveValue1(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -1644,28 +1649,28 @@ static void TestMoveValue1(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value1 = true;
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value1 = false;
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value1 = nullptr;
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value1 = 33;
     test.IsTrue(value1.IsNumber(), __LINE__);
@@ -1673,9 +1678,9 @@ static void TestMoveValue1(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
@@ -1683,9 +1688,9 @@ static void TestMoveValue1(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value1        = QUtility::Move(h_arr_var);
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -1704,36 +1709,36 @@ static void TestMoveValue2(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
     ////////////////////////////////////////////
 
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value1 = true;
     test.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value1 = false;
     test.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value1 = nullptr;
     test.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value1 = 33;
     test.IsTrue(value1.IsNumber(), __LINE__);
@@ -1741,9 +1746,9 @@ static void TestMoveValue2(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = QUtility::Move(str_var);
     test.IsTrue(value1.IsString(), __LINE__);
@@ -1751,9 +1756,9 @@ static void TestMoveValue2(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value1      = QUtility::Move(arr_var);
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -1773,14 +1778,14 @@ static void TestMoveValue3(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray           h_arr_var;
-    const ObjectItem *h_arr_storage; // = h_arr_var.First();
+    ObjectT      h_arr_var;
+    const VItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -1811,7 +1816,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = true;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = QUtility::Move(value2);
@@ -1822,7 +1827,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = true;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
     value1      = QUtility::Move(value2);
@@ -1835,7 +1840,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = true;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value2        = QUtility::Move(h_arr_var);
     value1        = QUtility::Move(value2);
@@ -1874,7 +1879,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = false;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = QUtility::Move(value2);
@@ -1885,7 +1890,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = false;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
     value1      = QUtility::Move(value2);
@@ -1898,7 +1903,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = false;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value2        = QUtility::Move(h_arr_var);
     value1        = QUtility::Move(value2);
@@ -1937,7 +1942,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = nullptr;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = QUtility::Move(value2);
@@ -1948,7 +1953,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = nullptr;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
     value1      = QUtility::Move(value2);
@@ -1961,7 +1966,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = nullptr;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value2        = QUtility::Move(h_arr_var);
     value1        = QUtility::Move(value2);
@@ -1999,7 +2004,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = 47;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = QUtility::Move(value2);
@@ -2010,7 +2015,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = 10e10;
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
     value1      = QUtility::Move(value2);
@@ -2023,7 +2028,7 @@ static void TestMoveValue3(QTest &test) {
     /////////////
     value1 = 9.1;
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value2        = QUtility::Move(h_arr_var);
     value1        = QUtility::Move(value2);
@@ -2035,7 +2040,7 @@ static void TestMoveValue3(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = true;
     value1 = QUtility::Move(value2);
@@ -2043,7 +2048,7 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = false;
     value1 = QUtility::Move(value2);
@@ -2051,7 +2056,7 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = nullptr;
     value1 = QUtility::Move(value2);
@@ -2059,7 +2064,7 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = 4;
     value1 = QUtility::Move(value2);
@@ -2068,9 +2073,9 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
     value1      = QUtility::Move(value2);
@@ -2081,9 +2086,9 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value2        = QUtility::Move(h_arr_var);
     value1        = QUtility::Move(value2);
@@ -2095,7 +2100,7 @@ static void TestMoveValue3(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = true;
     value1 = QUtility::Move(value2);
@@ -2103,7 +2108,7 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = false;
     value1 = QUtility::Move(value2);
@@ -2111,7 +2116,7 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = nullptr;
     value1 = QUtility::Move(value2);
@@ -2119,7 +2124,7 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = 33;
     value1 = QUtility::Move(value2);
@@ -2128,9 +2133,9 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = QUtility::Move(value2);
@@ -2139,9 +2144,9 @@ static void TestMoveValue3(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
-    h_arr_var     = VHArray(1);
+    h_arr_var     = ObjectT(1);
     h_arr_storage = h_arr_var.First();
     value2        = QUtility::Move(h_arr_var);
     value1        = QUtility::Move(value2);
@@ -2162,15 +2167,15 @@ static void TestMoveValue4(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
     ////////////////////////////////////////////
 
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = true;
     value1 = QUtility::Move(value2);
@@ -2178,7 +2183,7 @@ static void TestMoveValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = false;
     value1 = QUtility::Move(value2);
@@ -2186,7 +2191,7 @@ static void TestMoveValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = nullptr;
     value1 = QUtility::Move(value2);
@@ -2194,7 +2199,7 @@ static void TestMoveValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = 33;
     value1 = QUtility::Move(value2);
@@ -2203,9 +2208,9 @@ static void TestMoveValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = QUtility::Move(value2);
@@ -2214,9 +2219,9 @@ static void TestMoveValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
-    arr_var     = VArray(1);
+    arr_var     = ArrayT(1);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
     value1      = QUtility::Move(value2);
@@ -2236,20 +2241,20 @@ static void TestCopyValue1(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray           h_arr_var;
-    const ObjectItem *h_arr_storage; // = h_arr_var.First();
+    ObjectT      h_arr_var;
+    const VItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
     value1 = true;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     test.IsTrue(value1.IsString(), __LINE__);
@@ -2260,7 +2265,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = true;
 
     // No values
-    arr_var = VArray(1);
+    arr_var = ArrayT(1);
     value1  = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -2269,7 +2274,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = true;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2283,7 +2288,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = true;
 
     // No values
-    h_arr_var = VHArray(1);
+    h_arr_var = ObjectT(1);
     value1    = h_arr_var;
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
@@ -2292,10 +2297,10 @@ static void TestCopyValue1(QTest &test) {
     value1 = true;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2313,7 +2318,7 @@ static void TestCopyValue1(QTest &test) {
 
     value1 = false;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     test.IsTrue(value1.IsString(), __LINE__);
@@ -2324,7 +2329,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = false;
 
     // No values
-    arr_var = VArray(1);
+    arr_var = ArrayT(1);
     value1  = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -2333,7 +2338,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = false;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2347,7 +2352,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = false;
 
     // No values
-    h_arr_var = VHArray(1);
+    h_arr_var = ObjectT(1);
     value1    = h_arr_var;
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
@@ -2356,10 +2361,10 @@ static void TestCopyValue1(QTest &test) {
     value1 = false;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2377,7 +2382,7 @@ static void TestCopyValue1(QTest &test) {
 
     value1 = nullptr;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     test.IsTrue(value1.IsString(), __LINE__);
@@ -2388,7 +2393,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = nullptr;
 
     // No values
-    arr_var = VArray(1);
+    arr_var = ArrayT(1);
     value1  = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -2397,7 +2402,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = nullptr;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2411,7 +2416,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = nullptr;
 
     // No values
-    h_arr_var = VHArray(1);
+    h_arr_var = ObjectT(1);
     value1    = h_arr_var;
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
@@ -2420,10 +2425,10 @@ static void TestCopyValue1(QTest &test) {
     value1 = nullptr;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2441,7 +2446,7 @@ static void TestCopyValue1(QTest &test) {
 
     value1 = 23;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     test.IsTrue(value1.IsString(), __LINE__);
@@ -2452,7 +2457,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = 33;
 
     // No values
-    arr_var = VArray(1);
+    arr_var = ArrayT(1);
     value1  = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
@@ -2461,7 +2466,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = 33;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2475,7 +2480,7 @@ static void TestCopyValue1(QTest &test) {
     value1 = 34;
 
     // No values
-    h_arr_var = VHArray(1);
+    h_arr_var = ObjectT(1);
     value1    = h_arr_var;
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
@@ -2484,10 +2489,10 @@ static void TestCopyValue1(QTest &test) {
     value1 = 34;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2511,29 +2516,29 @@ static void TestCopyValue2(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray           h_arr_var;
-    const ObjectItem *h_arr_storage; // = h_arr_var.First();
+    ObjectT      h_arr_var;
+    const VItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // No values
-    arr_var = VArray(1);
+    arr_var = ArrayT(1);
     value1  = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2544,22 +2549,22 @@ static void TestCopyValue2(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // No values
-    h_arr_var = VHArray(1);
+    h_arr_var = ObjectT(1);
     value1    = h_arr_var;
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2575,9 +2580,9 @@ static void TestCopyValue2(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     test.IsTrue(value1.IsString(), __LINE__);
@@ -2585,22 +2590,22 @@ static void TestCopyValue2(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     // No values
-    h_arr_var = VHArray(1);
+    h_arr_var = ObjectT(1);
     value1    = h_arr_var;
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2616,9 +2621,9 @@ static void TestCopyValue2(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     test.IsTrue(value1.IsString(), __LINE__);
@@ -2626,19 +2631,19 @@ static void TestCopyValue2(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     // No values
-    arr_var = VArray(1);
+    arr_var = ArrayT(1);
     value1  = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2658,14 +2663,14 @@ static void TestCopyValue3(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray           h_arr_var;
-    const ObjectItem *h_arr_storage; // = h_arr_var.First();
+    ObjectT      h_arr_var;
+    const VItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -2696,7 +2701,7 @@ static void TestCopyValue3(QTest &test) {
     /////////////
     value1 = true;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = value2;
@@ -2708,7 +2713,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = true;
 
     // No values
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2718,7 +2723,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = true;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
@@ -2734,7 +2739,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = true;
 
     // No values
-    value2 = VHArray(1);
+    value2 = ObjectT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -2744,10 +2749,10 @@ static void TestCopyValue3(QTest &test) {
     value1 = true;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2792,7 +2797,7 @@ static void TestCopyValue3(QTest &test) {
     /////////////
     value1 = false;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = value2;
@@ -2804,7 +2809,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = false;
 
     // No values
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2814,7 +2819,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = false;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
@@ -2830,7 +2835,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = false;
 
     // No values
-    value2 = VHArray(1);
+    value2 = ObjectT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -2840,10 +2845,10 @@ static void TestCopyValue3(QTest &test) {
     value1 = false;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2888,7 +2893,7 @@ static void TestCopyValue3(QTest &test) {
     /////////////
     value1 = nullptr;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = value2;
@@ -2900,7 +2905,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = nullptr;
 
     // No values
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2910,7 +2915,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = nullptr;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
@@ -2926,7 +2931,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = nullptr;
 
     // No values
-    value2 = VHArray(1);
+    value2 = ObjectT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -2936,10 +2941,10 @@ static void TestCopyValue3(QTest &test) {
     value1 = nullptr;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2983,7 +2988,7 @@ static void TestCopyValue3(QTest &test) {
     /////////////
     value1 = 47;
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = value2;
@@ -2995,7 +3000,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = 10e10;
 
     // No values
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -3005,7 +3010,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = 10e10;
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
@@ -3021,7 +3026,7 @@ static void TestCopyValue3(QTest &test) {
     value1 = 9.1;
 
     // No values
-    value2 = VHArray(1);
+    value2 = ObjectT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
@@ -3031,10 +3036,10 @@ static void TestCopyValue3(QTest &test) {
     value1 = 9.1;
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -3061,18 +3066,18 @@ static void TestCopyValue4(QTest &test) {
     // false
     // null
 
-    VString     str_var;
+    StringT     str_var;
     const char *c_str_var; // = str_var.First();
 
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray           h_arr_var;
-    const ObjectItem *h_arr_storage; // = h_arr_var.First();
+    ObjectT      h_arr_var;
+    const VItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = true;
     value1 = value2;
@@ -3080,7 +3085,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = false;
     value1 = value2;
@@ -3088,7 +3093,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = nullptr;
     value1 = value2;
@@ -3096,7 +3101,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = 4;
     value1 = value2;
@@ -3105,20 +3110,20 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // No values
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
@@ -3131,23 +3136,23 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // No values
-    value2 = VHArray(1);
+    value2 = ObjectT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
-    value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    value1 = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -3165,7 +3170,7 @@ static void TestCopyValue4(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = true;
     value1 = value2;
@@ -3173,7 +3178,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = false;
     value1 = value2;
@@ -3181,7 +3186,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = nullptr;
     value1 = value2;
@@ -3189,7 +3194,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     value2 = 33;
     value1 = value2;
@@ -3198,9 +3203,9 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = value2;
@@ -3209,23 +3214,23 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     // No values
-    value2 = VHArray(1);
+    value2 = ObjectT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsObject(), __LINE__);
     test.IsNotNull(value1.GetObject(), __LINE__);
     test.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
-    value1 = VArray(1);
+    value1 = ArrayT(1);
 
     // Has values
-    h_arr_var = VHArray{};
+    h_arr_var = ObjectT{};
 
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key;
+        StringT key;
 
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -3243,7 +3248,7 @@ static void TestCopyValue4(QTest &test) {
 
     ////////////////////////////////////////////
 
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = true;
     value1 = value2;
@@ -3251,7 +3256,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = false;
     value1 = value2;
@@ -3259,7 +3264,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = nullptr;
     value1 = value2;
@@ -3267,7 +3272,7 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     value2 = 33;
     value1 = value2;
@@ -3276,9 +3281,9 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
-    str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
+    str_var   = StringT{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = QUtility::Move(str_var);
     value1    = value2;
@@ -3287,20 +3292,20 @@ static void TestCopyValue4(QTest &test) {
     value1.Reset();
 
     /////////////
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     // No values
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1 = value2;
 
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
-    value1 = VHArray(1);
+    value1 = ObjectT(1);
 
     // Has values
-    arr_var = VArray{};
+    arr_var = ArrayT{};
     arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = QUtility::Move(arr_var);
@@ -3317,10 +3322,10 @@ static void TestCopyValue4(QTest &test) {
 
 static void TestIndexOperator1(QTest &test) {
     ValueC        value;
-    const VString str1("D");
-    const VString str2("DEFG");
+    const StringT str1("D");
+    const StringT str2("DEFG");
 
-    value = VHArray(1); // Test changing type
+    value = ObjectT(1); // Test changing type
 
     value[0] = 5;
     test.IsTrue(value.IsArray(), __LINE__);
@@ -3394,10 +3399,10 @@ static void TestIndexOperator1(QTest &test) {
 
     value[0]                   = 50;
     value["B"]                 = 100;
-    value[VString("C")]        = 200;
+    value[StringT("C")]        = 200;
     value[str1]                = 300;
     value["EFEFE"]             = 400;
-    value[VString("FGHIGKLM")] = 500;
+    value[StringT("FGHIGKLM")] = 500;
 
     test.IsTrue(value.IsObject(), __LINE__);
     test.IsEqual(value.Size(), 6U, __LINE__);
@@ -3444,11 +3449,11 @@ static void TestIndexOperator1(QTest &test) {
 
     value.Reset();
 
-    value[VString("C")] = 4;
+    value[StringT("C")] = 4;
     test.IsTrue(value.IsObject(), __LINE__);
     test.IsEqual(value.Size(), 1U, __LINE__);
     test.IsEqual(value[0].GetNumber(), 4.0, __LINE__);
-    test.IsEqual(value[VString("C")].GetNumber(), 4.0, __LINE__);
+    test.IsEqual(value[StringT("C")].GetNumber(), 4.0, __LINE__);
 
     value.Reset();
 
@@ -3495,8 +3500,8 @@ static void TestIndexOperator2(QTest &test) {
 
 static void TestAddition1(QTest &test) {
     ValueC        value;
-    const VString str1("D");
-    const VString str2("DEFG");
+    const StringT str1("D");
+    const StringT str2("DEFG");
 
     value += 20;
     test.IsTrue(value.IsArray(), __LINE__);
@@ -3539,7 +3544,7 @@ static void TestAddition1(QTest &test) {
 
 static void TestAddition2(QTest &test) {
     ValueC  value;
-    VString str;
+    StringT str;
 
     /////////////////
 
@@ -3600,7 +3605,7 @@ static void TestAddition2(QTest &test) {
     test.IsTrue(StringUtils::IsEqual(value[1].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34), __LINE__);
     value.Reset();
     /////////////////
-    str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
+    str               = StringT("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
     value += QUtility::Move(str);
     test.IsTrue(value.IsArray(), __LINE__);
@@ -3609,7 +3614,7 @@ static void TestAddition2(QTest &test) {
     test.IsEqual(value[0].StringStorage(), c_str, __LINE__);
     test.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
-    str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
+    str                = StringT("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value += QUtility::Move(str);
     test.IsTrue(value.IsArray(), __LINE__);
@@ -3623,7 +3628,7 @@ static void TestAddition2(QTest &test) {
     value.Reset();
     /////////////////
 
-    str   = VString("-ABCDEF0123456789ABCDEF0123456789-");
+    str   = StringT("-ABCDEF0123456789ABCDEF0123456789-");
     c_str = str.First();
     value += str;
     test.IsTrue(value.IsArray(), __LINE__);
@@ -3632,7 +3637,7 @@ static void TestAddition2(QTest &test) {
     test.IsNotEqual(value[0].StringStorage(), c_str, __LINE__);
     test.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
-    str    = VString("#0123456789ABCDEF0123456789ABCDEF#");
+    str    = StringT("#0123456789ABCDEF0123456789ABCDEF#");
     c_str2 = str.First();
     value += str;
     test.IsTrue(value.IsArray(), __LINE__);
@@ -3647,12 +3652,12 @@ static void TestAddition2(QTest &test) {
 
     //////////////
 
-    value += VHArray{};
+    value += ObjectT{};
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 1U, __LINE__);
     test.IsTrue(value[0].IsObject(), __LINE__);
 
-    value += VHArray{};
+    value += ObjectT{};
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 2U, __LINE__);
     test.IsTrue(value[0].IsObject(), __LINE__);
@@ -3663,12 +3668,12 @@ static void TestAddition2(QTest &test) {
 
 static void TestAddition3(QTest &test) {
     ValueC        value;
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage;
     const char   *c_str;
     const char   *c_str2;
     /////////////////
-    arr_var = VArray(1);
+    arr_var = ArrayT(1);
     value += arr_var;
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 1U, __LINE__);
@@ -3677,7 +3682,7 @@ static void TestAddition3(QTest &test) {
 
     value.Reset();
 
-    arr_var = VArray(3);
+    arr_var = ArrayT(3);
     value += arr_var;
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 1U, __LINE__);
@@ -3689,7 +3694,7 @@ static void TestAddition3(QTest &test) {
 
     arr_var += ValueC{false};
     arr_var += ValueC{true};
-    arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
+    arr_var += ValueC{StringT("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
 
@@ -3708,7 +3713,7 @@ static void TestAddition3(QTest &test) {
     arr_var.Reset();
     arr_var += ValueC{nullptr};
     arr_var += ValueC{14};
-    arr_var += ValueC{VString("^ABCDEF0123456789ABCDEF0123456789^")};
+    arr_var += ValueC{StringT("^ABCDEF0123456789ABCDEF0123456789^")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
 
@@ -3732,7 +3737,7 @@ static void TestAddition3(QTest &test) {
 
     value.Reset();
     /////////////////
-    value += VArray(1);
+    value += ArrayT(1);
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 1U, __LINE__);
     test.IsNotNull(value.GetArray(), __LINE__);
@@ -3740,7 +3745,7 @@ static void TestAddition3(QTest &test) {
 
     value.Reset();
 
-    value += VArray(3);
+    value += ArrayT(3);
     test.IsTrue(value.IsArray(), __LINE__);
     test.IsEqual(value.Size(), 1U, __LINE__);
     test.IsNotNull(value.GetArray(), __LINE__);
@@ -3751,7 +3756,7 @@ static void TestAddition3(QTest &test) {
 
     arr_var += ValueC{ValueType::False};
     arr_var += ValueC{ValueType::True};
-    arr_var += ValueC{VString("#0123456789ABCDEF0123456789ABCDEF#")};
+    arr_var += ValueC{StringT("#0123456789ABCDEF0123456789ABCDEF#")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
 
@@ -3769,7 +3774,7 @@ static void TestAddition3(QTest &test) {
 
     arr_var += ValueC{nullptr};
     arr_var += ValueC{14};
-    arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
+    arr_var += ValueC{StringT("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
 
@@ -3798,9 +3803,9 @@ static void TestAddition3(QTest &test) {
 static void TestAddition4(QTest &test) {
     ValueC        value1;
     ValueC        value2;
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage;
-    VString       str;
+    StringT       str;
 
     /////////////////
 
@@ -3851,7 +3856,7 @@ static void TestAddition4(QTest &test) {
 
     value1.Reset();
     /////////////////
-    str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
+    str               = StringT("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
     value2            = QUtility::Move(str);
 
@@ -3862,7 +3867,7 @@ static void TestAddition4(QTest &test) {
     test.IsNotEqual(value1[0].StringStorage(), c_str, __LINE__);
     test.IsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
-    str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
+    str                = StringT("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = QUtility::Move(str);
 
@@ -3878,7 +3883,7 @@ static void TestAddition4(QTest &test) {
     value1.Reset();
     /////////////////
 
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1 += value2;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 1U, __LINE__);
@@ -3886,7 +3891,7 @@ static void TestAddition4(QTest &test) {
 
     value1.Reset();
 
-    value2 = VArray(10);
+    value2 = ArrayT(10);
     value1 += value2;
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 1U, __LINE__);
@@ -3894,13 +3899,13 @@ static void TestAddition4(QTest &test) {
 
     value1.Reset();
 
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1.Merge(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
 
-    value2 = VArray(10);
+    value2 = ArrayT(10);
     value1.Merge(QUtility::Move(value2));
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
@@ -3911,7 +3916,7 @@ static void TestAddition4(QTest &test) {
 
     arr_var += ValueC{ValueType::False};
     arr_var += ValueC{ValueType::True};
-    arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
+    arr_var += ValueC{StringT("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
     value2      = QUtility::Move(arr_var);
@@ -3931,7 +3936,7 @@ static void TestAddition4(QTest &test) {
     arr_var.Reset();
     arr_var += ValueC{ValueType::Null};
     arr_var += ValueC{14};
-    arr_var += ValueC{VString("^ABCDEF0123456789ABCDEF0123456789^")};
+    arr_var += ValueC{StringT("^ABCDEF0123456789ABCDEF0123456789^")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
     value2      = QUtility::Move(arr_var);
@@ -3962,9 +3967,9 @@ static void TestAddition4(QTest &test) {
 static void TestAddition5(QTest &test) {
     ValueC        value1;
     ValueC        value2;
-    VArray        arr_var;
+    ArrayT        arr_var;
     const ValueC *arr_storage;
-    VString       str;
+    StringT       str;
 
     /////////////////
 
@@ -3982,8 +3987,8 @@ static void TestAddition5(QTest &test) {
     value2 += nullptr;
     value2 += "v";
     value2 += 4;
-    value2 += VArray(1);
-    value2 += VHArray(1);
+    value2 += ArrayT(1);
+    value2 += ObjectT(1);
 
     value2 = true;
     value1 += QUtility::Move(value2);
@@ -4027,7 +4032,7 @@ static void TestAddition5(QTest &test) {
 
     value1.Reset();
     /////////////////
-    str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
+    str               = StringT("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
     value2            = QUtility::Move(str);
 
@@ -4038,7 +4043,7 @@ static void TestAddition5(QTest &test) {
     test.IsEqual(value1[0].StringStorage(), c_str, __LINE__);
     test.IsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
-    str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
+    str                = StringT("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = QUtility::Move(str);
 
@@ -4054,14 +4059,14 @@ static void TestAddition5(QTest &test) {
     value1.Reset();
     /////////////////
 
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1.Merge(value2);
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
     test.IsNotNull(value1.GetArray(), __LINE__);
     test.IsNotNull(value2.GetArray(), __LINE__);
 
-    value2 = VArray(1);
+    value2 = ArrayT(1);
     value1.Merge(QUtility::Move(value2));
     test.IsTrue(value1.IsArray(), __LINE__);
     test.IsEqual(value1.Size(), 0U, __LINE__);
@@ -4073,7 +4078,7 @@ static void TestAddition5(QTest &test) {
 
     arr_var += ValueC{ValueType::False};
     arr_var += ValueC{ValueType::True};
-    arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
+    arr_var += ValueC{StringT("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
     value2      = QUtility::Move(arr_var);
@@ -4093,7 +4098,7 @@ static void TestAddition5(QTest &test) {
     arr_var.Reset();
     arr_var += ValueC{ValueType::Null};
     arr_var += ValueC{14};
-    arr_var += ValueC{VString("#0123456789ABCDEF0123456789ABCDEF#")};
+    arr_var += ValueC{StringT("#0123456789ABCDEF0123456789ABCDEF#")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
     value2      = QUtility::Move(arr_var);
@@ -4121,14 +4126,14 @@ static void TestAddition5(QTest &test) {
 }
 
 static void TestAddition6(QTest &test) {
-    ValueC            value1;
-    ValueC            value2;
-    VString           str_var;
-    const char       *str_c1;
-    const char       *str_c2;
-    VHArray           h_arr_var;
-    const ObjectItem *h_arr_storage1 = nullptr;
-    const ObjectItem *h_arr_storage2 = nullptr;
+    ValueC       value1;
+    ValueC       value2;
+    StringT      str_var;
+    const char  *str_c1;
+    const char  *str_c2;
+    ObjectT      h_arr_var;
+    const VItem *h_arr_storage1 = nullptr;
+    const VItem *h_arr_storage2 = nullptr;
 
     value1["k1"] = 11;
     value1["k2"] = 22;
@@ -4140,15 +4145,15 @@ static void TestAddition6(QTest &test) {
         h_arr_storage1 = value1.GetObject()->First();
     }
 
-    h_arr_var[VString("w1")] = 10;
-    h_arr_var[VString("w2")] = 20;
-    h_arr_var[VString("w3")] = 30;
+    h_arr_var[StringT("w1")] = 10;
+    h_arr_var[StringT("w2")] = 20;
+    h_arr_var[StringT("w3")] = 30;
     str_var                  = "-ABCDEF0123456789ABCDEF0123456789-";
     str_c2                   = str_var.First();
-    h_arr_var[VString("w4")] = QUtility::Move(str_var);
+    h_arr_var[StringT("w4")] = QUtility::Move(str_var);
     h_arr_storage2           = h_arr_var.First();
 
-    value2 = VHArray{};   // Setting to object type.
+    value2 = ObjectT{};   // Setting to object type.
     value2.Merge(value1); // Copy
     test.IsEqual(value2.Size(), 3U, __LINE__);
     test.IsNotNull(value2.GetObject(), __LINE__);
@@ -4158,7 +4163,7 @@ static void TestAddition6(QTest &test) {
     test.IsNotEqual(value2["k3"].StringStorage(), str_c1, __LINE__);
     test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
 
-    value2 = VHArray{};  // Clearing and  Setting to object type.
+    value2 = ObjectT{};  // Clearing and  Setting to object type.
     value2 += h_arr_var; // Copy
     test.IsEqual(value2.Size(), 4U, __LINE__);
     test.IsNotNull(value2.GetObject(), __LINE__);
@@ -4172,7 +4177,7 @@ static void TestAddition6(QTest &test) {
 
     ////
 
-    value2 = VHArray{};                   // Clearing and  Setting to object type.
+    value2 = ObjectT{};                   // Clearing and  Setting to object type.
     value2.Merge(QUtility::Move(value1)); // Move
     test.IsTrue(value1.IsUndefined(), __LINE__);
     test.IsEqual(value2.Size(), 3U, __LINE__);
@@ -4186,7 +4191,7 @@ static void TestAddition6(QTest &test) {
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
 
-    value2 = VHArray{};                  // Clearing and  Setting to object type.
+    value2 = ObjectT{};                  // Clearing and  Setting to object type.
     value2 += QUtility::Move(h_arr_var); // Move
     test.IsNull(h_arr_var.First(), __LINE__);
     test.IsEqual(value2.Size(), 4U, __LINE__);
@@ -4201,11 +4206,11 @@ static void TestAddition6(QTest &test) {
 
     if (value2.GetObject() != nullptr) {
         h_arr_var = *(value2.GetObject()); // Copying back the values.
-        str_c2    = h_arr_var[VString("w4")].StringStorage();
+        str_c2    = h_arr_var[StringT("w4")].StringStorage();
     }
 
     ////////
-    value2 = VHArray{};   // Clearing and  Setting to object type.
+    value2 = ObjectT{};   // Clearing and  Setting to object type.
     value2.Merge(value1); // Copy
     value2 += h_arr_var;  // Copy
     test.IsEqual(value2.Size(), 7U, __LINE__);
@@ -4220,7 +4225,7 @@ static void TestAddition6(QTest &test) {
     test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
 
     ////
-    value2       = VHArray{}; // Clearing and  Setting to object type.
+    value2       = ObjectT{}; // Clearing and  Setting to object type.
     value2["w0"] = 5;
     value2["w1"] = 100;
     value2["w2"] = 200;
@@ -4243,7 +4248,7 @@ static void TestAddition6(QTest &test) {
     test.IsNotEqual(value2["k3"].StringStorage(), str_c1, __LINE__);
     test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
 
-    value2       = VHArray{}; // Clearing and  Setting to object type.
+    value2       = ObjectT{}; // Clearing and  Setting to object type.
     value2["w0"] = 5;
     value2["w1"] = 100;
     value2["w2"] = 200;
@@ -4338,7 +4343,7 @@ static void TestStringify1(QTest &test) {
     ValueC             value;
 
     ///////////
-    value = VArray{};
+    value = ArrayT{};
     test.IsEqual(value.Stringify(ss), "[]", __LINE__);
     ss.Clear();
 
@@ -4373,12 +4378,12 @@ static void TestStringify1(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[[]]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[{}]", __LINE__);
     ss.Clear();
     ///////////
@@ -4420,13 +4425,13 @@ static void TestStringify1(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
+    value += ArrayT{};
     value += true;
     test.IsEqual(value.Stringify(ss), "[[],true]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
+    value += ObjectT{};
     value += true;
     test.IsEqual(value.Stringify(ss), "[{},true]", __LINE__);
     ss.Clear();
@@ -4457,26 +4462,26 @@ static void TestStringify1(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value += VString("a");
+    value += StringT("a");
     value += false;
     test.IsEqual(value.Stringify(ss), R"(["a",false])", __LINE__);
     ss.Clear();
 
     value.Reset();
-    const VString str("ABC");
+    const StringT str("ABC");
     value += str;
     value += false;
     test.IsEqual(value.Stringify(ss), R"(["ABC",false])", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
+    value += ArrayT{};
     value += false;
     test.IsEqual(value.Stringify(ss), "[[],false]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
+    value += ObjectT{};
     value += false;
     test.IsEqual(value.Stringify(ss), "[{},false]", __LINE__);
     ss.Clear();
@@ -4519,13 +4524,13 @@ static void TestStringify1(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
+    value += ArrayT{};
     value += nullptr;
     test.IsEqual(value.Stringify(ss), "[[],null]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
+    value += ObjectT{};
     value += nullptr;
     test.IsEqual(value.Stringify(ss), "[{},null]", __LINE__);
     ss.Clear();
@@ -4568,13 +4573,13 @@ static void TestStringify1(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
+    value += ArrayT{};
     value += "ABCDEF";
     test.IsEqual(value.Stringify(ss), R"([[],"ABCDEF"])", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
+    value += ObjectT{};
     value += "ABCDEFG";
     test.IsEqual(value.Stringify(ss), R"([{},"ABCDEFG"])", __LINE__);
     ss.Clear();
@@ -4582,107 +4587,107 @@ static void TestStringify1(QTest &test) {
 
     value.Reset();
     value += true;
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[true,[]]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[false,[]]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[null,[]]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += 10000;
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[10000,[]]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += "ABC";
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), R"(["ABC",[]])", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
-    value += VArray{};
+    value += ArrayT{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[[],[]]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
-    value += VArray{};
+    value += ObjectT{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[{},[]]", __LINE__);
     ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
-    value += VHArray{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[true,{}]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VHArray{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[false,{}]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VHArray{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[null,{}]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += -1000;
-    value += VHArray{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[-1000,{}]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += "ABC";
-    value += VHArray{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), R"(["ABC",{}])", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
-    value += VHArray{};
+    value += ArrayT{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[[],{}]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
-    value += VHArray{};
+    value += ObjectT{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[{},{}]", __LINE__);
     ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
-    value += VHArray{};
+    value += ObjectT{};
     value += false;
     test.IsEqual(value.Stringify(ss), "[true,{},false]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VArray{};
+    value += ArrayT{};
     value += nullptr;
     test.IsEqual(value.Stringify(ss), "[false,[],null]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VHArray{};
+    value += ObjectT{};
     value += "ABC";
     test.IsEqual(value.Stringify(ss), R"([null,{},"ABC"])", __LINE__);
     ss.Clear();
@@ -4696,21 +4701,21 @@ static void TestStringify1(QTest &test) {
 
     value.Reset();
     value += "ABC";
-    value += VArray{};
-    value += VHArray{};
+    value += ArrayT{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), R"(["ABC",[],{}])", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
-    value += VHArray{};
+    value += ArrayT{};
+    value += ObjectT{};
     value[2] = 498;
     test.IsEqual(value.Stringify(ss), "[[],{},498]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
-    value += VArray{};
+    value += ObjectT{};
+    value += ArrayT{};
     value += true;
     test.IsEqual(value.Stringify(ss), "[{},[],true]", __LINE__);
     ///////////
@@ -4718,49 +4723,49 @@ static void TestStringify1(QTest &test) {
 
     value.Reset();
     value += true;
-    value += VHArray{};
+    value += ObjectT{};
     value += 0;
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[true,{},0,[]]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VArray{};
+    value += ArrayT{};
     value += nullptr;
-    value += VHArray{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), "[false,[],null,{}]", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VHArray{};
+    value += ObjectT{};
     value += "ABC";
-    value += VArray{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), R"([null,{},"ABC",[]])", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += "ABC";
-    value += VArray{};
-    value += VHArray{};
+    value += ArrayT{};
+    value += ObjectT{};
     value += nullptr;
     test.IsEqual(value.Stringify(ss), R"(["ABC",[],{},null])", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray{};
+    value += ArrayT{};
     value += false;
-    value += VHArray{};
+    value += ObjectT{};
     value += true;
     test.IsEqual(value.Stringify(ss), "[[],false,{},true]", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray{};
+    value += ObjectT{};
     value += nullptr;
-    value += VArray{};
-    value += VArray{};
+    value += ArrayT{};
+    value += ArrayT{};
     test.IsEqual(value.Stringify(ss), "[{},null,[],[]]", __LINE__);
     ss.Clear();
     ///////////
@@ -4771,15 +4776,15 @@ static void TestStringify1(QTest &test) {
     value += nullptr;
     value += 123;
     value += "ABC";
-    value += VArray{};
-    value += VHArray{};
+    value += ArrayT{};
+    value += ObjectT{};
     test.IsEqual(value.Stringify(ss), R"([true,false,null,123,"ABC",[],{}])", __LINE__);
     ss.Clear();
     ///////////
 
     value.Reset();
-    value += VHArray{};
-    value += VArray{};
+    value += ObjectT{};
+    value += ArrayT{};
     value += "a";
     value += 1.5;
     value += nullptr;
@@ -4798,19 +4803,19 @@ static void TestStringify4(QTest &test) {
     value[0] += nullptr;
     value[0] += 0;
     value[0] += "ABC";
-    value[0] += VArray{};
-    value[0] += VHArray{};
+    value[0] += ArrayT{};
+    value[0] += ObjectT{};
     test.IsEqual(value.Stringify(ss), R"([[true,false,null,0,"ABC",[],{}]])", __LINE__);
     ss.Clear();
 
-    value         = VArray{};
+    value         = ArrayT{};
     value[0]["a"] = true;
     value[0]["0"] = false;
     value[0]["1"] = nullptr;
     value[0]["V"] = 0;
     value[0]["B"] = "a";
-    value[0]["2"] = VArray{};
-    value[0]["6"] = VHArray{};
+    value[0]["2"] = ArrayT{};
+    value[0]["6"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", __LINE__);
     ss.Clear();
 
@@ -4820,8 +4825,8 @@ static void TestStringify4(QTest &test) {
     value["o"] += nullptr;
     value["o"] += 0;
     value["o"] += "ABC";
-    value["o"] += VArray{};
-    value["o"] += VHArray{};
+    value["o"] += ArrayT{};
+    value["o"] += ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"o":[true,false,null,0,"ABC",[],{}]})", __LINE__);
     ss.Clear();
 
@@ -4831,8 +4836,8 @@ static void TestStringify4(QTest &test) {
     value["i"]["1"] = nullptr;
     value["i"]["V"] = 0;
     value["i"]["B"] = "a";
-    value["i"]["2"] = VArray{};
-    value["i"]["6"] = VHArray{};
+    value["i"]["2"] = ArrayT{};
+    value["i"]["6"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})", __LINE__);
 }
 
@@ -4841,7 +4846,7 @@ static void TestStringify2(QTest &test) {
     ValueC             value;
 
     ///////////
-    value = VHArray{};
+    value = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({})", __LINE__);
     ss.Clear();
 
@@ -4876,12 +4881,12 @@ static void TestStringify2(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value["ABC"] = VArray{};
+    value["ABC"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"ABC":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["5vn7b83y98t3wrupwmwa4ataw"] = VHArray{};
+    value["5vn7b83y98t3wrupwmwa4ataw"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", __LINE__);
     ///////////
     ss.Clear();
@@ -4923,13 +4928,13 @@ static void TestStringify2(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value["X"]   = VArray{};
+    value["X"]   = ArrayT{};
     value["123"] = true;
     test.IsEqual(value.Stringify(ss), R"({"X":[],"123":true})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["x"] = VHArray{};
+    value["x"] = ObjectT{};
     value["A"] = true;
     test.IsEqual(value.Stringify(ss), R"({"x":{},"A":true})", __LINE__);
     ///////////
@@ -4960,26 +4965,26 @@ static void TestStringify2(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value["A"] = VString("a");
+    value["A"] = StringT("a");
     value["B"] = false;
     test.IsEqual(value.Stringify(ss), R"({"A":"a","B":false})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    const VString str("ABC");
+    const StringT str("ABC");
     value["A"] = str;
     value["B"] = false;
     test.IsEqual(value.Stringify(ss), R"({"A":"ABC","B":false})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VArray{};
+    value["X"] = ArrayT{};
     value["A"] = false;
     test.IsEqual(value.Stringify(ss), R"({"X":[],"A":false})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VHArray{};
+    value["X"] = ObjectT{};
     value["A"] = false;
     test.IsEqual(value.Stringify(ss), R"({"X":{},"A":false})", __LINE__);
     ///////////
@@ -5022,13 +5027,13 @@ static void TestStringify2(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value["X"] = VArray{};
+    value["X"] = ArrayT{};
     value["n"] = nullptr;
     test.IsEqual(value.Stringify(ss), R"({"X":[],"n":null})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["t"] = VHArray{};
+    value["t"] = ObjectT{};
     value["A"] = nullptr;
     test.IsEqual(value.Stringify(ss), R"({"t":{},"A":null})", __LINE__);
     ///////////
@@ -5076,13 +5081,13 @@ static void TestStringify3(QTest &test) {
     ss.Clear();
 
     value.Reset();
-    value["o"] = VArray{};
+    value["o"] = ArrayT{};
     value["A"] = "ABCDEF";
     test.IsEqual(value.Stringify(ss), R"({"o":[],"A":"ABCDEF"})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["A"] = VHArray{};
+    value["A"] = ObjectT{};
     value["o"] = "ABCDEFG";
     test.IsEqual(value.Stringify(ss), R"({"A":{},"o":"ABCDEFG"})", __LINE__);
     ///////////
@@ -5090,107 +5095,107 @@ static void TestStringify3(QTest &test) {
 
     value.Reset();
     value["d"] = true;
-    value["y"] = VArray{};
+    value["y"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"d":true,"y":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = false;
-    value["y"] = VArray{};
+    value["y"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"A":false,"y":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
-    value["y"] = VArray{};
+    value["y"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"A":null,"y":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = 10000;
-    value["y"] = VArray{};
+    value["y"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"A":10000,"y":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
-    value["y"] = VArray{};
+    value["y"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"A":"ABC","y":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VArray{};
-    value["y"] = VArray{};
+    value["X"] = ArrayT{};
+    value["y"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"X":[],"y":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VHArray{};
-    value["Y"] = VArray{};
+    value["X"] = ObjectT{};
+    value["Y"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"X":{},"Y":[]})", __LINE__);
     ///////////
     ss.Clear();
 
     value.Reset();
     value["A"] = true;
-    value["y"] = VHArray{};
+    value["y"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"A":true,"y":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = false;
-    value["y"] = VHArray{};
+    value["y"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"A":false,"y":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
-    value["y"] = VHArray{};
+    value["y"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"A":null,"y":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = -1000;
-    value["y"] = VHArray{};
+    value["y"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"A":-1000,"y":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
-    value["y"] = VHArray{};
+    value["y"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"A":"ABC","y":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["C"] = VArray{};
-    value["R"] = VHArray{};
+    value["C"] = ArrayT{};
+    value["R"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"C":[],"R":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["cc"] = VHArray{};
-    value["rr"] = VHArray{};
+    value["cc"] = ObjectT{};
+    value["rr"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"cc":{},"rr":{}})", __LINE__);
     ///////////
     ss.Clear();
 
     value.Reset();
     value["A"]  = true;
-    value["y"]  = VHArray{};
+    value["y"]  = ObjectT{};
     value["AA"] = false;
     test.IsEqual(value.Stringify(ss), R"({"A":true,"y":{},"AA":false})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = false;
-    value["y"] = VArray{};
+    value["y"] = ArrayT{};
     value["B"] = nullptr;
     test.IsEqual(value.Stringify(ss), R"({"A":false,"y":[],"B":null})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"]   = nullptr;
-    value["y"]   = VHArray{};
+    value["y"]   = ObjectT{};
     value["ABC"] = "ABC";
     test.IsEqual(value.Stringify(ss), R"({"A":null,"y":{},"ABC":"ABC"})", __LINE__);
     ss.Clear();
@@ -5204,21 +5209,21 @@ static void TestStringify3(QTest &test) {
 
     value.Reset();
     value["A"]     = "ABC";
-    value["y"]     = VArray{};
-    value["key-u"] = VHArray{};
+    value["y"]     = ArrayT{};
+    value["key-u"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"A":"ABC","y":[],"key-u":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"]     = VArray{};
-    value["Y"]     = VHArray{};
+    value["X"]     = ArrayT{};
+    value["Y"]     = ObjectT{};
     value["key-u"] = 498;
     test.IsEqual(value.Stringify(ss), R"({"X":[],"Y":{},"key-u":498})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VHArray{};
-    value["y"] = VArray{};
+    value["X"] = ObjectT{};
+    value["y"] = ArrayT{};
     value["A"] = true;
     test.IsEqual(value.Stringify(ss), R"({"X":{},"y":[],"A":true})", __LINE__);
     ///////////
@@ -5226,49 +5231,49 @@ static void TestStringify3(QTest &test) {
 
     value.Reset();
     value["{}}"]   = true;
-    value["y"]     = VHArray{};
+    value["y"]     = ObjectT{};
     value["AA"]    = 0;
-    value["k-300"] = VArray{};
+    value["k-300"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["B1"]    = false;
-    value["y"]     = VArray{};
+    value["y"]     = ArrayT{};
     value["[A]"]   = nullptr;
-    value["k-300"] = VHArray{};
+    value["k-300"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["{A}"]   = nullptr;
-    value["y"]     = VHArray{};
+    value["y"]     = ObjectT{};
     value["AA"]    = "ABC";
-    value["k-300"] = VArray{};
+    value["k-300"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["x"]     = "ABC";
-    value["[]]"]   = VArray{};
-    value["key-u"] = VHArray{};
+    value["[]]"]   = ArrayT{};
+    value["key-u"] = ObjectT{};
     value["A"]     = nullptr;
     test.IsEqual(value.Stringify(ss), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"]       = VArray{};
+    value["X"]       = ArrayT{};
     value["CCCCccc"] = false;
-    value["key-u"]   = VHArray{};
+    value["key-u"]   = ObjectT{};
     value["A"]       = true;
     test.IsEqual(value.Stringify(ss), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"]     = VHArray{};
+    value["X"]     = ObjectT{};
     value["A"]     = nullptr;
-    value["key-u"] = VArray{};
-    value["k-300"] = VArray{};
+    value["key-u"] = ArrayT{};
+    value["k-300"] = ArrayT{};
     test.IsEqual(value.Stringify(ss), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", __LINE__);
 
     ///////////
@@ -5280,16 +5285,16 @@ static void TestStringify3(QTest &test) {
     value["C"] = nullptr;
     value["D"] = 123;
     value["E"] = "ABC";
-    value["F"] = VArray{};
-    value["G"] = VHArray{};
+    value["F"] = ArrayT{};
+    value["G"] = ObjectT{};
     test.IsEqual(value.Stringify(ss), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", __LINE__);
 
     ///////////
     ss.Clear();
 
     value.Reset();
-    value["A"]       = VHArray{};
-    value["BB"]      = VArray{};
+    value["A"]       = ObjectT{};
+    value["BB"]      = ArrayT{};
     value["CCC"]     = "a";
     value["DDDD"]    = 1.5;
     value["EEEEE"]   = nullptr;
@@ -5329,7 +5334,7 @@ static void TestDeleteValue(QTest &test) {
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
-    value[0] = VArray{};
+    value[0] = ArrayT{};
     value.RemoveAt(SizeT64{0});
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
@@ -5381,8 +5386,8 @@ static void TestDeleteValue(QTest &test) {
     ss.Clear();
 
     value[0] = "a";
-    value[1] = VArray{};
-    value[2] = VHArray{};
+    value[1] = ArrayT{};
+    value[2] = ObjectT{};
     value.RemoveAt(2);
     test.IsEqual(value.Stringify(ss), R"(["a",[]])", __LINE__);
     ss.Clear();
@@ -5407,7 +5412,7 @@ static void TestDeleteValue(QTest &test) {
     test.IsEqual(value.Stringify(ss), R"({})", __LINE__);
     ss.Clear();
 
-    value["A"] = VArray{};
+    value["A"] = ArrayT{};
     value.Remove("A");
     test.IsEqual(value.Stringify(ss), R"({})", __LINE__);
     ss.Clear();
@@ -5450,8 +5455,8 @@ static void TestDeleteValue(QTest &test) {
     ss.Clear();
 
     value["A"]   = "a";
-    value["bb"]  = VHArray{};
-    value["AAA"] = VArray{};
+    value["bb"]  = ObjectT{};
+    value["AAA"] = ArrayT{};
     value.Remove("AAA");
     test.IsEqual(value.Stringify(ss), R"({"A":"a","bb":{}})", __LINE__);
     ss.Clear();
@@ -5464,8 +5469,8 @@ static void TestDeleteValue(QTest &test) {
     ss.Clear();
 
     value["A"]   = "a";
-    value["bb"]  = VHArray{};
-    value["AAA"] = VArray{};
+    value["bb"]  = ObjectT{};
+    value["AAA"] = ArrayT{};
     value["AAA"].Reset();
     test.IsEqual(value.Stringify(ss), R"({"A":"a","bb":{}})", __LINE__);
     ss.Clear();
@@ -5486,7 +5491,7 @@ static void TestCompressValue(QTest &test) {
     value[3] = 1;
     value[4] = 1;
 
-    const VArray *arr = value.GetArray();
+    const ArrayT *arr = value.GetArray();
 
     test.IsNotNull(arr, __LINE__);
     if (arr != nullptr) {
@@ -5546,7 +5551,7 @@ static void TestCompressValue(QTest &test) {
     value.Remove("key8");
     value.Remove("key9");
 
-    const VHArray *obj = value.GetObject();
+    const ObjectT *obj = value.GetObject();
     test.IsNotNull(obj, __LINE__);
     if (obj != nullptr) {
         test.IsTrue(obj->Size() > obj->ActualSize(), __LINE__);
@@ -5702,13 +5707,13 @@ static void TestGroupValue(QTest &test) {
     StringStream<char> ss;
     ValueC             value;
 
-    value += VHArray{};
-    value += VHArray{};
-    value += VHArray{};
-    value += VHArray{};
-    value += VHArray{};
-    value += VHArray{};
-    value += VHArray{};
+    value += ObjectT{};
+    value += ObjectT{};
+    value += ObjectT{};
+    value += ObjectT{};
+    value += ObjectT{};
+    value += ObjectT{};
+    value += ObjectT{};
 
     value[0]["year"] = 2019;
     value[1]["year"] = 2020;
@@ -5787,7 +5792,7 @@ static void TestGroupValue(QTest &test) {
     value.GroupBy(value2, "year");
     test.IsFalse(value.GroupBy(value2, "year"), __LINE__);
 
-    value[2]["year"] = VHArray{};
+    value[2]["year"] = ObjectT{};
     test.IsFalse(value.GroupBy(value2, "year"), __LINE__);
 
     ///////////////////
@@ -5824,10 +5829,10 @@ static void TestGroupValue(QTest &test) {
 
     value2 += 5.4;
     value2 += "str";
-    value2 += VArray{};
+    value2 += ArrayT{};
     value2 += nullptr;
     value2 += true;
-    value2 += VHArray{};
+    value2 += ObjectT{};
     value2 += false;
 
     value = value2;

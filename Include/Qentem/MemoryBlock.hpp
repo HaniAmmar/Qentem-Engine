@@ -295,7 +295,7 @@ struct MemoryBlock {
             table[table_index] |= mask;
         }
 
-        // next_index_ *= static_cast<SystemLong>(table_index != (table_size_ - SystemLong{1}));
+        next_index_ *= static_cast<SystemLong>(table_index != (table_size_ - SystemLong{1}));
 
         return ptr;
     }

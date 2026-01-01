@@ -2403,6 +2403,8 @@ static void TestSuperVariableUTag2(QTest &test) {
 }
 
 static void TestInlineIfUTag(QTest &test) {
+    using ArrayT = typename Value<char16_t>::ArrayT;
+
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -2414,7 +2416,7 @@ static void TestInlineIfUTag(QTest &test) {
     value += false;
     value += nullptr;
     value += uR"(ABC)";
-    value += Array<Value<char16_t>>();
+    value += ArrayT();
 
     content = uR"({if case="0" true="T" false="F"})";
     test.IsEqual(Template::Render(content, value, ss), uR"(F)", __LINE__);
@@ -2975,6 +2977,8 @@ static void TestLoopUTag1(QTest &test) {
 }
 
 static void TestLoopUTag2(QTest &test) {
+    using ArrayT = typename Value<char16_t>::ArrayT;
+
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -3019,7 +3023,7 @@ static void TestLoopUTag2(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"()", __LINE__);
     ss.Clear();
 
-    value[uR"(in)"] = Array<Value<char16_t>>();
+    value[uR"(in)"] = ArrayT();
 
     content = uR"(<loop value="v">{var:v}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), uR"(in)", __LINE__);

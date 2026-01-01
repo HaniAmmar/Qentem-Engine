@@ -126,16 +126,19 @@ struct JSON {
             }
 
             ++offset;
+
             return value;
         }
 
         static ValueT parseArray(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
+            using ArrayT = typename ValueT::ArrayT;
+
             StringUtils::TrimLeft(content, offset, end);
 
             ValueT value{ValueType::Array};
 
             if (content[offset] != NotationConstants::ESquareChar) {
-                Array<ValueT> *arr = value.GetArray();
+                ArrayT *arr = value.GetArray();
 
                 while (offset < end) {
                     *arr += parseValue(stream, content, offset, end);
@@ -163,6 +166,7 @@ struct JSON {
             }
 
             ++offset;
+
             return value;
         }
 
@@ -274,6 +278,7 @@ struct JSON {
             }
 
             offset = end;
+
             return ValueT{};
         }
     };
