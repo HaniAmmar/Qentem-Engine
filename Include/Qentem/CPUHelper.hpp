@@ -84,7 +84,7 @@ struct CPUSet {
     }
 
     QENTEM_INLINE constexpr SystemLong Size() const noexcept {
-        return SIZE;
+        return (SIZE * sizeof(SystemLong));
     }
 
   private:
@@ -157,7 +157,7 @@ struct CPUHelper {
         cores.Set(core_id);
 
         // 0 = current thread
-        const long ret = setAffinity(0, static_cast<SystemLong>(cores.Size()), cores.Data());
+        const long ret = setAffinity(0, cores.Size(), cores.Data());
 
         return (ret == 0);
 #elif defined(_WIN32)
