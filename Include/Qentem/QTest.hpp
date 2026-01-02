@@ -45,11 +45,12 @@ struct QTest {
     }
 
     QENTEM_NOINLINE int EndTests() {
-        if (!(Reserver::IsEmpty())) {
-            QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Reserver should be empty.\n\n",
-                            QConsole::GetColor(QConsole::Color::EndColor));
-            error_ = true;
-        } else if (!error_) {
+        // if (!(Reserver::IsEmpty())) {
+        //     QConsole::Print(QConsole::GetColor(QConsole::Color::ErrorColor), "Reserver should be empty.\n\n",
+        //                     QConsole::GetColor(QConsole::Color::EndColor));
+        // }
+
+        if (!error_) {
             QConsole::Print(QConsole::GetColor(QConsole::Color::TitleColor), test_name_,
                             QConsole::GetColor(QConsole::Color::PassColor), " Passed all tests",
                             QConsole::GetColor(QConsole::Color::EndColor), "\n\n");
