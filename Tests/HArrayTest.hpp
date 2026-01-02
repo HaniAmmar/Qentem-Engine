@@ -1083,7 +1083,7 @@ static void TestHArraySort(QTest &test) {
     }
 
     test.IsEqual(strings["2021"], 2026U, __LINE__);
-    test.IsEqual(strings["2020"], 2026U, __LINE__);
+    test.IsEqual(strings["2020"], 2025U, __LINE__);
     test.IsEqual(strings["2019"], 2024U, __LINE__);
     test.IsEqual(strings["2018"], 2023U, __LINE__);
     test.IsEqual(strings["2018"], 2023U, __LINE__);
