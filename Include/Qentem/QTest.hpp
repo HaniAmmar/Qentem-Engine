@@ -135,7 +135,7 @@ struct QTest {
 
         QConsole::Flush();
 
-        if (!continue_on_error_) {
+        if (!continue_on_error_ && QConsole::IsOutputEnabled()) {
             terminate();
         }
     }

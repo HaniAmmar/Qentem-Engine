@@ -29,23 +29,16 @@
 namespace Qentem {
 namespace Test {
 
-using ValueC = Value<char>;
-
-using StringT = typename ValueC::StringT;
-using ArrayT  = typename ValueC::ArrayT;
-using ObjectT = typename ValueC::ObjectT;
-using VItem   = typename ValueC::VItem;
-
-using VStringStream = StringStream<char>;
-
 static void TestEmptyValue(QTest &test) {
+    using ValueC = Value<char>;
+
     ValueC value1;
 
-    VStringStream ss_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     test.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
     test.IsTrue(value1.IsUndefined(), __LINE__);
@@ -99,14 +92,16 @@ static void TestEmptyValue(QTest &test) {
 }
 
 static void TestTrueValue(QTest &test) {
+    using ValueC = Value<char>;
+
     ValueC value1;
     ValueC value2;
 
-    VStringStream ss_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     value1 = true;
     test.IsTrue(value1.IsTrue(), __LINE__);
@@ -165,14 +160,16 @@ static void TestTrueValue(QTest &test) {
 }
 
 static void TestFalseValue(QTest &test) {
+    using ValueC = Value<char>;
+
     ValueC value1;
     ValueC value2;
 
-    VStringStream ss_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     value1 = false;
     test.IsTrue(value1.IsFalse(), __LINE__);
@@ -231,14 +228,16 @@ static void TestFalseValue(QTest &test) {
 }
 
 static void TestNullValue(QTest &test) {
+    using ValueC = Value<char>;
+
     ValueC value1;
     ValueC value2;
 
-    VStringStream ss_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     value1 = nullptr;
     test.IsTrue(value1.IsNull(), __LINE__);
@@ -297,14 +296,16 @@ static void TestNullValue(QTest &test) {
 }
 
 static void TestNumberValue1(QTest &test) {
+    using ValueC = Value<char>;
+
     ValueC value1;
     ValueC value2;
 
-    VStringStream ss_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     value1 = 33;
     test.IsTrue(value1.IsNumber(), __LINE__);
@@ -379,12 +380,13 @@ static void TestNumberValue1(QTest &test) {
 }
 
 static void TestNumberValue2(QTest &test) {
+    using ValueC  = Value<char>;
     using vu_long = unsigned long;
 
-    ValueC        value1;
-    VStringStream ss_var;
-    QNumber64     num_var;
-    bool          bool_var;
+    ValueC             value1;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    bool               bool_var;
 
     /////////////////// unsigned
 
@@ -441,10 +443,12 @@ static void TestNumberValue2(QTest &test) {
 }
 
 static void TestNumberValue3(QTest &test) {
-    ValueC        value1;
-    VStringStream ss_var;
-    QNumber64     num_var;
-    bool          bool_var;
+    using ValueC = Value<char>;
+
+    ValueC             value1;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    bool               bool_var;
 
     /////////////////// signed
 
@@ -544,10 +548,12 @@ static void TestNumberValue3(QTest &test) {
 }
 
 static void TestNumberValue4(QTest &test) {
-    ValueC        value1;
-    VStringStream ss_var;
-    QNumber64     num_var;
-    bool          bool_var;
+    using ValueC = Value<char>;
+
+    ValueC             value1;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    bool               bool_var;
 
     /////////////////// float
 
@@ -659,6 +665,7 @@ static void TestNumberValue4(QTest &test) {
 }
 
 static void TestNumberValue5(QTest &test) {
+    using ValueC  = Value<char>;
     using vu_long = unsigned long;
 
     ValueC value1;
@@ -720,15 +727,18 @@ static void TestNumberValue5(QTest &test) {
 }
 
 static void TestStringValue(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+
     ValueC value1;
     ValueC value2;
 
-    VStringStream ss_var;
-    StringT       str_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    StringStream<char> ss_var;
+    StringT            str_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     value1 = "-ABCDEF0123456789ABCDEF0123456789-";
     test.IsTrue(value1.IsString(), __LINE__);
@@ -848,17 +858,21 @@ static void TestStringValue(QTest &test) {
 }
 
 static void TestArrayValue(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+
     ValueC value1;
     ValueC value2;
 
-    ArrayT        arr_var;
-    const ValueC *storage;
-    VStringStream ss_var;
-    StringT       str_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    ArrayT             arr_var;
+    const ValueC      *storage;
+    StringStream<char> ss_var;
+    StringT            str_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     arr_var.ResizeWithDefaultInit(5);
     storage = arr_var.First();
@@ -1106,16 +1120,21 @@ static void TestArrayValue(QTest &test) {
 }
 
 static void TestObjectValue1(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC value1;
     ValueC value2;
 
-    ObjectT       h_arr_var;
-    const VItem  *storage;
-    VStringStream ss_var;
-    QNumber64     num_var;
-    const char   *c_str_var;
-    SizeT         c_str_len;
-    bool          bool_var;
+    ObjectT            h_arr_var;
+    const VItem       *storage;
+    StringStream<char> ss_var;
+    QNumber64          num_var;
+    const char        *c_str_var;
+    SizeT              c_str_len;
+    bool               bool_var;
 
     for (SizeT32 i = 0; i < 5; i++) {
         StringT key("Key_");
@@ -1237,6 +1256,11 @@ static void TestObjectValue1(QTest &test) {
 }
 
 static void TestObjectValue2(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC       value1;
     ObjectT      h_arr_var;
     const VItem *storage;
@@ -1388,6 +1412,12 @@ static void TestObjectValue2(QTest &test) {
 }
 
 static void TestMoveValue1(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC value1;
 
     // true
@@ -1740,6 +1770,11 @@ static void TestMoveValue1(QTest &test) {
 }
 
 static void TestMoveValue2(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     ValueC value1;
 
     // true
@@ -1808,6 +1843,12 @@ static void TestMoveValue2(QTest &test) {
 }
 
 static void TestMoveValue3(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC value1;
     ValueC value2;
 
@@ -2197,6 +2238,11 @@ static void TestMoveValue3(QTest &test) {
 }
 
 static void TestMoveValue4(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     ValueC value1;
     ValueC value2;
 
@@ -2272,6 +2318,12 @@ static void TestMoveValue4(QTest &test) {
 }
 
 static void TestCopyValue1(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC value1;
 
     // true
@@ -2547,6 +2599,12 @@ static void TestCopyValue1(QTest &test) {
 }
 
 static void TestCopyValue2(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC value1;
 
     // true
@@ -2693,6 +2751,12 @@ static void TestCopyValue2(QTest &test) {
 }
 
 static void TestCopyValue3(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC value1;
     ValueC value2;
 
@@ -3096,6 +3160,12 @@ static void TestCopyValue3(QTest &test) {
 }
 
 static void TestCopyValue4(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC value1;
     ValueC value2;
 
@@ -3358,6 +3428,10 @@ static void TestCopyValue4(QTest &test) {
 }
 
 static void TestIndexOperator1(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ObjectT = typename ValueC::ObjectT;
+
     ValueC        value;
     const StringT str1("D");
     const StringT str2("DEFG");
@@ -3504,6 +3578,8 @@ static void TestIndexOperator1(QTest &test) {
 }
 
 static void TestIndexOperator2(QTest &test) {
+    using ValueC = Value<char>;
+
     ValueC  value;
     ValueC *value_ptr;
 
@@ -3536,6 +3612,9 @@ static void TestIndexOperator2(QTest &test) {
 }
 
 static void TestAddition1(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+
     ValueC        value;
     const StringT str1("D");
     const StringT str2("DEFG");
@@ -3580,6 +3659,10 @@ static void TestAddition1(QTest &test) {
 }
 
 static void TestAddition2(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ObjectT = typename ValueC::ObjectT;
+
     ValueC  value;
     StringT str;
 
@@ -3704,6 +3787,10 @@ static void TestAddition2(QTest &test) {
 }
 
 static void TestAddition3(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+
     ValueC        value;
     ArrayT        arr_var;
     const ValueC *arr_storage;
@@ -3838,6 +3925,10 @@ static void TestAddition3(QTest &test) {
 }
 
 static void TestAddition4(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+
     ValueC        value1;
     ValueC        value2;
     ArrayT        arr_var;
@@ -4002,6 +4093,11 @@ static void TestAddition4(QTest &test) {
 }
 
 static void TestAddition5(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     ValueC        value1;
     ValueC        value2;
     ArrayT        arr_var;
@@ -4163,6 +4259,11 @@ static void TestAddition5(QTest &test) {
 }
 
 static void TestAddition6(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ObjectT = typename ValueC::ObjectT;
+    using VItem   = typename ValueC::VItem;
+
     ValueC       value1;
     ValueC       value2;
     StringT      str_var;
@@ -4376,6 +4477,11 @@ static void TestAddition6(QTest &test) {
 }
 
 static void TestStringify1(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     StringStream<char> ss;
     ValueC             value;
 
@@ -4832,6 +4938,10 @@ static void TestStringify1(QTest &test) {
 }
 
 static void TestStringify4(QTest &test) {
+    using ValueC  = Value<char>;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     StringStream<char> ss;
     ValueC             value;
 
@@ -4879,6 +4989,11 @@ static void TestStringify4(QTest &test) {
 }
 
 static void TestStringify2(QTest &test) {
+    using ValueC  = Value<char>;
+    using StringT = typename ValueC::StringT;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     StringStream<char> ss;
     ValueC             value;
 
@@ -5102,6 +5217,10 @@ static void TestStringify2(QTest &test) {
 }
 
 static void TestStringify3(QTest &test) {
+    using ValueC  = Value<char>;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     StringStream<char> ss;
     ValueC             value;
 
@@ -5343,6 +5462,8 @@ static void TestStringify3(QTest &test) {
 }
 
 static void TestStringify5(QTest &test) {
+    using ValueC = Value<char>;
+
     StringStream<char> ss;
     ValueC             value;
 
@@ -5356,6 +5477,10 @@ static void TestStringify5(QTest &test) {
 }
 
 static void TestDeleteValue(QTest &test) {
+    using ValueC  = Value<char>;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     StringStream<char> ss;
     ValueC             value;
 
@@ -5520,6 +5645,10 @@ static void TestDeleteValue(QTest &test) {
 }
 
 static void TestCompressValue(QTest &test) {
+    using ValueC  = Value<char>;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     ValueC value;
 
     value[0] = 1;
@@ -5681,6 +5810,8 @@ static void TestCompressValue(QTest &test) {
 }
 
 static void TestSortValue(QTest &test) {
+    using ValueC = Value<char>;
+
     StringStream<char> ss;
     ValueC             value;
 
@@ -5741,6 +5872,10 @@ static void TestSortValue(QTest &test) {
 }
 
 static void TestGroupValue(QTest &test) {
+    using ValueC  = Value<char>;
+    using ArrayT  = typename ValueC::ArrayT;
+    using ObjectT = typename ValueC::ObjectT;
+
     StringStream<char> ss;
     ValueC             value;
 

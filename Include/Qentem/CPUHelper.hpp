@@ -237,7 +237,7 @@ struct CPUHelper {
 #elif defined(_WIN32)
         const SizeT32 count = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
 #else
-        const SizeT32 tmp   = sysconf(_SC_NPROCESSORS_ONLN);
+        const SizeT32 tmp   = static_cast<SizeT32>(::sysconf(_SC_NPROCESSORS_ONLN));
         const SizeT32 count = ((tmp > 0) ? static_cast<SizeT32>(tmp) : 1U);
 #endif
 

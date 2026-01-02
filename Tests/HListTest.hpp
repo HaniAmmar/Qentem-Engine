@@ -34,7 +34,6 @@ namespace Test {
 static void TestHList1(QTest &test) {
     HList<String<char>> numbers1;
     HList<String<char>> numbers2;
-    SizeT              *value;
 
     for (SizeT i = 1; i <= 10; i++) {
         String<char> key{"k-", 2};
@@ -149,7 +148,7 @@ static void TestHList1(QTest &test) {
     numbers1["a"];
     numbers1.Compress();
     test.IsEqual(numbers1.Size(), 1U, __LINE__);
-    test.IsEqual(numbers1.Capacity(), 16, __LINE__);
+    test.IsEqual(numbers1.Capacity(), 16U, __LINE__);
 }
 
 static void TestHListNumeric(QTest &test) {

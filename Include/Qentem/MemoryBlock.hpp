@@ -61,12 +61,14 @@ struct MemoryBlock {
         static_assert((Alignment_T > 0) && ((Alignment_T & (Alignment_T - 1)) == 0),
                       "Alignment_T must be power-of-two");
 
-        const SizeT32 page_size = SystemMemory::GetPageSize();
+        const SizeT32 page_size{SystemMemory::GetPageSize()};
 
         if (capacity_ > page_size) {
+            const SystemLong page_size_m1{(page_size - SystemLong{1})};
+
             // Round up to next page boundary
-            capacity_ += (page_size - 1U);
-            capacity_ &= ~(page_size - 1U);
+            capacity_ += page_size_m1;
+            capacity_ &= ~page_size_m1;
         } else {
             capacity_ = page_size;
         }

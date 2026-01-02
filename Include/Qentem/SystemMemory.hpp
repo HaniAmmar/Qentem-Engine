@@ -271,6 +271,7 @@ struct SystemMemory {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
+        (void)flags;
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     #else
         #if defined(__linux__)
@@ -367,10 +368,12 @@ struct SystemMemory {
                         0)
             );
         #else
+            (void)flags;
             return ::mmap(nullptr, size, (PROT_READ | PROT_WRITE), (MAP_PRIVATE | MAP_ANONYMOUS | flags), -1, 0);
         #endif
     #endif
 #else
+        (void)flags;
         return __builtin_malloc(size);
 #endif
         // clang-format on

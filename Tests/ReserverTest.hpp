@@ -158,7 +158,12 @@ static void TestReserverShrink(QTest &test) {
     // Release the second block's allocation.
     r.Release(var2, 8 * 1024);
     test.IsFalse(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__); // Block count collapses.
+
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+    test.IsEqual(r.TotalBlocks(), SizeT{2}, __LINE__);
+#else
+    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
+#endif
 
     // Finally release the remaining half of var1.
     r.Release(var1, max - half);
