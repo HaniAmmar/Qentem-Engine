@@ -77,7 +77,7 @@ for:
 
       build_script:
           - sh: mkdir Build
-          - sh: g++ -std=c++17 -g -O0 -Wall -Wextra -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+          - sh: g++ -std=c++17 -g -O0 -Wall -Wextra -fno-exceptions -flto=auto -fno-rtti -fno-threadsafe-statics -nostdlib++ ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
 
       test_script:
           - sh: ./Build/QTest.bin
@@ -92,7 +92,7 @@ for:
 
       build_script:
           - sh: mkdir Build
-          - sh: g++ -std=c++11 -g -O0 -m32 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+          - sh: g++ -std=c++17 -g -O0 -m32 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
 
       test_script:
           - sh: ./Build/QTest.bin
@@ -103,7 +103,7 @@ for:
 
       build_script:
           - sh: mkdir Build
-          - sh: clang++ -std=c++11 -g -O0 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+          - sh: clang++ -std=c++17 -g -O0 -Wall -Wextra ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
 
       test_script:
           - sh: ./Build/QTest.bin
