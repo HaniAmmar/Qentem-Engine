@@ -72,6 +72,14 @@ struct LiteStream {
         length_ = new_length;
     }
 
+    void InsertNull() {
+        if (capacity_ < length_) {
+            expand(capacity_ + SizeT{1});
+        }
+
+        storage_[length_] = char{0};
+    }
+
     QENTEM_INLINE void SetLength(SizeT length) noexcept {
         if (capacity_ < length) {
             expand(length);
