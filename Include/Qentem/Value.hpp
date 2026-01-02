@@ -7,7 +7,7 @@
  * enabling flexible and efficient handling of JSON-like data.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

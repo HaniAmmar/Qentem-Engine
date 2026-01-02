@@ -6,7 +6,7 @@
  * It is a foundational data structure used throughout the Qentem Engine library.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

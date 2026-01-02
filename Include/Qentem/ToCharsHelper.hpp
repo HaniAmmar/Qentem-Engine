@@ -13,7 +13,7 @@
  * across pointer and value categories. Supports safe fallback for unknown types via iteration-based rendering.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

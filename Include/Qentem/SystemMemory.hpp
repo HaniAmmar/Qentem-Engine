@@ -12,7 +12,7 @@
  * On unknown or freestanding platforms, it transparently falls back to malloc.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

@@ -20,7 +20,7 @@
  * true O(1) insertion, eviction, and index lookup — even in dynamic table scenarios.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

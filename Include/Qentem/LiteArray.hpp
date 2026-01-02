@@ -10,7 +10,7 @@
  * Use only within low-level memory components where minimal dependencies and overhead are required.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

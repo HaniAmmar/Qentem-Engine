@@ -8,7 +8,7 @@
  * features such as loops, conditionals, variables, and custom tag extensions.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

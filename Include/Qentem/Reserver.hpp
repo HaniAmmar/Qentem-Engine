@@ -27,7 +27,7 @@
  * @note    Depends on MemoryBlock and LiteArray. Behavior customizable via macros.
  *
  * @author  Hani Ammar
- * @date    2025
+ * @date    2026
  * @license MIT
  */
 

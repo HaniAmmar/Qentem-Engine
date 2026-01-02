@@ -13,7 +13,7 @@
  * @tparam Alignment_T The minimum alignment (and chunk size) in bytes.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT
  */
 

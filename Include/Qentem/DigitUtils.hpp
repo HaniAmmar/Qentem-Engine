@@ -12,7 +12,7 @@
  * speed and correctness, and may challenge your understanding of floating-point math.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  */
 

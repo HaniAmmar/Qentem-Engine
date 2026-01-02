@@ -29,7 +29,7 @@
  *   multiply, divide, and bitwise operations—fully documented and tested.
  *
  * @author Hani Ammar
- * @date 2025
+ * @date 2026
  * @copyright MIT License
  *
  * @note This implementation is tuned for unsigned integer limbs. Signed bignum support,
