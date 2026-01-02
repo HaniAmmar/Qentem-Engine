@@ -78,7 +78,7 @@ struct SystemMemory {
     #else
             #if defined(__linux__)
                 constexpr int no_access = 0;
-                return (SystemCall(__NR_mprotect, ptr, size, no_access) == 0);
+                return (SystemCall(__NR_mprotect, reinterpret_cast<long>(ptr), size, no_access) == 0);
             #else
                 return (::mprotect(ptr, size, PROT_NONE) == 0);
             #endif
@@ -130,7 +130,7 @@ struct SystemMemory {
             ::VirtualFree(ptr, 0, MEM_RELEASE);
     #else
         #if defined(__linux__)
-            SystemCall(__NR_munmap,ptr, size);
+            SystemCall(__NR_munmap,reinterpret_cast<long>(ptr), size);
         #else
             ::munmap(ptr, size);
         #endif
@@ -162,7 +162,7 @@ struct SystemMemory {
         // clang-format off
     #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
         #if defined(__linux__)
-            SystemCall(__NR_munmap,start, size);
+            SystemCall(__NR_munmap,reinterpret_cast<long>(start), size);
         #else
             ::munmap(start, size);
         #endif

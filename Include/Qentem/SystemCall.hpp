@@ -376,37 +376,38 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
  * @param v1..v6           Optional syscall arguments.
  * @return Kernel return value (negative indicates -errno).
  */
-template <typename Var1_T = long>
+template <typename Var1_T>
 QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1) noexcept {
-    return SystemCall_(name, (long)v1);
+    return SystemCall_(name, static_cast<long>(v1));
 }
 
-template <typename Var1_T = long, typename Var2_T = long>
+template <typename Var1_T, typename Var2_T>
 QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2) noexcept {
-    return SystemCall_(name, (long)v1, (long)v2);
+    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2));
 }
 
-template <typename Var1_T = long, typename Var2_T = long, typename Var3_T = long>
+template <typename Var1_T, typename Var2_T, typename Var3_T>
 QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3) noexcept {
-    return SystemCall_(name, (long)v1, (long)v2, (long)v3);
+    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3));
 }
 
-template <typename Var1_T = long, typename Var2_T = long, typename Var3_T = long, typename Var4_T = long>
+template <typename Var1_T, typename Var2_T, typename Var3_T, typename Var4_T>
 QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4) noexcept {
-    return SystemCall_(name, (long)v1, (long)v2, (long)v3, (long)v4);
+    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3),
+                       static_cast<long>(v4));
 }
 
-template <typename Var1_T = long, typename Var2_T = long, typename Var3_T = long, typename Var4_T = long,
-          typename Var5_T = long>
+template <typename Var1_T, typename Var2_T, typename Var3_T, typename Var4_T, typename Var5_T>
 QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4, Var5_T v5) noexcept {
-    return SystemCall_(name, (long)v1, (long)v2, (long)v3, (long)v4, (long)v5);
+    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3), static_cast<long>(v4),
+                       static_cast<long>(v5));
 }
 
-template <typename Var1_T = long, typename Var2_T = long, typename Var3_T = long, typename Var4_T = long,
-          typename Var5_T = long, typename Var6_T = long>
+template <typename Var1_T, typename Var2_T, typename Var3_T, typename Var4_T, typename Var5_T, typename Var6_T>
 QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4, Var5_T v5,
                                             Var6_T v6) noexcept {
-    return SystemCall_(name, (long)v1, (long)v2, (long)v3, (long)v4, (long)v5, (long)v6);
+    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3), static_cast<long>(v4),
+                       static_cast<long>(v5), static_cast<long>(v6));
 }
 
 } // namespace Qentem

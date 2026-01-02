@@ -103,7 +103,7 @@ struct QConsole {
         DWORD written = 0;
         ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), data, length, &written, nullptr);
 #elif defined(__linux__)
-        SystemCall(__NR_write, 1, data, length);
+        SystemCall(__NR_write, 1, reinterpret_cast<long>(data), length);
 #else
         ::write(1, data, length); // stdout
 #endif
