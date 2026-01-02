@@ -189,12 +189,12 @@ struct SystemMemory {
         GetSystemInfo(&info);
         return static_cast<SystemLong>(info.dwPageSize);
     #else
-        struct {
-            SystemLong Type;
-            SystemLong Value;
-        } aux;
-
         #if defined(__linux__)
+            struct {
+                SystemLong Type;
+                SystemLong Value;
+            } aux;
+
             constexpr int at_fdcwd      = -100; // AT_FDCWD
             constexpr int read_only     = 0;    // O_RDONLY
             constexpr int page_size_id  = 6;    // AT_PAGESZ
