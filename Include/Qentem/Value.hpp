@@ -43,8 +43,8 @@ struct Value {
 
     using StringT     = String<Char_T>;
     using StringViewT = StringView<Char_T>;
-    using ArrayT      = Array<Value, 8>;
-    using ObjectT     = HArray<StringT, Value, 8>;
+    using ArrayT      = Array<Value, QENTEM_VALUE_EXPANSION_MULTIPLIER>;
+    using ObjectT     = HArray<StringT, Value, QENTEM_VALUE_EXPANSION_MULTIPLIER>;
 
     Value() noexcept : array_{} {
     }

@@ -159,7 +159,24 @@ union PtrCast_T {
 //              Configuration Macros (Overridable)           //
 ///////////////////////////////////////////////////////////////
 #ifndef QENTEM_MAX_CPU_CORES
-#define QENTEM_MAX_CPU_CORES 128
+#define QENTEM_MAX_CPU_CORES 128U
+#endif
+
+/**
+ * @brief Default expansion multiplier used by Value-owned containers.
+ *
+ * This macro defines the growth factor applied to dynamic containers
+ * (such as Array and HArray) instantiated inside the Value type.
+ *
+ * A higher multiplier is intentionally chosen to reduce reallocations
+ * and rehashing during incremental construction of JSON-like structures,
+ * where the final size is often unknown at insertion time.
+ *
+ * This value can be overridden at compile time to tune memory growth
+ * behavior for specific workloads or constrained environments.
+ */
+#ifndef QENTEM_VALUE_EXPANSION_MULTIPLIER
+#define QENTEM_VALUE_EXPANSION_MULTIPLIER 8U
 #endif
 
 #ifndef QENTEM_ENABLE_FLOAT_16

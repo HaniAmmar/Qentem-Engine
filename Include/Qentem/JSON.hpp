@@ -113,8 +113,9 @@ struct JSON {
 
                                 if (c == NotationConstants::ECurlyChar) {
                                     ++offset;
+#if QENTEM_VALUE_EXPANSION_MULTIPLIER > 2
                                     obj->RemoveExcessStorage();
-
+#endif
                                     return value;
                                 }
                             }
