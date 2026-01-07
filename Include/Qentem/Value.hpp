@@ -1973,10 +1973,10 @@ struct Value {
 
         if (type == ValueType::Array) {
             StringStream<Char_T> stream;
-            ObjectT              new_sub_obj;
-            const Value         *item_   = array_.First();
-            const Char_T        *str     = nullptr;
-            SizeT                str_len = 0;
+            Value                sub_valu;
+            const Value         *item_ = array_.First();
+            const Char_T        *str;
+            SizeT                str_len;
             SizeT                grouped_key_index;
 
             groupedValue.reset();
@@ -1988,15 +1988,16 @@ struct Value {
 
                 while (item_ != end) {
                     if ((item_ != nullptr) && item_->isObject()) {
-                        SizeT count = 0;
-
                         const VItem *obj_item = item_->object_.First();
                         const VItem *obj_end  = item_->object_.End();
+                        SizeT        count    = 0;
+
+                        sub_valu.setTypeToObject();
 
                         while (obj_item != obj_end) {
                             if ((obj_item != nullptr) && !(obj_item->Value.isUndefined())) {
                                 if (count != grouped_key_index) {
-                                    new_sub_obj[obj_item->Key] = obj_item->Value;
+                                    sub_valu.object_[obj_item->Key] = obj_item->Value;
                                 } else if (!(obj_item->Value.SetCharAndLength(str, str_len))) {
                                     stream.Clear();
 
@@ -2010,23 +2011,31 @@ struct Value {
 
                                 ++count;
                                 ++obj_item;
+
                                 continue;
                             }
 
                             return false;
                         }
 
-                        new_sub_obj.Compress();
-                        groupedValue.object_.Get(str, str_len) += QUtility::Move(new_sub_obj);
+                        Value &tmp = groupedValue.object_.Get(str, str_len);
+
+                        if (!(tmp.isArray())) {
+                            tmp.setTypeToArray();
+                        }
+
+                        tmp.array_ += QUtility::Move(sub_valu);
 
                         ++item_;
+
                         continue;
                     }
 
                     return false;
                 }
 
-                groupedValue.Compress();
+                groupedValue.RemoveExcessStorage();
+
                 return true;
             }
         } else if (type == ValueType::ValuePtr) {
