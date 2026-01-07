@@ -1934,6 +1934,36 @@ struct Value {
         }
     }
 
+    void RemoveExcessStorage() {
+        if (isArray()) {
+            array_.Compress();
+
+            Value       *src_val = array_.Storage();
+            const Value *src_end = array_.End();
+
+            while (src_val < src_end) {
+                if (src_val->isArray() || src_val->isObject()) {
+                    src_val->RemoveExcessStorage();
+                }
+
+                ++src_val;
+            }
+        } else if (isObject()) {
+            object_.RemoveExcessStorage();
+
+            VItem       *src_val = object_.Storage();
+            const VItem *src_end = (src_val + object_.Size());
+
+            while (src_val < src_end) {
+                if (src_val->Value.isArray() || src_val->Value.isObject()) {
+                    src_val->Value.RemoveExcessStorage();
+                }
+
+                ++src_val;
+            }
+        }
+    }
+
     QENTEM_INLINE ValueType Type() const noexcept {
         return type_;
     }
