@@ -1605,7 +1605,7 @@ struct Value {
     }
 
     template <typename StringStream_T>
-    using CopyValueToStringFunction_T = void(StringStream_T, const Char_T *, SizeT);
+    using CopyValueToStringFunction_T = void(StringStream_T &, const Char_T *, SizeT);
 
     template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>>
     bool CopyValueTo(StringStream_T             &stream,
