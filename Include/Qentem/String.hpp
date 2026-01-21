@@ -183,10 +183,6 @@ struct String {
         return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
     }
 
-    QENTEM_INLINE bool IsEqual(const Char_T *str, const SizeT length) const noexcept {
-        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
-    }
-
     QENTEM_INLINE bool operator!=(const String &string) const noexcept {
         return (!(*this == string));
     }
@@ -229,6 +225,14 @@ struct String {
 
     QENTEM_INLINE bool operator>=(const Char_T *str) const noexcept {
         return StringUtils::IsGreater(First(), str, Length(), StringUtils::Count(str), true);
+    }
+
+    QENTEM_INLINE bool IsEqual(const Char_T *str, const SizeT length) const noexcept {
+        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
+    }
+
+    QENTEM_INLINE bool IsNotEqual(const Char_T *str, const SizeT length) const noexcept {
+        return ((Length() != length) || !(StringUtils::IsEqual(First(), str, length)));
     }
 
     void Write(Char_T ch) {

@@ -134,6 +134,10 @@ struct StringView {
         return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
     }
 
+    QENTEM_INLINE bool IsNotEqual(const Char_T *str, const SizeT length) const noexcept {
+        return ((Length() != length) || !(StringUtils::IsEqual(First(), str, length)));
+    }
+
     void Reset() noexcept {
         clearStorage();
         clearLength();
