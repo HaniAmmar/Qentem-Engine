@@ -300,23 +300,17 @@ struct StringStream {
     }
 
     String<Char_T> GetString() {
+        String<Char_T> new_str{};
+        const SizeT    length = Length(); // Detach() resets Length.
+
         if (Capacity() > Length()) {
-            const SizeT length  = Length(); // Detach() resets Length.
-            Storage()[Length()] = Char_T{0};
-
             Reserver::Shrink(Storage(), Capacity(), (Length() + SizeT{1}));
-
-            String<Char_T> a_string{};
-            a_string.Adopt(Detach(), length, length);
-
-            return a_string;
         }
 
-        String<Char_T> str{First(), Length()};
+        InsertNull();
+        new_str.Adopt(Detach(), length, length);
 
-        Reset();
-
-        return str;
+        return new_str;
     }
 
     Char_T *Detach() noexcept {
