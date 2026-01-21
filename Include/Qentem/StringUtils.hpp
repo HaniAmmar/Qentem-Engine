@@ -161,7 +161,7 @@ struct StringUtils {
                        bool orEqual) noexcept {
         SizeT offset = 0;
 
-        while ((left_length > offset) && (right_length > offset)) {
+        while ((offset < left_length) && (offset < right_length)) {
             if (left[offset] > right[offset]) {
                 return false;
             }
@@ -181,7 +181,7 @@ struct StringUtils {
                           bool orEqual) noexcept {
         SizeT offset = 0;
 
-        while ((left_length > offset) && (right_length > offset)) {
+        while ((offset < left_length) && (offset < right_length)) {
             if (left[offset] < right[offset]) {
                 return false;
             }
@@ -201,7 +201,7 @@ struct StringUtils {
         SizeT offset = 0;
 
         // if ((left != nullptr) && (right != nullptr)) {
-        while ((length > offset) && (left[offset] == right[offset])) {
+        while ((offset < length) && (left[offset] == right[offset])) {
             ++offset;
         }
         // }
