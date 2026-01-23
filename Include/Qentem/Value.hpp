@@ -14,11 +14,11 @@
 #ifndef QENTEM_VALUE_H
 #define QENTEM_VALUE_H
 
-#include "StringStream.hpp"
-#include "QNumber.hpp"
-#include "Array.hpp"
-#include "HArray.hpp"
-#include "JSONUtils.hpp"
+#include "Qentem/StringStream.hpp"
+#include "Qentem/QNumber.hpp"
+#include "Qentem/Array.hpp"
+#include "Qentem/HArray.hpp"
+#include "Qentem/JSONUtils.hpp"
 
 namespace Qentem {
 

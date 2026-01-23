@@ -17,8 +17,8 @@
 #ifndef QENTEM_LITE_ARRAY_H
 #define QENTEM_LITE_ARRAY_H
 
-#include "SystemMemory.hpp"
-#include "MemoryUtils.hpp"
+#include "Qentem/SystemMemory.hpp"
+#include "Qentem/MemoryUtils.hpp"
 
 namespace Qentem {
 

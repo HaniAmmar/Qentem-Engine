@@ -18,9 +18,9 @@
 #ifndef QENTEM_Q_EXPRESSION_H
 #define QENTEM_Q_EXPRESSION_H
 
-#include "QNumber.hpp"
-#include "VariableTag.hpp"
-#include "Array.hpp"
+#include "Qentem/QNumber.hpp"
+#include "Qentem/VariableTag.hpp"
+#include "Qentem/Array.hpp"
 
 namespace Qentem {
 

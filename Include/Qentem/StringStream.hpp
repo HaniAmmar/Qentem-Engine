@@ -15,7 +15,7 @@
 #ifndef QENTEM_STRINGSTREAM_H
 #define QENTEM_STRINGSTREAM_H
 
-#include "String.hpp"
+#include "Qentem/String.hpp"
 
 namespace Qentem {
 /*

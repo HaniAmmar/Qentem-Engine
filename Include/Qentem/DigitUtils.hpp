@@ -19,7 +19,7 @@
 #ifndef QENTEM_DIGIT_UTILS_H
 #define QENTEM_DIGIT_UTILS_H
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 namespace Qentem {
 namespace DigitUtils {

@@ -15,8 +15,8 @@
 #ifndef QENTEM_TAGS_H
 #define QENTEM_TAGS_H
 
-#include "QExpression.hpp"
-#include "VariableTag.hpp"
+#include "Qentem/QExpression.hpp"
+#include "Qentem/VariableTag.hpp"
 
 namespace Qentem {
 namespace Tags {

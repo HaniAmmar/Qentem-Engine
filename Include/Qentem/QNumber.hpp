@@ -14,7 +14,7 @@
 #ifndef QENTEM_Q_NUMBER_H
 #define QENTEM_Q_NUMBER_H
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 namespace Qentem {
 

@@ -15,10 +15,10 @@
 #ifndef QENTEM_DIGIT_H
 #define QENTEM_DIGIT_H
 
-#include "QNumber.hpp"
-#include "BigInt.hpp"
-#include "DigitUtils.hpp"
-#include "StringUtils.hpp"
+#include "Qentem/QNumber.hpp"
+#include "Qentem/BigInt.hpp"
+#include "Qentem/DigitUtils.hpp"
+#include "Qentem/StringUtils.hpp"
 
 namespace Qentem {
 

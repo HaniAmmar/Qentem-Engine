@@ -15,8 +15,8 @@
 #ifndef QENTEM_JSON_UTILS_H
 #define QENTEM_JSON_UTILS_H
 
-#include "Digit.hpp"
-#include "Unicode.hpp"
+#include "Qentem/Digit.hpp"
+#include "Qentem/Unicode.hpp"
 
 namespace Qentem {
 

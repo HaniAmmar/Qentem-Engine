@@ -19,8 +19,8 @@
 #ifndef QENTEM_STRING_H
 #define QENTEM_STRING_H
 
-#include "StringView.hpp"
-#include "Reserver.hpp"
+#include "Qentem/StringView.hpp"
+#include "Qentem/Reserver.hpp"
 
 namespace Qentem {
 /*

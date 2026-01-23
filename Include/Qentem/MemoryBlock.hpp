@@ -20,8 +20,8 @@
 #ifndef QENTEM_MEMORY_BLOCK_HPP
 #define QENTEM_MEMORY_BLOCK_HPP
 
-#include "SystemMemory.hpp"
-#include "Platform.hpp"
+#include "Qentem/SystemMemory.hpp"
+#include "Qentem/Platform.hpp"
 
 namespace Qentem {
 

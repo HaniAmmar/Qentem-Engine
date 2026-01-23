@@ -15,7 +15,7 @@
 #ifndef QENTEM_MEMORY_UTILS_H
 #define QENTEM_MEMORY_UTILS_H
 
-#include "Platform.hpp"
+#include "Qentem/Platform.hpp"
 
 #ifndef QENTEM_NO_CUSTOM_PLACEMENT_NEW
 inline QENTEM_INLINE void *operator new(Qentem::SystemLong, void *pointer, bool) noexcept {

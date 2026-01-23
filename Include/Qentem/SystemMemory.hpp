@@ -19,7 +19,7 @@
 #ifndef QENTEM_SYSTEM_MEMORY_HPP
 #define QENTEM_SYSTEM_MEMORY_HPP
 
-#include "Platform.hpp"
+#include "Qentem/Platform.hpp"
 
 // clang-format off
 #if defined(_WIN32)
@@ -29,7 +29,7 @@
 
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #if defined(__linux__)
-        #include "SystemCall.hpp"
+        #include "Qentem/SystemCall.hpp"
         #include <linux/mman.h>
     #else
         // POSIX-style platforms: mmap, sysconf, etc.

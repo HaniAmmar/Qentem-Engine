@@ -18,10 +18,10 @@
 #ifndef QENTEM_TEMPLATE_H
 #define QENTEM_TEMPLATE_H
 
-#include "PatternFinder.hpp"
-#include "Digit.hpp"
-#include "Tags.hpp"
-#include "StringView.hpp"
+#include "Qentem/PatternFinder.hpp"
+#include "Qentem/Digit.hpp"
+#include "Qentem/Tags.hpp"
+#include "Qentem/StringView.hpp"
 
 namespace Qentem {
 

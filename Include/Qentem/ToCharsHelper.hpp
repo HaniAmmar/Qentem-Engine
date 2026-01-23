@@ -20,10 +20,10 @@
 #ifndef QENTEM_TO_CHARS_HELPER_H
 #define QENTEM_TO_CHARS_HELPER_H
 
-#include "Digit.hpp"
-#include "QTraits.hpp"
-#include "Unicode.hpp"
-#include "StringUtils.hpp"
+#include "Qentem/Digit.hpp"
+#include "Qentem/QTraits.hpp"
+#include "Qentem/Unicode.hpp"
+#include "Qentem/StringUtils.hpp"
 
 namespace Qentem {
 

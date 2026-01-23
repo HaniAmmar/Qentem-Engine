@@ -34,12 +34,12 @@
 #ifndef QENTEM_RESERVER_HPP
 #define QENTEM_RESERVER_HPP
 
-#include "MemoryBlock.hpp"
-#include "LiteArray.hpp"
-#include "CPUHelper.hpp"
+#include "Qentem/MemoryBlock.hpp"
+#include "Qentem/LiteArray.hpp"
+#include "Qentem/CPUHelper.hpp"
 
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
-#include "MemoryRecord.hpp"
+#include "Qentem/MemoryRecord.hpp"
 #endif
 
 /// TODO: NUMA-awareness

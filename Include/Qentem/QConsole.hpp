@@ -7,13 +7,13 @@
 #define NOMINMAX
 #include <windows.h>
 #elif defined(__linux__)
-#include "SystemCall.hpp"
+#include "Qentem/SystemCall.hpp"
 #else
 #include <unistd.h>
 #endif
 
-#include "ToCharsHelper.hpp"
-#include "LiteStream.hpp"
+#include "Qentem/ToCharsHelper.hpp"
+#include "Qentem/LiteStream.hpp"
 
 namespace Qentem {
 

@@ -13,7 +13,7 @@
 #ifndef QENTEM_VARIABLE_TAG_H
 #define QENTEM_VARIABLE_TAG_H
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 namespace Qentem {
 namespace Tags {

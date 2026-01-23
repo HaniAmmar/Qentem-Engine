@@ -14,7 +14,7 @@
 #ifndef QENTEM_COMMON_H
 #define QENTEM_COMMON_H
 
-#include "QUtility.hpp"
+#include "Qentem/QUtility.hpp"
 
 namespace Qentem {
 

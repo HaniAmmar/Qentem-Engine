@@ -17,8 +17,8 @@
 #ifndef QENTEM_LITE_STREAM_H
 #define QENTEM_LITE_STREAM_H
 
-#include "SystemMemory.hpp"
-#include "StringUtils.hpp"
+#include "Qentem/SystemMemory.hpp"
+#include "Qentem/StringUtils.hpp"
 
 namespace Qentem {
 

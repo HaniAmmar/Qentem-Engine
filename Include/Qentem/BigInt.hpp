@@ -37,7 +37,7 @@
  * @note For best performance, prefer 32- or 64-bit limbs on modern hardware.
  *
  * @usage
- *     #include "BigInt.hpp"
+ *     #include "Qentem/BigInt.hpp"
  *     using Qentem::BigInt;
  *
  *     // 128-bit unsigned integer using 64-bit limbs:
@@ -49,7 +49,7 @@
 #ifndef QENTEM_BIG_INT_H
 #define QENTEM_BIG_INT_H
 
-#include "Platform.hpp"
+#include "Qentem/Platform.hpp"
 
 namespace Qentem {
 // Width_T is the total number of bits to represent.

@@ -15,7 +15,7 @@
 #ifndef QENTEM_H_LIST_H
 #define QENTEM_H_LIST_H
 
-#include "HashTableAdapters.hpp"
+#include "Qentem/HashTableAdapters.hpp"
 
 namespace Qentem {
 

@@ -20,7 +20,7 @@
 
 #if defined(__linux__)
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 #include <linux/unistd.h>
 #include <linux/errno.h>

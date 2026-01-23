@@ -20,7 +20,7 @@
 #ifndef QENTEM_HARRAY_H
 #define QENTEM_HARRAY_H
 
-#include "HashTableAdapters.hpp"
+#include "Qentem/HashTableAdapters.hpp"
 
 namespace Qentem {
 

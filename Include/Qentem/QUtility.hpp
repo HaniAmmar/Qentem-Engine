@@ -19,7 +19,7 @@
 #ifndef QENTEM_UTILITY_H
 #define QENTEM_UTILITY_H
 
-#include "QTraits.hpp"
+#include "Qentem/QTraits.hpp"
 
 ///////////////////////////////////////////////////////////////
 //               Compiler Intrinsic Macros                   //

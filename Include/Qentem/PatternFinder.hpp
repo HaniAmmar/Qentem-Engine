@@ -15,7 +15,7 @@
 #ifndef QENTEM_FINDER_H
 #define QENTEM_FINDER_H
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 namespace Qentem {
 

@@ -15,7 +15,7 @@
 #ifndef QENTEM_STRING_VIEW_H
 #define QENTEM_STRING_VIEW_H
 
-#include "StringUtils.hpp"
+#include "Qentem/StringUtils.hpp"
 
 namespace Qentem {
 

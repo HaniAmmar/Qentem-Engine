@@ -14,11 +14,11 @@
 #ifndef QENTEM_HASH_TABLE_ADAPTERS_H
 #define QENTEM_HASH_TABLE_ADAPTERS_H
 
-#include "QTraits.hpp"
-#include "HashTable.hpp"
-#include "QNumber.hpp"
-#include "StringUtils.hpp"
-#include "StringView.hpp"
+#include "Qentem/QTraits.hpp"
+#include "Qentem/HashTable.hpp"
+#include "Qentem/QNumber.hpp"
+#include "Qentem/StringUtils.hpp"
+#include "Qentem/StringView.hpp"
 
 namespace Qentem {
 

@@ -2,7 +2,7 @@
 #ifndef QENTEM_MEMORY_RECORD_HPP
 #define QENTEM_MEMORY_RECORD_HPP
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 namespace Qentem {
 

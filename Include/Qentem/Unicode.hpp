@@ -22,7 +22,7 @@
 #ifndef QENTEM_UNICODE_H
 #define QENTEM_UNICODE_H
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 namespace Qentem {
 struct Unicode {

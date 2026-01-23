@@ -14,7 +14,7 @@
 #ifndef QENTEM_STRING_UTILS_H
 #define QENTEM_STRING_UTILS_H
 
-#include "QCommon.hpp"
+#include "Qentem/QCommon.hpp"
 
 namespace Qentem {
 

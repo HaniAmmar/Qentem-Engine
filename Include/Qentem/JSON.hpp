@@ -15,7 +15,7 @@
 #ifndef QENTEM_JSON_H
 #define QENTEM_JSON_H
 
-#include "Value.hpp"
+#include "Qentem/Value.hpp"
 
 namespace Qentem {
 

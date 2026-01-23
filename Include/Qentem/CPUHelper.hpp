@@ -18,13 +18,13 @@
 #ifndef QENTEM_CPU_HELPER_HPP
 #define QENTEM_CPU_HELPER_HPP
 
-#include "Platform.hpp"
+#include "Qentem/Platform.hpp"
 
 #if defined(_WIN32)
 #define NOMINMAX
 #include <windows.h> // GetSystemInfo
 #elif defined(__linux__)
-#include "SystemCall.hpp"
+#include "Qentem/SystemCall.hpp"
 #else
 #include <sched.h>  // sched_setaffinity
 #include <unistd.h> // sysconf
