@@ -39,8 +39,11 @@ struct CPUSet {
     static constexpr SizeT32    SHIFT     = (BIT_WIDTH == SystemLong{64} ? 6U : 5U);
 
     QENTEM_INLINE void Clear() noexcept {
-        for (SystemLong i = 0; i < SIZE; ++i) {
-            mask_[i] = 0;
+        SystemLong index = SIZE;
+
+        while (index != 0) {
+            --index;
+            mask_[index] = 0;
         }
     }
 
@@ -84,6 +87,10 @@ struct CPUSet {
     }
 
     QENTEM_INLINE constexpr SystemLong Size() const noexcept {
+        return SIZE;
+    }
+
+    QENTEM_INLINE constexpr SystemLong TotalBytes() const noexcept {
         return (SIZE * sizeof(SystemLong));
     }
 
@@ -157,7 +164,7 @@ struct CPUHelper {
         cores.Set(core_id);
 
         // 0 = current thread
-        const long ret = setAffinity(0, cores.Size(), cores.Data());
+        const long ret = setAffinity(0, cores.TotalBytes(), cores.Data());
 
         return (ret == 0);
 #elif defined(_WIN32)
@@ -189,10 +196,8 @@ struct CPUHelper {
      *         `false` otherwise.
      */
     QENTEM_INLINE static bool OnlineCoresMask(CPUSet &mask) noexcept {
-        mask.Clear();
-
 #if defined(__linux__)
-        if (SystemCall(__NR_sched_getaffinity, 0, mask.Size(), reinterpret_cast<long>(mask.Data())) >= 0) {
+        if (SystemCall(__NR_sched_getaffinity, 0, mask.TotalBytes(), reinterpret_cast<long>(mask.Data())) >= 0) {
             return true;
         }
 #else
@@ -257,7 +262,8 @@ struct CPUHelper {
      * @return Number of online logical cores available to the process (>= 1).
      */
     QENTEM_INLINE static SizeT32 onlineCoresCount() noexcept {
-        CPUSet cores;
+        CPUSet cores{};
+        cores.Clear();
 
         if (OnlineCoresMask(cores)) {
             SizeT32 count = 0;
