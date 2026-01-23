@@ -19,90 +19,6 @@
 namespace Qentem {
 
 ///////////////////////////////////////////////////////////////
-//               Type Width Detection (32/64-bit)            //
-///////////////////////////////////////////////////////////////
-
-template <unsigned>
-struct SystemIntDefs {};
-
-template <>
-struct SystemIntDefs<8U> {
-    // 64-bit
-    using SizeT32  = unsigned int;
-    using SizeT32I = int;
-
-#ifdef _MSC_VER
-    using SizeT64  = unsigned long long;
-    using SizeT64I = long long;
-#else
-    using SizeT64  = unsigned long;
-    using SizeT64I = long;
-#endif
-};
-
-template <>
-struct SystemIntDefs<4U> {
-    // 32-bit
-    using SizeT32  = unsigned int;
-    using SizeT32I = int;
-    using SizeT64  = unsigned long long;
-    using SizeT64I = long long;
-};
-
-using NullType = decltype(nullptr);
-
-using SizeT8   = unsigned char;
-using SizeT8I  = signed char;
-using SizeT16  = unsigned short;
-using SizeT16I = short;
-
-using SizeT32  = SystemIntDefs<sizeof(void *)>::SizeT32;
-using SizeT32I = SystemIntDefs<sizeof(void *)>::SizeT32I;
-using SizeT64  = SystemIntDefs<sizeof(void *)>::SizeT64;
-using SizeT64I = SystemIntDefs<sizeof(void *)>::SizeT64I;
-
-///////////////////////////////////////////////////////////////
-//                   System Integer Type                     //
-///////////////////////////////////////////////////////////////
-
-template <SizeT32>
-struct SystemIntTypeT {};
-
-template <>
-struct SystemIntTypeT<8U> {
-    using NumberType  = SizeT64;
-    using NumberTypeI = SizeT64I;
-    using SizeType    = SizeT32;
-};
-
-template <>
-struct SystemIntTypeT<4U> {
-    using NumberType  = SizeT32;
-    using NumberTypeI = SizeT32I;
-    using SizeType    = SizeT32;
-};
-
-using SystemIntTypes = SystemIntTypeT<sizeof(void *)>;
-
-#ifndef QENTEM_SIZE_T
-#define QENTEM_SIZE_T SystemIntTypes::SizeType
-#endif
-
-using SizeT       = QENTEM_SIZE_T;
-using SystemLong  = SystemIntTypes::NumberType;
-using SystemLongI = SystemIntTypes::NumberTypeI;
-
-///////////////////////////////////////////////////////////////
-//                    Pointer Casting                        //
-///////////////////////////////////////////////////////////////
-
-template <typename Type_T>
-union PtrCast_T {
-    Type_T    *Pointer;
-    SystemLong Number;
-};
-
-///////////////////////////////////////////////////////////////
 //                  Reserver Configuration                  //
 ///////////////////////////////////////////////////////////////
 /// Fallback page size (4KiB) used if system page size cannot be queried.
@@ -198,6 +114,90 @@ union PtrCast_T {
 #ifndef QENTEM_TEMPLATE_DOUBLE_FORMAT
 #define QENTEM_TEMPLATE_DOUBLE_FORMAT Digit::RealFormatType::SemiFixed // Default, Fixed, SemiFixed
 #endif
+
+///////////////////////////////////////////////////////////////
+//               Type Width Detection (32/64-bit)            //
+///////////////////////////////////////////////////////////////
+
+template <unsigned>
+struct SystemIntDefs {};
+
+template <>
+struct SystemIntDefs<8U> {
+    // 64-bit
+    using SizeT32  = unsigned int;
+    using SizeT32I = int;
+
+#ifdef _MSC_VER
+    using SizeT64  = unsigned long long;
+    using SizeT64I = long long;
+#else
+    using SizeT64  = unsigned long;
+    using SizeT64I = long;
+#endif
+};
+
+template <>
+struct SystemIntDefs<4U> {
+    // 32-bit
+    using SizeT32  = unsigned int;
+    using SizeT32I = int;
+    using SizeT64  = unsigned long long;
+    using SizeT64I = long long;
+};
+
+using NullType = decltype(nullptr);
+
+using SizeT8   = unsigned char;
+using SizeT8I  = signed char;
+using SizeT16  = unsigned short;
+using SizeT16I = short;
+
+using SizeT32  = SystemIntDefs<sizeof(void *)>::SizeT32;
+using SizeT32I = SystemIntDefs<sizeof(void *)>::SizeT32I;
+using SizeT64  = SystemIntDefs<sizeof(void *)>::SizeT64;
+using SizeT64I = SystemIntDefs<sizeof(void *)>::SizeT64I;
+
+///////////////////////////////////////////////////////////////
+//                   System Integer Type                     //
+///////////////////////////////////////////////////////////////
+
+template <SizeT32>
+struct SystemIntTypeT {};
+
+template <>
+struct SystemIntTypeT<8U> {
+    using NumberType  = SizeT64;
+    using NumberTypeI = SizeT64I;
+    using SizeType    = SizeT32;
+};
+
+template <>
+struct SystemIntTypeT<4U> {
+    using NumberType  = SizeT32;
+    using NumberTypeI = SizeT32I;
+    using SizeType    = SizeT32;
+};
+
+using SystemIntTypes = SystemIntTypeT<sizeof(void *)>;
+
+#ifndef QENTEM_SIZE_T
+#define QENTEM_SIZE_T SystemIntTypes::SizeType
+#endif
+
+using SizeT       = QENTEM_SIZE_T;
+using SystemLong  = SystemIntTypes::NumberType;
+using SystemLongI = SystemIntTypes::NumberTypeI;
+
+///////////////////////////////////////////////////////////////
+//                    Pointer Casting                        //
+///////////////////////////////////////////////////////////////
+
+template <typename Type_T>
+union PtrCast_T {
+    Type_T    *Pointer;
+    SystemLong Number;
+};
 
 ///////////////////////////////////////////////////////////////
 //                 Qentem Build Configuration                //
