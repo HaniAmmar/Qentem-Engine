@@ -87,6 +87,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(ArrayTest --coverage)
 endif()
 
+# QPool
+add_executable(QPoolTest Tests/QPoolTest.cpp)
+add_test(NAME QPoolTest COMMAND QPoolTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(QPoolTest --coverage)
+endif()
+
 # Deque
 add_executable(DequeTest Tests/DequeTest.cpp)
 add_test(NAME DequeTest COMMAND DequeTest)

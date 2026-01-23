@@ -34,6 +34,7 @@ int main() {
     //     Test::RunStringTests();
     //     Test::RunStringStreamTests();
     //     Test::RunArrayTests();
+    //     Test::RunQPoolTests();
     //     Test::RunDequeTests();
     //     Test::RunBigIntTests();
     //     Test::RunDigitTests();

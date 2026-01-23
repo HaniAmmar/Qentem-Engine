@@ -31,6 +31,7 @@
 #include "StringTest.hpp"
 #include "StringStreamTest.hpp"
 #include "ArrayTest.hpp"
+#include "QPoolTest.hpp"
 #include "DequeTest.hpp"
 #include "BigIntTest.hpp"
 #include "DigitTest.hpp"
@@ -118,6 +119,7 @@ static int RunTests() {
     ((Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
     ((Test::RunArrayTests() == 0) ? ++passed : ++failed);
+    ((Test::RunQPoolTests() == 0) ? ++passed : ++failed);
     ((Test::RunDequeTests() == 0) ? ++passed : ++failed);
     ((Test::RunBigIntTests() == 0) ? ++passed : ++failed);
     ((Test::RunDigitTests() == 0) ? ++passed : ++failed);
