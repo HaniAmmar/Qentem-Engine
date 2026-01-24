@@ -407,7 +407,7 @@ static void TestStringStream2(QTest &test) {
     test.IsEqual(*(stream.End()), '8', __LINE__);
 
     stream = "56789";
-    stream.ShiftRight(5);
+    StringUtils::ShiftRight(stream, 5);
 
     test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
     test.IsEqual(stream, "5678956789", __LINE__);
@@ -438,7 +438,7 @@ static void TestStringStream2(QTest &test) {
     stream.Reset();
     stream = "56";
     stream += "789";
-    stream.ShiftRight(5);
+    StringUtils::ShiftRight(stream, 5);
 
     stream.Storage()[0] = '0';
     stream.Storage()[1] = '1';
@@ -455,10 +455,24 @@ static void TestStringStream2(QTest &test) {
     test.IsTrue(stream.Capacity() >= SizeT{128}, __LINE__);
 
     stream = "0123456789";
-    stream.ShiftRight(10);
+    StringUtils::ShiftRight(stream, 10);
 
     test.IsEqual(stream.Length(), SizeT{20}, __LINE__);
     test.IsEqual(stream, "01234567890123456789", __LINE__);
+
+    stream = "56789";
+    StringUtils::ShiftRight(stream, 1, 0);
+    stream.Storage()[0] = '4';
+    test.IsEqual(stream, "456789", __LINE__);
+
+    StringUtils::ShiftRight(stream, 3, 0);
+    MemoryUtils::CopyTo(stream.Storage(), "123", SizeT{3});
+    test.IsEqual(stream, "123456789", __LINE__);
+
+    stream = "123789";
+    StringUtils::ShiftRight(stream, 3, 3);
+    MemoryUtils::CopyTo((stream.Storage() + SizeT{3}), "456", SizeT{3});
+    test.IsEqual(stream, "123456789", __LINE__);
 }
 
 static int RunStringStreamTests() {

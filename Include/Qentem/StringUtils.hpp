@@ -96,6 +96,24 @@ struct StringUtils {
         }
     }
 
+    template <typename Stream_T>
+    static void ShiftRight(Stream_T &stream, SizeT shift, SizeT start_at = 0) {
+        if (start_at < stream.Length()) {
+            stream.SetLength(stream.Length() + shift);
+            SizeT offset  = (stream.Length() - SizeT{1});
+            SizeT offset2 = (offset - shift);
+
+            typename Stream_T::CharType *storage = stream.Storage();
+
+            while ((offset2 >= start_at) && (offset >= shift)) {
+                storage[offset] = storage[offset2];
+                --offset;
+
+                offset2 = (offset - shift);
+            }
+        }
+    }
+
     template <typename Char_T, typename Number_T>
     QENTEM_INLINE static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
         using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;

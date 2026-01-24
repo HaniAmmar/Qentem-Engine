@@ -333,41 +333,6 @@ struct StringStream {
         StringUtils::Reverse(Storage(), start, Length());
     }
 
-    void ShiftRight(SizeT shift) {
-        if ((shift != 0) && IsNotEmpty()) {
-            const SizeT old_length = Length();
-            const SizeT new_length = (old_length + shift);
-
-            if ((new_length <= Capacity()) || tryInplaceExpand(new_length)) {
-                // Enough capacity, shift in place (backwards to avoid overlap).
-                Char_T *storage = Storage();
-                SizeT   offset  = old_length;
-
-                while (offset != 0) {
-                    storage[offset + (shift - SizeT{1})] = storage[offset - SizeT{1}];
-                    --offset;
-                }
-
-                setLength(new_length);
-            } else {
-                Char_T     *old_storage  = Storage();
-                const SizeT old_capacity = Capacity();
-
-                // Not enough capacity: reserve, then copy with the shift.
-                reserve(new_length);
-
-                // 2. Copy old data to the right position in new storage
-                if (old_length != 0) {
-                    MemoryUtils::CopyTo(Storage() + shift, old_storage, old_length);
-                }
-
-                // Clean up, set new pointers
-                release(old_storage, old_capacity);
-                setLength(new_length);
-            }
-        }
-    }
-
     // Set the needed length to write directly to a returned buffer,
     Char_T *Buffer(SizeT length) {
         const SizeT new_length = (Length() + length);
