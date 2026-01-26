@@ -27,6 +27,17 @@ namespace Qentem {
 #endif
 
 /**
+ * @brief Assumed CPU cache line size for padding and alignment.
+ *
+ * Defaulted to 64 bytes on modern x86_64 platforms, used to prevent
+ * false sharing in per-core and frequently-accessed structures.
+ * Can be overridden for platforms with different cache line sizes.
+ */
+#ifndef QENTEM_CACHE_LINE_SIZE
+#define QENTEM_CACHE_LINE_SIZE 64U
+#endif
+
+/**
  * @brief Enables fallback memory handling for unsupported or freestanding platforms.
  *
  * Define this macro to bypass platform-specific memory APIs (e.g., mmap, VirtualAlloc)
