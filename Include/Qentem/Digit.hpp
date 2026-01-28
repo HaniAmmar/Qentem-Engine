@@ -224,7 +224,71 @@ struct Digit {
         SizeT offset{0};
         return HexStringToNumber<Number_T>(value, offset, length);
     }
+
     /////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief Writes the binary representation of a number to a stream.
+     *
+     * This function prints the bits of @p value from most-significant bit (MSB)
+     * to least-significant bit (LSB), independent of machine endianness.
+     *
+     * The output is formatted into groups of bits (columns) separated by spaces,
+     * and wrapped into rows separated by newlines.
+     *
+     * Internally, the value is converted to its unsigned QNumber representation
+     * to ensure well-defined shifting and masking behavior for all integer types,
+     * including signed types.
+     *
+     * @tparam Stream_T  Output stream type. Must provide:
+     *                   - CharType
+     *                   - Write(CharType)
+     * @tparam Number_T  Integer type to be printed.
+     *
+     * @param stream               Destination stream.
+     * @param value                Number whose binary form will be written.
+     * @param max_bits_per_column  Number of bits per column (group). Default is 8.
+     * @param max_bits_per_row     Number of bits per row before inserting a newline.
+     *                             Default is 32.
+     */
+    template <typename Stream_T, typename Number_T>
+    static void NumberToBinary(Stream_T &stream, Number_T value, const SizeT32 max_bits_per_column = 8U,
+                               const SizeT32 max_bits_per_row = 32U) {
+        using Char_T        = typename Stream_T::CharType;
+        using QNumberType_T = typename QNumberAutoTypeT<Number_T, sizeof(Number_T)>::QNumberType_T;
+
+        static constexpr SizeT32  TOTAL_BITS{sizeof(Number_T) * 8U};
+        static constexpr SizeT32  TOTAL_BITS_M1{TOTAL_BITS - 1U};
+        static constexpr Number_T High{Number_T{1} << TOTAL_BITS_M1};
+
+        QNumberType_T qn{value};
+        SizeT32       column{0};
+        SizeT32       row{0};
+
+        SizeT32 index{0};
+
+        do {
+            if (row == max_bits_per_row) {
+                stream.Write(Char_T{'\n'});
+                row    = 0;
+                column = 0;
+            } else if (column == max_bits_per_column) {
+                stream.Write(Char_T{' '});
+                column = 0;
+            }
+
+            stream.Write(Char_T(((qn.Natural & High) >> TOTAL_BITS_M1) + DigitUtils::DigitChar::Zero));
+            qn.Natural <<= 1U;
+
+            ++column;
+            ++row;
+
+            ++index;
+        } while (index < TOTAL_BITS);
+    }
+
+    /////////////////////////////////////////////////////////////////
+
     template <typename Number_T, typename Char_T>
     static void FastStringToNumber(Number_T &number, const Char_T *content, SizeT length) noexcept {
         SizeT offset = 0;
