@@ -208,6 +208,163 @@ struct CPUHelper {
         return false;
     }
 
+    /**
+     * @brief Parses a numeric CPU range list into a validated CPU bitmask array.
+     *
+     * This function reads a textual list of CPU indices and ranges from
+     * @p content and sets the corresponding bits in @p list, **only if**
+     * the referenced CPUs are present in the system online-core mask.
+     *
+     * The input format supports:
+     * - Single values:        "3"
+     * - Comma-separated:     "1,4,7"
+     * - Ranges with '-':     "2-5"
+     * - Arbitrary spacing:   "1, 3- 7 , 9"
+     *
+     * Each parsed CPU index is mapped to a bit position inside the array,
+     * where each element of the array represents a word-sized bitmask
+     * (as defined by CPUSet::SHIFT and CPUSet::BIT_WIDTH_M1).
+     *
+     * Example:
+     *   "1,3-5,64,65-69"
+     * expands to:
+     *   1,3,4,5,64,65,66,67,68,69
+     *
+     * The function validates the input while parsing:
+     * - Returns false if a malformed range is detected (e.g. "7-3").
+     * - Returns false if an unexpected character is encountered.
+     * - Returns false if any referenced CPU index is not marked online
+     *   in the system CPU mask.
+     *
+     * @tparam Array_SystemLong_T  Container type holding SystemLong values.
+     *                            Must provide:
+     *                            - Size()
+     *                            - ResizeWithDefaultInit(SizeT)
+     *                            - Storage()
+     *
+     * @param list     Destination array that receives the resulting bitmask.
+     * @param content  Pointer to the character buffer containing the range text.
+     * @param length   Length of the character buffer.
+     *
+     * @return true if the entire input string was parsed successfully and all
+     *         referenced CPUs are valid and online,
+     *         false if a syntax error, range error, or invalid CPU id is detected.
+     */
+    template <typename Array_SystemLong_T, typename Char_T>
+    static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT length) noexcept {
+        CPUSet     online_cores;
+        SystemLong bit;
+        SizeT      offset{0};
+        SizeT      index;
+
+        online_cores.Clear();
+        OnlineCoresMask(online_cores);
+
+        auto checkArray = [&](SystemLong id) {
+            index = static_cast<SizeT>(id >> CPUSet::SHIFT);
+
+            if (list.Size() <= index) {
+                SizeT current_size{list.Size()};
+
+                list.ResizeWithDefaultInit(index + SizeT{1});
+
+                while (current_size < list.Size()) {
+                    list.Storage()[current_size] = 0;
+                    ++current_size;
+                }
+            }
+        };
+
+        while (offset < length) {
+            while ((offset < length) && ((content[offset] == ' ') || (content[offset] == ','))) {
+                ++offset;
+            }
+
+            if (offset < length) {
+                SizeT start = offset;
+
+                while ((offset < length) && (content[offset] >= DigitUtils::DigitChar::Zero) &&
+                       (content[offset] <= DigitUtils::DigitChar::Nine)) {
+                    ++offset;
+                }
+
+                SystemLong id;
+                Digit::FastStringToNumber(id, (content + start), (offset - start));
+
+                checkArray(id);
+
+                bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
+
+                if ((online_cores.Data()[index] & bit) != bit) {
+                    return false;
+                }
+
+                list.Storage()[index] |= bit;
+
+                if (offset < length) {
+                    while ((offset < length) && (content[offset] != ',') && (content[offset] != '-')) {
+                        ++offset;
+                    }
+
+                    if (offset < length) {
+                        if (content[offset] == '-') {
+                            // range
+                            do {
+                                ++offset;
+                            } while ((offset < length) && (content[offset] == ' '));
+
+                            start = offset;
+
+                            while ((offset < length) && (content[offset] >= DigitUtils::DigitChar::Zero) &&
+                                   (content[offset] <= DigitUtils::DigitChar::Nine)) {
+                                ++offset;
+                            }
+
+                            SystemLong id2;
+                            Digit::FastStringToNumber(id2, (content + start), (offset - start));
+
+                            if (id2 > id) {
+                                checkArray(id2);
+
+                                do {
+                                    ++id;
+                                    index = static_cast<SizeT>(id >> CPUSet::SHIFT);
+
+                                    bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
+
+                                    if ((online_cores.Data()[index] & bit) != bit) {
+                                        return false;
+                                    }
+
+                                    list.Storage()[index] |= bit;
+                                } while (id < id2);
+
+                                if (offset < length) {
+                                    continue;
+                                }
+
+                                return true;
+                            }
+
+                            return false;
+                        }
+
+                        if (content[offset] == ',') {
+                            ++offset;
+                            continue;
+                        }
+
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
   private:
     /**
      * @brief Set the CPU affinity mask for a process or thread.
