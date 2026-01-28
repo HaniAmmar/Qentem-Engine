@@ -287,6 +287,76 @@ struct Digit {
         } while (index < TOTAL_BITS);
     }
 
+    /**
+     * @brief Writes the binary representation of a character string to a stream.
+     *
+     * This function converts each character in the input string into its binary
+     * form and writes the result to @p stream, starting from the most-significant
+     * bit (MSB) to the least-significant bit (LSB) of each character.
+     *
+     * The binary output is formatted into columns and rows:
+     * - Columns group bits (e.g. 8 bits per character).
+     * - Rows wrap after a specified number of bits.
+     *
+     * Internally, each character is converted to its unsigned QNumber
+     * representation to ensure well-defined shifting and masking behavior,
+     * even when CharType is a signed type.
+     *
+     * @tparam Stream_T  Output stream type. Must provide:
+     *                   - CharType
+     *                   - Write(CharType)
+     *
+     * @param stream               Destination stream.
+     * @param content              Pointer to the character sequence to convert.
+     * @param length               Number of characters to process.
+     * @param max_bits_per_column  Number of bits per column (group). Default is 8.
+     * @param max_bits_per_row     Number of bits per row before inserting a newline.
+     *                             Default is 32.
+     */
+    template <typename Stream_T>
+    static void StringToBinary(Stream_T &stream, const typename Stream_T::CharType *content, SizeT length,
+                               const SizeT32 max_bits_per_column = 8U, const SizeT32 max_bits_per_row = 32U) {
+        using Char_T        = typename Stream_T::CharType;
+        using QNumberType_T = typename QNumberAutoTypeT<Char_T, sizeof(Char_T)>::QNumberType_T;
+        QNumberType_T qn;
+
+        using Natural_T = decltype(qn.Natural);
+
+        static constexpr SizeT32   TOTAL_BITS{sizeof(Char_T) * 8U};
+        static constexpr SizeT32   TOTAL_BITS_M1{TOTAL_BITS - 1U};
+        static constexpr Natural_T High{Natural_T{1} << TOTAL_BITS_M1};
+
+        SizeT32 column{0};
+        SizeT32 row{0};
+        SizeT32 offset{0};
+
+        while (offset < length) {
+            qn = content[offset];
+            SizeT32 index{0};
+
+            do {
+                if (row == max_bits_per_row) {
+                    stream.Write(Char_T{'\n'});
+                    row    = 0;
+                    column = 0;
+                } else if (column == max_bits_per_column) {
+                    stream.Write(Char_T{' '});
+                    column = 0;
+                }
+
+                stream.Write(Char_T(((qn.Natural & High) >> TOTAL_BITS_M1) + DigitUtils::DigitChar::Zero));
+                qn.Natural <<= 1U;
+
+                ++column;
+                ++row;
+
+                ++index;
+            } while (index < TOTAL_BITS);
+
+            ++offset;
+        }
+    }
+
     /////////////////////////////////////////////////////////////////
 
     template <typename Number_T, typename Char_T>
