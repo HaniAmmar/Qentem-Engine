@@ -19,6 +19,7 @@
 #define QENTEM_CPU_HELPER_HPP
 
 #include "Qentem/Platform.hpp"
+#include "Qentem/Digit.hpp"
 
 #if defined(_WIN32)
 #define NOMINMAX
@@ -33,10 +34,11 @@
 namespace Qentem {
 
 struct CPUSet {
-    static constexpr SystemLong MAX_CORE  = QENTEM_MAX_CPU_CORES;
-    static constexpr SystemLong BIT_WIDTH = (sizeof(SystemLong) * SystemLong{8});
-    static constexpr SystemLong SIZE      = ((MAX_CORE + (BIT_WIDTH - 1U)) / BIT_WIDTH);
-    static constexpr SizeT32    SHIFT     = (BIT_WIDTH == SystemLong{64} ? 6U : 5U);
+    static constexpr SystemLong MAX_CORE     = QENTEM_MAX_CPU_CORES;
+    static constexpr SystemLong BIT_WIDTH    = (sizeof(SystemLong) * SystemLong{8});
+    static constexpr SystemLong BIT_WIDTH_M1 = (BIT_WIDTH - SystemLong{1});
+    static constexpr SystemLong SIZE         = ((QENTEM_MAX_CPU_CORES + (BIT_WIDTH - 1U)) / BIT_WIDTH);
+    static constexpr SizeT32    SHIFT        = Platform::FindFirstBit(BIT_WIDTH);
 
     QENTEM_INLINE void Clear() noexcept {
         SystemLong index = SIZE;
@@ -76,7 +78,7 @@ struct CPUSet {
 
             setIndexOffset(index, offset, core);
 
-            return (mask_[index] & (SystemLong{1} << offset)) != 0;
+            return ((mask_[index] & (SystemLong{1} << offset)) != 0);
         }
 
         return false;
@@ -97,7 +99,7 @@ struct CPUSet {
   private:
     QENTEM_INLINE static void setIndexOffset(SystemLong &index, SystemLong &offset, SystemLong core) {
         index  = (core >> SHIFT);
-        offset = (core & (BIT_WIDTH - 1U));
+        offset = (core & BIT_WIDTH_M1);
     }
 
     SystemLong mask_[SIZE]{};
@@ -266,21 +268,21 @@ struct CPUHelper {
         cores.Clear();
 
         if (OnlineCoresMask(cores)) {
+            SizeT32 index = cores.Size();
             SizeT32 count = 0;
-            SizeT32 index = 0;
 
-            while (index < cores.Size()) {
+            do {
+                --index;
+
                 if (cores.Data()[index] != 0) {
                     count += Platform::PopCount(cores.Data()[index]);
                 }
-
-                ++index;
-            }
+            } while (index != 0);
 
             return count;
         }
 
-        return 1;
+        return 1U;
     }
 
     inline static const SizeT32 core_count_{coreCount()};
