@@ -251,14 +251,11 @@ struct CPUHelper {
      *         false if a syntax error, range error, or invalid CPU id is detected.
      */
     template <typename Array_SystemLong_T, typename Char_T>
-    static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT length) noexcept {
-        CPUSet     online_cores;
+    static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT length,
+                             CPUSet &online_cores) noexcept {
         SystemLong bit;
         SizeT      offset{0};
         SizeT      index;
-
-        online_cores.Clear();
-        OnlineCoresMask(online_cores);
 
         auto checkArray = [&](SystemLong id) {
             index = static_cast<SizeT>(id >> CPUSet::SHIFT);
