@@ -397,6 +397,31 @@ struct Deque {
         }
     }
 
+    template <typename... Values_T>
+    void ResizeInit(SizeT new_size, Values_T &&...values) {
+        // 1) Perform capacity-adjusting Resize without growing logical size
+        Resize(new_size);
+
+        // 2) Only default-initialize when actually grown beyond old Size()
+        if (new_size > Size()) {
+            // Number of new slots that need initialization
+            const SizeT count = (new_size - Size());
+            // Starting position for new elements (tail of old data)
+            const SizeT start = tail();
+            // Unwrapped end index (may exceed Capacity())
+            const SizeT end = (tail() + count);
+
+            // 3) Initialize contiguous range
+            if (end <= Capacity()) {
+                MemoryUtils::ConstructRange((Storage() + start), (Storage() + end),
+                                            QUtility::Forward<Values_T>(values)...);
+            }
+
+            // 4) Update logical size to include the new default-initialized elements
+            setSize(new_size);
+        }
+    }
+
     /**
      * @brief Shrinks the internal buffer to match the current element count.
      *

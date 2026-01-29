@@ -239,7 +239,7 @@ struct CPUHelper {
      * @tparam Array_SystemLong_T  Container type holding SystemLong values.
      *                            Must provide:
      *                            - Size()
-     *                            - ResizeWithDefaultInit(SizeT)
+     *                            - ResizeInit(SizeT, ...)
      *                            - Storage()
      *
      * @param list     Destination array that receives the resulting bitmask.
@@ -264,14 +264,7 @@ struct CPUHelper {
             index = static_cast<SizeT>(id >> CPUSet::SHIFT);
 
             if (list.Size() <= index) {
-                SizeT current_size{list.Size()};
-
-                list.ResizeWithDefaultInit(index + SizeT{1});
-
-                while (current_size < list.Size()) {
-                    list.Storage()[current_size] = 0;
-                    ++current_size;
-                }
+                list.ResizeInit(index + SizeT{1}, SystemLong{0});
             }
         };
 

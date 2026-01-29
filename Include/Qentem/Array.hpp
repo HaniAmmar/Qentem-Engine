@@ -314,6 +314,18 @@ struct Array {
         }
     }
 
+    template <typename... Values_T>
+    void ResizeInit(SizeT new_size, Values_T &&...values) {
+        Resize(new_size);
+
+        if (new_size > Size()) {
+            Type_T *current = Storage();
+            MemoryUtils::ConstructRange((current + Size()), (current + new_size),
+                                        QUtility::Forward<Values_T>(values)...);
+            setSize(new_size);
+        }
+    }
+
     QENTEM_INLINE void Expect(SizeT size) {
         const SizeT n_size = (size + Size());
 
