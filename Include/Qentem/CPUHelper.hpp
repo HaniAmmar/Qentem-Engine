@@ -166,7 +166,7 @@ struct CPUHelper {
         cores.Set(core_id);
 
         // 0 = current thread
-        const long ret = setAffinity(0, cores.TotalBytes(), cores.Data());
+        const long ret = SetAffinity(0, cores.TotalBytes(), cores.Data());
 
         return (ret == 0);
 #elif defined(_WIN32)
@@ -358,7 +358,6 @@ struct CPUHelper {
         return false;
     }
 
-  private:
     /**
      * @brief Set the CPU affinity mask for a process or thread.
      *
@@ -367,10 +366,10 @@ struct CPUHelper {
      * specified in `mask`.
      *
      * @param pid         Target process ID (0 applies to the calling thread).
-     * @param cpusetsize  Size of the CPU mask in bytes (typically `sizeof(cpu_set_t)`).
+     * @param cpusetsize  Size of the CPU mask in bytes.
      * @param mask        Pointer to the CPU set bitmask indicating allowed CPUs.
      */
-    QENTEM_INLINE static long setAffinity(int pid, long cpusetsize, const void *mask) noexcept {
+    QENTEM_INLINE static long SetAffinity(int pid, long cpusetsize, const void *mask) noexcept {
 #if defined(__linux__)
         return SystemCall(__NR_sched_setaffinity, pid, cpusetsize, reinterpret_cast<long>(mask));
 #else
@@ -381,6 +380,7 @@ struct CPUHelper {
 #endif
     }
 
+  private:
     /**
      * @brief Returns the number of available CPU cores for this process.
      *
