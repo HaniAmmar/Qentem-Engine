@@ -130,6 +130,14 @@ struct Digit {
             return SizeT(storage - str);
         }
     }
+
+    template <typename Number_T>
+    QENTEM_INLINE static void IntToString(const char *&out, SizeT32 &out_length, Number_T number) noexcept {
+        constexpr SizeT max{20}; // Max length for 64-bit number as string
+        char            buffer[max];
+        out_length = IntToString(&(buffer[max]), number);
+        out        = &(buffer[max - out_length]);
+    }
     /////////////////////////////////////////////////////////////////
     template <typename Number_T, typename Char_T, typename SizeT_Type>
     static Number_T HexStringToNumber(const Char_T *value, SizeT_Type &offset, const SizeT_Type end_offset) noexcept {
