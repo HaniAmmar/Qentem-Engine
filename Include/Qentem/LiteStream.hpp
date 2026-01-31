@@ -1,13 +1,17 @@
 /**
  * @file LiteStream.hpp
- * @brief Lightweight, expandable character stream for internal logging and output.
+ * @brief Lightweight, page-expandable character stream.
  *
- * `LiteStream` is a minimal, dynamically resizing buffer designed for efficient
- * character streaming. It supports single-character and block writes, backstepping,
- * null termination, and insertion.
+ * `LiteStream` is a minimal character stream backed by a page-aligned expandable buffer,
+ * designed for efficient sequential writes. It supports single-character and block
+ * writes, explicit null termination, and controlled capacity growth.
  *
- * Unlike `StringStream`, this class is optimized for internal diagnostics, file
- * logging, and console output.
+ * Capacity increases only when required and is rounded to system page boundaries,
+ * providing predictable memory usage and avoiding excessive reallocation.
+ *
+ * Unlike `StringStream`, this class is intended for internal diagnostics, file logging,
+ * and console output where simplicity, low overhead, and controlled expansion are
+ * preferred over rich string manipulation.
  *
  * @author Hani Ammar
  * @date 2026
@@ -24,7 +28,6 @@ namespace Qentem {
 
 struct LiteStream {
     using CharType = char;
-    static constexpr SizeT32 ExpandFactor{2};
 
     LiteStream(LiteStream &&)                 = delete;
     LiteStream(const LiteStream &)            = delete;
@@ -47,7 +50,7 @@ struct LiteStream {
         const SizeT32 new_length = (length_ + 1U);
 
         if (Capacity() == length_) {
-            expand(new_length * ExpandFactor);
+            expand(new_length);
         }
 
         storage_[length_] = ch;
@@ -58,7 +61,7 @@ struct LiteStream {
         const SizeT32 new_length = (length_ + length);
 
         if (Capacity() < new_length) {
-            expand(new_length * ExpandFactor);
+            expand(new_length);
         }
 
         char   *des    = (storage_ + length_);
@@ -101,6 +104,10 @@ struct LiteStream {
     }
 
     QENTEM_INLINE char *Storage() noexcept {
+        return storage_;
+    }
+
+    QENTEM_INLINE const char *Storage() const noexcept {
         return storage_;
     }
 
@@ -167,6 +174,8 @@ struct LiteStream {
             capacity += page_size_m1;
             capacity &= ~page_size_m1;
         }
+#else
+        capacity *= 2;
 #endif
 
         storage_  = static_cast<char *>(SystemMemory::Reserve(capacity));
