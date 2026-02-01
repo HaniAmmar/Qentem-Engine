@@ -98,7 +98,7 @@ struct QConsole {
     }
 
   private:
-    QENTEM_NOINLINE static void writeAll(const char *data, unsigned length) noexcept {
+    QENTEM_NOINLINE static void writeAll(const char *data, SizeT32 length) noexcept {
 #if defined(_WIN32)
         DWORD written = 0;
 
@@ -106,7 +106,7 @@ struct QConsole {
             ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), data, length, &written, nullptr);
 
             if (written > 0) {
-                length -= static_cast<SystemLong>(written);
+                length -= static_cast<SizeT32>(written);
                 data += written;
                 continue;
             }
@@ -118,7 +118,7 @@ struct QConsole {
             const SystemLongI written = SystemCall(__NR_write, 1, reinterpret_cast<long>(data), length);
 
             if (written > 0) {
-                length -= static_cast<SystemLong>(written);
+                length -= static_cast<SizeT32>(written);
                 data += written;
                 continue;
             } else if ((written == -EINTR) || (written == -EAGAIN)) {
@@ -132,7 +132,7 @@ struct QConsole {
             const SystemLongI written = ::write(1, data, length); // stdout
 
             if (written > 0) {
-                length -= static_cast<SystemLong>(written);
+                length -= static_cast<SizeT32>(written);
                 data += written;
                 continue;
             } else if ((written == -1) && ((errno == EINTR) || (errno == EAGAIN))) {

@@ -198,12 +198,12 @@ struct SystemMemory {
             constexpr int at_fdcwd      = -100; // AT_FDCWD
             constexpr int read_only     = 0;    // O_RDONLY
             constexpr int page_size_id  = 6;    // AT_PAGESZ
-            constexpr const char AUXV_PATH[] = "/proc/self/auxv";
+            constexpr const char *AUXV_PATH = "/proc/self/auxv";
 
             SystemLong page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
 
             const int fd = static_cast<int>(SystemCall(__NR_openat, at_fdcwd,
-                                                reinterpret_cast<long>(AUXV_PATH),
+                                                reinterpret_cast<long>(&(AUXV_PATH[0])),
                                                 read_only, 0));
             if (fd >= 0) {
                 unsigned char *ptr = reinterpret_cast<unsigned char*>(&aux);

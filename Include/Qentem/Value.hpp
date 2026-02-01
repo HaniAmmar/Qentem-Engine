@@ -1974,9 +1974,9 @@ struct Value {
         if (type == ValueType::Array) {
             StringStream<Char_T> stream;
             Value                sub_valu;
-            const Value         *item_ = array_.First();
-            const Char_T        *str;
-            SizeT                str_len;
+            const Value         *item_   = array_.First();
+            const Char_T        *str     = nullptr;
+            SizeT                str_len = 0;
             SizeT                grouped_key_index;
 
             groupedValue.reset();
