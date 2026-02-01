@@ -41,6 +41,9 @@ struct CPUSet {
     // static constexpr SizeT32 SHIFT        = Platform::FindFirstBit(BIT_WIDTH);
     static constexpr SizeT32 SHIFT = (BIT_WIDTH == SystemLong{64} ? 6U : 5U);
 
+    QENTEM_INLINE CPUSet() noexcept : mask_{} {
+    }
+
     QENTEM_INLINE void Clear() noexcept {
         SizeT32 index = SIZE;
 
@@ -162,7 +165,7 @@ struct CPUHelper {
      */
     static bool PinToCore(SizeT32 core_id) {
 #if defined(__linux__)
-        CPUSet cores;
+        CPUSet cores{};
         cores.Clear();
         cores.Set(core_id);
 
