@@ -366,7 +366,7 @@ struct CPUHelper {
      * @param cpusetsize  Size of the CPU mask in bytes.
      * @param mask        Pointer to the CPU set bitmask indicating allowed CPUs.
      */
-    QENTEM_INLINE static long SetAffinity(int pid, long cpusetsize, const void *mask) noexcept {
+    QENTEM_INLINE static long SetAffinity(int pid, SystemLong cpusetsize, const void *mask) noexcept {
 #if defined(__linux__)
         return SystemCall(__NR_sched_setaffinity, pid, cpusetsize, reinterpret_cast<long>(mask));
 #else
