@@ -10,6 +10,7 @@
 #include "Qentem/SystemCall.hpp"
 #else
 #include <unistd.h>
+#include <errno.h>
 #endif
 
 #include "Qentem/ToCharsHelper.hpp"
