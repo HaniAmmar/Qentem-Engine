@@ -98,19 +98,54 @@ struct QConsole {
     }
 
   private:
-    QENTEM_NOINLINE static void write(const char *data, unsigned length) noexcept {
+    QENTEM_NOINLINE static void writeAll(const char *data, unsigned length) noexcept {
 #if defined(_WIN32)
         DWORD written = 0;
-        ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), data, length, &written, nullptr);
+
+        while (length != 0) {
+            ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), data, length, &written, nullptr);
+
+            if (written > 0) {
+                length -= static_cast<SystemLong>(written);
+                data += written;
+                continue;
+            }
+
+            return;
+        }
 #elif defined(__linux__)
-        SystemCall(__NR_write, 1, reinterpret_cast<long>(data), length);
+        while (length != 0) {
+            const SystemLongI written = SystemCall(__NR_write, 1, reinterpret_cast<long>(data), length);
+
+            if (written > 0) {
+                length -= static_cast<SystemLong>(written);
+                data += written;
+                continue;
+            } else if ((written == -EINTR) || (written == -EAGAIN)) {
+                continue; // retry
+            }
+
+            return;
+        }
 #else
-        ::write(1, data, length); // stdout
+        while (length != 0) {
+            const SystemLongI written = ::write(1, data, length); // stdout
+
+            if (written > 0) {
+                length -= static_cast<SystemLong>(written);
+                data += written;
+                continue;
+            } else if ((written == -1) && ((errno == EINTR) || (errno == EAGAIN))) {
+                continue; // retry
+            }
+
+            return;
+        }
 #endif
     }
 
     QENTEM_NOINLINE static void flush() noexcept {
-        write(buffer_.First(), buffer_.Length());
+        writeAll(buffer_.First(), buffer_.Length());
         buffer_.Clear();
     }
 
