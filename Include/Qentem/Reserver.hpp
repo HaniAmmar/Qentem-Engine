@@ -818,10 +818,10 @@ struct Reserver {
             // constexpr SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
             // (align>=CustomAlignment_T?align:(align+1))
 
-            return static_cast<Type_T *>(GetCurrentInstance().Reserve<CustomAlignment_T>(RoundUpBytes<Type_T>(size)));
+            return static_cast<Type_T *>(GetCurrentInstance()->Reserve<CustomAlignment_T>(RoundUpBytes<Type_T>(size)));
         } else {
             return static_cast<Type_T *>(
-                GetCurrentInstance().Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(RoundUpBytes<Type_T>(size)));
+                GetCurrentInstance()->Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(RoundUpBytes<Type_T>(size)));
         }
     }
 
@@ -846,23 +846,23 @@ struct Reserver {
     template <typename Type_T>
     static void Release(Type_T *ptr, SystemLong size) noexcept {
         if (ptr != nullptr) {
-            Core &instance = GetCurrentInstance();
+            Core *instance = GetCurrentInstance();
             size           = RoundUpBytes<Type_T>(size);
 
 #if defined(__linux__) || defined(_WIN32)
             // Prefer returning to the current arena.
-            if (instance.Release(ptr, size)) {
+            if (instance->Release(ptr, size)) {
                 return;
             }
 
             for (Core &reserver : reservers_) {
-                if ((&reserver != &instance) && reserver.Release(ptr, size)) {
+                if ((&reserver != instance) && reserver.Release(ptr, size)) {
                     return;
                 }
             }
 #else
             // Single-arena fallback path.
-            instance.Release(ptr, size);
+            instance->Release(ptr, size);
 #endif
         }
     }
@@ -894,25 +894,25 @@ struct Reserver {
     template <typename Type_T>
     static void Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         if (ptr != nullptr) {
-            Core &instance = GetCurrentInstance();
+            Core *instance = GetCurrentInstance();
             from_size      = RoundUpBytes<Type_T>(from_size);
             to_size        = RoundUpBytes<Type_T>(to_size);
 
             if (from_size > to_size) {
 #if defined(__linux__) || defined(_WIN32)
                 // Prefer returning to the current arena.
-                if (instance.Shrink(ptr, from_size, to_size)) {
+                if (instance->Shrink(ptr, from_size, to_size)) {
                     return;
                 }
 
                 for (Core &reserver : reservers_) {
-                    if ((&reserver != &instance) && reserver.Shrink(ptr, from_size, to_size)) {
+                    if ((&reserver != instance) && reserver.Shrink(ptr, from_size, to_size)) {
                         return;
                     }
                 }
 #else
                 // Single-arena fallback path.
-                instance.Shrink(ptr, from_size, to_size);
+                instance->Shrink(ptr, from_size, to_size);
 #endif
             }
         }
@@ -933,7 +933,7 @@ struct Reserver {
     template <typename Type_T>
     static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         if (ptr != nullptr) {
-            Core &instance = GetCurrentInstance();
+            Core *instance = GetCurrentInstance();
             from_size      = RoundUpBytes<Type_T>(from_size);
             to_size        = RoundUpBytes<Type_T>(to_size);
 
@@ -941,7 +941,7 @@ struct Reserver {
 #if defined(__linux__) || defined(_WIN32)
                 // Prefer returning to the current arena.
 
-                const SystemLong new_size = instance.TryExpand(ptr, from_size, to_size);
+                const SystemLong new_size = instance->TryExpand(ptr, from_size, to_size);
 
                 if (new_size == to_size) {
                     return true;
@@ -949,7 +949,7 @@ struct Reserver {
 
                 if (new_size == 0) {
                     for (Core &reserver : reservers_) {
-                        if ((&reserver != &instance) && reserver.TryExpand(ptr, from_size, to_size) == to_size) {
+                        if ((&reserver != instance) && reserver.TryExpand(ptr, from_size, to_size) == to_size) {
                             return true;
                         }
                     }
@@ -958,7 +958,7 @@ struct Reserver {
                 return false;
 #else
                 // Single-arena fallback path.
-                return (instance.TryExpand(ptr, from_size, to_size) == to_size);
+                return (instance->TryExpand(ptr, from_size, to_size) == to_size);
 #endif
             }
 
@@ -974,7 +974,7 @@ struct Reserver {
      * Should be used with care—this releases all memory regions tracked by the current core’s arena.
      */
     QENTEM_INLINE static void Reset() noexcept {
-        GetCurrentInstance().Reset();
+        GetCurrentInstance()->Reset();
     }
 
     /**
@@ -1020,17 +1020,22 @@ struct Reserver {
     /**
      * @brief Provides access to the arena associated with the calling thread’s core.
      *
-     * Each logical CPU has its own arena to promote spatial locality and eliminate
-     * cross-thread contention.
+     * Each logical CPU owns a dedicated arena to promote spatial locality and
+     * eliminate cross-thread contention.
+     *
+     * For optimal correctness and performance, the calling thread should remain
+     * bound to a single logical core for its lifetime (e.g. via CPU affinity),
+     * as the arena selection is cached per thread.
      *
      * @return Reference to the active core’s memory management unit.
      */
-    QENTEM_INLINE static Core &GetCurrentInstance() noexcept {
+    QENTEM_INLINE static Core *GetCurrentInstance() noexcept {
 #if defined(__linux__) || defined(_WIN32)
-        thread_local const SizeT32 core_id{CPUHelper::GetCurrentCore()};
-        return reservers_.Storage()[core_id];
+        thread_local Core *reserver{reservers_.Storage() + CPUHelper::GetCurrentCore()};
+
+        return reserver;
 #else
-        return reserver_;
+        return &reserver_;
 #endif
     }
 
