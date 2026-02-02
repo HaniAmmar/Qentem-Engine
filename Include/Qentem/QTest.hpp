@@ -154,14 +154,14 @@ struct QTest {
     }
 
     QENTEM_NOINLINE static void PrintMemoryRecord() {
-        const auto &storage = MemoryRecord::GetRecord();
+        const MemoryRecord::MemoryRecordData &storage = MemoryRecord::GetRecord();
 
-        QConsole::Print("Memory: ", (double(storage.Size) / 1024), " KiB, Peak: ", (double(storage.PeakSize) / 1024),
-                        " KiB.\n");
+        QConsole::Print("Memory: ", ((storage.Size == 0) ? 0U : (double(storage.Size) / 1024)),
+                        " KiB, Peak: ", ((storage.PeakSize != 0) ? (double(storage.PeakSize) / 1024) : 0), " KiB.\n");
 
         QConsole::Print("Reserves: ", storage.Reserved, ", Releases: ", storage.Released, ".\n");
-        QConsole::Print("Kept Blocks: ", storage.Blocks, ", Total: ", (double(storage.BlocksTotalSize) / 1024),
-                        " KiB.\n");
+        QConsole::Print("Kept Blocks: ", storage.Blocks,
+                        ", Total: ", ((storage.PeakSize != 0) ? (double(storage.PeakSize) / 1024) : 0), " KiB.\n");
 
         QConsole::Flush();
     }
