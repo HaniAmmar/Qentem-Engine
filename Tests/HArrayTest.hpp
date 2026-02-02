@@ -41,7 +41,7 @@ using HAItem3 = typename HashArray3::HItem;
 
 static void TestHArray1(QTest &test) {
     HashArray1 numbers1;
-    HashArray1 numbers2(8);
+    HashArray1 numbers2{8};
 
     test.IsEqual(numbers1.Size(), 0U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 0U, __LINE__);
@@ -104,10 +104,10 @@ static void TestHArray1(QTest &test) {
 
 static void TestHArray2(QTest &test) {
     HashArray1          numbers1{};
-    HashArray1          numbers2;
-    const String<char> *key;
-    const char         *str_c;
-    const HAItem1      *storage;
+    HashArray1          numbers2{};
+    const String<char> *key{nullptr};
+    const char         *str_c{nullptr};
+    const HAItem1      *storage{nullptr};
 
     numbers1["key1"] = 1;
     test.IsEqual(numbers1.Size(), 1U, __LINE__);
