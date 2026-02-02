@@ -557,21 +557,13 @@ struct BigInt {
      * After division, index_ is updated to reflect any leading zeros.
      */
     Number_T Divide(const Number_T divisor) noexcept {
-        // True if the limb size is 64 bits (affects shift optimization)
-        constexpr bool is_size_64b = (BitWidth() == 64U);
-
         // Start from the highest limb
-        SizeT32  index     = index_;
-        Number_T remainder = (storage_[index_] % divisor);
+        const SizeT32 initial_shift = ((BitWidth() - 1U) - Platform::FindLastBit(divisor));
+        SizeT32       index         = index_;
+        Number_T      remainder     = (storage_[index_] % divisor);
 
         // Divide the highest limb and get the initial remainder
         storage_[index_] /= divisor;
-
-        SizeT32 initial_shift = 0;
-        if constexpr (is_size_64b) {
-            // Calculate the initial shift for 64-bit division optimization
-            initial_shift = ((BitWidth() - 1U) - Platform::FindLastBit(divisor));
-        }
 
         // Process all lower limbs, propagating remainder as needed
         while (index != 0) {
@@ -1178,7 +1170,12 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
      * Packs two 32-bit values into 64 bits, divides, then splits result.
      */
     QENTEM_INLINE static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                                     SizeT32) noexcept {
+                                     const SizeT32 initial_shift) noexcept {
+        if constexpr (!QentemConfig::Is64bit) {
+            DoubleWidthArithmetic<Number_T, 64>::Divide(dividend_high, dividend_low, divisor, initial_shift);
+            return;
+        }
+
         SizeT64 dividend64{dividend_high};              // Pack high 32 bits
         dividend64 <<= shift_;                          // Shift to high dword
         dividend64 |= dividend_low;                     // Add in low 32 bits
@@ -1196,6 +1193,10 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
      * Used for multi-limb multiplication.
      */
     QENTEM_INLINE static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
+        if constexpr (!QentemConfig::Is64bit) {
+            return DoubleWidthArithmetic<Number_T, 64>::Multiply(number, multiplier);
+        }
+
         SizeT64 number64{number};            // Promote to 64 bits
         number64 *= multiplier;              // 64-bit multiplication
         number = Number_T(number64);         // Store low 32 bits
