@@ -137,7 +137,7 @@ struct QTest {
         QConsole::Flush();
 
         if (!continue_on_error_ && QConsole::IsOutputEnabled()) {
-            terminate();
+            Exit(1);
         }
     }
 
@@ -219,6 +219,18 @@ struct QTest {
         QConsole::Flush();
     }
 
+    [[noreturn]] QENTEM_INLINE static void Exit(int num) noexcept {
+#if defined(_WIN32)
+        ::ExitProcess(1);
+#elif defined(__linux__)
+        SystemCall(__NR_exit_group, num);
+        __builtin_unreachable();
+#else
+        _exit(1);
+        __builtin_unreachable();
+#endif
+    }
+
   private:
     QENTEM_NOINLINE void afterTest(bool test_for_leaks) {
         if (!error_) {
@@ -236,18 +248,6 @@ struct QTest {
                 QConsole::Flush();
             }
         }
-    }
-
-    [[noreturn]] QENTEM_INLINE void terminate() noexcept {
-#if defined(_WIN32)
-        ::ExitProcess(1);
-#elif defined(__linux__)
-        SystemCall(__NR_exit_group, 1);
-        __builtin_unreachable();
-#else
-        _exit(1);
-        __builtin_unreachable();
-#endif
     }
 
     const char *part_name_{nullptr};
