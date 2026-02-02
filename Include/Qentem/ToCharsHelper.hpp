@@ -36,13 +36,7 @@ struct ToCharsHelper {
 
     template <typename Stream_T, typename... Values_T>
     static void Write(Stream_T &stream, const Values_T &...values) {
-#if __cplusplus > 201402L
         (Writer<Stream_T, typename QTraits::Decay<Values_T>::Type>::Write(stream, values), ...);
-#else
-        const int dummy[sizeof...(Values_T)] = {
-            (Writer<Stream_T, typename QTraits::Decay<Values_T>::Type>::Write(stream, values), 0)...};
-        (void)dummy;
-#endif
     }
 
     template <typename Stream_T, typename Value_T>
