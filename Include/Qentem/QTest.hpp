@@ -156,12 +156,52 @@ struct QTest {
     QENTEM_NOINLINE static void PrintMemoryRecord() {
         const MemoryRecord::MemoryRecordData &storage = MemoryRecord::GetRecord();
 
-        QConsole::Print("Memory: ", ((storage.Size == 0) ? 0U : (double(storage.Size) / 1024)),
-                        " KiB, Peak: ", ((storage.PeakSize != 0) ? (double(storage.PeakSize) / 1024) : 0), " KiB.\n");
+        const SystemLong size_x100 = ((storage.Size * SystemLong{100}) / SystemLong{1024});
+        const SystemLong size      = (size_x100 / SystemLong{100});
+        SystemLong       rem_size  = (size_x100 % SystemLong{100});
+
+        if ((rem_size != 0) && (rem_size % SystemLong{10} == 0)) {
+            rem_size /= SystemLong{10};
+        }
+
+        const SystemLong peak_size_x100 = ((storage.PeakSize * SystemLong{100}) / SystemLong{1024});
+        const SystemLong peak_size      = (peak_size_x100 / SystemLong{100});
+        SystemLong       rem_peak_size  = (peak_size_x100 % SystemLong{100});
+
+        if ((rem_peak_size != 0) && (rem_peak_size % SystemLong{10} == 0)) {
+            rem_peak_size /= SystemLong{10};
+        }
+
+        const SystemLong total_size_x100 = ((storage.BlocksTotalSize * SystemLong{100}) / SystemLong{1024});
+        const SystemLong total_size_     = (total_size_x100 / SystemLong{100});
+        SystemLong       rem_total_size  = (total_size_x100 % SystemLong{100});
+
+        if ((rem_total_size != 0) && (rem_total_size % SystemLong{10} == 0)) {
+            rem_total_size /= SystemLong{10};
+        }
+
+        QConsole::Print("Memory: ", size);
+
+        if (rem_size != 0) {
+            QConsole::Print(".", rem_size);
+        }
+
+        QConsole::Print(" KiB, Peak: ", peak_size);
+
+        if (rem_peak_size != 0) {
+            QConsole::Print(".", rem_peak_size);
+        }
+
+        QConsole::Print(" KiB.\n");
 
         QConsole::Print("Reserves: ", storage.Reserved, ", Releases: ", storage.Released, ".\n");
-        QConsole::Print("Kept Blocks: ", storage.Blocks,
-                        ", Total: ", ((storage.PeakSize != 0) ? (double(storage.PeakSize) / 1024) : 0), " KiB.\n");
+        QConsole::Print("Kept Blocks: ", storage.Blocks, ", Total: ", total_size_);
+
+        if (rem_total_size != 0) {
+            QConsole::Print(".", rem_total_size);
+        }
+
+        QConsole::Print(" KiB.\n");
 
         QConsole::Flush();
     }
