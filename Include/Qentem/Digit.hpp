@@ -131,12 +131,19 @@ struct Digit {
         }
     }
 
-    template <typename Number_T>
-    QENTEM_INLINE static void IntToString(const char *&out, SizeT32 &out_length, Number_T number) noexcept {
-        constexpr SizeT max{20}; // Max length for 64-bit number as string
-        char            buffer[max];
-        out_length = IntToString(&(buffer[max]), number);
-        out        = &(buffer[max - out_length]);
+    // MAX: 20 for unsigned long long, 10 for unsigned int, 5 for unsigned short
+    /**
+     *    char        buffer[20];
+     *    const char *out_str;
+     *    SizeT32     out_length;
+     *
+     *    Digit::IntToString(buffer, out_str, out_length, number);
+     */
+    template <typename Number_T, SizeT32 MAX = 20>
+    QENTEM_INLINE static void IntToString(char (&buffer)[MAX], const char *&out, SizeT32 &out_length,
+                                          Number_T number) noexcept {
+        out_length = IntToString(&(buffer[MAX]), number);
+        out        = &(buffer[MAX - out_length]);
     }
     /////////////////////////////////////////////////////////////////
     template <typename Number_T, typename Char_T, typename SizeT_Type>
