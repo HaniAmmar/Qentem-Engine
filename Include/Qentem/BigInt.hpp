@@ -94,7 +94,9 @@ struct BigInt {
     /**
      * @brief Default constructor. Initializes to zero.
      */
-    BigInt() noexcept = default;
+    BigInt() noexcept : index_{0} {
+        storage_[0] = 0;
+    }
 
     /**
      * @brief Destructor.
@@ -135,7 +137,8 @@ struct BigInt {
      * @param number Value to initialize with.
      */
     template <typename N_Number_T>
-    QENTEM_INLINE BigInt(const N_Number_T number) noexcept {
+    QENTEM_INLINE BigInt(const N_Number_T number) noexcept : index_{0} {
+        storage_[0] = 0;
         doOperation<BigIntOperation::Set>(number);
     }
 
@@ -448,9 +451,16 @@ struct BigInt {
      * Updates the internal limb count if necessary.
      */
     void Add(Number_T number, SizeT32 index = 0) noexcept {
-        if (number != 0) {
+        if ((number != 0) && (index <= MaxIndex())) {
+            SizeT32 offset = index_;
+
+            while (offset < index) {
+                ++offset;
+                storage_[offset] = 0;
+            }
+
             // Propagate the addition and any carry across limbs
-            while (index <= MaxIndex()) {
+            do {
                 const Number_T tmp = storage_[index];
                 storage_[index] += number;
 
@@ -462,7 +472,7 @@ struct BigInt {
                 // Overflow occurred: set number to 1 to propagate carry
                 number = Number_T{1};
                 ++index;
-            }
+            } while (index <= MaxIndex());
 
             // If we overflowed past the last limb, reset index_
             if (index > MaxIndex()) {
@@ -499,6 +509,10 @@ struct BigInt {
                 // Underflow occurred: set number to 1 to propagate borrow
                 number = Number_T{1};
                 ++index;
+
+                if ((index > index_) && (index <= MaxIndex())) {
+                    storage_[index] = 0;
+                }
             }
 
             // If borrow exceeded highest limb, set index_ to the max index
@@ -553,15 +567,11 @@ struct BigInt {
         // Divide the highest limb and get the initial remainder
         storage_[index_] /= divisor;
 
-        // Calculate the initial shift for 64-bit division optimization
-        const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
-            if (is_size_64b) {
-                // Optimize for 64-bit limb division
-                return ((BitWidth() - 1U) - Platform::FindLastBit(divisor));
-            }
-
-            return 0;
-        }();
+        SizeT32 initial_shift = 0;
+        if constexpr (is_size_64b) {
+            // Calculate the initial shift for 64-bit division optimization
+            initial_shift = ((BitWidth() - 1U) - Platform::FindLastBit(divisor));
+        }
 
         // Process all lower limbs, propagating remainder as needed
         while (index != 0) {
@@ -694,8 +704,11 @@ struct BigInt {
 
             // If carry bits spilled over, extend limb count and add carry
             if (index_ != MaxIndex()) {
-                index_ += SizeT32(carry != 0);
-                storage_[index_] |= carry;
+                if (carry != 0) {
+                    ++index_;
+                    storage_[index_] = 0;
+                    storage_[index_] |= carry;
+                }
             }
 
             // For each lower limb, propagate bits from the lower limb up
@@ -1044,12 +1057,12 @@ struct BigInt {
      * Each element represents a fixed-width chunk ("limb") of the overall value.
      * Size is determined by MaxIndex() + 1 to cover all requested bits.
      */
-    Number_T storage_[MaxIndex() + Number_T{1}]{0};
+    Number_T storage_[MaxIndex() + Number_T{1}];
 
     /**
      * @brief Highest non-zero limb index currently used.
      */
-    SizeT32 index_{0};
+    SizeT32 index_;
 };
 
 /**

@@ -235,6 +235,9 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::setStorage;
     using BaseT::tryInsert;
 
+    QENTEM_INLINE StringHashTable() noexcept : BaseT{} {
+    }
+
     /**
      * @brief Inserts a key into the hash table from a raw character array.
      *

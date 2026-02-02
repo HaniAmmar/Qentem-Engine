@@ -1018,7 +1018,7 @@ struct TemplateCore {
     QENTEM_INLINE void render(const TagBit *tag, const TagBit *end, SizeT offset, SizeT end_offset) const {
         using HandlerFunc = void (TemplateCore::*)(const TagBit *tag, SizeT &) const;
 
-        constexpr HandlerFunc handlers[SizeT8(TagType::None)] = {
+        static constexpr HandlerFunc handlers[SizeT8(TagType::None)] = {
             &TemplateCore::renderVariable, &TemplateCore::renderRawVariable,
             &TemplateCore::renderMath,     &TemplateCore::renderSuperVariable,
             &TemplateCore::renderInLineIf, &TemplateCore::renderLoop,

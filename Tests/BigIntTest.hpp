@@ -42,8 +42,8 @@ static void StreamDigits(char *storage, unsigned int &index, BigInt_T &b_int) {
 
 template <typename BigInt_T>
 static void PrintDigits(BigInt_T b_int, StringStream<char> &stream) {
-    constexpr unsigned int max = (((b_int.TotalBitWidth() * 30103U) / 100000U) + 1U);
-    char                   storage[max]{0};
+    constexpr unsigned int max = (((BigInt_T::TotalBitWidth() * 30103U) / 100000U) + 1U);
+    char                   storage[max];
     unsigned int           index = 0;
 
     StreamDigits(&(storage[0]), index, b_int);

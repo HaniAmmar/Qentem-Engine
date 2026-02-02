@@ -109,7 +109,8 @@ struct IfTag {
 
 struct TagBit {
   public:
-    TagBit() = default;
+    TagBit() noexcept : storage_{nullptr}, type_{TagType::None} {
+    }
 
     TagBit(TagBit &&src) noexcept : storage_{src.storage_}, type_{src.type_} {
         src.type_ = TagType::None;
@@ -379,7 +380,7 @@ struct TagBit {
     }
 
   private:
-    void   *storage_{};
+    void   *storage_{nullptr};
     TagType type_{TagType::None};
 };
 

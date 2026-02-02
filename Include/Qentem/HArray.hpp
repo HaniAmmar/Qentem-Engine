@@ -54,7 +54,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      *
      * Sets key and value to their default-constructed states.
      */
-    QENTEM_INLINE void Clear() {
+    QENTEM_INLINE void Clear() noexcept {
         Key   = Key_T{};
         Value = Value_T{};
     }
@@ -66,7 +66,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      *
      * @param item Source item to move from.
      */
-    QENTEM_INLINE void MoveDoublecat(HAItem_T &item) {
+    QENTEM_INLINE void MoveDoublecat(HAItem_T &item) noexcept {
         Value = QUtility::Move(item.Value);
         MemoryUtils::Destruct(&(item.Key));
     }
@@ -76,7 +76,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      *
      * @param item Source item to copy from.
      */
-    QENTEM_INLINE void CopyValue(HAItem_T const &item) {
+    QENTEM_INLINE void CopyValue(HAItem_T const &item) noexcept {
         Value = item.Value;
     }
 
@@ -88,13 +88,13 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      *
      * Should only be used when writing to uninitialized or cleared item slots.
      */
-    QENTEM_INLINE void Construct(const HAItem_T &item) {
+    QENTEM_INLINE void Construct(const HAItem_T &item) noexcept {
         Hash = item.Hash;
         MemoryUtils::Construct(&Key, item.Key);
         MemoryUtils::Construct(&Value, item.Value);
     }
 
-    QENTEM_INLINE void Construct(HAItem_T &&item) {
+    QENTEM_INLINE void Construct(HAItem_T &&item) noexcept {
         Hash = item.Hash;
         MemoryUtils::Construct(&Key, QUtility::Move(item.Key));
         MemoryUtils::Construct(&Value, QUtility::Move(item.Value));
@@ -105,7 +105,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
      *
      * Uses placement-new or custom Qentem initialization logic.
      */
-    QENTEM_INLINE void InitValue() {
+    QENTEM_INLINE void InitValue() noexcept {
         MemoryUtils::Construct(&Value);
     }
 };
@@ -152,6 +152,9 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>, Expans
     using BaseT::Size;
     using BaseT::Storage;
     using BaseT::tryInsert;
+
+    QENTEM_INLINE HArrayBase() noexcept : BaseT{} {
+    }
 
     /**
      * @brief Gets (or inserts) a value by key object.
@@ -393,6 +396,9 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T, Expansion_Multiplier_T>
 
     using BaseT::find;
     using BaseT::tryInsert;
+
+    QENTEM_INLINE HArrayStrings() noexcept : BaseT{} {
+    }
 
     /**
      * @brief Gets (or inserts) a value by raw character key and length.
