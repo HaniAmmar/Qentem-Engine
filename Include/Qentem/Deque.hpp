@@ -40,7 +40,8 @@ struct Deque {
     /**
      * @brief Default constructor: creates an empty deque.
      */
-    QENTEM_INLINE Deque() noexcept = default;
+    QENTEM_INLINE Deque() noexcept : storage_{nullptr}, size_{0}, head_{0}, pop_count_{0}, capacity_{0} {
+    }
 
     /**
      * @brief Deleted copy constructor: Deque is non-copyable.
