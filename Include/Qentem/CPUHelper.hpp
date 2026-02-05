@@ -33,7 +33,7 @@
 
 namespace Qentem {
 
-struct CPUSet {
+struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
     static constexpr SizeT32 MAX_CORE     = QENTEM_MAX_CPU_CORES;
     static constexpr SizeT32 BIT_WIDTH    = (sizeof(SystemLong) * 8U);
     static constexpr SizeT32 BIT_WIDTH_M1 = (BIT_WIDTH - 1U);
