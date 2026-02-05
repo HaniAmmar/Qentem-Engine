@@ -86,7 +86,7 @@ namespace Qentem {
 //              Configuration Macros (Overridable)           //
 ///////////////////////////////////////////////////////////////
 #ifndef QENTEM_MAX_CPU_CORES
-#define QENTEM_MAX_CPU_CORES 128U
+#define QENTEM_MAX_CPU_CORES 512
 #endif
 
 /**
