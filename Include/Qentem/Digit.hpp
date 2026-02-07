@@ -25,7 +25,7 @@ namespace Qentem {
 struct Digit {
     // Default: same as std::defaultfloat.
     // Fixed: same as std::fixed.
-    // SemiFixed: same as std::fixed, but do not insert zeros.
+    // SemiFixed: same as std::fixed, but does not insert useless extra zeros.
     // Scientific: not implemented.
     enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, SemiFixed = 2, Scientific = 3 };
 
@@ -510,6 +510,7 @@ struct Digit {
     }
 
   private:
+    // TODO: Pass big_int to powerOfNegativeTen and powerOfPositiveTen, and use QNumberXX
     template <typename Char_T>
     static QNumberType stringToNumber(QNumber64 &number, const Char_T *content, SizeT &offset,
                                       SizeT end_offset) noexcept {
