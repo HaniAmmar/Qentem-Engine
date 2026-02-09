@@ -78,7 +78,7 @@ struct SystemMemory {
     #else
             #if defined(__linux__)
                 constexpr int no_access = 0;
-                return (SystemCall(__NR_mprotect, reinterpret_cast<long>(ptr), size, no_access) == 0);
+                return (SystemCall(__NR_mprotect, reinterpret_cast<SystemLongI>(ptr), size, no_access) == 0);
             #else
                 return (::mprotect(ptr, size, PROT_NONE) == 0);
             #endif
@@ -130,7 +130,7 @@ struct SystemMemory {
             ::VirtualFree(ptr, 0, MEM_RELEASE);
     #else
         #if defined(__linux__)
-            SystemCall(__NR_munmap,reinterpret_cast<long>(ptr), size);
+            SystemCall(__NR_munmap,reinterpret_cast<SystemLongI>(ptr), size);
         #else
             ::munmap(ptr, size);
         #endif
@@ -162,7 +162,7 @@ struct SystemMemory {
         // clang-format off
     #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
         #if defined(__linux__)
-            SystemCall(__NR_munmap,reinterpret_cast<long>(start), size);
+            SystemCall(__NR_munmap,reinterpret_cast<SystemLongI>(start), size);
         #else
             ::munmap(start, size);
         #endif
@@ -203,7 +203,7 @@ struct SystemMemory {
             SystemLong page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
 
             const int fd = static_cast<int>(SystemCall(__NR_openat, at_fdcwd,
-                                                reinterpret_cast<long>(&(AUXV_PATH[0])),
+                                                reinterpret_cast<SystemLongI>(AUXV_PATH),
                                                 read_only, 0));
             if (fd >= 0) {
                 unsigned char *ptr = reinterpret_cast<unsigned char*>(&aux);
@@ -211,7 +211,7 @@ struct SystemMemory {
 
                 while (true) {
                    const SystemLongI ret = SystemCall(__NR_read, fd,
-                                          reinterpret_cast<long>(ptr + filled),
+                                          reinterpret_cast<SystemLongI>(ptr + filled),
                                           (sizeof(aux) - filled));
 
                     if (ret > 0) {

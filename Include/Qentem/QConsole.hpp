@@ -132,7 +132,7 @@ struct QConsole {
         }
 #elif defined(__linux__)
         while (length != 0) {
-            const SystemLongI written = SystemCall(__NR_write, 1, reinterpret_cast<long>(data), length);
+            const SystemLongI written = SystemCall(__NR_write, 1, reinterpret_cast<SystemLongI>(data), length);
 
             if (written > 0) {
                 length -= static_cast<SizeT32>(written);

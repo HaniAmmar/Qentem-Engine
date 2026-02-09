@@ -7,7 +7,7 @@
  * invoking the kernel directly per ABI calling conventions.
  *
  * Usage pattern:
- *   long r = SystemCall(__NR_somecall, arg1, arg2, ...);
+ *   SystemLongI r = SystemCall(__NR_somecall, arg1, arg2, ...);
  *   // negative return values correspond to -errno
  *
  * @author Hani Ammar
@@ -38,15 +38,15 @@ namespace Qentem {
  *       for type-flexible argument passing.
  */
 
-QENTEM_INLINE inline static long SystemCall_(long name, long v1) noexcept {
+QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLongI v1) noexcept {
 #if defined(__x86_64__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("syscall" : "=a"(ret) : "a"(name), "D"(v1) : "rcx", "r11", "cc", "memory");
 
     return ret;
 #elif defined(__i386__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("int  $0x80\n\t" // syscall
                          : "=a"(ret)
@@ -55,22 +55,22 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1) noexcept {
 
     return ret;
 #elif defined(__aarch64__)
-    register long x8 __asm__("x8") = name;
-    register long x0 __asm__("x0") = v1;
+    register SystemLongI x8 __asm__("x8") = name;
+    register SystemLongI x0 __asm__("x0") = v1;
 
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8) : "cc", "memory");
 
     return x0;
 #elif defined(__arm__) && defined(__ARM_EABI__)
-    register long r7 __asm__("r7") = name;
-    register long r0 __asm__("r0") = v1;
+    register SystemLongI r7 __asm__("r7") = name;
+    register SystemLongI r0 __asm__("r0") = v1;
 
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7) : "cc", "memory");
 
     return r0;
 #elif defined(__riscv) && (__riscv_xlen == 64)
-    register long a7 __asm__("a7") = name;
-    register long a0 __asm__("a0") = v1;
+    register SystemLongI a7 __asm__("a7") = name;
+    register SystemLongI a0 __asm__("a0") = v1;
 
     __asm__ __volatile__("ecall" : "+r"(a0) : "r"(a7) : "cc", "memory");
 
@@ -80,15 +80,15 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1) noexcept {
 #endif
 }
 
-QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2) noexcept {
+QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLongI v1, SystemLongI v2) noexcept {
 #if defined(__x86_64__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("syscall" : "=a"(ret) : "a"(name), "D"(v1), "S"(v2) : "rcx", "r11", "cc", "memory");
 
     return ret;
 #elif defined(__i386__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("int  $0x80\n\t" // syscall
                          : "=a"(ret)
@@ -97,27 +97,27 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2) noexce
 
     return ret;
 #elif defined(__aarch64__)
-    register long x8 __asm__("x8") = name;
-    register long x0 __asm__("x0") = v1;
-    register long x1 __asm__("x1") = v2;
+    register SystemLongI x8 __asm__("x8") = name;
+    register SystemLongI x0 __asm__("x0") = v1;
+    register SystemLongI x1 __asm__("x1") = v2;
 
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1) : "cc", "memory");
 
     return x0;
 
 #elif defined(__arm__) && defined(__ARM_EABI__)
-    register long r7 __asm__("r7") = name;
-    register long r0 __asm__("r0") = v1;
-    register long r1 __asm__("r1") = v2;
+    register SystemLongI r7 __asm__("r7") = name;
+    register SystemLongI r0 __asm__("r0") = v1;
+    register SystemLongI r1 __asm__("r1") = v2;
 
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1) : "cc", "memory");
 
     return r0;
 
 #elif defined(__riscv) && (__riscv_xlen == 64)
-    register long a7 __asm__("a7") = name;
-    register long a0 __asm__("a0") = v1;
-    register long a1 __asm__("a1") = v2;
+    register SystemLongI a7 __asm__("a7") = name;
+    register SystemLongI a0 __asm__("a0") = v1;
+    register SystemLongI a1 __asm__("a1") = v2;
 
     __asm__ __volatile__("ecall" : "+r"(a0) : "r"(a7), "r"(a1) : "cc", "memory");
 
@@ -128,15 +128,16 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2) noexce
 #endif
 }
 
-QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v3) noexcept {
+QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLongI v1, SystemLongI v2,
+                                                    SystemLongI v3) noexcept {
 #if defined(__x86_64__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("syscall" : "=a"(ret) : "a"(name), "D"(v1), "S"(v2), "d"(v3) : "rcx", "r11", "cc", "memory");
 
     return ret;
 #elif defined(__i386__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("int  $0x80\n\t" // syscall
                          : "=a"(ret)
@@ -145,28 +146,28 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 
     return ret;
 #elif defined(__aarch64__)
-    register long x8 __asm__("x8") = name;
-    register long x0 __asm__("x0") = v1;
-    register long x1 __asm__("x1") = v2;
-    register long x2 __asm__("x2") = v3;
+    register SystemLongI x8 __asm__("x8") = name;
+    register SystemLongI x0 __asm__("x0") = v1;
+    register SystemLongI x1 __asm__("x1") = v2;
+    register SystemLongI x2 __asm__("x2") = v3;
 
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2) : "cc", "memory");
 
     return x0;
 #elif defined(__arm__) && defined(__ARM_EABI__)
-    register long r7 __asm__("r7") = name;
-    register long r0 __asm__("r0") = v1;
-    register long r1 __asm__("r1") = v2;
-    register long r2 __asm__("r2") = v3;
+    register SystemLongI r7 __asm__("r7") = name;
+    register SystemLongI r0 __asm__("r0") = v1;
+    register SystemLongI r1 __asm__("r1") = v2;
+    register SystemLongI r2 __asm__("r2") = v3;
 
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2) : "cc", "memory");
 
     return r0;
 #elif defined(__riscv) && (__riscv_xlen == 64)
-    register long a7 __asm__("a7") = name;
-    register long a0 __asm__("a0") = v1;
-    register long a1 __asm__("a1") = v2;
-    register long a2 __asm__("a2") = v3;
+    register SystemLongI a7 __asm__("a7") = name;
+    register SystemLongI a0 __asm__("a0") = v1;
+    register SystemLongI a1 __asm__("a1") = v2;
+    register SystemLongI a2 __asm__("a2") = v3;
 
     __asm__ __volatile__("ecall" : "+r"(a0) : "r"(a7), "r"(a1), "r"(a2) : "cc", "memory");
 
@@ -176,10 +177,11 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 #endif
 }
 
-QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v3, long v4) noexcept {
+QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLongI v1, SystemLongI v2, SystemLongI v3,
+                                                    SystemLongI v4) noexcept {
 #if defined(__x86_64__)
-    register long r10 __asm__("r10") = v4;
-    long          ret;
+    register SystemLongI r10 __asm__("r10") = v4;
+    SystemLongI          ret;
 
     __asm__ __volatile__("syscall"
                          : "=a"(ret)
@@ -188,7 +190,7 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 
     return ret;
 #elif defined(__i386__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("int  $0x80\n\t" // syscall
                          : "=a"(ret)
@@ -197,31 +199,31 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 
     return ret;
 #elif defined(__aarch64__)
-    register long x8 __asm__("x8") = name;
-    register long x0 __asm__("x0") = v1;
-    register long x1 __asm__("x1") = v2;
-    register long x2 __asm__("x2") = v3;
-    register long x3 __asm__("x3") = v4;
+    register SystemLongI x8 __asm__("x8") = name;
+    register SystemLongI x0 __asm__("x0") = v1;
+    register SystemLongI x1 __asm__("x1") = v2;
+    register SystemLongI x2 __asm__("x2") = v3;
+    register SystemLongI x3 __asm__("x3") = v4;
 
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2), "r"(x3) : "cc", "memory");
 
     return x0;
 #elif defined(__arm__) && defined(__ARM_EABI__)
-    register long r7 __asm__("r7") = name;
-    register long r0 __asm__("r0") = v1;
-    register long r1 __asm__("r1") = v2;
-    register long r2 __asm__("r2") = v3;
-    register long r3 __asm__("r3") = v4;
+    register SystemLongI r7 __asm__("r7") = name;
+    register SystemLongI r0 __asm__("r0") = v1;
+    register SystemLongI r1 __asm__("r1") = v2;
+    register SystemLongI r2 __asm__("r2") = v3;
+    register SystemLongI r3 __asm__("r3") = v4;
 
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2), "r"(r3) : "cc", "memory");
 
     return r0;
 #elif defined(__riscv) && (__riscv_xlen == 64)
-    register long a7 __asm__("a7") = name;
-    register long a0 __asm__("a0") = v1;
-    register long a1 __asm__("a1") = v2;
-    register long a2 __asm__("a2") = v3;
-    register long a3 __asm__("a3") = v4;
+    register SystemLongI a7 __asm__("a7") = name;
+    register SystemLongI a0 __asm__("a0") = v1;
+    register SystemLongI a1 __asm__("a1") = v2;
+    register SystemLongI a2 __asm__("a2") = v3;
+    register SystemLongI a3 __asm__("a3") = v4;
 
     __asm__ __volatile__("ecall" : "+r"(a0) : "r"(a7), "r"(a1), "r"(a2), "r"(a3) : "cc", "memory");
 
@@ -231,11 +233,12 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 #endif
 }
 
-QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v3, long v4, long v5) noexcept {
+QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLongI v1, SystemLongI v2, SystemLongI v3,
+                                                    SystemLongI v4, SystemLongI v5) noexcept {
 #if defined(__x86_64__)
-    register long r10 __asm__("r10") = v4;
-    register long r8 __asm__("r8")   = v5;
-    long          ret;
+    register SystemLongI r10 __asm__("r10") = v4;
+    register SystemLongI r8 __asm__("r8")   = v5;
+    SystemLongI          ret;
 
     __asm__ __volatile__("syscall"
                          : "=a"(ret)
@@ -244,7 +247,7 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 
     return ret;
 #elif defined(__i386__)
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("int  $0x80\n\t" // syscall
                          : "=a"(ret)
@@ -253,34 +256,34 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 
     return ret;
 #elif defined(__aarch64__)
-    register long x8 __asm__("x8") = name;
-    register long x0 __asm__("x0") = v1;
-    register long x1 __asm__("x1") = v2;
-    register long x2 __asm__("x2") = v3;
-    register long x3 __asm__("x3") = v4;
-    register long x4 __asm__("x4") = v5;
+    register SystemLongI x8 __asm__("x8") = name;
+    register SystemLongI x0 __asm__("x0") = v1;
+    register SystemLongI x1 __asm__("x1") = v2;
+    register SystemLongI x2 __asm__("x2") = v3;
+    register SystemLongI x3 __asm__("x3") = v4;
+    register SystemLongI x4 __asm__("x4") = v5;
 
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2), "r"(x3), "r"(x4) : "cc", "memory");
 
     return x0;
 #elif defined(__arm__) && defined(__ARM_EABI__)
-    register long r7 __asm__("r7") = name;
-    register long r0 __asm__("r0") = v1;
-    register long r1 __asm__("r1") = v2;
-    register long r2 __asm__("r2") = v3;
-    register long r3 __asm__("r3") = v4;
-    register long r4 __asm__("r4") = v5;
+    register SystemLongI r7 __asm__("r7") = name;
+    register SystemLongI r0 __asm__("r0") = v1;
+    register SystemLongI r1 __asm__("r1") = v2;
+    register SystemLongI r2 __asm__("r2") = v3;
+    register SystemLongI r3 __asm__("r3") = v4;
+    register SystemLongI r4 __asm__("r4") = v5;
 
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2), "r"(r3), "r"(r4) : "cc", "memory");
 
     return r0;
 #elif defined(__riscv) && (__riscv_xlen == 64)
-    register long a7 __asm__("a7") = name;
-    register long a0 __asm__("a0") = v1;
-    register long a1 __asm__("a1") = v2;
-    register long a2 __asm__("a2") = v3;
-    register long a3 __asm__("a3") = v4;
-    register long a4 __asm__("a4") = v5;
+    register SystemLongI a7 __asm__("a7") = name;
+    register SystemLongI a0 __asm__("a0") = v1;
+    register SystemLongI a1 __asm__("a1") = v2;
+    register SystemLongI a2 __asm__("a2") = v3;
+    register SystemLongI a3 __asm__("a3") = v4;
+    register SystemLongI a4 __asm__("a4") = v5;
 
     __asm__ __volatile__("ecall" : "+r"(a0) : "r"(a7), "r"(a1), "r"(a2), "r"(a3), "r"(a4) : "cc", "memory");
 
@@ -290,13 +293,14 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 #endif
 }
 
-QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v3, long v4, long v5, long v6) noexcept {
+QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLongI v1, SystemLongI v2, SystemLongI v3,
+                                                    SystemLongI v4, SystemLongI v5, SystemLongI v6) noexcept {
 #if defined(__x86_64__)
     // x86-64 ABI: rax=nr, rdi, rsi, rdx, r10, r8, r9 -> rax
-    register long r10 __asm__("r10") = v4;
-    register long r8 __asm__("r8")   = v5;
-    register long r9 __asm__("r9")   = v6;
-    long          ret;
+    register SystemLongI r10 __asm__("r10") = v4;
+    register SystemLongI r8 __asm__("r8")   = v5;
+    register SystemLongI r9 __asm__("r9")   = v6;
+    SystemLongI          ret;
 
     __asm__ __volatile__("syscall"
                          : "=a"(ret)
@@ -310,7 +314,7 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
     //   - The asm version preserved and restored EBP manually to remain debug-safe.
 
     // i386 ABI : eax = nr, ebx, ecx, edx, esi, edi, EBP->eax
-    long ret;
+    SystemLongI ret;
 
     __asm__ __volatile__("push %%ebp\n\t"        // preserve frame pointer (debug-safe)
                          "mov  %[a6], %%ebp\n\t" // 6th arg must be in EBP
@@ -323,39 +327,39 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
     return ret;
 #elif defined(__aarch64__)
     // AArch64 ABI: x8=nr, x0..x5=args -> x0
-    register long x8 __asm__("x8") = name;
-    register long x0 __asm__("x0") = v1;
-    register long x1 __asm__("x1") = v2;
-    register long x2 __asm__("x2") = v3;
-    register long x3 __asm__("x3") = v4;
-    register long x4 __asm__("x4") = v5;
-    register long x5 __asm__("x5") = v6;
+    register SystemLongI x8 __asm__("x8") = name;
+    register SystemLongI x0 __asm__("x0") = v1;
+    register SystemLongI x1 __asm__("x1") = v2;
+    register SystemLongI x2 __asm__("x2") = v3;
+    register SystemLongI x3 __asm__("x3") = v4;
+    register SystemLongI x4 __asm__("x4") = v5;
+    register SystemLongI x5 __asm__("x5") = v6;
 
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2), "r"(x3), "r"(x4), "r"(x5) : "cc", "memory");
 
     return x0;
 #elif defined(__arm__) && defined(__ARM_EABI__)
     // ARM32 EABI: r7=nr, r0..r5=args -> r0
-    register long r7 __asm__("r7") = name;
-    register long r0 __asm__("r0") = v1;
-    register long r1 __asm__("r1") = v2;
-    register long r2 __asm__("r2") = v3;
-    register long r3 __asm__("r3") = v4;
-    register long r4 __asm__("r4") = v5;
-    register long r5 __asm__("r5") = v6;
+    register SystemLongI r7 __asm__("r7") = name;
+    register SystemLongI r0 __asm__("r0") = v1;
+    register SystemLongI r1 __asm__("r1") = v2;
+    register SystemLongI r2 __asm__("r2") = v3;
+    register SystemLongI r3 __asm__("r3") = v4;
+    register SystemLongI r4 __asm__("r4") = v5;
+    register SystemLongI r5 __asm__("r5") = v6;
 
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r5) : "cc", "memory");
 
     return r0;
 #elif defined(__riscv) && (__riscv_xlen == 64)
     // RISC-V 64-bit: a7=nr, a0..a5=args -> a0
-    register long a7 __asm__("a7") = name;
-    register long a0 __asm__("a0") = v1;
-    register long a1 __asm__("a1") = v2;
-    register long a2 __asm__("a2") = v3;
-    register long a3 __asm__("a3") = v4;
-    register long a4 __asm__("a4") = v5;
-    register long a5 __asm__("a5") = v6;
+    register SystemLongI a7 __asm__("a7") = name;
+    register SystemLongI a0 __asm__("a0") = v1;
+    register SystemLongI a1 __asm__("a1") = v2;
+    register SystemLongI a2 __asm__("a2") = v3;
+    register SystemLongI a3 __asm__("a3") = v4;
+    register SystemLongI a4 __asm__("a4") = v5;
+    register SystemLongI a5 __asm__("a5") = v6;
 
     __asm__ __volatile__("ecall" : "+r"(a0) : "r"(a7), "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5) : "cc", "memory");
 
@@ -368,46 +372,48 @@ QENTEM_INLINE inline static long SystemCall_(long name, long v1, long v2, long v
 /**
  * @brief Type-flexible, always-inline syscall wrapper.
  *
- * Converts arbitrary integral types to `long` for the raw `SystemCall_`.
+ * Converts arbitrary integral types to `SystemLongI` for the raw `SystemCall_`.
  * Allows libc-free, header-only usage across multiple platforms.
  *
- * @tparam Var1_T..Var6_T  Argument types, defaults to long.
+ * @tparam Var1_T..Var6_T  Argument types, defaults to SystemLongI.
  * @param name             Syscall number (e.g., __NR_openat).
  * @param v1..v6           Optional syscall arguments.
  * @return Kernel return value (negative indicates -errno).
  */
 template <typename Var1_T>
-QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1) noexcept {
-    return SystemCall_(name, static_cast<long>(v1));
+QENTEM_INLINE inline static SystemLongI SystemCall(SystemLongI name, Var1_T v1) noexcept {
+    return SystemCall_(name, static_cast<SystemLongI>(v1));
 }
 
 template <typename Var1_T, typename Var2_T>
-QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2) noexcept {
-    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2));
+QENTEM_INLINE inline static SystemLongI SystemCall(SystemLongI name, Var1_T v1, Var2_T v2) noexcept {
+    return SystemCall_(name, static_cast<SystemLongI>(v1), static_cast<SystemLongI>(v2));
 }
 
 template <typename Var1_T, typename Var2_T, typename Var3_T>
-QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3) noexcept {
-    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3));
+QENTEM_INLINE inline static SystemLongI SystemCall(SystemLongI name, Var1_T v1, Var2_T v2, Var3_T v3) noexcept {
+    return SystemCall_(name, static_cast<SystemLongI>(v1), static_cast<SystemLongI>(v2), static_cast<SystemLongI>(v3));
 }
 
 template <typename Var1_T, typename Var2_T, typename Var3_T, typename Var4_T>
-QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4) noexcept {
-    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3),
-                       static_cast<long>(v4));
+QENTEM_INLINE inline static SystemLongI SystemCall(SystemLongI name, Var1_T v1, Var2_T v2, Var3_T v3,
+                                                   Var4_T v4) noexcept {
+    return SystemCall_(name, static_cast<SystemLongI>(v1), static_cast<SystemLongI>(v2), static_cast<SystemLongI>(v3),
+                       static_cast<SystemLongI>(v4));
 }
 
 template <typename Var1_T, typename Var2_T, typename Var3_T, typename Var4_T, typename Var5_T>
-QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4, Var5_T v5) noexcept {
-    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3), static_cast<long>(v4),
-                       static_cast<long>(v5));
+QENTEM_INLINE inline static SystemLongI SystemCall(SystemLongI name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4,
+                                                   Var5_T v5) noexcept {
+    return SystemCall_(name, static_cast<SystemLongI>(v1), static_cast<SystemLongI>(v2), static_cast<SystemLongI>(v3),
+                       static_cast<SystemLongI>(v4), static_cast<SystemLongI>(v5));
 }
 
 template <typename Var1_T, typename Var2_T, typename Var3_T, typename Var4_T, typename Var5_T, typename Var6_T>
-QENTEM_INLINE inline static long SystemCall(long name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4, Var5_T v5,
-                                            Var6_T v6) noexcept {
-    return SystemCall_(name, static_cast<long>(v1), static_cast<long>(v2), static_cast<long>(v3), static_cast<long>(v4),
-                       static_cast<long>(v5), static_cast<long>(v6));
+QENTEM_INLINE inline static SystemLongI SystemCall(SystemLongI name, Var1_T v1, Var2_T v2, Var3_T v3, Var4_T v4,
+                                                   Var5_T v5, Var6_T v6) noexcept {
+    return SystemCall_(name, static_cast<SystemLongI>(v1), static_cast<SystemLongI>(v2), static_cast<SystemLongI>(v3),
+                       static_cast<SystemLongI>(v4), static_cast<SystemLongI>(v5), static_cast<SystemLongI>(v6));
 }
 
 } // namespace Qentem

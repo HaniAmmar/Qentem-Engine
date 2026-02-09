@@ -138,7 +138,7 @@ struct CPUHelper {
 #if defined(__linux__)
         long core = 0;
 
-        SystemCall(__NR_getcpu, reinterpret_cast<long>(&core), 0, 0);
+        SystemCall(__NR_getcpu, reinterpret_cast<SystemLongI>(&core), 0, 0);
 
         return static_cast<SizeT32>(core);
 #elif defined(_WIN32)
@@ -203,7 +203,7 @@ struct CPUHelper {
      */
     QENTEM_INLINE static bool OnlineCoresMask(CPUSet &mask) noexcept {
 #if defined(__linux__)
-        if (SystemCall(__NR_sched_getaffinity, 0, mask.TotalBytes(), reinterpret_cast<long>(mask.Data())) >= 0) {
+        if (SystemCall(__NR_sched_getaffinity, 0, mask.TotalBytes(), reinterpret_cast<SystemLongI>(mask.Data())) >= 0) {
             return true;
         }
 #else
@@ -372,7 +372,7 @@ struct CPUHelper {
      */
     QENTEM_INLINE static long SetAffinity(int pid, SystemLong cpusetsize, const void *mask) noexcept {
 #if defined(__linux__)
-        return SystemCall(__NR_sched_setaffinity, pid, cpusetsize, reinterpret_cast<long>(mask));
+        return SystemCall(__NR_sched_setaffinity, pid, cpusetsize, reinterpret_cast<SystemLongI>(mask));
 #else
         (void)pid;
         (void)cpusetsize;
