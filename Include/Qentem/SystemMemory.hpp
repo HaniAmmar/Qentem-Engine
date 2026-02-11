@@ -103,6 +103,38 @@ struct SystemMemory {
         return reserve<false>(size, flags);
     }
 
+#if defined(__linux__)
+    /**
+     * @brief Reserves virtual memory using explicit platform mapping parameters.
+     *
+     * This function is a low-level wrapper around the platform's memory mapping
+     * system call (e.g., mmap on Linux). Unlike Reserve(), which selects sensible
+     * defaults, this function exposes all mapping parameters directly to the caller.
+     *
+     * @param address_hint Preferred virtual address for the mapping, or nullptr to let
+     *        the system choose an appropriate location.
+     * @param length Size of the mapping in bytes. Must be a multiple of the system page size.
+     * @param protection Memory protection flags (e.g., PROT_READ, PROT_WRITE, PROT_EXEC).
+     * @param mapping_flags Mapping behavior flags (e.g., MAP_PRIVATE, MAP_SHARED,
+     *        MAP_ANONYMOUS, MAP_STACK).
+     * @param file_descriptor File descriptor backing the mapping, or -1 for anonymous mappings.
+     * @param offset Offset within the backing file, in bytes (must be page-aligned when applicable).
+     *
+     * @return System call result. On success, returns the base address of the mapping
+     *         cast to SystemLongI. On failure, returns a negative error code.
+     */
+    static SystemLongI ReserveEx(void *address_hint, SystemLong length, int protection, int mapping_flags,
+                                 int file_descriptor, SystemLong offset) noexcept {
+        return SystemCall(
+#if defined(__i386__) || defined(__arm__) || defined(__ARM_EABI__)
+            __NR_mmap2,
+#else
+            __NR_mmap,
+#endif
+            reinterpret_cast<SystemLongI>(address_hint), length, protection, mapping_flags, file_descriptor, offset);
+    }
+#endif
+
     /**
      * @brief Reserves page-aligned memory intended for use as a stack.
      *
