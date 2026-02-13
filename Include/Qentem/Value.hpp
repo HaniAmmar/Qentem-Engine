@@ -1287,6 +1287,25 @@ struct Value {
                 return array_.Storage();
             }
 
+            default:
+                return nullptr;
+        }
+    }
+
+    const Value *Storage() const {
+        switch (Type()) {
+            case ValueType::Object: {
+                const VItem *item = object_.Storage();
+
+                if (item != nullptr) {
+                    return &(item->Value);
+                }
+            }
+
+            case ValueType::Array: {
+                return array_.Storage();
+            }
+
             case ValueType::ValuePtr: {
                 return value_->Storage();
             }
@@ -1349,7 +1368,7 @@ struct Value {
     const Value *Last() const {
         switch (Type()) {
             case ValueType::Object: {
-                VItem *item = object_.Last();
+                const VItem *item = object_.Last();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1374,7 +1393,7 @@ struct Value {
     const Value *End() const {
         switch (Type()) {
             case ValueType::Object: {
-                VItem *item = object_.End();
+                const VItem *item = object_.End();
 
                 if (item != nullptr) {
                     return &(item->Value);
