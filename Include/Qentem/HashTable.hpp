@@ -535,8 +535,9 @@ struct HashTable {
      * @param to   The new key name (rvalue).
      * @return true if renaming is successful; false otherwise.
      */
-    bool Rename(const Key_T &from, Key_T &&to) const noexcept {
+    bool Rename(const Key_T &from, Key_T &&to) noexcept {
         HItem_T *item = prepareRename(from, to); // Unlink and ready for new key
+
         if (item != nullptr) {
             item->Key = QUtility::Move(to); // Move-assign new key
 
