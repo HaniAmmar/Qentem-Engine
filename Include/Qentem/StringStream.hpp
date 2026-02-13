@@ -27,9 +27,9 @@ struct StringStream {
 
     static constexpr SizeT ExpandShift{2};
 
-    QENTEM_INLINE StringStream() noexcept : storage_{nullptr}, capacity_{0}, length_{0} {};
+    QENTEM_INLINE StringStream() noexcept = default;
 
-    explicit StringStream(SizeT capacity) : storage_{nullptr}, capacity_{0}, length_{0} {
+    explicit StringStream(SizeT capacity) {
         if (capacity != 0) {
             reserve(capacity);
         }
@@ -42,19 +42,19 @@ struct StringStream {
         src.setLength(0);
     }
 
-    StringStream(const StringStream &src) : storage_{nullptr}, capacity_{0}, length_{0} {
+    StringStream(const StringStream &src) {
         if (src.Length() != 0) {
             reserve(src.Length());
             Write(src.First(), src.Length());
         }
     }
 
-    StringStream(const Char_T *str, SizeT length) : storage_{nullptr}, capacity_{0}, length_{0} {
+    StringStream(const Char_T *str, SizeT length) {
         reserve(length);
         Write(str, length);
     }
 
-    StringStream(const Char_T *str) : storage_{nullptr}, capacity_{0}, length_{0} {
+    StringStream(const Char_T *str) {
         const SizeT length = StringUtils::Count(str);
         reserve(length);
         Write(str, length);
@@ -209,7 +209,7 @@ struct StringStream {
         const SizeT new_length = (Length() + SizeT{1});
 
         if (Capacity() == Length()) {
-            expand(new_length << ExpandShift);
+            expand(static_cast<SizeT>(new_length << ExpandShift));
         }
 
         Storage()[Length()] = ch;
@@ -221,7 +221,7 @@ struct StringStream {
             const SizeT new_length = (Length() + length);
 
             if (Capacity() < new_length) {
-                expand(new_length << ExpandShift);
+                expand(static_cast<SizeT>(new_length << ExpandShift));
             }
 
             MemoryUtils::CopyTo((Storage() + Length()), str, length);
@@ -464,9 +464,9 @@ struct StringStream {
         Reserver::Release(storage, capacity);
     }
 
-    Char_T *storage_;
-    SizeT   capacity_;
-    SizeT   length_;
+    Char_T *storage_{nullptr};
+    SizeT   capacity_{0};
+    SizeT   length_{0};
 };
 
 } // namespace Qentem

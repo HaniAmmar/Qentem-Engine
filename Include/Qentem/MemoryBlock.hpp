@@ -96,8 +96,8 @@ struct MemoryBlock {
 
         table_size_ /= PTR_SIZE;
 
-        SizeT32 unusable_bits    = static_cast<SizeT32>(unusable >> DefaultAlignmentBit());
-        SizeT32 unusable_indices = (unusable_bits / BIT_WIDTH);
+        const SizeT32 unusable_bits    = static_cast<SizeT32>(unusable >> DefaultAlignmentBit());
+        const SizeT32 unusable_indices = (unusable_bits / BIT_WIDTH);
 
         table_size_ -= unusable_indices;
         table_mask_shift_ -= (unusable_bits - (unusable_indices * BIT_WIDTH));

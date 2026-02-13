@@ -24,14 +24,12 @@ namespace Qentem {
 
 template <typename Type_T>
 struct LiteArray {
-    QENTEM_INLINE LiteArray() noexcept : storage_{nullptr}, capacity_{0}, size_{0} {
-    }
+    QENTEM_INLINE LiteArray() noexcept = default;
 
     LiteArray(const LiteArray &)            = delete;
     LiteArray &operator=(const LiteArray &) = delete;
 
-    QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) noexcept
-        : storage_{nullptr}, capacity_{0}, size_{0} {
+    QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) noexcept {
         if (capacity != 0) {
             reserve(capacity);
 
@@ -246,7 +244,7 @@ struct LiteArray {
         if (capacity_bytes > SystemMemory::GetPageSize()) {
             capacity_bytes = SystemMemory::AlignToPageSize(capacity_bytes);
         } else {
-            capacity_bytes = SystemMemory::GetPageSize();
+            capacity_bytes = static_cast<SizeT>(SystemMemory::GetPageSize());
         }
 
         storage_ = static_cast<Type_T *>(SystemMemory::Reserve(capacity_bytes));
@@ -268,9 +266,9 @@ struct LiteArray {
     void *raw_storage_{nullptr};
 #endif
 
-    Type_T *storage_;
-    SizeT   capacity_;
-    SizeT   size_;
+    Type_T *storage_{nullptr};
+    SizeT   capacity_{0};
+    SizeT   size_{0};
 };
 
 } // namespace Qentem

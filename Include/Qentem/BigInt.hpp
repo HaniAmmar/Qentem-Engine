@@ -94,14 +94,12 @@ struct BigInt {
     /**
      * @brief Default constructor. Initializes to zero.
      */
-    BigInt() noexcept : index_{0} {
-        storage_[0] = 0;
-    }
+    QENTEM_INLINE BigInt() noexcept = default;
 
     /**
      * @brief Destructor.
      */
-    ~BigInt() noexcept = default;
+    QENTEM_INLINE ~BigInt() noexcept = default;
 
     /**
      * @brief Move constructor.
@@ -1049,12 +1047,12 @@ struct BigInt {
      * Each element represents a fixed-width chunk ("limb") of the overall value.
      * Size is determined by MaxIndex() + 1 to cover all requested bits.
      */
-    Number_T storage_[MaxIndex() + Number_T{1}];
+    Number_T storage_[MaxIndex() + Number_T{1}]{};
 
     /**
      * @brief Highest non-zero limb index currently used.
      */
-    SizeT32 index_;
+    SizeT32 index_{0};
 };
 
 /**

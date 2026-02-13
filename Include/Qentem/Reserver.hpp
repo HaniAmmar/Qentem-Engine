@@ -86,16 +86,15 @@ struct ReserverCore {
     ReserverCore(const ReserverCore &)            = delete;
     ReserverCore &operator=(const ReserverCore &) = delete;
 
+    static_assert(Alignment_T >= sizeof(void *),
+                  "Alignment_T must be at least the size of a pointer to ensure correct placement.");
     /**
      * @brief Constructs a fresh memory manager for a single core.
      *
      * Begins with a smaller-than-target block to allow gradual scaling.
      * Each block obtained is internally subdivided, zero-overhead, and alignment-aware.
      */
-    QENTEM_INLINE ReserverCore() noexcept {
-        static_assert(Alignment_T >= sizeof(void *),
-                      "Alignment_T must be at least the size of a pointer to ensure correct placement.");
-    }
+    QENTEM_INLINE ReserverCore() noexcept = default;
 
     QENTEM_INLINE ~ReserverCore() noexcept {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
@@ -491,12 +490,12 @@ struct ReserverCore {
         // You are welcome to use this system — but you *will* credit the architect.
         // -----------------------------------------------------------------------------
 
-        SystemLong      *table       = static_cast<SystemLong *>(block->Base());
-        const SystemLong table_size  = block->TableSize();
-        SystemLong       table_index = block->GetRefNextIndex();
-        SystemLong       start_index = block->GetRefNextIndex();
-        SystemLong       start_bit   = 0;
-        SystemLong       region_size = 0;
+        const SystemLong *table       = static_cast<const SystemLong *>(block->Base());
+        const SystemLong  table_size  = block->TableSize();
+        SystemLong        table_index = block->GetRefNextIndex();
+        SystemLong        start_index = block->GetRefNextIndex();
+        SystemLong        start_bit   = 0;
+        SystemLong        region_size = 0;
 
         while (table_index < table_size) {
             if (table[table_index] == MAX_SYSTEM_INT_TYPE) {
@@ -599,9 +598,9 @@ struct ReserverCore {
     bool reserveAt(MemoryBlockT *block, void *ptr, SystemLong chunks) {
         constexpr SizeT32 bit_width_m1 = (BIT_WIDTH - 1U);
 
-        SystemLong *table = static_cast<SystemLong *>(block->Base());
-        SystemLong  table_index;
-        SystemLong  shifted;
+        const SystemLong *table = static_cast<const SystemLong *>(block->Base());
+        SystemLong        table_index;
+        SystemLong        shifted;
 
         MemoryBlockT::DecodeBitmapPosition(
             static_cast<SystemLong>(static_cast<char *>(ptr) - static_cast<char *>(block->Data())), table_index,
@@ -1042,7 +1041,7 @@ struct Reserver {
 
   private:
 #if defined(__linux__) || defined(_WIN32)
-    inline static LiteArray<ReserverCore<>> reservers_{CPUHelper::GetCoreCount(), true};
+    inline static LiteArray<ReserverCore<>> reservers_{static_cast<SizeT>(CPUHelper::GetCoreCount()), true};
 #else
     inline static ReserverCore<> reserver_{};
 #endif

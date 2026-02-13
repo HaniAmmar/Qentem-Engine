@@ -79,7 +79,7 @@ struct ToCharsHelper {
         }
 
         static void Write(Stream_T &stream, const char *str) {
-            stream.Write(str, StringUtils::Count(str));
+            stream.Write(str, StringUtils::Count<char, SizeT32>(str));
         }
     };
 
@@ -90,7 +90,7 @@ struct ToCharsHelper {
         }
 
         static void Write(Stream_T &stream, const unsigned char *str) {
-            stream.Write(reinterpret_cast<const char *>(str), StringUtils::Count(str));
+            stream.Write(reinterpret_cast<const char *>(str), StringUtils::Count<unsigned char, SizeT32>(str));
         }
     };
 
@@ -148,10 +148,10 @@ struct ToCharsHelper {
     template <typename Stream_T>
     struct Writer<Stream_T, void> {
         static void Write(Stream_T &stream, const void *ptr) {
-            constexpr SizeT TOTAL_LENGTH{sizeof(void *) * 2U};
-            char            buffer[TOTAL_LENGTH];
-            const SizeT     length = Digit::NumberToHex(&(buffer[0]), reinterpret_cast<SystemLong>(ptr));
-            const SizeT     offset = (TOTAL_LENGTH - length);
+            static constexpr SizeT32 TOTAL_LENGTH{sizeof(void *) * 2U};
+            char                     buffer[TOTAL_LENGTH];
+            const SizeT32            length = Digit::NumberToHex(&(buffer[0]), reinterpret_cast<SystemLong>(ptr));
+            const SizeT32            offset = (TOTAL_LENGTH - length);
 
             stream.Write("0x", SizeT{2});
             Digit::InsertZeros(stream, offset);

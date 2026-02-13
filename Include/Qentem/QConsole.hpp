@@ -67,7 +67,7 @@ struct QConsole {
     }
 
     QENTEM_NOINLINE static void Write(const char *data) noexcept {
-        buffer_.Write(data, StringUtils::Count(data));
+        buffer_.Write(data, StringUtils::Count<char, SizeT32>(data));
 
         if (IsOutputEnabled() && (buffer_.Length() >= SizeT{512})) {
             flush();
@@ -138,7 +138,9 @@ struct QConsole {
                 length -= static_cast<SizeT32>(written);
                 data += written;
                 continue;
-            } else if ((written == -EINTR) || (written == -EAGAIN)) {
+            }
+
+            if ((written == -EINTR) || (written == -EAGAIN)) {
                 continue; // retry
             }
 

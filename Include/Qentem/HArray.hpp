@@ -47,7 +47,7 @@ struct HAItem_T : public HTableItem_T<Key_T> {
     /**
      * @brief The value associated with this key.
      */
-    Value_T Value;
+    Value_T Value{};
 
     /**
      * @brief Clears both the key and value, resetting the item.
@@ -153,9 +153,7 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>, Expans
     using BaseT::Storage;
     using BaseT::tryInsert;
 
-    QENTEM_INLINE HArrayBase() noexcept : BaseT{} {
-    }
-
+    QENTEM_INLINE HArrayBase() noexcept = default;
     /**
      * @brief Gets (or inserts) a value by key object.
      *
@@ -397,8 +395,7 @@ struct HArrayStrings : public HArrayBase<Key_T, Value_T, Expansion_Multiplier_T>
     using BaseT::find;
     using BaseT::tryInsert;
 
-    QENTEM_INLINE HArrayStrings() noexcept : BaseT{} {
-    }
+    QENTEM_INLINE HArrayStrings() noexcept = default;
 
     /**
      * @brief Gets (or inserts) a value by raw character key and length.

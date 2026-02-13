@@ -67,8 +67,8 @@ static int PrintResult(int passed, int failed) {
 
 QENTEM_MAYBE_UNUSED
 static void SelfTestLeak(QTest &test, char *&ptr) {
-    ptr        = Reserver::Reserve<char>(8U);
-    char *nptr = nullptr;
+    ptr              = Reserver::Reserve<char>(8U);
+    const char *nptr = nullptr;
 
     test.IsTrue(false, 1);
     test.IsFalse(true, 2);

@@ -41,8 +41,7 @@ struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
     // static constexpr SizeT32 SHIFT        = Platform::FindFirstBit(BIT_WIDTH);
     static constexpr SizeT32 SHIFT = (BIT_WIDTH == SystemLong{64} ? 6U : 5U);
 
-    QENTEM_INLINE CPUSet() noexcept : mask_{} {
-    }
+    QENTEM_INLINE CPUSet() noexcept = default;
 
     QENTEM_INLINE void Clear() noexcept {
         SizeT32 index = SIZE;
@@ -92,11 +91,11 @@ struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
         return &(mask_[0]);
     }
 
-    QENTEM_INLINE constexpr SizeT32 Size() const noexcept {
+    QENTEM_INLINE static constexpr SizeT32 Size() noexcept {
         return SIZE;
     }
 
-    QENTEM_INLINE constexpr SizeT32 TotalBytes() const noexcept {
+    QENTEM_INLINE static constexpr SizeT32 TotalBytes() noexcept {
         return (SIZE * sizeof(SystemLong));
     }
 
@@ -106,7 +105,7 @@ struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
         offset = (core & BIT_WIDTH_M1);
     }
 
-    SystemLong mask_[SIZE];
+    SystemLong mask_[SIZE]{};
 };
 
 struct CPUHelper {
@@ -170,7 +169,7 @@ struct CPUHelper {
         cores.Set(core_id);
 
         // 0 = current thread
-        const long ret = SetAffinity(0, cores.TotalBytes(), cores.Data());
+        const long ret = SetAffinity(0, CPUSet::TotalBytes(), cores.Data());
 
         return (ret == 0);
 #elif defined(_WIN32)
@@ -203,9 +202,8 @@ struct CPUHelper {
      */
     QENTEM_INLINE static bool OnlineCoresMask(CPUSet &mask) noexcept {
 #if defined(__linux__)
-        if (SystemCall(__NR_sched_getaffinity, 0, mask.TotalBytes(), reinterpret_cast<SystemLongI>(mask.Data())) >= 0) {
-            return true;
-        }
+        return (SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(),
+                           reinterpret_cast<SystemLongI>(mask.Data())) >= 0);
 #else
         (void)mask;
 #endif
@@ -419,7 +417,7 @@ struct CPUHelper {
         cores.Clear();
 
         if (OnlineCoresMask(cores)) {
-            SizeT32 index = cores.Size();
+            SizeT32 index = CPUSet::Size();
             SizeT32 count = 0;
 
             do {

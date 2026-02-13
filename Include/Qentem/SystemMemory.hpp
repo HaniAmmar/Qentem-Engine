@@ -244,7 +244,7 @@ struct SystemMemory {
             struct {
                 SystemLong Type;
                 SystemLong Value;
-            } aux;
+            } aux{0,0};
 
             constexpr int at_fdcwd      = -100; // AT_FDCWD
             constexpr int read_only     = 0;    // O_RDONLY
@@ -257,7 +257,7 @@ struct SystemMemory {
                                                 reinterpret_cast<SystemLongI>(AUXV_PATH),
                                                 read_only, 0));
             if (fd >= 0) {
-                unsigned char *ptr = reinterpret_cast<unsigned char*>(&aux);
+                const unsigned char *ptr = reinterpret_cast<const unsigned char*>(&aux);
                 SizeT32 filled = 0;
 
                 while (true) {

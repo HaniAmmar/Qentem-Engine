@@ -6,23 +6,25 @@
 
 namespace Qentem {
 
+struct MemoryRecordData {
+    MemoryRecordData()                                    = default;
+    ~MemoryRecordData()                                   = default;
+    MemoryRecordData(MemoryRecordData &&)                 = default;
+    MemoryRecordData(const MemoryRecordData &)            = default;
+    MemoryRecordData &operator=(MemoryRecordData &&)      = default;
+    MemoryRecordData &operator=(const MemoryRecordData &) = default;
+
+    SystemLong Reserved{0};
+    SystemLong Released{0};
+    SystemLong SubReserved{0};
+    SystemLong subReleased{0};
+    SystemLong Size{0};
+    SystemLong PeakSize{0};
+    SystemLong Blocks{0};
+    SystemLong BlocksTotalSize{0};
+};
+
 struct MemoryRecord {
-    struct MemoryRecordData {
-        QENTEM_NOINLINE MemoryRecordData() noexcept {
-        }
-
-        ~MemoryRecordData() = default;
-
-        SystemLong Reserved{0};
-        SystemLong Released{0};
-        SystemLong SubReserved{0};
-        SystemLong subReleased{0};
-        SystemLong Size{0};
-        SystemLong PeakSize{0};
-        SystemLong Blocks{0};
-        SystemLong BlocksTotalSize{0};
-    };
-
     MemoryRecord()  = default;
     ~MemoryRecord() = default;
 

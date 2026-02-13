@@ -82,7 +82,7 @@ struct StringUtils {
     template <typename Stream_T>
     static void InsertAt(Stream_T &stream, typename Stream_T::CharType ch, SizeT index) {
         if (index < stream.Length()) {
-            SizeT offset = stream.Length();
+            SizeT offset = static_cast<SizeT>(stream.Length());
             stream.SetLength(stream.Length() + SizeT{1});
 
             typename Stream_T::CharType *storage = stream.Storage();

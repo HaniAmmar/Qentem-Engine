@@ -413,7 +413,7 @@ struct QPool {
     static SystemLong getStorageSize() noexcept {
         // static_assert((STORAGE_SIZE > 0), "Object size exceeds page size — cannot fit even one item.");
 
-        SystemLong reserve_size = static_cast<SystemLong>(POOL_HEADER_SIZE + (ITEM_SIZE * getStorageCount()));
+        SystemLong reserve_size = (SystemLong{POOL_HEADER_SIZE} + (SystemLong{ITEM_SIZE} * getStorageCount()));
 
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
         if (reserve_size > SystemMemory::GetPageSize()) {

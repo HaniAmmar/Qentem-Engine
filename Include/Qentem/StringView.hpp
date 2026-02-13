@@ -23,9 +23,8 @@ template <typename Char_T>
 struct StringView {
     using CharType = Char_T;
 
-    constexpr StringView() noexcept : storage_{}, length_{} {};
-
-    ~StringView() noexcept = default;
+    QENTEM_INLINE StringView() noexcept  = default;
+    QENTEM_INLINE ~StringView() noexcept = default;
 
     constexpr StringView(StringView &&src) noexcept : storage_{src.First()}, length_{src.Length()} {
         src.clearStorage();
@@ -216,8 +215,8 @@ struct StringView {
         length_ = 0;
     }
 
-    const Char_T *storage_;
-    SizeT         length_;
+    const Char_T *storage_{nullptr};
+    SizeT         length_{0};
 };
 
 } // namespace Qentem

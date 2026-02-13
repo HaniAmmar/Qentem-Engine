@@ -34,7 +34,7 @@ struct HTableItem_T {
     /**
      * @brief Hash value for the key.
      */
-    SizeT Hash;
+    SizeT Hash{};
 
     /**
      * @brief Index of this item in the array (Storage), or Capacity() as sentinel.
@@ -46,19 +46,19 @@ struct HTableItem_T {
      * When acting as an item, `Position` is simply its stable index in Storage,
      * typically equal to its insertion order.
      */
-    SizeT Position;
+    SizeT Position{};
 
     /**
      * @brief Link to the next item in the collision chain.
      *
      * Stores the index of the next item in Storage[], or Capacity() as end-of-chain.
      */
-    SizeT Next;
+    SizeT Next{};
 
     /**
      * @brief The key associated with this item.
      */
-    Key_T Key;
+    Key_T Key{};
 
     /**
      * @brief Less-than comparison by key.
@@ -126,7 +126,7 @@ struct HashTable {
     /**
      * @brief Default constructor. Initializes an empty hash table.
      */
-    QENTEM_INLINE HashTable() noexcept : storage_{nullptr}, capacity_{0}, size_{0} {};
+    QENTEM_INLINE HashTable() noexcept = default;
 
     /**
      * @brief Constructs a hash table with the given initial capacity.
@@ -136,7 +136,7 @@ struct HashTable {
      *
      * @param capacity Initial capacity (number of items to prepare for).
      */
-    QENTEM_INLINE explicit HashTable(SizeT capacity) : storage_{nullptr}, capacity_{0}, size_{0} {
+    QENTEM_INLINE explicit HashTable(SizeT capacity) {
         if (capacity != 0) {
             capacity = MemoryUtils::AlignToPow2(capacity);
             reserve(capacity);
@@ -165,7 +165,7 @@ struct HashTable {
      *
      * @param src HashTable to copy from.
      */
-    QENTEM_INLINE HashTable(const HashTable &src) : storage_{nullptr}, capacity_{0}, size_{0} {
+    QENTEM_INLINE HashTable(const HashTable &src) {
         if (src.IsNotEmpty()) {
             const HItem_T *src_item = src.First();
             const HItem_T *src_end  = (src_item + src.Size());
@@ -1247,7 +1247,7 @@ struct HashTable {
      * @return Pointer to the newly inserted item.
      */
     QENTEM_INLINE HItem_T *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
-        HItem_T item;
+        HItem_T item{};
         item.Hash = hash;
         item.Key  = QUtility::Move(key); // Move key
 
@@ -1389,7 +1389,7 @@ struct HashTable {
                 hashAndFind(right_index, to, to_hash); // Find/compute slot for 'to'
 
                 if (*right_index == Capacity()) { // Ensure 'to' does not exist
-                    SizeT index = *left_index;
+                    const SizeT index = *left_index;
 
                     HItem_T *item = (Storage() + index);
 

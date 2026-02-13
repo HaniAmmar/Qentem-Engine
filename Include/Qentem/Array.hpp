@@ -60,9 +60,9 @@ namespace Qentem {
  */
 template <typename Type_T, SizeT Expansion_Multiplier_T = 2>
 struct Array {
-    QENTEM_INLINE Array() noexcept : storage_{nullptr}, capacity_{0}, size_{0} {};
+    QENTEM_INLINE Array() noexcept = default;
 
-    explicit Array(SizeT capacity, bool initialize = false) : storage_{nullptr}, capacity_{0}, size_{0} {
+    explicit Array(SizeT capacity, bool initialize = false) {
         if (capacity != 0) {
             reserve(capacity);
 
@@ -79,7 +79,7 @@ struct Array {
         src.setSize(0);
     }
 
-    QENTEM_INLINE Array(const Array &src) : storage_{nullptr}, capacity_{0}, size_{src.Size()} {
+    QENTEM_INLINE Array(const Array &src) : size_{src.Size()} {
         if (src.IsNotEmpty()) {
             copyArray(src);
         }

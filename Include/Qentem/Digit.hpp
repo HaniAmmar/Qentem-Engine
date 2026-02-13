@@ -30,13 +30,13 @@ struct Digit {
     enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, SemiFixed = 2, Scientific = 3 };
 
     struct RealFormatInfo {
-        constexpr RealFormatInfo() noexcept {
+        constexpr RealFormatInfo() noexcept : Precision{6U} {
         }
 
         constexpr RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
         }
 
-        constexpr RealFormatInfo(RealFormatType type) noexcept : Type{type} {
+        constexpr RealFormatInfo(RealFormatType type) noexcept : Precision{6U}, Type{type} {
         }
 
         constexpr RealFormatInfo(SizeT32 precision, RealFormatType type) noexcept : Precision{precision}, Type{type} {
@@ -52,7 +52,7 @@ struct Digit {
             return *this;
         }
 
-        SizeT32        Precision{6U};
+        SizeT32        Precision;
         RealFormatType Type{RealFormatType::Default};
     };
     /////////////////////////////////////////////////////////////////
@@ -184,22 +184,22 @@ struct Digit {
     }
 
     template <bool Lowercase = false, typename Number_T>
-    static SizeT NumberToHex(char *buffer, Number_T number) {
+    static SizeT32 NumberToHex(char *buffer, Number_T number) {
         static constexpr char HexTable[]  = "0123456789ABCDEF";
         static constexpr char HexTableL[] = "0123456789abcdef";
-        constexpr SizeT       length      = (sizeof(Number_T) * 2U);
+        constexpr SizeT32     length      = (sizeof(Number_T) * 2U);
 
-        SizeT index{length};
+        SizeT32 index{length};
 
         if constexpr (Lowercase) {
             while (index != 0) {
                 --index;
-                buffer[index] = HexTableL[static_cast<SizeT>(number & Number_T{0xF})];
+                buffer[index] = HexTableL[static_cast<SizeT32>(number & Number_T{0xF})];
                 number >>= 4U;
 
                 if (number != 0) {
                     --index;
-                    buffer[index] = HexTableL[static_cast<SizeT>((number & Number_T{0xF}))];
+                    buffer[index] = HexTableL[static_cast<SizeT32>((number & Number_T{0xF}))];
                     number >>= 4U;
 
                     if (number != 0) {
@@ -214,12 +214,12 @@ struct Digit {
         } else {
             while (index != 0) {
                 --index;
-                buffer[index] = HexTable[static_cast<SizeT>(number & Number_T{0xF})];
+                buffer[index] = HexTable[static_cast<SizeT32>(number & Number_T{0xF})];
                 number >>= 4U;
 
                 if (number != 0) {
                     --index;
-                    buffer[index] = HexTable[static_cast<SizeT>((number & Number_T{0xF}))];
+                    buffer[index] = HexTable[static_cast<SizeT32>((number & Number_T{0xF}))];
                     number >>= 4U;
 
                     if (number != 0) {
@@ -502,10 +502,10 @@ struct Digit {
         }
     }
 
-    template <typename Stream_T>
-    QENTEM_INLINE static void InsertZeros(Stream_T &stream, const SizeT length) {
-        using Char_T           = typename Stream_T::CharType;
-        constexpr SizeT32 size = sizeof(Char_T);
+    template <typename Stream_T, typename Number_T>
+    QENTEM_INLINE static void InsertZeros(Stream_T &stream, const Number_T length) {
+        using Char_T            = typename Stream_T::CharType;
+        constexpr Number_T size = sizeof(Char_T);
         stream.Write(DigitUtils::DigitString<Char_T, size>::Zeros, length);
     }
 
@@ -1054,7 +1054,7 @@ struct Digit {
                     const SizeT32 drop    = (SizeT32(extra_digits) * (digits - (format.Precision + 1U)));
                     const SizeT32 m_shift = (Info_T::MantissaSize + drop);
 
-                    int diff = (int(positive_exp) - int(m_shift));
+                    const int diff = (int(positive_exp) - int(m_shift));
 
                     if (diff > 0) {
                         b_int <<= SizeT32(diff);
@@ -1208,7 +1208,7 @@ struct Digit {
             length -= DigitString::ZerosLength;
         }
 
-        stream.Write(DigitString::Zeros, SizeT(length));
+        stream.Write(DigitString::Zeros, length);
     }
 
     template <typename Stream_T, typename BigInt_T>
@@ -1220,7 +1220,7 @@ struct Digit {
             NumberToString<true>(stream, b_int.Divide(DigitConst::MaxPowerOfTenValue));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            InsertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
+            InsertZeros(stream, (DigitConst::MaxPowerOfTen - (stream.Length() - length)));
         }
 
         if (b_int.NotZero()) {
@@ -1355,7 +1355,7 @@ struct Digit {
                         ++power;
                     }
                 } else if ((diff != 0) && (diff < SizeT{5})) {
-                    InsertZeros(stream, (diff - SizeT{1}));
+                    InsertZeros(stream, (diff - 1U));
                     stream.Write(DigitUtils::DigitChar::Dot);
                     stream.Write(DigitUtils::DigitChar::Zero);
                 } else {
@@ -1392,7 +1392,8 @@ struct Digit {
             ++new_length;
         }
 
-        StringUtils::Reverse(stream.Storage(), started_at, stream.Length(), (new_length - started_at));
+        StringUtils::Reverse(stream.Storage(), started_at, static_cast<SizeT>(stream.Length()),
+                             static_cast<SizeT>(new_length - started_at));
 
         stream.SetLength(new_length);
 
@@ -1480,7 +1481,8 @@ struct Digit {
 
         const SizeT new_length = (stream.Length() - (index - started_at));
 
-        StringUtils::Reverse(stream.Storage(), started_at, stream.Length(), (new_length - started_at));
+        StringUtils::Reverse(stream.Storage(), started_at, static_cast<SizeT>(stream.Length()),
+                             static_cast<SizeT>(new_length - started_at));
         stream.SetLength(new_length);
 
         if constexpr (Fixed_T) {

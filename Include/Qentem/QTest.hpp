@@ -154,7 +154,7 @@ struct QTest {
     }
 
     QENTEM_NOINLINE static void PrintMemoryRecord() {
-        const MemoryRecord::MemoryRecordData &storage = MemoryRecord::GetRecord();
+        const MemoryRecordData &storage = MemoryRecord::GetRecord();
 
         const SystemLong size_x100 = ((storage.Size * SystemLong{100}) / SystemLong{1024});
         const SystemLong size      = (size_x100 / SystemLong{100});

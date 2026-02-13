@@ -66,9 +66,9 @@ struct NumberKeyUtils_T {
         }
 
         if constexpr (key_size > n_size) {
-            return static_cast<SizeT>(SizeT(q_key >> ((key_size - n_size) * 8U)) | SizeT{1});
+            return (static_cast<SizeT>(q_key >> ((key_size - n_size) * 8U)) | SizeT{1});
         } else {
-            return ~SizeT{0};
+            return static_cast<SizeT>(~SizeT{0});
         }
     }
 
@@ -235,9 +235,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     using BaseT::setStorage;
     using BaseT::tryInsert;
 
-    QENTEM_INLINE StringHashTable() noexcept : BaseT{} {
-    }
-
+    QENTEM_INLINE StringHashTable() noexcept = default;
     /**
      * @brief Inserts a key into the hash table from a raw character array.
      *
