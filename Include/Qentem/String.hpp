@@ -93,7 +93,7 @@ struct String {
 
     String &operator=(const StringView<Char_T> &src) {
         Clear();
-        write(src.First(), src.Length());
+        Write(src.First(), src.Length());
 
         return *this;
     }
