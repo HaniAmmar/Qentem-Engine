@@ -416,16 +416,10 @@ struct QPool {
         SystemLong reserve_size = static_cast<SystemLong>(POOL_HEADER_SIZE + (ITEM_SIZE * getStorageCount()));
 
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-        const SizeT32 page_size    = SystemMemory::GetPageSize();
-        const SizeT32 page_size_m1 = (page_size - 1U);
-
-        if (reserve_size < page_size) {
-            // Ensure at least one full page is reserved
-            reserve_size = page_size;
+        if (reserve_size > SystemMemory::GetPageSize()) {
+            reserve_size = SystemMemory::AlignToPageSize(reserve_size);
         } else {
-            // Round up to the next page boundary
-            reserve_size += page_size_m1;
-            reserve_size &= ~page_size_m1;
+            reserve_size = SystemMemory::GetPageSize();
         }
 #endif
 

@@ -164,15 +164,10 @@ struct LiteStream {
 
     void reserve(SizeT32 capacity) noexcept {
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-        const SizeT32 page_size    = SystemMemory::GetPageSize();
-        const SizeT32 page_size_m1 = (page_size - 1U);
-
-        if (capacity < page_size) {
-            capacity = page_size;
+        if (capacity > SystemMemory::GetPageSize()) {
+            capacity = SystemMemory::AlignToPageSize(capacity);
         } else {
-            // Round up to next page boundary
-            capacity += page_size_m1;
-            capacity &= ~page_size_m1;
+            capacity = SystemMemory::GetPageSize();
         }
 #else
         capacity *= 2;

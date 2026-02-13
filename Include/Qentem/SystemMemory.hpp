@@ -61,6 +61,25 @@ struct SystemMemory {
     }
 
     /**
+     * @brief Rounds a size up to the next system memory page boundary.
+     *
+     * This function adjusts the given size so that it becomes a multiple
+     * of the system page size. If the value is already aligned, it remains unchanged.
+     *
+     * @param size The size to be aligned.
+     * @return The page-aligned size.
+     */
+    template <typename Number_T>
+    QENTEM_INLINE inline static Number_T AlignToPageSize(Number_T size) noexcept {
+        const Number_T page_size_m1 = static_cast<Number_T>(SystemMemory::GetPageSize() - 1U);
+
+        size += page_size_m1;
+        size &= ~page_size_m1;
+
+        return size;
+    }
+
+    /**
      * @brief Marks a memory region as inaccessible (guard page).
      *
      * For placing red zones in stacks or arenas.

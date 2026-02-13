@@ -243,15 +243,10 @@ struct LiteArray {
         SizeT capacity_bytes = (capacity * sizeof(Type_T));
 
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-        const SizeT32 page_size    = SystemMemory::GetPageSize();
-        const SizeT32 page_size_m1 = (page_size - 1U);
-
-        if (capacity_bytes < page_size) {
-            capacity_bytes = page_size;
+        if (capacity_bytes > SystemMemory::GetPageSize()) {
+            capacity_bytes = SystemMemory::AlignToPageSize(capacity_bytes);
         } else {
-            // Round up to next page boundary
-            capacity_bytes += page_size_m1;
-            capacity_bytes &= ~page_size_m1;
+            capacity_bytes = SystemMemory::GetPageSize();
         }
 
         storage_ = static_cast<Type_T *>(SystemMemory::Reserve(capacity_bytes));
