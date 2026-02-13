@@ -289,8 +289,7 @@ struct StringStream {
     }
 
     // Returns view without null-terminator.
-    QENTEM_INLINE StringView<Char_T> GetStringView() {
-        InsertNull();
+    QENTEM_INLINE StringView<Char_T> GetStringView() const noexcept {
         return StringView<Char_T>{First(), Length()};
     }
 
