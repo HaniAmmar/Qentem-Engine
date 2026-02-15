@@ -30,19 +30,23 @@
 
     #ifdef _MSC_VER
         #define QENTEM_NOINLINE
+        #define QENTEM_FORCE_INLINE __forceinline
         #define QENTEM_MAYBE_UNUSED
     #else
         #define QENTEM_NOINLINE __attribute__((noinline))
+        #define QENTEM_FORCE_INLINE __attribute__((always_inline))
         #define QENTEM_MAYBE_UNUSED __attribute__((unused))
     #endif
 #else
     #ifdef _MSC_VER
         #define QENTEM_NOINLINE __declspec(noinline)
         #define QENTEM_INLINE __forceinline
+        #define QENTEM_FORCE_INLINE __forceinline
         #define QENTEM_MAYBE_UNUSED
     #else
         #define QENTEM_NOINLINE __attribute__((noinline))
         #define QENTEM_INLINE __attribute__((always_inline))
+        #define QENTEM_FORCE_INLINE __attribute__((always_inline))
         #define QENTEM_MAYBE_UNUSED __attribute__((unused))
     #endif
 #endif
@@ -55,39 +59,41 @@ struct QUtility {
     //                    Alignment                          //
     ///////////////////////////////////////////////////////////
     template <typename Number_T>
-    QENTEM_INLINE static constexpr Number_T AlignUp(Number_T size, Number_T alignment) noexcept {
+    QENTEM_FORCE_INLINE static constexpr Number_T AlignUp(Number_T size, Number_T alignment) noexcept {
         return (size + (alignment - Number_T{1})) & ~(alignment - Number_T{1});
     }
 
     template <typename Number_T>
-    QENTEM_INLINE static constexpr Number_T AlignDown(Number_T size, Number_T alignment) noexcept {
+    QENTEM_FORCE_INLINE static constexpr Number_T AlignDown(Number_T size, Number_T alignment) noexcept {
         return size & ~(alignment - Number_T{1});
     }
 
     template <typename Number_T>
-    QENTEM_INLINE static constexpr bool IsAligned(Number_T size, Number_T alignment) noexcept {
+    QENTEM_FORCE_INLINE static constexpr bool IsAligned(Number_T size, Number_T alignment) noexcept {
         return (size & (alignment - Number_T{1})) == 0;
     }
     ///////////////////////////////////////////////////////////
     //                      Forward                          //
     ///////////////////////////////////////////////////////////
     template <typename Type_T>
-    QENTEM_INLINE static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &value) noexcept {
-        return (Type_T &&)(value);
+    QENTEM_FORCE_INLINE static constexpr Type_T &&
+    Forward(typename QTraits::ReferenceType<Type_T>::Type &value) noexcept {
+        return static_cast<Type_T &&>(value);
     }
 
     template <typename Type_T>
-    QENTEM_INLINE static constexpr Type_T &&Forward(typename QTraits::ReferenceType<Type_T>::Type &&value) noexcept {
+    QENTEM_FORCE_INLINE static constexpr Type_T &&
+    Forward(typename QTraits::ReferenceType<Type_T>::Type &&value) noexcept {
         static_assert(!QTraits::IsLValueReference<Type_T>::Value, "Forward<T>(x): Cannot forward an lvalue as rvalue.");
-        return (Type_T &&)(value);
+        return static_cast<Type_T &&>(value);
     }
 
     ///////////////////////////////////////////////////////////
     //                      Move                             //
     ///////////////////////////////////////////////////////////
     template <typename Type_T>
-    QENTEM_INLINE static constexpr typename QTraits::ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
-        return (typename QTraits::ReferenceType<Type_T>::Type &&)(value);
+    QENTEM_FORCE_INLINE static constexpr typename QTraits::ReferenceType<Type_T>::Type &&Move(Type_T &&value) noexcept {
+        return static_cast<typename QTraits::ReferenceType<Type_T>::Type &&>(value);
     }
     ///////////////////////////////////////////////////////////
     //                      Swap                             //
