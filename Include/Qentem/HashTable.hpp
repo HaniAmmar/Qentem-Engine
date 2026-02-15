@@ -707,7 +707,7 @@ struct HashTable {
      * The sorting is stable and preserves key/value associations. After sorting,
      * all hash buckets are reset and rebuilt for consistency.
      */
-    QENTEM_INLINE void Sort(const bool ascend = true) noexcept {
+    void Sort(const bool ascend = true) noexcept {
         HItem_T *storage = Storage();
 
         if (ascend) {
@@ -731,7 +731,7 @@ struct HashTable {
      * @note
      * This operation can be used after bulk removals to optimize memory use.
      */
-    QENTEM_INLINE void Compress() {
+    void Compress() noexcept {
         const SizeT old_size = Size(); // Count of truly valid items
         reorder();
 
@@ -765,7 +765,7 @@ struct HashTable {
      * For example, if the table was allocated for 1024 entries but only 256 are in use,
      * this function will shrink the capacity to match the active item count.
      */
-    QENTEM_INLINE void RemoveExcessStorage() {
+    void RemoveExcessStorage() noexcept {
         if (Size() != 0) {
             const SizeT old_capacity = Capacity();
             const SizeT new_capacity = MemoryUtils::AlignToPow2(Size());
@@ -801,7 +801,7 @@ struct HashTable {
      *   Any pointers or indices to items obtained before calling Reorder() will be invalid after this call.
      *   Use with caution if external code relies on storage layout or indices.
      */
-    void Reorder() {
+    void Reorder() noexcept {
         HItem_T    *storage  = Storage(); // Pointer to start of item storage array
         const SizeT old_size = Size();    // Next position to place a live item (and final live count)
 

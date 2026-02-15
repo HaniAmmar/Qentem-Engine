@@ -241,11 +241,6 @@ struct SystemMemory {
         return static_cast<SystemLong>(info.dwPageSize);
     #else
         #if defined(__linux__)
-            struct {
-                SystemLong Type;
-                SystemLong Value;
-            } aux{0,0};
-
             constexpr int at_fdcwd      = -100; // AT_FDCWD
             constexpr int read_only     = 0;    // O_RDONLY
             constexpr int page_size_id  = 6;    // AT_PAGESZ
@@ -257,6 +252,11 @@ struct SystemMemory {
                                                 reinterpret_cast<SystemLongI>(AUXV_PATH),
                                                 read_only, 0));
             if (fd >= 0) {
+                struct {
+                    SystemLong Type;
+                    SystemLong Value;
+                } aux;
+
                 const unsigned char *ptr = reinterpret_cast<const unsigned char*>(&aux);
                 SizeT32 filled = 0;
 
