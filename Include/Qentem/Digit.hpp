@@ -393,14 +393,14 @@ struct Digit {
         }
     }
 
-    template <typename Char_T>
-    QENTEM_INLINE static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT &offset,
+    template <typename QNumber_T, typename Char_T> // QNumber64, QNumber32 and QNumber16
+    QENTEM_INLINE static QNumberType StringToNumber(QNumber_T &number, const Char_T *content, SizeT &offset,
                                                     SizeT end_offset) noexcept {
         return stringToNumber(number, content, offset, end_offset);
     }
 
-    template <typename Char_T>
-    QENTEM_INLINE static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT length) noexcept {
+    template <typename QNumber_T, typename Char_T>
+    QENTEM_INLINE static QNumberType StringToNumber(QNumber_T &number, const Char_T *content, SizeT length) noexcept {
         SizeT offset{0};
         return stringToNumber(number, content, offset, length);
     }
@@ -510,13 +510,14 @@ struct Digit {
     }
 
   private:
-    // TODO: Pass big_int to powerOfNegativeTen and powerOfPositiveTen, and use QNumberXX
-    template <typename Char_T>
-    static QNumberType stringToNumber(QNumber64 &number, const Char_T *content, SizeT &offset,
+    template <typename QNumber_T, typename Char_T>
+    static QNumberType stringToNumber(QNumber_T &number, const Char_T *content, SizeT &offset,
                                       SizeT end_offset) noexcept {
-        using Number_T = decltype(number.Natural);
+        using Number_T       = decltype(number.Natural);
+        using DigitConst     = DigitUtils::DigitConst<sizeof(Number_T)>;
+        using RealNumberInfo = DigitUtils::RealNumberInfo<decltype(number.Real), sizeof(Number_T)>;
 
-        constexpr SizeT max_length = SizeT{19};
+        constexpr SizeT max_length = DigitConst::MaxPowerOfTen;
         number.Natural             = 0;
 
         if (offset < end_offset) {
@@ -602,7 +603,7 @@ struct Digit {
                     return QNumberType::NotANumber;
                 }
                 ///////////////////////////////////////////////////////////
-                const SizeT max_end_offset = tmp_offset;
+                SizeT max_end_offset = tmp_offset;
                 ///////////////////////////////////////////////////////////
                 while (offset < end_offset) {
                     while (offset < max_end_offset) {
@@ -625,6 +626,10 @@ struct Digit {
                             ++offset;
                             is_real = true;
                             has_dot = true;
+
+                            if (max_end_offset < end_offset) {
+                                ++max_end_offset; // Ignore dot
+                            }
 
                             if (offset < max_end_offset) {
                                 digit = content[offset];
@@ -668,8 +673,8 @@ struct Digit {
 
                         default: {
                             if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
-                                if ((number.Natural > Number_T{0x1999999999999999}) ||
-                                    ((number.Natural == Number_T{0x1999999999999999}) &&
+                                if ((number.Natural > DigitConst::MaxUIntV10) ||
+                                    ((number.Natural == DigitConst::MaxUIntV10) &&
                                      (digit > DigitUtils::DigitChar::Five))) {
                                     is_real = true;
                                     break;
@@ -711,11 +716,11 @@ struct Digit {
                     }
 
                     if (number.Natural == 0) {
-                        number.Natural |= Number_T{0x8000000000000000};
+                        number.Natural |= RealNumberInfo::SignMask;
                         return QNumberType::Real;
                     }
 
-                    if (number.Natural <= Number_T{0x7FFFFFFFFFFFFFFF}) {
+                    if (number.Natural <= (RealNumberInfo::SignMask - 1U)) {
                         number.Integer = -number.Integer;
                         return QNumberType::Integer;
                     }
@@ -799,7 +804,6 @@ struct Digit {
                     ///////////////////////////////////////
                     if (is_negative_exp) {
                         exponent += e_n10_power;
-
                     } else if (exponent >= e_n10_power) {
                         exponent -= e_n10_power;
                     } else {
@@ -807,20 +811,24 @@ struct Digit {
                         is_negative_exp = true;
                     }
 
-                    if ((is_negative_exp && (exponent > e_p10_power) && ((exponent - e_p10_power) > SizeT32{324})) ||
-                        (!is_negative_exp && ((exponent + e_p10_power) > SizeT32{309}))) {
+                    if ((is_negative_exp && (exponent > e_p10_power) &&
+                         ((exponent - e_p10_power) > RealNumberInfo::MaxNegativeExponent)) ||
+                        (!is_negative_exp && ((exponent + e_p10_power) > RealNumberInfo::MaxExponent))) {
                         return QNumberType::NotANumber;
                     }
 
+                    //////////////////////////////////////////////////////////////
+                    BigInt<SystemLong, 256U> b_int{number.Natural};
+                    //////////////////////////////////////////////////////////////
                     if (is_negative_exp) {
-                        powerOfNegativeTen(number.Natural, exponent);
+                        powerOfNegativeTen<RealNumberInfo>(number.Natural, exponent, b_int);
                     } else {
-                        powerOfPositiveTen(number.Natural, exponent);
+                        powerOfPositiveTen<RealNumberInfo>(number.Natural, exponent, b_int);
                     }
                 }
                 ///////////////////////////////////////
                 if (is_negative) {
-                    number.Natural |= 0x8000000000000000LL;
+                    number.Natural |= RealNumberInfo::SignMask;
                 }
 
                 return QNumberType::Real;
@@ -830,20 +838,21 @@ struct Digit {
         return QNumberType::NotANumber;
     }
     /////////////////////////////////////////
-    template <typename Number_T>
-    static void powerOfNegativeTen(Number_T &number, SizeT32 exponent) noexcept {
-        using UNumber_T  = SizeT64;
-        using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
-        //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 256U> b_int{number};
+    template <typename RealNumberInfo_T, typename Number_T, typename BigInt_T>
+    static void powerOfNegativeTen(Number_T &number, SizeT32 exponent, BigInt_T &b_int) noexcept {
+        using DigitConst = DigitUtils::DigitConst<sizeof(SystemLong)>;
         //////////////////////////////////////////////////////////////
         SizeT32 shifted{exponent};
         //////////////////////////////////////////////////////////////
-        shifted += 64U;
-        b_int <<= 64U;
+        if constexpr (sizeof(SystemLong) >= sizeof(Number_T)) {
+            shifted += DigitConst::MaxShift;
+            b_int <<= DigitConst::MaxShift;
+        } else {
+            shifted += DigitConst::MaxShift + 32U; // Makeup for precision loss
+            b_int <<= DigitConst::MaxShift + 32U;
+        }
         //////////////////////////////////////////////////////////////
-        constexpr bool is_size_8 = (sizeof(UNumber_T) == 8U);
-        if constexpr (is_size_8) {
+        if constexpr (sizeof(SystemLong) >= sizeof(Number_T)) {
             while (exponent >= DigitConst::MaxPowerOfFive) {
                 // 2**126 = 85070591730234615865843651857942052864
                 // 5**27 = 7450580596923828125 (MaxPowerOfFive)
@@ -876,15 +885,14 @@ struct Digit {
             }
         }
         //////////////////////////////////////////////////////////////
-        SizeT32       exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
+        SizeT32       exp = RealNumberInfo_T::Bias;
         const SizeT32 bit = b_int.FindLastBit();
-
-        // if (bit <= 52U) {
-        //     number = SizeT64(b_int);
-        //     number <<= (53U - bit);
+        // if (bit <= RealNumberInfo_T::MantissaSize) {
+        //     number = Number_T(b_int);
+        //     number <<= ((RealNumberInfo_T::MantissaSize + 1U) - bit);
         // } else {
-        b_int >>= (bit - SizeT32{53});
-        number = SizeT64(b_int);
+        b_int >>= (bit - (RealNumberInfo_T::MantissaSize + 1U));
+        number = Number_T(b_int);
         // }
         //////////////////////////////////////////////////////////////
         if (shifted <= bit) {
@@ -893,7 +901,7 @@ struct Digit {
 
             number += (number & Number_T{1});
             number >>= 1U;
-            exp += (number > Number_T{0x1FFFFFFFFFFFFF});
+            exp += static_cast<SizeT32>(number > RealNumberInfo_T::MantissaWithLeadingBit);
         } else {
             shifted -= bit;
 
@@ -901,26 +909,24 @@ struct Digit {
                 exp -= shifted;
                 number += (number & Number_T{1});
                 number >>= 1U;
-                exp += (number > Number_T{0x1FFFFFFFFFFFFF});
+                exp += static_cast<SizeT32>(number > RealNumberInfo_T::MantissaWithLeadingBit);
             } else {
                 shifted -= exp;
                 ++shifted;
                 number >>= shifted;
                 number += (number & Number_T{1});
                 number >>= 1U;
-                exp = (number > Number_T{0xFFFFFFFFFFFFF});
+                exp = static_cast<SizeT32>(number > RealNumberInfo_T::MantissaMask);
             }
         }
 
-        number &= 0xFFFFFFFFFFFFFULL;
-        number |= (SizeT64(exp) << 52U);
+        number &= RealNumberInfo_T::MantissaMask;
+        number |= (static_cast<Number_T>(exp) << RealNumberInfo_T::MantissaSize);
     }
     /////////////////////////////////////////
-    static void powerOfPositiveTen(SizeT64 &number, SizeT32 exponent) noexcept {
-        using UNumber_T  = SystemLong;
-        using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
-        //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 256U> b_int{number};
+    template <typename RealNumberInfo_T, typename Number_T, typename BigInt_T>
+    static void powerOfPositiveTen(Number_T &number, SizeT32 exponent, BigInt_T &b_int) noexcept {
+        using DigitConst = DigitUtils::DigitConst<sizeof(SystemLong)>;
         //////////////////////////////////////////////////////////////
         constexpr SizeT32 b_int_limit{2U};
         SizeT32           shifted{exponent};
@@ -942,22 +948,23 @@ struct Digit {
         //////////////////////////////////////////////////////////////
         const SizeT32 bit = b_int.FindLastBit();
 
-        if (bit <= 52U) {
-            number = SizeT64(b_int);
-            number <<= (52U - bit);
+        if (bit <= RealNumberInfo_T::MantissaSize) {
+            number = Number_T(b_int);
+            number <<= (RealNumberInfo_T::MantissaSize - bit);
         } else {
-            b_int >>= (bit - 53U);
-            number = SizeT64(b_int);
-            number += (number & SizeT64{1});
+            b_int >>= (bit - (RealNumberInfo_T::MantissaSize + 1U));
+            number = Number_T(b_int);
+            number += (number & Number_T{1});
             number >>= 1U;
-            shifted += SizeT32(number > SizeT64{0x1FFFFFFFFFFFFF});
+            shifted += static_cast<SizeT32>(number > RealNumberInfo_T::MantissaWithLeadingBit);
         }
         //////////////////////////////////////////////////////////////
-        SizeT64 exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
+        Number_T exp = RealNumberInfo_T::Bias;
         exp += bit;
         exp += shifted;
-        exp <<= 52U;
-        number &= SizeT64{0xFFFFFFFFFFFFF};
+        exp <<= RealNumberInfo_T::MantissaSize;
+        number &= RealNumberInfo_T::MantissaMask;
+
         number |= exp;
     }
     /////////////////////////////////////////

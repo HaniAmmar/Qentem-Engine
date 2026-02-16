@@ -157,7 +157,7 @@ union QNumber32 {
     float    Real;
 };
 ////////////////////
-template <typename Number_T>
+template <typename Float_T>
 union QNumber16 {
     QNumber16() noexcept                             = default;
     QNumber16(QNumber16 &&) noexcept                 = default;
@@ -214,9 +214,9 @@ union QNumber16 {
         return *this;
     }
 
-    SizeT16  Natural{0};
-    short    Integer;
-    Number_T Real; // float16 or whatever.
+    SizeT16 Natural{0};
+    short   Integer;
+    Float_T Real; // float16 or whatever.
 };
 ////////////////////
 union QNumber8 {

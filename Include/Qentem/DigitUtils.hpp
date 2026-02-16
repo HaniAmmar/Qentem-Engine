@@ -118,6 +118,8 @@ struct DigitConst<2U> {
     static constexpr SizeT32 MaxPowerOfFive     = 6U;
     static constexpr SizeT32 MaxPowerOfTen      = 4U;
     static constexpr SizeT32 MaxPowerOfTenValue = 10000U;
+    // Maximum value before multiplying by 10 would overflow uint16_t
+    static constexpr SizeT16 MaxUIntV10 = 6553U;
 
     inline static constexpr SizeT16 PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
 
@@ -145,6 +147,8 @@ struct DigitConst<4U> {
     static constexpr SizeT32 MaxPowerOfFive     = 13U;
     static constexpr SizeT32 MaxPowerOfTen      = 9U;
     static constexpr SizeT32 MaxPowerOfTenValue = 1000000000U;
+    // Maximum value before multiplying by 10 would overflow uint32_t
+    static constexpr SizeT32 MaxUIntV10 = 429496729U;
 
     inline static constexpr SizeT32 PowerOfFive[] = {
         // clang-format off
@@ -178,6 +182,10 @@ struct DigitConst<8U> {
     static constexpr SizeT32 MaxPowerOfFive     = 27U;
     static constexpr SizeT32 MaxPowerOfTen      = 19U;
     static constexpr SizeT64 MaxPowerOfTenValue = 10000000000000000000ULL;
+    // Maximum value before multiplying by 10 would overflow uint64_t
+    static constexpr SizeT64 MaxUIntV10 = 1844674407370955161ULL;
+    // Maximum value before multiplying by 10 would overflow uint128_t
+    // static constexpr SizeT128 MaxUIntV10 = 34028236692093846346337460743176821145UDL;
 
     inline static constexpr SizeT64 PowerOfFive[] = {
         // clang-format off
@@ -235,68 +243,79 @@ struct RealNumberInfo<Number_T, 1U> {
 // bfloat16_t
 template <>
 struct RealNumberInfo<BFloatT16, 2U> {
-    static constexpr SizeT32 Bias         = 127U;
-    static constexpr SizeT32 ExponentSize = 8U;
-    static constexpr SizeT32 MantissaSize = 7U;
-    static constexpr SizeT16 SignMask     = 0x8000U;
-    static constexpr SizeT16 ExponentMask = 0x7F80U;
-    static constexpr SizeT16 MantissaMask = 0x007F;
-    static constexpr SizeT16 LeadingBit   = 0x80;
-    static constexpr SizeT32 MaxCut       = 0U;
+    static constexpr SizeT32 Bias                   = 127U;
+    static constexpr SizeT32 ExponentSize           = 8U;
+    static constexpr SizeT32 MantissaSize           = 7U;
+    static constexpr SizeT16 SignMask               = 0x8000U;
+    static constexpr SizeT16 ExponentMask           = 0x7F80U;
+    static constexpr SizeT16 MantissaMask           = 0x007FU;
+    static constexpr SizeT16 LeadingBit             = 0x0080U;
+    static constexpr SizeT16 MantissaWithLeadingBit = 0x00FFU;
+    static constexpr SizeT32 MaxCut                 = 0U;
 };
 #endif
 
 // float16_t, _Float16
 template <typename Number_T>
 struct RealNumberInfo<Number_T, 2U> {
-    static constexpr SizeT32 Bias         = 15U;
-    static constexpr SizeT32 ExponentSize = 5U;
-    static constexpr SizeT32 MantissaSize = 10U;
-    static constexpr SizeT16 SignMask     = 0x8000U;
-    static constexpr SizeT16 ExponentMask = 0x7C00U;
-    static constexpr SizeT16 MantissaMask = 0x3FFU;
-    static constexpr SizeT16 LeadingBit   = 0x400U;
-    static constexpr SizeT32 MaxCut       = 0U;
+    static constexpr SizeT32 MaxExponent            = 4U;
+    static constexpr SizeT32 MaxNegativeExponent    = 5U;
+    static constexpr SizeT32 Bias                   = 15U;
+    static constexpr SizeT32 ExponentSize           = 5U;
+    static constexpr SizeT32 MantissaSize           = 10U;
+    static constexpr SizeT16 SignMask               = 0x8000U;
+    static constexpr SizeT16 ExponentMask           = 0x7C00U;
+    static constexpr SizeT16 MantissaMask           = 0x03FFU;
+    static constexpr SizeT16 LeadingBit             = 0x0400U;
+    static constexpr SizeT16 MantissaWithLeadingBit = 0x07FFU;
+    static constexpr SizeT32 MaxCut                 = 0U;
 };
 
 // float32
 template <typename Number_T>
 struct RealNumberInfo<Number_T, 4U> {
-    static constexpr SizeT32 Bias         = 127U;
-    static constexpr SizeT32 ExponentSize = 8U;
-    static constexpr SizeT32 MantissaSize = 23U;
-    static constexpr SizeT32 SignMask     = 0x80000000U;
-    static constexpr SizeT32 ExponentMask = 0x7F800000U;
-    static constexpr SizeT32 MantissaMask = 0x7FFFFFU;
-    static constexpr SizeT32 LeadingBit   = 0x800000U;
-    static constexpr SizeT32 MaxCut       = 30U;
+    static constexpr SizeT32 MaxExponent            = 38U;
+    static constexpr SizeT32 MaxNegativeExponent    = 38U;
+    static constexpr SizeT32 Bias                   = 127U;
+    static constexpr SizeT32 ExponentSize           = 8U;
+    static constexpr SizeT32 MantissaSize           = 23U;
+    static constexpr SizeT32 SignMask               = 0x80000000U;
+    static constexpr SizeT32 ExponentMask           = 0x7F800000U;
+    static constexpr SizeT32 MantissaMask           = 0x007FFFFFU;
+    static constexpr SizeT32 LeadingBit             = 0x00800000U;
+    static constexpr SizeT64 MantissaWithLeadingBit = 0x00FFFFFFU;
+    static constexpr SizeT32 MaxCut                 = 30U;
 };
 
 // double
 template <typename Number_T>
 struct RealNumberInfo<Number_T, 8U> {
-    static constexpr SizeT32 Bias         = 1023U;
-    static constexpr SizeT32 ExponentSize = 11U;
-    static constexpr SizeT32 MantissaSize = 52U;
-    static constexpr SizeT64 SignMask     = 0x8000000000000000ULL;
-    static constexpr SizeT64 ExponentMask = 0x7FF0000000000000ULL;
-    static constexpr SizeT64 MantissaMask = 0xFFFFFFFFFFFFFULL;
-    static constexpr SizeT64 LeadingBit   = 0x10000000000000ULL;
-    static constexpr SizeT32 MaxCut       = 300U;
+    static constexpr SizeT32 MaxExponent            = 309U;
+    static constexpr SizeT32 MaxNegativeExponent    = 324U;
+    static constexpr SizeT32 Bias                   = 1023U;
+    static constexpr SizeT32 ExponentSize           = 11U;
+    static constexpr SizeT32 MantissaSize           = 52U;
+    static constexpr SizeT64 SignMask               = 0x8000000000000000ULL;
+    static constexpr SizeT64 ExponentMask           = 0x7FF0000000000000ULL;
+    static constexpr SizeT64 MantissaMask           = 0x000FFFFFFFFFFFFFULL;
+    static constexpr SizeT64 LeadingBit             = 0x0010000000000000ULL;
+    static constexpr SizeT64 MantissaWithLeadingBit = 0x001FFFFFFFFFFFFFULL;
+    static constexpr SizeT32 MaxCut                 = 300U;
 };
 
 #if defined(QENTEM_ENABLE_FLOAT_128) && (QENTEM_ENABLE_FLOAT_128 == 1)
 // float128_t, _Float128 (IEEE 754 binary128, Quad Precision)
 template <typename Number_T>
 struct RealNumberInfo<Number_T, 16U> {
-    static constexpr SizeT32  Bias         = 16383U;
-    static constexpr SizeT32  ExponentSize = 15U;
-    static constexpr SizeT32  MantissaSize = 112U;
-    static constexpr SizeT128 SignMask     = 0x80000000000000000000000000000000ULL;
-    static constexpr SizeT128 ExponentMask = 0x7FFF0000000000000000000000000000ULL;
-    static constexpr SizeT128 MantissaMask = 0x0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFULL;
-    static constexpr SizeT128 LeadingBit   = 0x00010000000000000000000000000000ULL;
-    static constexpr SizeT32  MaxCut       = 300U;
+    static constexpr SizeT32  Bias                   = 16383U;
+    static constexpr SizeT32  ExponentSize           = 15U;
+    static constexpr SizeT32  MantissaSize           = 112U;
+    static constexpr SizeT128 SignMask               = 0x80000000000000000000000000000000ULL;
+    static constexpr SizeT128 ExponentMask           = 0x7FFF0000000000000000000000000000ULL;
+    static constexpr SizeT128 MantissaMask           = 0x0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFULL;
+    static constexpr SizeT128 LeadingBit             = 0x00010000000000000000000000000000ULL;
+    static constexpr SizeT128 MantissaWithLeadingBit = 0x0001FFFFFFFFFFFFFFFFFFFFFFFFFFFFULL;
+    static constexpr SizeT32  MaxCut                 = 300U;
 };
 #endif
 

@@ -114,24 +114,39 @@ QENTEM_NOINLINE static void RealToStreamEqualSemiFixed(QTest &test, StringStream
 
 template <typename Number_T>
 QENTEM_NOINLINE static bool StringToNumber(const QTest &test, Number_T &num, const char *str) noexcept {
-    QNumber64   number;
-    SizeT       offset = 0;
-    const SizeT length = StringUtils::Count(str);
+    constexpr SizeT32 n_size = sizeof(Number_T);
+    using QNumberType_T      = typename QNumberAutoTypeT<Number_T, n_size>::QNumberType_T;
+
+    QNumberType_T number;
+    SizeT         offset = 0;
+    const SizeT   length = StringUtils::Count(str);
 
     if (!test.HasError() || test.ContinueOnErrorEnabled()) {
         switch (Digit::StringToNumber(number, str, offset, length)) {
             case QNumberType::Natural: {
-                num = Number_T(number.Natural);
+                num = static_cast<Number_T>(number.Natural);
                 break;
             }
 
             case QNumberType::Integer: {
-                num = Number_T(number.Integer);
+                num = static_cast<Number_T>(number.Integer);
                 break;
             }
 
             case QNumberType::Real: {
-                num = Number_T(number.Real);
+                num = static_cast<Number_T>(number.Real);
+
+#ifdef QENTEM_COMPARE_DIGIT_WITH_STL
+                auto stl_number = number.Real;
+                stl_number      = 0;
+                std::istringstream in(str);
+                in >> stl_number;
+
+                if (stl_number != number.Real) {
+                    return false;
+                }
+#endif
+
                 break;
             }
 
@@ -1271,6 +1286,252 @@ static void TestStringToNumber5(QTest &test) {
 
 static void TestStringToNumber6(QTest &test) {
     const char *str      = nullptr;
+    float       f_number = 0;
+    bool        valid;
+
+    str   = "-1.0";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1.0f, __LINE__);
+
+    str   = "-1.1";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1.1f, __LINE__);
+
+    str   = "-1.48828125";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1.48828125f, __LINE__);
+
+    str   = "-1e10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1e10f, __LINE__);
+
+    str   = "-1E10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1e10f, __LINE__);
+
+    str   = "-1e+10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1e10f, __LINE__);
+
+    str   = "-1e+9";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1e9f, __LINE__);
+
+    str   = "-1E+10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1e10f, __LINE__);
+
+    str   = "-1e00";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1.0f, __LINE__);
+
+    str   = "-1e-00";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1.0f, __LINE__);
+
+    str   = "-1e+00";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1.0f, __LINE__);
+
+    str   = "1e-00";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 1.0f, __LINE__);
+
+    str   = "1e+00";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 1.0f, __LINE__);
+
+    str   = "1e-5";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 1e-5f, __LINE__);
+
+    str   = "1e5";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 1e5f, __LINE__);
+
+    str   = "1e-10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 1e-10f, __LINE__);
+
+    str   = "1e+9";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 1e9f, __LINE__);
+
+    str   = "-1e-10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1e-10f, __LINE__);
+
+    str   = "1E-10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 1e-10f, __LINE__);
+
+    str   = "-1E-10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -1e-10f, __LINE__);
+
+    str   = "-0.3";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -0.3f, __LINE__);
+
+    str   = "-0.2";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -0.2f, __LINE__);
+
+    str   = "-0.1";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -0.1f, __LINE__);
+
+    str   = "-2.3";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -2.3f, __LINE__);
+
+    str   = "-3.2";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -3.2f, __LINE__);
+
+    str   = "-4.";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -4.f, __LINE__);
+
+    str   = "-5.1";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -5.1f, __LINE__);
+
+    str   = "-0";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -0.0f, __LINE__);
+
+    str   = "-0.0";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -0.0f, __LINE__);
+
+    str   = "-123456789.0";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -123456789.0f, __LINE__);
+
+    str   = "18446744073709551616";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 18446744073709551616.0f, __LINE__);
+
+    str   = "-18446744073709551615";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -18446744073709551615.0f, __LINE__);
+
+    str   = "-18446744073709551616";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -18446744073709551616.0f, __LINE__);
+
+    str   = "-18446744073709551616e-10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -18446744073709551616e-10f, __LINE__);
+
+    str   = "+18446744073709551616e+10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, +18446744073709551616e+10f, __LINE__);
+
+    str   = "+18446744073709551615e+10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, +18446744073709551615e+10f, __LINE__);
+
+    str   = "-18446744073709551615e-10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -18446744073709551615e-10f, __LINE__);
+
+    str   = "-184467440737095516155";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -184467440737095516155.0f, __LINE__);
+
+    str   = "184467440737095516155";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 184467440737095516155.0f, __LINE__);
+
+    str   = "-9223372036854775808";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -9223372036854775808.0f, __LINE__);
+
+    str   = "-9223372036854775808.0";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, -9223372036854775808.0f, __LINE__);
+
+    str   = "5000000000000000000000000000000000";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 5e33f, __LINE__);
+
+    str   = "5000000000000000000000.000000000000";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 5e21f, __LINE__);
+
+    str   = "5000000000000000000000000000000000e-15";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 5000000000000000000.0f, __LINE__);
+
+    str   = "3.123456789123456789123456789123456789123456789123456789123456789";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 3.123456789123456812f, __LINE__);
+
+    str   = "3.123456789123456789123456789123456789123456789123456789123456789e+10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 31234568192.0f, __LINE__);
+
+    str   = "3.123456789123456789123456789123456789123456789123456789123456789e-10";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 3.123456789123456789123456789123456789123456789123456789123456789e-10f, __LINE__);
+
+    str   = "1.7976931348623157e+1";
+    valid = StringToNumber(test, f_number, str);
+    test.IsTrue(valid, __LINE__);
+    test.IsEqual(f_number, 17.97693134862315745f, __LINE__);
+}
+
+static void TestStringToNumber7(QTest &test) {
+    const char *str      = nullptr;
     double      d_number = 0;
     bool        valid;
 
@@ -1917,7 +2178,7 @@ static void TestStringToNumber6(QTest &test) {
     test.IsEqual(d_number, 0.0000000000000000000000000000000000000000000000001e-100, __LINE__);
 }
 
-static void TestStringToNumber7(QTest &test) {
+static void TestStringToNumber8(QTest &test) {
     const char *str      = nullptr;
     double      d_number = 0;
     bool        valid;
@@ -5029,6 +5290,7 @@ static int RunDigitTests() {
     test.Test("StringToNumber Test 5", TestStringToNumber5);
     test.Test("StringToNumber Test 6", TestStringToNumber6);
     test.Test("StringToNumber Test 7", TestStringToNumber7);
+    test.Test("StringToNumber Test 8", TestStringToNumber8);
 
     test.Test("HexStringToNumber Test 1", TestHexStringToNumber1);
     test.Test("HexStringToNumber Test 2", TestHexStringToNumber2);
