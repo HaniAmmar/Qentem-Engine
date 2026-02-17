@@ -1039,6 +1039,27 @@ struct Reserver {
 #endif
     }
 
+    /**
+     * @brief Returns the first available reserver instance.
+     *
+     * On platforms supporting multiple static reserver instances, this provides
+     * direct access to the underlying storage backing the reserver array.
+     * On other platforms, it resolves to the single global reserver object.
+     *
+     * This is intended for early-use scenarios (e.g. during program startup)
+     * where a stable reserver address is required before full initialization
+     * paths are established.
+     *
+     * @return Pointer to the first reserver instance.
+     */
+    QENTEM_INLINE static Core *GetFirstInstance() noexcept {
+#if defined(__linux__) || defined(_WIN32)
+        return reservers_.Storage();
+#else
+        return &reserver_;
+#endif
+    }
+
   private:
 #if defined(__linux__) || defined(_WIN32)
     inline static LiteArray<ReserverCore<>> reservers_{static_cast<SizeT>(CPUHelper::GetCoreCount()), true};
