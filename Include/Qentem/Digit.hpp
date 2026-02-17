@@ -1275,33 +1275,16 @@ struct Digit {
         }
     }
 
-    // template <typename Stream_T, typename BigInt_T>
-    // static void bigIntToString(Stream_T &stream, BigInt_T &b_int) {
-    //     using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
-    //     using NumberType = typename BigInt_T::NumberType;
-
-    //     constexpr auto mask = ((NumberType{1} << DigitConst::MaxPowerOfTen) - 1);
-
-    //     while (b_int.IsBig()) {
-    //         const SizeT length = stream.Length();
-
-    //         const NumberType rem1 = b_int.Divide(DigitConst::PowerOfFive[DigitConst::MaxPowerOfTen]);
-    //         NumberType       rem2 = (b_int.Number() & mask);
-    //         rem2 *= DigitConst::PowerOfFive[DigitConst::MaxPowerOfTen];
-    //         b_int >>= DigitConst::MaxPowerOfTen;
-
-    //         NumberToString<true>(stream, (rem2 + rem1));
-
-    //         // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-    //         InsertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
-    //     }
-
-    //     NumberToString<true>(stream, b_int.Number());
-    // }
-
     template <typename BigInt_T>
     QENTEM_INLINE static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
+
+        // TODO: needs more work for extremely large values (e300)
+        // while (drop > (DigitConst::MaxPowerOfFive * 3)) {
+        //     b_int *= DigitConst::PowerOfOneOverFive[DigitConst::MaxPowerOfFive];
+        //     b_int >>= (DigitConst::PowerOfOneOverFiveShift[DigitConst::MaxPowerOfFive] + BigInt_T::BitWidth());
+        //     drop -= DigitConst::MaxPowerOfFive;
+        // }
 
         while (drop >= DigitConst::MaxPowerOfFive) {
             b_int /= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
@@ -1312,30 +1295,6 @@ struct Digit {
             b_int /= DigitConst::PowerOfFive[drop];
         }
     }
-
-    // TODO: needs more work for extremely large values (e100)
-    // template <typename BigInt_T>
-    // QENTEM_INLINE static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
-    //     using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
-    //     if constexpr (BigInt_T::BitWidth()) {
-    //         // Magic division using reciprocal multiply + shift (for 64-bit)
-
-    //         while (drop > DigitConst::MaxPowerOfFive) {
-    //             b_int *= DigitConst::PowerOfOneOverFive[DigitConst::MaxPowerOfFive];
-    //             b_int >>= (DigitConst::PowerOfOneOverFiveShift[DigitConst::MaxPowerOfFive] + 64U);
-    //             drop -= DigitConst::MaxPowerOfFive;
-    //         }
-    //     }
-
-    //     while (drop >= DigitConst::MaxPowerOfFive) {
-    //         b_int /= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
-    //         drop -= DigitConst::MaxPowerOfFive;
-    //     }
-
-    //     if (drop != 0) {
-    //         b_int /= DigitConst::PowerOfFive[drop];
-    //     }
-    // }
 
     // TODO: Rewrite formatStringNumberDefault with same rigor as BigInt, post-QenWeb
     // Note: Use (32 * Char_T) fixed buffer size
