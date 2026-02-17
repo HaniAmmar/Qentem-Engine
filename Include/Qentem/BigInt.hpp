@@ -676,7 +676,7 @@ struct BigInt {
             } while (move != 0);
 
             // Update the highest used limb index
-            while (storage_[index] == 0) {
+            while ((storage_[index] == 0) && (index != 0)) {
                 --index;
             }
 
