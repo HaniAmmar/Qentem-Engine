@@ -92,42 +92,82 @@ struct Digit {
     static SizeT IntToString(Char_T *storage, Number_T number) noexcept {
         const Char_T *str = storage;
 
-        if constexpr (!Reverse_V_T) {
-            while (number >= Number_T{10}) {
-                SizeT index = SizeT(number % Number_T{100});
-                number /= Number_T{100};
-                index *= SizeT{2};
+        if constexpr (sizeof(Number_T) <= sizeof(SystemLong)) {
+            if constexpr (!Reverse_V_T) {
+                while (number >= Number_T{10}) {
+                    SizeT32 index = static_cast<SizeT32>(number % Number_T{100});
+                    number /= Number_T{100};
+                    index *= 2U;
 
-                --storage;
-                *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
-                --storage;
-                *storage = Char_T(DigitUtils::DigitTable1[index]);
+                    --storage;
+                    *storage = Char_T(DigitUtils::DigitTable1[index + 1U]);
+                    --storage;
+                    *storage = Char_T(DigitUtils::DigitTable1[index]);
+                }
+
+                if ((number != 0) || (str == storage)) {
+                    --storage;
+                    *storage = Char_T(DigitUtils::DigitTable2[number]);
+                }
+
+                return SizeT(str - storage);
+            } else {
+                while (number >= Number_T{10}) {
+                    SizeT32 index = static_cast<SizeT32>(number % Number_T{100});
+                    number /= Number_T{100};
+                    index *= 2U;
+
+                    *storage = Char_T(DigitUtils::DigitTable1[index + 1U]);
+                    ++storage;
+                    *storage = Char_T(DigitUtils::DigitTable1[index]);
+                    ++storage;
+                }
+
+                if ((number != 0) || (str == storage)) {
+                    *storage = Char_T(DigitUtils::DigitTable2[number]);
+                    ++storage;
+                }
+
+                return SizeT(storage - str);
             }
-
-            if ((number != 0) || (str == storage)) {
-                --storage;
-                *storage = Char_T(DigitUtils::DigitTable2[number]);
-            }
-
-            return SizeT(str - storage);
         } else {
-            while (number >= Number_T{10}) {
-                SizeT index = SizeT(number % Number_T{100});
-                number /= Number_T{100};
-                index *= SizeT{2};
+            BigInt<SystemLong, 64> b_int{number};
 
-                *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
-                ++storage;
-                *storage = Char_T(DigitUtils::DigitTable1[index]);
-                ++storage;
+            if constexpr (!Reverse_V_T) {
+                while (b_int >= Number_T{10}) {
+                    SizeT32 index = static_cast<SizeT32>(b_int.Divide(100U));
+                    index *= 2U;
+
+                    --storage;
+                    *storage = Char_T(DigitUtils::DigitTable1[index + 1U]);
+                    --storage;
+                    *storage = Char_T(DigitUtils::DigitTable1[index]);
+                }
+
+                if ((b_int != 0) || (str == storage)) {
+                    --storage;
+                    *storage = Char_T(DigitUtils::DigitTable2[SizeT32(b_int)]);
+                }
+
+                return SizeT(str - storage);
+            } else {
+                while (b_int >= Number_T{10}) {
+                    SizeT32 index = static_cast<SizeT32>(b_int.Divide(100U));
+                    index *= 2U;
+
+                    *storage = Char_T(DigitUtils::DigitTable1[index + 1U]);
+                    ++storage;
+                    *storage = Char_T(DigitUtils::DigitTable1[index]);
+                    ++storage;
+                }
+
+                if ((b_int != 0) || (str == storage)) {
+                    *storage = Char_T(DigitUtils::DigitTable2[SizeT32(b_int)]);
+                    ++storage;
+                }
+
+                return SizeT(storage - str);
             }
-
-            if ((number != 0) || (str == storage)) {
-                *storage = Char_T(DigitUtils::DigitTable2[number]);
-                ++storage;
-            }
-
-            return SizeT(storage - str);
         }
     }
 
