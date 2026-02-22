@@ -84,6 +84,17 @@ struct ToCharsHelper {
     };
 
     template <typename Stream_T>
+    struct Writer<Stream_T, signed char> {
+        static void Write(Stream_T &stream, signed char ch) {
+            stream.Write(ch);
+        }
+
+        static void Write(Stream_T &stream, const signed char *str) {
+            stream.Write(str, StringUtils::Count<signed char, SizeT32>(str));
+        }
+    };
+
+    template <typename Stream_T>
     struct Writer<Stream_T, unsigned char> {
         static void Write(Stream_T &stream, unsigned char ch) {
             stream.Write(static_cast<char>(ch));
