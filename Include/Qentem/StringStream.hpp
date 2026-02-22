@@ -431,16 +431,29 @@ struct StringStream {
     }
 
     void expand(SizeT new_capacity) {
+        constexpr SizeT32 long_m1 = (sizeof(SystemLong) - 1U);
+
         if (tryInplaceExpand(new_capacity)) {
             return;
         }
 
-        Char_T *old_storage  = Storage();
-        SizeT   old_capacity = Capacity();
+        Char_T       *old_storage    = Storage();
+        SizeT         old_capacity   = Capacity();
+        const SizeT32 aligned_length = (((Length() * sizeof(Char_T)) + long_m1) & ~long_m1) / sizeof(SystemLong);
 
         reserve(new_capacity);
 
-        MemoryUtils::CopyTo(Storage(), old_storage, Length());
+        SystemLong *dst = reinterpret_cast<SystemLong *>(Storage());
+        SystemLong *src = reinterpret_cast<SystemLong *>(old_storage);
+
+        SizeT32 offset = 0;
+        while (offset < aligned_length) {
+            dst[offset] = src[offset];
+            ++offset;
+        }
+
+        // MemoryUtils::CopyTo(Storage(), old_storage, Length());
+
         release(old_storage, old_capacity);
     }
 

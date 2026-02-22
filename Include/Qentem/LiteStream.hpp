@@ -141,15 +141,20 @@ struct LiteStream {
 
   private:
     void expand(const SizeT32 new_capacity) noexcept {
+        constexpr SizeT32 long_m1        = (sizeof(SystemLong) - 1U);
+        SizeT32           aligned_length = (((length_ + long_m1) & ~long_m1) / sizeof(SystemLong));
+
         char         *str          = storage_;
         const SizeT32 old_capacity = capacity_;
 
         reserve(new_capacity);
 
-        SizeT32 offset = 0;
+        SystemLong *dst = reinterpret_cast<SystemLong *>(storage_);
+        SystemLong *src = reinterpret_cast<SystemLong *>(str);
 
-        while (offset < length_) {
-            storage_[offset] = str[offset];
+        SizeT32 offset = 0;
+        while (offset < aligned_length) {
+            dst[offset] = src[offset];
             ++offset;
         }
 
@@ -170,6 +175,7 @@ struct LiteStream {
             capacity = SystemMemory::GetPageSize();
         }
 #else
+        capacity = (capacity + sizeof(SystemLong) - 1U) & ~(sizeof(SystemLong) - 1U);
         capacity *= 2;
 #endif
 
