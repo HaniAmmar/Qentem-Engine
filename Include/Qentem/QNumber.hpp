@@ -247,8 +247,8 @@ union QNumber8 {
         return *this;
     }
 
-    SizeT8 Natural{0};
-    char   Integer;
+    SizeT8  Natural{0};
+    SizeT8I Integer;
 };
 ///////////////////////////////////////////////
 template <typename Number_T, SizeT32>
