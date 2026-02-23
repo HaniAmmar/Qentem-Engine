@@ -43,7 +43,6 @@
 #endif
 
 /// TODO: NUMA-awareness
-/// TODO: Add double-free and corruption detection and other debug features
 /// TODO: Add emulation for malloc, calloc, realloc, and free APIs
 namespace Qentem {
 

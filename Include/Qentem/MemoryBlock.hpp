@@ -338,6 +338,12 @@ struct MemoryBlock {
         SystemLong mask = MAX_SYSTEM_INT_TYPE;
         mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
         mask >>= bit_index;
+
+#if defined(QENTEM_DEBUG) && !defined(_WIN32)
+        if ((table[table_index] & mask) != mask) {
+            __builtin_trap(); // Double free
+        }
+#endif
         table[table_index] &= ~mask;
 
         chunks += bit_index;
@@ -349,6 +355,12 @@ struct MemoryBlock {
             mask = MAX_SYSTEM_INT_TYPE;
             mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
             ++table_index;
+
+#if defined(QENTEM_DEBUG) && !defined(_WIN32)
+            if ((table[table_index] & mask) != mask) {
+                __builtin_trap(); // Double free
+            }
+#endif
             table[table_index] &= ~mask;
         }
     }
