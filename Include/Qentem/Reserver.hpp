@@ -43,7 +43,6 @@
 #endif
 
 /// TODO: NUMA-awareness
-/// TODO: Add emulation for malloc, calloc, realloc, and free APIs
 namespace Qentem {
 
 /**
@@ -813,15 +812,7 @@ struct Reserver {
      */
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
     QENTEM_INLINE static Type_T *Reserve(SystemLong size) noexcept {
-        if constexpr (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
-            // constexpr SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
-            // (align>=CustomAlignment_T?align:(align+1))
-
-            return static_cast<Type_T *>(GetCurrentInstance()->Reserve<CustomAlignment_T>(RoundUpBytes<Type_T>(size)));
-        } else {
-            return static_cast<Type_T *>(
-                GetCurrentInstance()->Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(RoundUpBytes<Type_T>(size)));
-        }
+        return reserve<Type_T, CustomAlignment_T>(RoundUpBytes<Type_T>(size));
     }
 
     /**
@@ -1059,7 +1050,88 @@ struct Reserver {
 #endif
     }
 
+    // malloc
+    QENTEM_INLINE static void *LibcReserve(SystemLong size) noexcept {
+        size += sizeof(SystemLong);
+
+        void       *ptr   = Reserve<char>(size);
+        SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
+
+        *l_ptr = size;
+        ++l_ptr;
+
+        return l_ptr;
+    }
+
+    // calloc
+    QENTEM_INLINE static void *LibcReserveClear(SystemLong size) noexcept {
+        size += sizeof(SystemLong);
+
+        SystemLong  r_size = RoundUpBytes<char>(size);
+        void       *ptr    = reserve<char>(r_size);
+        SystemLong *l_ptr  = static_cast<SystemLong *>(ptr);
+
+        *l_ptr = r_size;
+        ++l_ptr;
+
+        r_size -= sizeof(SystemLong);
+
+        if (r_size != 0) {
+            MemoryUtils::SetToZeroByType(l_ptr, (r_size / sizeof(SystemLong)));
+        }
+
+        return l_ptr;
+    }
+
+    // realloc
+    QENTEM_INLINE static void *LibcResize(void *ptr, SystemLong new_size) {
+        if (ptr != nullptr) {
+            new_size += sizeof(SystemLong);
+            SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
+            --l_ptr;
+
+            const SystemLong size = *l_ptr;
+
+            if ((new_size > size) && TryExpand(reinterpret_cast<char *>(l_ptr), size, new_size)) {
+                return ptr;
+            }
+
+            if (new_size < size) {
+                Shrink(reinterpret_cast<char *>(l_ptr), size, new_size);
+                return ptr;
+            }
+
+            return nullptr;
+        }
+
+        return LibcReserve(new_size);
+    }
+
+    // free
+    QENTEM_INLINE static void LibcRelease(void *ptr) noexcept {
+        if (ptr != nullptr) {
+            SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
+            --l_ptr;
+
+            const SystemLong size = *l_ptr;
+
+            Release(reinterpret_cast<char *>(l_ptr), size);
+        }
+    }
+
   private:
+    template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
+    QENTEM_INLINE static Type_T *reserve(SystemLong size) noexcept {
+        if constexpr (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
+            // constexpr SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
+            // (align>=CustomAlignment_T?align:(align+1))
+
+            return static_cast<Type_T *>(GetCurrentInstance()->Reserve<CustomAlignment_T>(size));
+        } else {
+            return static_cast<Type_T *>(GetCurrentInstance()->Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(size));
+        }
+    }
+
 #if defined(__linux__) || defined(_WIN32)
     inline static LiteArray<ReserverCore<>> reservers_{static_cast<SizeT>(CPUHelper::GetCoreCount()), true};
 #else
