@@ -17,6 +17,7 @@
 -   [Modules](#modules)
 -   [JSON Example](#json-example)
 -   [Tests](#tests)
+-   [Deprecation Notice (Windows)](#deprecation-notice-windows)
 -   [License](#license)
 
 ## Introduction
@@ -365,6 +366,11 @@ The test suite includes over 23k lines of code, more than five times the size of
     cmake --build .
     ctest -C Debug
     ```
+
+
+## Deprecation Notice (Windows)
+
+Windows support is deprecated and will be discontinued in a future release. Future development will target POSIX-compliant systems.
 
 ## License
 
