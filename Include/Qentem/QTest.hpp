@@ -261,12 +261,12 @@ struct QTest {
 
     [[noreturn]] QENTEM_INLINE static void Exit(int num) noexcept {
 #if defined(_WIN32)
-        ::ExitProcess(1);
+        ::ExitProcess(num);
 #elif defined(__linux__)
         SystemCall(__NR_exit_group, num);
         __builtin_unreachable();
 #else
-        _exit(1);
+        _exit(num);
         __builtin_unreachable();
 #endif
     }
