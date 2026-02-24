@@ -1,11 +1,11 @@
 /**
  * @file JSON.hpp
- * @brief Implements the main JSON data structures and logic for Qentem Engine.
+ * @brief Provides an iterative, non-recursive JSON parser for Qentem Engine.
  *
  * This header defines the core types and algorithms for parsing, representing,
- * and manipulating JSON documents. JSON.hpp provides the primary interface for
- * working with JSON data within the Qentem Engine library, enabling efficient
- * and flexible handling of structured data.
+ * and manipulating JSON documents. The parser is implemented as an explicit
+ * state machine rather than a recursive descent parser, allowing safe handling
+ * of deeply nested structures.
  *
  * @author Hani Ammar
  * @date 2026
@@ -20,12 +20,9 @@
 namespace Qentem {
 
 struct JSON {
-    template <typename, typename>
-    struct Parser;
-
-    template <typename Char_T, typename Number_T, typename Stream_T>
+    template <typename Stream_T, typename Char_T, typename Number_T>
     QENTEM_INLINE static Value<Char_T> Parse(Stream_T &stream, const Char_T *content, Number_T length) {
-        return Parser<Char_T, Stream_T>::Parse(stream, content, SizeT(length));
+        return parse(stream, content, SizeT(length));
     }
 
     template <typename Char_T, typename Number_T>
@@ -39,254 +36,372 @@ struct JSON {
         return Parse(content, StringUtils::Count(content));
     }
 
-    template <typename Char_T, typename Stream_T>
-    struct Parser {
-        using ValueT = Value<Char_T>;
+  private:
+    template <typename Stream_T, typename Char_T>
+    static Value<Char_T> parse(Stream_T &stream, const Char_T *content, SizeT length) {
+        using WhiteSpaceChars = StringUtils::WhiteSpaceChars_T<Char_T>;
+        Value<Char_T> value{};
 
-        Parser()                          = delete;
-        Parser(Parser &&)                 = delete;
-        Parser(const Parser &)            = delete;
-        Parser &operator=(Parser &&)      = delete;
-        Parser &operator=(const Parser &) = delete;
-        ~Parser()                         = delete;
+        if (length != 0) {
+            SizeT offset = 0;
+            parse(value, stream, content, offset, length);
 
-        static ValueT Parse(Stream_T &stream, const Char_T *content, SizeT length) {
-            if (length != 0) {
-                SizeT offset = 0;
-                StringUtils::TrimLeft(content, offset, length);
-                ValueT value{parseValue(stream, content, offset, length)};
-                StringUtils::TrimRight(content, offset, length);
-
-                if (offset == length) {
-                    return value;
-                }
+            while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                         (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                         (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                         (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                ++offset;
             }
 
-            return ValueT{};
+            if (offset != length) {
+                value.Reset();
+            }
         }
 
-      private:
+        return value;
+    }
+
+    template <typename ValueT, typename Stream_T, typename Char_T>
+    static void parse(ValueT &value, Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
+        using WhiteSpaceChars   = StringUtils::WhiteSpaceChars_T<Char_T>;
         using NotationConstants = JSONUtils::NotationConstants_T<Char_T>;
+        using ObjectT           = typename ValueT::ObjectT;
+        using ArrayT            = typename ValueT::ArrayT;
 
-        static ValueT parseObject(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
-            using ObjectT = typename ValueT::ObjectT;
+        while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                  (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                  (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                  (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+            ++offset;
+        }
 
-            StringUtils::TrimLeft(content, offset, end);
+        if (offset < end) {
+            Array<ValueT *> tree{SizeT{8}};
+            ValueT         *parent{&value};
+            ObjectT        *obj{nullptr};
+            ArrayT         *arr{nullptr};
+            ValueT         *obj_value{nullptr};
+            bool            expecting_value{false};
 
-            ValueT value{ValueType::Object};
-
-            if (content[offset] != NotationConstants::ECurlyChar) {
-                ObjectT *obj = value.GetObject();
-
-                while ((offset < end) && (content[offset] == NotationConstants::QuoteChar)) {
-                    ++offset;
-                    const Char_T *str = (content + offset);
-                    SizeT         len = JSONUtils::UnEscape(str, end, stream);
-
-                    if (len != 0) {
-                        offset += len;
-                        --len;
-
-                        if (stream.IsNotEmpty()) {
-                            str = stream.First();
-                            len = stream.Length();
-                            stream.Clear();
-                        }
-
-                        StringUtils::TrimLeft(content, offset, end);
-
-                        if (content[offset] == NotationConstants::ColonChar) {
-                            ++offset;
-                            StringUtils::TrimLeft(content, offset, end);
-                            String<Char_T> key{str, len};
-                            obj->Insert(QUtility::Move(key), parseValue(stream, content, offset, end));
-                            StringUtils::TrimLeft(content, offset, end);
-
-                            if (offset < end) {
-                                const Char_T c = content[offset];
-
-                                if (c == NotationConstants::CommaChar) {
-                                    ++offset;
-                                    StringUtils::TrimLeft(content, offset, end);
-                                    continue;
-                                }
-
-                                if (c == NotationConstants::ECurlyChar) {
-                                    ++offset;
-#if QENTEM_VALUE_EXPANSION_MULTIPLIER > 2
-                                    obj->RemoveExcessStorage();
-#endif
-                                    return value;
-                                }
-                            }
-                        }
-                    }
-
-                    break;
-                }
-
-                value.Reset();
+            if (content[offset] == NotationConstants::SSquareChar) {
+                value = {ValueType::Array};
+                arr   = parent->GetArray();
+            } else {
+                value = {ValueType::Object};
+                obj   = parent->GetObject();
             }
 
             ++offset;
 
-            return value;
-        }
+            while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                      (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                      (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                      (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                ++offset;
+            }
 
-        static ValueT parseArray(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
-            using ArrayT = typename ValueT::ArrayT;
+            while (offset < end) {
+                switch (content[offset]) {
+                    case NotationConstants::QuoteChar: {
+                        ++offset;
 
-            StringUtils::TrimLeft(content, offset, end);
+                        const Char_T *str = (content + offset);
+                        SizeT         len = JSONUtils::UnEscape(str, (end - offset), stream);
 
-            ValueT value{ValueType::Array};
+                        if (len != 0) {
+                            offset += len;
+                            --len;
 
-            if (content[offset] != NotationConstants::ESquareChar) {
-                ArrayT *arr = value.GetArray();
+                            if (stream.IsNotEmpty()) {
+                                str = stream.First();
+                                len = stream.Length();
+                                stream.Clear();
+                            }
 
-                while (offset < end) {
-                    *arr += parseValue(stream, content, offset, end);
-                    StringUtils::TrimLeft(content, offset, end);
+                            if (obj != nullptr) {
+                                if (obj_value == nullptr) {
+                                    // Name
+                                    obj_value = &((*obj)[String<Char_T>{str, len}]);
+                                } else {
+                                    *obj_value = ValueT{String<Char_T>{str, len}};
+                                    obj_value  = nullptr;
+                                }
+                            } else {
+                                *arr += ValueT{String<Char_T>{str, len}};
+                            }
 
-                    if (offset < end) {
-                        const Char_T ch = content[offset];
+                            expecting_value = false;
+                        }
 
-                        if (ch == NotationConstants::CommaChar) {
+                        break;
+                    }
+
+                    case NotationConstants::F_Char: {
+                        const Char_T *false_string = (NotationConstants::FalseString + 1U);
+
+                        while ((++offset < end) && (content[offset] == *false_string)) {
+                            ++false_string;
+                        }
+
+                        if (*false_string == Char_T{0}) {
+                            if (obj_value != nullptr) {
+                                *obj_value = ValueT{ValueType::False};
+                                obj_value  = nullptr;
+                            } else if (arr != nullptr) {
+                                *arr += ValueT{ValueType::False};
+                            } else {
+                                value.Reset();
+                                return;
+                            }
+
+                            expecting_value = false;
+                            break;
+                        }
+
+                        value.Reset();
+                        return;
+                    }
+
+                    case NotationConstants::N_Char: {
+                        const Char_T *null_string = (NotationConstants::NullString + 1U);
+
+                        while ((++offset < end) && (content[offset] == *null_string)) {
+                            ++null_string;
+                        }
+
+                        if (*null_string == Char_T{0}) {
+                            if (obj_value != nullptr) {
+                                *obj_value = ValueT{ValueType::Null};
+                                obj_value  = nullptr;
+                            } else if (arr != nullptr) {
+                                *arr += ValueT{ValueType::Null};
+                            } else {
+                                value.Reset();
+                                return;
+                            }
+
+                            expecting_value = false;
+                            break;
+                        }
+
+                        value.Reset();
+                        return;
+                    }
+
+                    case NotationConstants::T_Char: {
+                        const Char_T *true_string = (NotationConstants::TrueString + 1U);
+
+                        while ((++offset < end) && (content[offset] == *true_string)) {
+                            ++true_string;
+                        }
+
+                        if (*true_string == Char_T{0}) {
+                            if (obj_value != nullptr) {
+                                *obj_value = ValueT{ValueType::True};
+                                obj_value  = nullptr;
+                            } else if (arr != nullptr) {
+                                *arr += ValueT{ValueType::True};
+                            } else {
+                                value.Reset();
+                                return;
+                            }
+
+                            expecting_value = false;
+                            break;
+                        }
+
+                        value.Reset();
+                        return;
+                    }
+
+                    case NotationConstants::SSquareChar:
+                    case NotationConstants::SCurlyChar: {
+                        tree += parent;
+
+                        const bool is_object = (content[offset] == NotationConstants::SCurlyChar);
+
+                        if (obj_value != nullptr) {
+                            *obj_value = ValueT{is_object ? ValueType::Object : ValueType::Array};
+                            parent     = obj_value;
+                            obj_value  = nullptr;
+                        } else if (arr != nullptr) {
+                            parent = &(arr->Insert(ValueT{is_object ? ValueType::Object : ValueType::Array}));
+                        } else {
+                            value.Reset();
+                            return;
+                        }
+
+                        if (is_object) {
+                            obj = parent->GetObject();
+                            arr = nullptr;
+                        } else {
+                            obj = nullptr;
+                            arr = parent->GetArray();
+                        }
+
+                        expecting_value = false;
+                        ++offset;
+                        break;
+                    }
+
+                    case NotationConstants::ESquareChar: {
+                        if ((arr != nullptr) && !expecting_value) {
+                            arr->Compress();
                             ++offset;
-                            StringUtils::TrimLeft(content, offset, end);
+
+                            ValueT **last = tree.Last();
+
+                            if (last != nullptr) {
+                                parent = *(last);
+                                tree.Drop(SizeT{1});
+
+                                if (parent->IsObject()) {
+                                    obj = parent->GetObject();
+                                    arr = nullptr;
+                                } else {
+                                    obj = nullptr;
+                                    arr = parent->GetArray();
+                                }
+
+                                break;
+                            }
+
+                            return;
+                        }
+
+                        value.Reset();
+                        return;
+                    }
+
+                    case NotationConstants::ECurlyChar: {
+                        if ((obj != nullptr) && !expecting_value) {
+#if QENTEM_VALUE_EXPANSION_MULTIPLIER > 2U
+                            obj->RemoveExcessStorage();
+#endif
+                            ++offset;
+
+                            ValueT **last = tree.Last();
+
+                            if (last != nullptr) {
+                                parent = *(last);
+                                tree.Drop(SizeT{1});
+
+                                if (parent->IsObject()) {
+                                    obj = parent->GetObject();
+                                    arr = nullptr;
+                                } else {
+                                    obj = nullptr;
+                                    arr = parent->GetArray();
+                                }
+
+                                break;
+                            }
+
+                            return;
+                        }
+
+                        value.Reset();
+                        return;
+                    }
+
+                    default: {
+                        QNumber64 number;
+
+                        switch (Digit::StringToNumber(number, content, offset, end)) {
+                            case QNumberType::NotANumber: {
+                                value.Reset();
+                                return;
+                            }
+
+                            case QNumberType::Natural: {
+                                if (obj_value != nullptr) {
+                                    *obj_value = ValueT{number.Natural};
+                                    obj_value  = nullptr;
+                                } else if (arr != nullptr) {
+                                    *arr += ValueT{number.Natural};
+                                } else {
+                                    value.Reset();
+                                    return;
+                                }
+
+                                expecting_value = false;
+                                break;
+                            }
+
+                            case QNumberType::Integer: {
+                                if (obj_value != nullptr) {
+                                    *obj_value = ValueT{number.Integer};
+                                    obj_value  = nullptr;
+                                } else if (arr != nullptr) {
+                                    *arr += ValueT{number.Integer};
+                                } else {
+                                    value.Reset();
+                                    return;
+                                }
+
+                                expecting_value = false;
+                                break;
+                            }
+
+                            case QNumberType::Real: {
+                                if (obj_value != nullptr) {
+                                    *obj_value = ValueT{number.Real};
+                                    obj_value  = nullptr;
+                                } else if (arr != nullptr) {
+                                    *arr += ValueT{number.Real};
+                                } else {
+                                    value.Reset();
+                                    return;
+                                }
+
+                                expecting_value = false;
+                                break;
+                            }
+                        };
+                    }
+                }
+
+                while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                          (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                          (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                          (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                    ++offset;
+                }
+
+                if (obj_value != nullptr) {
+                    if (content[offset] == NotationConstants::ColonChar) {
+                        expecting_value = true;
+                        ++offset;
+                    } else {
+                        break;
+                    }
+                } else if (!expecting_value &&
+                           (((arr != nullptr) && arr->IsNotEmpty()) || ((obj != nullptr) && obj->IsNotEmpty()))) {
+                    if (content[offset] == NotationConstants::CommaChar) {
+                        expecting_value = true;
+                        ++offset;
+                    } else {
+                        if ((content[offset] == NotationConstants::ESquareChar) ||
+                            (content[offset] == NotationConstants::ECurlyChar)) {
                             continue;
                         }
 
-                        if (ch == NotationConstants::ESquareChar) {
-                            ++offset;
-                            arr->Compress();
-
-                            return value;
-                        }
+                        break;
                     }
-
-                    break;
                 }
 
-                value.Reset();
-            }
-
-            ++offset;
-
-            return value;
-        }
-
-        static ValueT parseValue(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
-            switch (content[offset]) {
-                case NotationConstants::SCurlyChar: {
+                while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                          (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                          (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                          (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
                     ++offset;
-                    return parseObject(stream, content, offset, end);
-                }
-
-                case NotationConstants::SSquareChar: {
-                    ++offset;
-                    return parseArray(stream, content, offset, end);
-                }
-
-                case NotationConstants::QuoteChar: {
-                    ++offset;
-
-                    const Char_T *str = (content + offset);
-                    SizeT         len = JSONUtils::UnEscape(str, (end - offset), stream);
-
-                    if (len != 0) {
-                        offset += len;
-                        --len;
-
-                        if (stream.IsNotEmpty()) {
-                            str = stream.First();
-                            len = stream.Length();
-                            stream.Clear();
-                        }
-
-                        return ValueT{String<Char_T>{str, len}};
-                    }
-
-                    break;
-                }
-
-                case NotationConstants::T_Char: {
-                    const Char_T *true_string = (NotationConstants::TrueString + 1U);
-
-                    ++offset;
-
-                    while ((offset < end) && (content[offset] == *true_string)) {
-                        ++true_string;
-                        ++offset;
-                    }
-
-                    if (*true_string == Char_T{0}) {
-                        return ValueT{ValueType::True};
-                    }
-
-                    break;
-                }
-
-                case NotationConstants::F_Char: {
-                    const Char_T *false_string = (NotationConstants::FalseString + 1U);
-
-                    ++offset;
-
-                    while ((offset < end) && (content[offset] == *false_string)) {
-                        ++false_string;
-                        ++offset;
-                    }
-
-                    if (*false_string == Char_T{0}) {
-                        return ValueT{ValueType::False};
-                    }
-
-                    break;
-                }
-
-                case NotationConstants::N_Char: {
-                    const Char_T *null_string = (NotationConstants::NullString + 1U);
-
-                    ++offset;
-
-                    while ((offset < end) && (content[offset] == *null_string)) {
-                        ++null_string;
-                        ++offset;
-                    }
-
-                    if (*null_string == Char_T{0}) {
-                        return ValueT{ValueType::Null};
-                    }
-
-                    break;
-                }
-
-                default: {
-                    QNumber64 number;
-
-                    switch (Digit::StringToNumber(number, content, offset, end)) {
-                        case QNumberType::Natural: {
-                            return ValueT{number.Natural};
-                        }
-
-                        case QNumberType::Integer: {
-                            return ValueT{number.Integer};
-                        }
-
-                        case QNumberType::Real: {
-                            return ValueT{number.Real};
-                        }
-
-                        default: {
-                        }
-                    };
                 }
             }
-
-            offset = end;
-
-            return ValueT{};
         }
-    };
+
+        value.Reset();
+        return;
+    }
 };
 
 } // namespace Qentem
