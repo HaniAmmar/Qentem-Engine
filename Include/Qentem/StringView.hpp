@@ -187,6 +187,17 @@ struct StringView {
         return (Length() != 0);
     }
 
+    static StringView Trim(const Char_T *str, SizeT length) {
+        SizeT offset = 0;
+
+        StringUtils::Trim(str, offset, length);
+        return StringView{(str + offset), length};
+    }
+
+    static StringView Trim(const StringView &src) {
+        return Trim(src.First(), src.Length());
+    }
+
     // For STL
     QENTEM_INLINE const Char_T *begin() const noexcept {
         return First();
@@ -195,8 +206,6 @@ struct StringView {
     QENTEM_INLINE const Char_T *end() const noexcept {
         return End();
     }
-
-    //////////// Private ////////////
 
   private:
     constexpr void setLength(SizeT length) noexcept {
