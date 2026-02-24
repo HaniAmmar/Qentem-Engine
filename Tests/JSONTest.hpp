@@ -1664,6 +1664,38 @@ static void TestParse9(QTest &test) {
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsTrue(value.IsUndefined(), __LINE__);
 
+    content = R"({1})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
+    content = R"({-1})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
+    content = R"({1.5})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
+    content = R"({true})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
+    content = R"({false})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
+    content = R"({null})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
+    content = R"({""})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
+    content = R"({[]})";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    test.IsTrue(value.IsUndefined(), __LINE__);
+
     content = R"([123e])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsTrue(value.IsUndefined(), __LINE__);
