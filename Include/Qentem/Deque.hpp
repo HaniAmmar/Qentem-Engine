@@ -513,11 +513,11 @@ struct Deque {
     }
 
     QENTEM_INLINE bool IsEmpty() const noexcept {
-        return Size() == 0;
+        return (Size() == 0);
     }
 
     QENTEM_INLINE bool IsNotEmpty() const noexcept {
-        return Size() != 0;
+        return (Size() != 0);
     }
 
     QENTEM_INLINE bool IsFull() const noexcept {

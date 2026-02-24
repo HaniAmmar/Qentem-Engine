@@ -392,7 +392,7 @@ struct StringStream {
     }
 
     QENTEM_INLINE bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
+        return (Length() != 0);
     }
 
     // Iterator support (STL-compatible)

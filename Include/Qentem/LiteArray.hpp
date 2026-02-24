@@ -149,11 +149,11 @@ struct LiteArray {
     }
 
     QENTEM_INLINE bool IsEmpty() const noexcept {
-        return (size_ == 0);
+        return (Size() == 0);
     }
 
     QENTEM_INLINE bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
+        return (Size() != 0);
     }
 
     QENTEM_INLINE Type_T *Storage() noexcept {
@@ -174,7 +174,7 @@ struct LiteArray {
 
     QENTEM_INLINE Type_T *Last() noexcept {
         if (IsNotEmpty()) {
-            return (Storage() + (size_ - SizeT{1}));
+            return (Storage() + (Size() - SizeT{1}));
         }
 
         return nullptr;
@@ -182,14 +182,14 @@ struct LiteArray {
 
     QENTEM_INLINE const Type_T *Last() const noexcept {
         if (IsNotEmpty()) {
-            return (First() + (size_ - SizeT{1}));
+            return (First() + (Size() - SizeT{1}));
         }
 
         return nullptr;
     }
 
     QENTEM_INLINE const Type_T *End() const noexcept {
-        return (First() + size_);
+        return (First() + Size());
     }
 
     // For STL
@@ -222,7 +222,7 @@ struct LiteArray {
         reserve(new_capacity);
 
         if (old_storage != nullptr) {
-            MemoryUtils::CopyTo(storage_, old_storage, size_);
+            MemoryUtils::CopyTo(storage_, old_storage, Size());
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
             release(old_raw_storage, old_capacity);
 #else

@@ -139,6 +139,14 @@ struct LiteStream {
         return capacity_;
     }
 
+    QENTEM_INLINE bool IsEmpty() const noexcept {
+        return (Length() == 0);
+    }
+
+    QENTEM_INLINE bool IsNotEmpty() const noexcept {
+        return (Length() != 0);
+    }
+
   private:
     void expand(const SizeT32 new_capacity) noexcept {
         constexpr SizeT32 long_m1        = (sizeof(SystemLong) - 1U);

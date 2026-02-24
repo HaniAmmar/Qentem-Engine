@@ -418,7 +418,7 @@ struct Array {
     }
 
     QENTEM_INLINE bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
+        return (Size() != 0);
     }
 
     // For STL

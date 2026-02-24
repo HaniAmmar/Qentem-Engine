@@ -20,9 +20,9 @@ namespace Qentem {
 
 enum struct QNumberType : SizeT8 {
     NotANumber = 0, // NAN
-    Real       = 1, // double
-    Natural    = 2, // unsigned
-    Integer    = 3  // signed
+    Natural    = 1, // unsigned
+    Integer    = 2, // signed
+    Real       = 3  // double
 };
 ///////////////////////////////////////////////
 template <typename Type_T>
