@@ -3,9 +3,10 @@
  * @brief Provides an iterative, non-recursive JSON parser for Qentem Engine.
  *
  * This header defines the core types and algorithms for parsing, representing,
- * and manipulating JSON documents. The parser is implemented as an explicit
- * state machine rather than a recursive descent parser, allowing safe handling
- * of deeply nested structures.
+ * and manipulating JSON documents. Parsing is performed using an explicit
+ * state machine rather than recursive descent, enabling safe handling of
+ * deeply nested structures. Optional support for C-style line and block
+ * comments is provided as a preprocessing step.
  *
  * @author Hani Ammar
  * @date 2026
@@ -36,15 +37,68 @@ struct JSON {
         return Parse(content, StringUtils::Count(content));
     }
 
+    template <typename Stream_T, typename Char_T, typename Number_T>
+    QENTEM_INLINE static Value<Char_T> ParseWithComments(Stream_T &stream, const Char_T *content, Number_T length) {
+        return parse<Stream_T, Char_T, true>(stream, content, SizeT(length));
+    }
+
+    template <typename Char_T, typename Number_T>
+    QENTEM_INLINE static Value<Char_T> ParseWithComments(const Char_T *content, Number_T length) {
+        StringStream<Char_T> stream;
+        return ParseWithComments(stream, content, SizeT(length));
+    }
+
+    template <typename Char_T>
+    QENTEM_INLINE static Value<Char_T> ParseWithComments(const Char_T *content) {
+        return ParseWithComments(content, StringUtils::Count(content));
+    }
+
   private:
-    template <typename Stream_T, typename Char_T>
+    template <typename Stream_T, typename Char_T, bool WithComments_T = false>
     static Value<Char_T> parse(Stream_T &stream, const Char_T *content, SizeT length) {
         using WhiteSpaceChars = StringUtils::WhiteSpaceChars_T<Char_T>;
         Value<Char_T> value{};
 
         if (length != 0) {
             SizeT offset = 0;
-            parse(value, stream, content, offset, length);
+            parse<Value<Char_T>, Stream_T, Char_T, WithComments_T>(value, stream, content, offset, length);
+
+            if constexpr (WithComments_T) {
+                while (true) {
+                    while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                                 (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                                 (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                                 (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                        ++offset;
+                    }
+
+                    // Comments at the end
+                    if ((offset < length) && (content[offset] == '/')) {
+                        ++offset;
+
+                        if (offset < length) {
+                            if (content[offset] == '/') {
+                                while ((offset < length) && (content[offset] != WhiteSpaceChars::LineControlChar)) {
+                                    ++offset;
+                                }
+                            } else if (content[offset] == '*') {
+                                while ((++offset < length) && (content[offset] != '*')) {
+                                }
+
+                                if ((++offset < length) && (content[offset] == '/')) {
+                                    ++offset;
+                                } else {
+                                    value.Reset();
+                                }
+                            } else {
+                                value.Reset();
+                            }
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
 
             while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
                                          (content[offset] == WhiteSpaceChars::LineControlChar) ||
@@ -61,27 +115,71 @@ struct JSON {
         return value;
     }
 
-    template <typename ValueT, typename Stream_T, typename Char_T>
-    static void parse(ValueT &value, Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
+    template <typename ValueT, typename Stream_T, typename Char_T, bool WithComments_T = false>
+    static void parse(ValueT &value, Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT length) {
         using WhiteSpaceChars   = StringUtils::WhiteSpaceChars_T<Char_T>;
         using NotationConstants = JSONUtils::NotationConstants_T<Char_T>;
         using ObjectT           = typename ValueT::ObjectT;
         using ArrayT            = typename ValueT::ArrayT;
 
-        while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
-                                  (content[offset] == WhiteSpaceChars::LineControlChar) ||
-                                  (content[offset] == WhiteSpaceChars::TabControlChar) ||
-                                  (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+        while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                     (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                     (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                     (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
             ++offset;
         }
 
-        if (offset < end) {
+        if (offset < length) {
             Array<ValueT *> tree{SizeT{8}};
             ValueT         *parent{&value};
             ObjectT        *obj{nullptr};
             ArrayT         *arr{nullptr};
             ValueT         *obj_value{nullptr};
             bool            expecting_value{false};
+
+            // Comments at the begining
+            if constexpr (WithComments_T) {
+                while (true) {
+                    while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                                 (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                                 (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                                 (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                        ++offset;
+                    }
+
+                    if ((offset < length) && (content[offset] == '/')) {
+                        ++offset;
+
+                        if (offset < length) {
+                            if (content[offset] == '/') {
+                                while ((offset < length) && (content[offset] != WhiteSpaceChars::LineControlChar)) {
+                                    ++offset;
+                                }
+                            } else if (content[offset] == '*') {
+                                while ((++offset < length) && (content[offset] != '*')) {
+                                }
+
+                                if ((++offset < length) && (content[offset] == '/')) {
+                                    ++offset;
+                                } else {
+                                    return;
+                                }
+                            } else {
+                                return;
+                            }
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                             (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                             (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                             (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                    ++offset;
+                }
+            }
 
             if (content[offset] == NotationConstants::SSquareChar) {
                 value = {ValueType::Array};
@@ -91,20 +189,20 @@ struct JSON {
                 obj   = parent->GetObject();
             }
 
-            while ((++offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
-                                        (content[offset] == WhiteSpaceChars::LineControlChar) ||
-                                        (content[offset] == WhiteSpaceChars::TabControlChar) ||
-                                        (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+            while ((++offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                           (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                           (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                           (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
             }
 
-            while (offset < end) {
+            while (offset < length) {
                 switch (content[offset]) {
                     case NotationConstants::QuoteChar: {
                         ++offset;
 
-                        if (offset < end) {
+                        if (offset < length) {
                             const Char_T *str = (content + offset);
-                            SizeT         len = JSONUtils::UnEscape(str, (end - offset), stream);
+                            SizeT         len = JSONUtils::UnEscape(str, (length - offset), stream);
 
                             if (len != 0) {
                                 offset += len;
@@ -138,7 +236,7 @@ struct JSON {
                     case NotationConstants::F_Char: {
                         const Char_T *false_string = (NotationConstants::FalseString + 1U);
 
-                        while ((++offset < end) && (content[offset] == *false_string)) {
+                        while ((++offset < length) && (content[offset] == *false_string)) {
                             ++false_string;
                         }
 
@@ -164,7 +262,7 @@ struct JSON {
                     case NotationConstants::N_Char: {
                         const Char_T *null_string = (NotationConstants::NullString + 1U);
 
-                        while ((++offset < end) && (content[offset] == *null_string)) {
+                        while ((++offset < length) && (content[offset] == *null_string)) {
                             ++null_string;
                         }
 
@@ -190,7 +288,7 @@ struct JSON {
                     case NotationConstants::T_Char: {
                         const Char_T *true_string = (NotationConstants::TrueString + 1U);
 
-                        while ((++offset < end) && (content[offset] == *true_string)) {
+                        while ((++offset < length) && (content[offset] == *true_string)) {
                             ++true_string;
                         }
 
@@ -304,9 +402,52 @@ struct JSON {
                     }
 
                     default: {
+                        if constexpr (WithComments_T) {
+                            if (content[offset] == '/') {
+                                ++offset;
+
+                                if (offset < length) {
+                                    if (content[offset] == '/') {
+                                        while ((offset < length) &&
+                                               (content[offset] != WhiteSpaceChars::LineControlChar)) {
+                                            ++offset;
+                                        }
+                                    } else if (content[offset] == '*') {
+                                        while ((++offset < length) && (content[offset] != '*')) {
+                                        }
+
+                                        if ((++offset < length) && (content[offset] == '/')) {
+                                            ++offset;
+                                        } else {
+                                            break;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+
+                                    if (offset < length) {
+                                        while ((offset < length) &&
+                                               ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                                (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                                (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                                (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                                            ++offset;
+                                        }
+                                    }
+
+                                    if ((offset < length) && (content[offset] != NotationConstants::CommaChar) &&
+                                        content[offset] != NotationConstants::ColonChar) {
+                                        continue;
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+
                         QNumber64 number;
 
-                        switch (Digit::StringToNumber(number, content, offset, end)) {
+                        switch (Digit::StringToNumber(number, content, offset, length)) {
                             case QNumberType::NotANumber: {
                                 value.Reset();
                                 return;
@@ -360,19 +501,25 @@ struct JSON {
                     }
                 }
 
-                while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
-                                          (content[offset] == WhiteSpaceChars::LineControlChar) ||
-                                          (content[offset] == WhiteSpaceChars::TabControlChar) ||
-                                          (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                             (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                             (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                             (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
                     ++offset;
                 }
 
-                if (offset < end) {
+                if (offset < length) {
                     if (obj_value != nullptr) {
                         if (content[offset] == NotationConstants::ColonChar) {
                             expecting_value = true;
                             ++offset;
                         } else {
+                            if constexpr (WithComments_T) {
+                                if (content[offset] == NotationConstants::SlashChar) {
+                                    continue;
+                                }
+                            }
+
                             break;
                         }
                     } else if (!expecting_value &&
@@ -386,15 +533,21 @@ struct JSON {
                                 continue;
                             }
 
+                            if constexpr (WithComments_T) {
+                                if (content[offset] == NotationConstants::SlashChar) {
+                                    continue;
+                                }
+                            }
+
                             break;
                         }
                     }
                 }
 
-                while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
-                                          (content[offset] == WhiteSpaceChars::LineControlChar) ||
-                                          (content[offset] == WhiteSpaceChars::TabControlChar) ||
-                                          (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
+                while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                             (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                             (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                             (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
                     ++offset;
                 }
             }

@@ -1,6 +1,6 @@
 #include "Qentem/JSON.hpp"
 
-#include <iostream>
+#include "Qentem/QConsole.hpp"
 
 using namespace Qentem;
 
@@ -41,12 +41,11 @@ int main() {
 /* Block at end */
 )jsonc";
 
-    StringUtils::StripComments(ss.Storage(), ss.Length());
-    Value<char> val1 = JSON::Parse(ss.First(), ss.Length());
+    Value<char> val1 = JSON::ParseWithComments(ss.First(), ss.Length());
 
-    std::cout << "Parsed polluted_json_1:\n" << val1.Stringify() << "\n\n";
+    QConsole::Print("Parsed polluted_json_1:\n", val1.Stringify(), "\n\n");
 
-    /* Output:
+    /** Output:
         [
             1,
             2,
@@ -55,11 +54,11 @@ int main() {
             5,
             "value",
             "\/\/not a comment",
-            "\/*not a comment*\/",
+            "backslash slash *not a comment*\/",
             "Escaped \\\"\/\/ still string",
             "\/\/",
             6,
-            "C-style \/* inside string \/\/ with \/\/slashes*\/ 7",
+            "C-style backslash slash * inside string \/\/ with \/\/slashes*\/ 7",
             8
         ]
     */
@@ -88,25 +87,24 @@ int main() {
 /* Block at EOF */
 )jsonc";
 
-    StringUtils::StripComments(ss.Storage(), ss.Length());
-    Value<char> val2 = JSON::Parse(ss.First(), ss.Length());
+    Value<char> val2 = JSON::ParseWithComments(ss.First(), ss.Length());
 
-    std::cout << "Parsed polluted_json_2:\n" << val2.Stringify() << "\n\n";
-
+    QConsole::Print("Parsed polluted_json_2:\n", val2.Stringify(), "\n\n");
+    QConsole::Flush();
     /*
     [ Output:
         1,
         2,
         "string \/\/ not a comment",
-        "weird \/* string \/\/ with \/\/ multiple slashes*\/",
+        "weird \slash* string \/\/ with \/\/ multiple slashes*\/",
         3,
         4,
         5,
         6,
         7,
-        "escaped quote: \\\" \/* not a comment *\/",
+        "escaped quote: \\\" \slash* not a comment *\/",
         "backslash: \\\\",
-        "mix: \/\/ \/* \" \\\" *\/"
+        "mix: \/\/ \slash* \" \\\" *\/"
     ]
     */
 
