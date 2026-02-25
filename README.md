@@ -49,6 +49,7 @@ Qentem Engine is a C++ library offering high-performance template rendering and 
 
 -   Fast and efficient parsing and serialization.
 -   Supports merging, sorting, and grouping of values.
+-   Optional support for C-style line (`//`) and block (`/* */`) comments.
 
 ## Requirements
 
