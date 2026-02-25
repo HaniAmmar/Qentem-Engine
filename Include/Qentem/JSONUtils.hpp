@@ -172,9 +172,6 @@ struct JSONUtils {
                 case NotationConstants::CarriageControlChar: {
                     return 0;
                 }
-
-                default: {
-                }
             }
 
             ++offset;
@@ -204,12 +201,12 @@ struct JSONUtils {
                 case NotationConstants::BSlashChar:
                 case NotationConstants::SlashChar: {
                     stream.Write((content + offset2), (offset - offset2));
-
                     stream.Write(NotationConstants::BSlashChar);
+                    stream.Write(ch);
+
                     offset2 = offset;
                     ++offset2;
 
-                    stream.Write(ch);
                     break;
                 }
 
@@ -219,16 +216,13 @@ struct JSONUtils {
                 case NotationConstants::FormfeedControlChar:
                 case NotationConstants::CarriageControlChar: {
                     stream.Write((content + offset2), (offset - offset2));
-
                     stream.Write(NotationConstants::BSlashChar);
+                    stream.Write(ReplaceList[static_cast<SizeT8>(ch)]);
+
                     offset2 = offset;
                     ++offset2;
 
-                    stream.Write(ReplaceList[static_cast<SizeT8>(ch)]);
                     break;
-                }
-
-                default: {
                 }
             }
 

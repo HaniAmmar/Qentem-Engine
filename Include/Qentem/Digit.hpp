@@ -195,24 +195,24 @@ struct Digit {
 
             if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                 // 0-9
-                number <<= 4U;
                 ++offset;
+                number <<= 4U;
                 number |= Number_T(digit - DigitUtils::DigitChar::Zero);
                 continue;
             }
 
             if ((digit >= DigitUtils::DigitChar::UA) && (digit <= DigitUtils::DigitChar::UF)) {
                 // A-F
-                number <<= 4U;
                 ++offset;
+                number <<= 4U;
                 number |= Number_T(digit - DigitUtils::DigitChar::Seven);
                 continue;
             }
 
             if ((digit >= DigitUtils::DigitChar::A) && (digit <= DigitUtils::DigitChar::F)) {
                 // a-f
-                number <<= 4U;
                 ++offset;
+                number <<= 4U;
                 number |= Number_T(digit - DigitUtils::DigitChar::UW);
                 continue;
             }

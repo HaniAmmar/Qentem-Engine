@@ -91,13 +91,10 @@ struct JSON {
                 obj   = parent->GetObject();
             }
 
-            ++offset;
-
-            while ((offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
-                                      (content[offset] == WhiteSpaceChars::LineControlChar) ||
-                                      (content[offset] == WhiteSpaceChars::TabControlChar) ||
-                                      (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
-                ++offset;
+            while ((++offset < end) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
+                                        (content[offset] == WhiteSpaceChars::LineControlChar) ||
+                                        (content[offset] == WhiteSpaceChars::TabControlChar) ||
+                                        (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
             }
 
             while (offset < end) {
@@ -105,32 +102,34 @@ struct JSON {
                     case NotationConstants::QuoteChar: {
                         ++offset;
 
-                        const Char_T *str = (content + offset);
-                        SizeT         len = JSONUtils::UnEscape(str, (end - offset), stream);
+                        if (offset < end) {
+                            const Char_T *str = (content + offset);
+                            SizeT         len = JSONUtils::UnEscape(str, (end - offset), stream);
 
-                        if (len != 0) {
-                            offset += len;
-                            --len;
+                            if (len != 0) {
+                                offset += len;
+                                --len;
 
-                            if (stream.IsNotEmpty()) {
-                                str = stream.First();
-                                len = stream.Length();
-                                stream.Clear();
-                            }
-
-                            if (obj != nullptr) {
-                                if (obj_value == nullptr) {
-                                    // Name
-                                    obj_value = &((*obj)[String<Char_T>{str, len}]);
-                                } else {
-                                    *obj_value = ValueT{String<Char_T>{str, len}};
-                                    obj_value  = nullptr;
+                                if (stream.IsNotEmpty()) {
+                                    str = stream.First();
+                                    len = stream.Length();
+                                    stream.Clear();
                                 }
-                            } else {
-                                *arr += ValueT{String<Char_T>{str, len}};
-                            }
 
-                            expecting_value = false;
+                                if (obj != nullptr) {
+                                    if (obj_value == nullptr) {
+                                        // Name
+                                        obj_value = &((*obj)[String<Char_T>{str, len}]);
+                                    } else {
+                                        *obj_value = ValueT{String<Char_T>{str, len}};
+                                        obj_value  = nullptr;
+                                    }
+                                } else {
+                                    *arr += ValueT{String<Char_T>{str, len}};
+                                }
+
+                                expecting_value = false;
+                            }
                         }
 
                         break;
@@ -368,25 +367,27 @@ struct JSON {
                     ++offset;
                 }
 
-                if (obj_value != nullptr) {
-                    if (content[offset] == NotationConstants::ColonChar) {
-                        expecting_value = true;
-                        ++offset;
-                    } else {
-                        break;
-                    }
-                } else if (!expecting_value &&
-                           (((arr != nullptr) && arr->IsNotEmpty()) || ((obj != nullptr) && obj->IsNotEmpty()))) {
-                    if (content[offset] == NotationConstants::CommaChar) {
-                        expecting_value = true;
-                        ++offset;
-                    } else {
-                        if ((content[offset] == NotationConstants::ESquareChar) ||
-                            (content[offset] == NotationConstants::ECurlyChar)) {
-                            continue;
+                if (offset < end) {
+                    if (obj_value != nullptr) {
+                        if (content[offset] == NotationConstants::ColonChar) {
+                            expecting_value = true;
+                            ++offset;
+                        } else {
+                            break;
                         }
+                    } else if (!expecting_value &&
+                               (((arr != nullptr) && arr->IsNotEmpty()) || ((obj != nullptr) && obj->IsNotEmpty()))) {
+                        if (content[offset] == NotationConstants::CommaChar) {
+                            expecting_value = true;
+                            ++offset;
+                        } else {
+                            if ((content[offset] == NotationConstants::ESquareChar) ||
+                                (content[offset] == NotationConstants::ECurlyChar)) {
+                                continue;
+                            }
 
-                        break;
+                            break;
+                        }
                     }
                 }
 
