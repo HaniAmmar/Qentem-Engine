@@ -1172,14 +1172,14 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
         if constexpr (!QentemConfig::Is64bit) {
             DoubleWidthArithmetic<Number_T, 64>::Divide(dividend_high, dividend_low, divisor, initial_shift);
             return;
+        } else {
+            SizeT64 dividend64{dividend_high};              // Pack high 32 bits
+            dividend64 <<= shift_;                          // Shift to high dword
+            dividend64 |= dividend_low;                     // Add in low 32 bits
+            dividend_high = Number_T(dividend64 % divisor); // New remainder in high
+            dividend64 /= divisor;                          // New quotient in low
+            dividend_low = Number_T(dividend64);
         }
-
-        SizeT64 dividend64{dividend_high};              // Pack high 32 bits
-        dividend64 <<= shift_;                          // Shift to high dword
-        dividend64 |= dividend_low;                     // Add in low 32 bits
-        dividend_high = Number_T(dividend64 % divisor); // New remainder in high
-        dividend64 /= divisor;                          // New quotient in low
-        dividend_low = Number_T(dividend64);
     }
 
     /**
@@ -1193,12 +1193,12 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
     QENTEM_INLINE static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
         if constexpr (!QentemConfig::Is64bit) {
             return DoubleWidthArithmetic<Number_T, 64>::Multiply(number, multiplier);
+        } else {
+            SizeT64 number64{number};            // Promote to 64 bits
+            number64 *= multiplier;              // 64-bit multiplication
+            number = Number_T(number64);         // Store low 32 bits
+            return Number_T(number64 >> shift_); // Return high 32 bits as carry
         }
-
-        SizeT64 number64{number};            // Promote to 64 bits
-        number64 *= multiplier;              // 64-bit multiplication
-        number = Number_T(number64);         // Store low 32 bits
-        return Number_T(number64 >> shift_); // Return high 32 bits as carry
     }
 
   private:
