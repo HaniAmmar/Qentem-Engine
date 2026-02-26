@@ -430,7 +430,7 @@ struct StringStream {
         capacity_ = new_capacity;
     }
 
-    void expand(SizeT new_capacity) {
+    QENTEM_NOINLINE void expand(SizeT new_capacity) {
         constexpr SizeT32 long_m1 = (sizeof(SystemLong) - 1U);
 
         if (tryInplaceExpand(new_capacity)) {

@@ -210,7 +210,7 @@ struct LiteArray {
     }
 
   private:
-    QENTEM_INLINE void expand(SizeT new_capacity) noexcept {
+    QENTEM_NOINLINE void expand(SizeT new_capacity) noexcept {
         Type_T *old_storage = storage_;
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK

@@ -834,7 +834,7 @@ struct Reserver {
      * @see getReservers
      */
     template <typename Type_T>
-    static void Release(Type_T *ptr, SystemLong size) noexcept {
+    QENTEM_NOINLINE static void Release(Type_T *ptr, SystemLong size) noexcept {
         if (ptr != nullptr) {
             Core *instance = GetCurrentInstance();
             size           = RoundUpBytes<Type_T>(size);
@@ -882,7 +882,7 @@ struct Reserver {
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    static void Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+    QENTEM_NOINLINE static void Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         if (ptr != nullptr) {
             Core *instance = GetCurrentInstance();
             from_size      = RoundUpBytes<Type_T>(from_size);
@@ -921,7 +921,7 @@ struct Reserver {
      * @return true if the allocation was expanded in-place; false otherwise.
      */
     template <typename Type_T>
-    static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+    QENTEM_NOINLINE static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         if (ptr != nullptr) {
             Core *instance = GetCurrentInstance();
             from_size      = RoundUpBytes<Type_T>(from_size);
@@ -1051,7 +1051,7 @@ struct Reserver {
     }
 
     // malloc
-    QENTEM_INLINE static void *LibcReserve(SystemLong size) noexcept {
+    QENTEM_NOINLINE static void *LibcReserve(SystemLong size) noexcept {
         size += sizeof(SystemLong);
 
         void       *ptr   = Reserve<char>(size);
@@ -1064,7 +1064,7 @@ struct Reserver {
     }
 
     // calloc
-    QENTEM_INLINE static void *LibcReserveClear(SystemLong size) noexcept {
+    QENTEM_NOINLINE static void *LibcReserveClear(SystemLong size) noexcept {
         size += sizeof(SystemLong);
 
         SystemLong  r_size = RoundUpBytes<char>(size);
@@ -1084,7 +1084,7 @@ struct Reserver {
     }
 
     // realloc
-    QENTEM_INLINE static void *LibcResize(void *ptr, SystemLong new_size) {
+    QENTEM_NOINLINE static void *LibcResize(void *ptr, SystemLong new_size) {
         if (ptr != nullptr) {
             new_size += sizeof(SystemLong);
             SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
@@ -1108,7 +1108,7 @@ struct Reserver {
     }
 
     // free
-    QENTEM_INLINE static void LibcRelease(void *ptr) noexcept {
+    QENTEM_NOINLINE static void LibcRelease(void *ptr) noexcept {
         if (ptr != nullptr) {
             SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
             --l_ptr;
@@ -1121,7 +1121,7 @@ struct Reserver {
 
   private:
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
-    QENTEM_INLINE static Type_T *reserve(SystemLong size) noexcept {
+    QENTEM_NOINLINE static Type_T *reserve(SystemLong size) noexcept {
         if constexpr (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
             // constexpr SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
             // (align>=CustomAlignment_T?align:(align+1))

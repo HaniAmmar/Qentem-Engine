@@ -1529,7 +1529,7 @@ struct HashTable {
      *
      * @param new_size The new capacity (number of items) to reserve.
      */
-    void expand(SizeT new_capacity) {
+    QENTEM_NOINLINE void expand(SizeT new_capacity) {
         HItem_T *storage = Storage();
         new_capacity     = MemoryUtils::AlignToPow2(new_capacity);
 

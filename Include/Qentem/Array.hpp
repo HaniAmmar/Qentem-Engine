@@ -472,7 +472,7 @@ struct Array {
         }
     }
 
-    void expand(SizeT new_capacity) {
+    QENTEM_NOINLINE void expand(SizeT new_capacity) {
         if (Reserver::TryExpand(Storage(), Capacity(), new_capacity)) {
             setCapacity(new_capacity);
             return;

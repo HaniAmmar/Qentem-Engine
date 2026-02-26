@@ -148,7 +148,7 @@ struct LiteStream {
     }
 
   private:
-    void expand(const SizeT32 new_capacity) noexcept {
+    QENTEM_NOINLINE void expand(const SizeT32 new_capacity) noexcept {
         constexpr SizeT32 long_m1        = (sizeof(SystemLong) - 1U);
         SizeT32           aligned_length = (((length_ + long_m1) & ~long_m1) / sizeof(SystemLong));
 

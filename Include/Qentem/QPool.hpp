@@ -355,7 +355,7 @@ struct QPool {
      *
      * @param count Number of new pool blocks to allocate.
      */
-    void expand(SizeT32 count) {
+    QENTEM_NOINLINE void expand(SizeT32 count) {
         do {
             Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(reserve_size_));
 

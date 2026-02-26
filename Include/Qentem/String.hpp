@@ -513,7 +513,7 @@ struct String {
         return ns;
     }
 
-    void expand(SizeT new_capacity) {
+    QENTEM_NOINLINE void expand(SizeT new_capacity) {
         if (Reserver::TryExpand(Storage(), Capacity(), new_capacity + SizeT{1})) {
             new_capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(new_capacity + SizeT{1}) / sizeof(Char_T));
             --new_capacity;
