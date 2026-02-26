@@ -1064,8 +1064,8 @@ struct Reserver {
     }
 
     // calloc
-    QENTEM_NOINLINE static void *LibcReserveClear(SystemLong size) noexcept {
-        size += sizeof(SystemLong);
+    QENTEM_NOINLINE static void *LibcReserveClear(SystemLong count, SystemLong item_size) noexcept {
+        const SystemLong size = (count * item_size) + sizeof(SystemLong);
 
         SystemLong  r_size = RoundUpBytes<char>(size);
         void       *ptr    = reserve<char>(r_size);
