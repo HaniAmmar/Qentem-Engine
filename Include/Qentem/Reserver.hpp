@@ -1030,22 +1030,26 @@ struct Reserver {
     }
 
     /**
-     * @brief Returns the first available reserver instance.
+     * @brief Returns the reserver instance at the given index.
      *
      * On platforms supporting multiple static reserver instances, this provides
-     * direct access to the underlying storage backing the reserver array.
-     * On other platforms, it resolves to the single global reserver object.
+     * direct access to the underlying storage backing the reserver array at
+     * the specified index.
+     * On other platforms, it resolves to the single global reserver object,
+     * ignoring the index.
      *
-     * This is intended for early-use scenarios (e.g. during program startup)
+     * This is intended for early-use scenarios (e.g., during program startup)
      * where a stable reserver address is required before full initialization
      * paths are established.
      *
-     * @return Pointer to the first reserver instance.
+     * @param core_id Index of the reserver instance to retrieve.
+     * @return Pointer to the reserver instance at the specified index.
      */
-    QENTEM_INLINE static Core *GetFirstInstance() noexcept {
+    QENTEM_INLINE static Core *GetInstanceAt(SizeT core_id) noexcept {
 #if defined(__linux__) || defined(_WIN32)
-        return reservers_.Storage();
+        return (reservers_.Storage() + core_id);
 #else
+        (void)core_id;
         return &reserver_;
 #endif
     }
