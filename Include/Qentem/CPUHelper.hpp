@@ -129,18 +129,39 @@ struct CPUHelper {
     };
 
     /**
-     * @brief Returns the number of logical CPU cores available to the process.
+     * @brief Returns the number of logical CPU cores currently online.
      *
-     * This method queries the system once and caches the result for future calls.
-     * On Linux, it returns the number of logical cores currently available to this
-     * process according to its CPU affinity (via `sched_getaffinity`).
-     * On Windows, it returns the total number of logical cores in the system,
-     * across all processor groups, regardless of the calling thread's affinity.
+     * This function provides a cached count of logical CPU cores.
+     * - On Linux, it reads the list of online CPUs from
+     *   `/sys/devices/system/cpu/online`.
+     * - On Windows, it returns the total number of logical cores across all
+     *   processor groups.
+     * - On other platforms, it queries the system via `sysconf(_SC_NPROCESSORS_ONLN)`
+     *   or an equivalent method, returning at least 1.
      *
-     * @return Number of logical CPU cores. Guaranteed to be at least 1.
+     * The value is computed once at program startup and stored in `CPUHelper::info_`,
+     * ensuring minimal overhead for repeated calls.
+     *
+     * @return Number of logical CPU cores currently online. Always >= 1.
      */
     QENTEM_INLINE static SizeT32 GetCoreCount() noexcept {
         return info_.CoreCount;
+    }
+
+    /**
+     * @brief Returns the highest zero-based CPU ID currently online.
+     *
+     * - On Linux, this value is determined by parsing `/sys/devices/system/cpu/online`.
+     * - On Windows, it is computed as `GetCoreCount() - 1`.
+     * - On other platforms, it is derived from the system-reported number of online processors.
+     *
+     * The value is cached in `CPUHelper::info_` at program startup, so repeated calls
+     * are inexpensive.
+     *
+     * @return Zero-based maximum CPU ID. Always >= 0.
+     */
+    QENTEM_INLINE static SizeT32 GetMaxCPUID() noexcept {
+        return info_.MaxID;
     }
 
     /**
@@ -479,9 +500,11 @@ struct CPUHelper {
         //            reinterpret_cast<SystemLongI>(info.OnlineCores.Data()));
 #elif defined(_WIN32)
         info.CoreCount = static_cast<SizeT32>(GetActiveProcessorCount(ALL_PROCESSOR_GROUPS));
+        info.MaxID     = (info.CoreCount - 1U);
 #else
         const SizeT32 tmp = static_cast<SizeT32>(::sysconf(_SC_NPROCESSORS_ONLN));
         info.CoreCount    = ((tmp > 0) ? static_cast<SizeT32>(tmp) : 1U);
+        info.MaxID        = (info.CoreCount - 1U);
 #endif
         return info;
     }
