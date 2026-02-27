@@ -1137,7 +1137,7 @@ struct Reserver {
     }
 
 #if defined(__linux__) || defined(_WIN32)
-    inline static LiteArray<ReserverCore<>> reservers_{static_cast<SizeT>(CPUHelper::GetCoreCount()), true};
+    inline static LiteArray<ReserverCore<>> reservers_{static_cast<SizeT>(CPUHelper::GetMaxCPUID() + 1U), true};
 #else
     inline static ReserverCore<> reserver_{};
 #endif
