@@ -100,6 +100,10 @@ struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
         return &(mask_[0]);
     }
 
+    QENTEM_INLINE SystemLong *Storage() noexcept {
+        return &(mask_[0]);
+    }
+
     QENTEM_INLINE static constexpr SizeT32 Size() noexcept {
         return SIZE;
     }
