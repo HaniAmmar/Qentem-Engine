@@ -315,7 +315,16 @@ struct QPool {
 
         while (storage_ != nullptr) {
             Pool *next_pool = storage_->Next;
-            Item *items     = reinterpret_cast<Item *>(reinterpret_cast<unsigned char *>(storage_) + POOL_HEADER_SIZE);
+
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+            Item *items = reinterpret_cast<Item *>(reinterpret_cast<unsigned char *>(storage_) + POOL_HEADER_SIZE);
+#else
+            const SystemLong raw_address = reinterpret_cast<SystemLong>(storage_);
+            const SystemLong aligned_address =
+                ((raw_address + SystemLong{TYPE_ALIGN_T - 1U}) & ~SystemLong{TYPE_ALIGN_T - 1U});
+            Item *items = reinterpret_cast<Item *>(
+                reinterpret_cast<unsigned char *>(reinterpret_cast<Pool *>(aligned_address)) + POOL_HEADER_SIZE);
+#endif
 
             SizeT32 index = 0;
 
@@ -332,7 +341,11 @@ struct QPool {
             constructed_ -= count;
             count = storage_size_;
 
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
             SystemMemory::Release(storage_, reserve_size_);
+#else
+            SystemMemory::Release(storage_, (reserve_size_ + TYPE_ALIGN_T));
+#endif
 
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
             MemoryRecord::Released(reserve_size_);
@@ -357,14 +370,27 @@ struct QPool {
      */
     QENTEM_NOINLINE void expand(SizeT32 count) {
         do {
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
             Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(reserve_size_));
+#else
+            Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(reserve_size_ + TYPE_ALIGN_T));
+#endif
 
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
             MemoryRecord::ReservedBlock(reserve_size_);
             MemoryRecord::Reserved(reserve_size_);
 #endif
 
-            Item   *items = reinterpret_cast<Item *>(reinterpret_cast<unsigned char *>(pool) + POOL_HEADER_SIZE);
+#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+            Item *items = reinterpret_cast<Item *>(reinterpret_cast<unsigned char *>(pool) + POOL_HEADER_SIZE);
+#else
+            const SystemLong raw_address = reinterpret_cast<SystemLong>(pool);
+            const SystemLong aligned_address =
+                ((raw_address + SystemLong{TYPE_ALIGN_T - 1U}) & ~SystemLong{TYPE_ALIGN_T - 1U});
+            Item *items = reinterpret_cast<Item *>(
+                reinterpret_cast<unsigned char *>(reinterpret_cast<Pool *>(aligned_address)) + POOL_HEADER_SIZE);
+#endif
+
             SizeT32 index = storage_size_;
 
             // Link the newly allocated pool block into the storage chain
@@ -392,10 +418,8 @@ struct QPool {
      *
      * @return Number of items that fit in one storage block.
      */
-    static SizeT32 getStorageCount() noexcept {
-        const SizeT32 payload = (SystemMemory::GetPageSize() - POOL_HEADER_SIZE);
-
-        return (payload / ITEM_SIZE);
+    QENTEM_INLINE static SizeT32 getStorageCount() noexcept {
+        return ((SystemMemory::GetPageSize() - POOL_HEADER_SIZE) / ITEM_SIZE);
     }
 
     /**
@@ -410,20 +434,9 @@ struct QPool {
      *
      * @return Size in bytes to reserve for one storage block.
      */
-    static SystemLong getStorageSize() noexcept {
+    QENTEM_INLINE static SystemLong getStorageSize() noexcept {
         // static_assert((STORAGE_SIZE > 0), "Object size exceeds page size — cannot fit even one item.");
-
-        SystemLong reserve_size = (SystemLong{POOL_HEADER_SIZE} + (SystemLong{ITEM_SIZE} * getStorageCount()));
-
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-        if (reserve_size > SystemMemory::GetPageSize()) {
-            reserve_size = SystemMemory::AlignToPageSize(reserve_size);
-        } else {
-            reserve_size = SystemMemory::GetPageSize();
-        }
-#endif
-
-        return reserve_size;
+        return (SystemLong{POOL_HEADER_SIZE} + (SystemLong{ITEM_SIZE} * getStorageCount()));
     }
 
     inline static SystemLong reserve_size_{getStorageSize()};
