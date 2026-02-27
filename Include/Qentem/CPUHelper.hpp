@@ -122,6 +122,12 @@ struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
 };
 
 struct CPUHelper {
+    struct CPUInfo {
+        CPUSet  OnlineCores{};
+        SizeT32 CoreCount{0};
+        SizeT32 MaxID{0};
+    };
+
     /**
      * @brief Returns the number of logical CPU cores available to the process.
      *
@@ -134,7 +140,7 @@ struct CPUHelper {
      * @return Number of logical CPU cores. Guaranteed to be at least 1.
      */
     QENTEM_INLINE static SizeT32 GetCoreCount() noexcept {
-        return core_count_;
+        return info_.CoreCount;
     }
 
     /**
@@ -210,7 +216,7 @@ struct CPUHelper {
      * @return Pointer to the CPUSet describing online CPUs.
      */
     QENTEM_INLINE static const CPUSet *GetOnlineCPUSet() noexcept {
-        return &online_cores_;
+        return &(info_.OnlineCores);
     }
 #endif
 
@@ -260,13 +266,13 @@ struct CPUHelper {
     QENTEM_NOINLINE static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT32 length) noexcept {
         SystemLong bit;
         SizeT32    offset{0};
-        SizeT      index;
+        SizeT      bit_index;
 
         auto checkArray = [&](SystemLong id) {
-            index = static_cast<SizeT>(id >> CPUSet::SHIFT);
+            bit_index = static_cast<SizeT>(id >> CPUSet::SHIFT);
 
-            if (list.Size() <= index) {
-                list.ResizeInit(index + SizeT{1}, SystemLong{0});
+            if (list.Size() <= bit_index) {
+                list.ResizeInit(bit_index + SizeT{1}, SystemLong{0});
             }
         };
 
@@ -287,16 +293,15 @@ struct CPUHelper {
                 Digit::FastStringToNumber(id, (content + start), (offset - start));
 
                 checkArray(id);
-
                 bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
 
                 if constexpr (Verify_T) {
-                    if ((online_cores_.Data()[index] & bit) != bit) {
+                    if ((info_.OnlineCores.Data()[bit_index] & bit) != bit) {
                         return false;
                     }
                 }
 
-                list.Storage()[index] |= bit;
+                list.Storage()[bit_index] |= bit;
 
                 if (offset < length) {
                     while ((offset < length) && (content[offset] != ',') && (content[offset] != '-')) {
@@ -321,20 +326,18 @@ struct CPUHelper {
                             Digit::FastStringToNumber(id2, (content + start), (offset - start));
 
                             if (id2 > id) {
-                                checkArray(id2);
-
                                 do {
                                     ++id;
-                                    index = (static_cast<SizeT>(id) >> CPUSet::SHIFT);
-                                    bit   = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
+                                    checkArray(id);
+                                    bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
 
                                     if constexpr (Verify_T) {
-                                        if ((online_cores_.Data()[index] & bit) != bit) {
+                                        if ((info_.OnlineCores.Data()[bit_index] & bit) != bit) {
                                             return false;
                                         }
                                     }
 
-                                    list.Storage()[index] |= bit;
+                                    list.Storage()[bit_index] |= bit;
                                 } while (id < id2);
 
                                 if (offset < length) {
@@ -387,26 +390,6 @@ struct CPUHelper {
 
   private:
     /**
-     * @brief Returns the number of available CPU cores for this process.
-     *
-     * Detects the number of logical processors using platform-appropriate APIs:
-     *
-     * @return Number of logical CPU cores (at least 1).
-     */
-    QENTEM_NOINLINE static SizeT32 coreCount() noexcept {
-#if defined(__linux__)
-        const SizeT32 count = onlineCoresCount();
-#elif defined(_WIN32)
-        const SizeT32 count = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
-#else
-        const SizeT32 tmp   = static_cast<SizeT32>(::sysconf(_SC_NPROCESSORS_ONLN));
-        const SizeT32 count = ((tmp > 0) ? static_cast<SizeT32>(tmp) : 1U);
-#endif
-
-        return count;
-    }
-
-    /**
      * @brief Counts the number of currently online CPU cores on Linux.
      *
      * This function queries the kernel for the CPU affinity mask of the current process
@@ -418,41 +401,104 @@ struct CPUHelper {
      *
      * @return Number of online logical cores available to the process (>= 1).
      */
+    QENTEM_NOINLINE static CPUInfo getCPUInfo() noexcept {
+        CPUInfo info{};
+        info.OnlineCores.Clear();
+
 #if defined(__linux__)
-    QENTEM_NOINLINE static SizeT32 onlineCoresCount() noexcept {
-        CPUSet cores{};
-        cores.Clear();
+        constexpr int at_fdcwd  = -100; // AT_FDCWD
+        constexpr int read_only = 0;    // O_RDONLY
 
-        if ((SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(), reinterpret_cast<SystemLongI>(cores.Data())) >=
-             0)) {
-            SizeT32 index = CPUSet::Size();
-            SizeT32 count = 0;
+        constexpr const char *PRESENT_PATH = "/sys/devices/system/cpu/online";
 
-            do {
-                --index;
+        const int fd = static_cast<int>(
+            SystemCall(__NR_openat, at_fdcwd, reinterpret_cast<SystemLongI>(PRESENT_PATH), read_only, 0));
 
-                if (cores.Data()[index] != 0) {
-                    count += Platform::PopCount(cores.Data()[index]);
+        if (fd >= 0) {
+            constexpr SizeT32 NUMBER_MAX = 8U;
+            constexpr SizeT32 BUFFER_MAX = 32U;
+            char              number_buffer[NUMBER_MAX];
+            char              buffer[BUFFER_MAX];
+
+            SystemLong bit;
+            SizeT32    bit_index;
+            SizeT32    number_index = 0;
+
+            SizeT32 last_number    = 0;
+            SizeT32 current_number = 0;
+            bool    is_range       = false;
+
+            while (true) {
+                const SystemLongI ret = SystemCall(__NR_read, fd, reinterpret_cast<SystemLongI>(buffer), BUFFER_MAX);
+
+                if (ret >= 0) {
+                    SizeT32 index  = 0;
+                    SizeT32 length = static_cast<SizeT32>(ret);
+
+                    while (index < length) {
+                        while ((index < length) && (number_index < NUMBER_MAX) && (buffer[index] != ',') &&
+                               (buffer[index] != '-') && (buffer[index] != '\n')) {
+                            number_buffer[number_index] = buffer[index];
+                            ++index;
+                            ++number_index;
+                        }
+
+                        if ((index < length) || (buffer[index] == '\n')) {
+                            last_number = current_number;
+                            Digit::FastStringToNumber(current_number, number_buffer, number_index);
+                            number_index = 0;
+
+                            if (is_range) {
+                                is_range = false;
+                                while (++last_number < current_number) {
+                                    bit_index = (static_cast<SizeT>(last_number) >> CPUSet::SHIFT);
+                                    bit       = (SystemLong{1} << (last_number & CPUSet::BIT_WIDTH_M1));
+                                    info.OnlineCores.Storage()[bit_index] |= bit;
+
+                                    ++(info.CoreCount);
+                                }
+
+                            } else if (index < length) {
+                                is_range = (buffer[index] == '-');
+                            }
+
+                            bit_index = (static_cast<SizeT>(current_number) >> CPUSet::SHIFT);
+                            bit       = (SystemLong{1} << (current_number & CPUSet::BIT_WIDTH_M1));
+                            info.OnlineCores.Storage()[bit_index] |= bit;
+
+                            ++(info.CoreCount);
+                            info.MaxID = current_number;
+                        }
+
+                        if (buffer[index] == '\n') {
+                            SystemCall(__NR_close, fd);
+                            return info;
+                        }
+
+                        ++index;
+                    }
+
+                    continue;
                 }
-            } while (index != 0);
 
-            return count;
+                break;
+            }
+
+            SystemCall(__NR_close, fd);
         }
 
-        return 1U;
-    }
-
-    QENTEM_NOINLINE static CPUSet onlineCores() noexcept {
-        CPUSet cores{};
-        cores.Clear();
-
-        SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(), reinterpret_cast<SystemLongI>(cores.Data()));
-        return cores;
-    }
+        // SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(),
+        //            reinterpret_cast<SystemLongI>(info.OnlineCores.Data()));
+#elif defined(_WIN32)
+        info.CoreCount = static_cast<SizeT32>(GetActiveProcessorCount(ALL_PROCESSOR_GROUPS));
+#else
+        const SizeT32 tmp = static_cast<SizeT32>(::sysconf(_SC_NPROCESSORS_ONLN));
+        info.CoreCount    = ((tmp > 0) ? static_cast<SizeT32>(tmp) : 1U);
 #endif
+        return info;
+    }
 
-    inline static const SizeT32 core_count_{coreCount()};
-    inline static const CPUSet  online_cores_{onlineCores()};
+    inline static const CPUInfo info_{getCPUInfo()};
 };
 
 } // namespace Qentem
