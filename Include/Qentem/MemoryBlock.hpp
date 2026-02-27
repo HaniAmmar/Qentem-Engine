@@ -68,7 +68,7 @@ struct MemoryBlock {
         }
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-        capacity_ += page_size; // Insure correct alignment
+        capacity_ += SystemMemory::GetPageSize(); // Insure correct alignment
 #endif
 
         base_raw_ = SystemMemory::Reserve(capacity_);
