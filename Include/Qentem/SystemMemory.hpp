@@ -142,8 +142,8 @@ struct SystemMemory {
      * @return System call result. On success, returns the base address of the mapping
      *         cast to SystemLongI. On failure, returns a negative error code.
      */
-    static SystemLongI ReserveEx(void *address_hint, SystemLong length, int protection, int mapping_flags,
-                                 int file_descriptor, SystemLong offset) noexcept {
+    QENTEM_INLINE static SystemLongI ReserveEx(void *address_hint, SystemLong length, int protection, int mapping_flags,
+                                               int file_descriptor, SystemLong offset) noexcept {
         return SystemCall(
 #if defined(__i386__) || defined(__arm__) || defined(__ARM_EABI__)
             __NR_mmap2,
@@ -232,7 +232,7 @@ struct SystemMemory {
      *
      * @return Size of a memory page in bytes.
      */
-    static SystemLong getPageSize() noexcept {
+    QENTEM_NOINLINE static SystemLong getPageSize() noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -251,32 +251,51 @@ struct SystemMemory {
             const int fd = static_cast<int>(SystemCall(__NR_openat, at_fdcwd,
                                                 reinterpret_cast<SystemLongI>(AUXV_PATH),
                                                 read_only, 0));
+
             if (fd >= 0) {
-                struct {
+                struct aux_st_{
                     SystemLong Type;
                     SystemLong Value;
-                } aux;
+                } aux[4];
 
-                const unsigned char *ptr = reinterpret_cast<const unsigned char*>(&aux);
+                 bool done = false;
+
+                 unsigned char *ptr = reinterpret_cast< unsigned char*>(&aux);
                 SizeT32 filled = 0;
 
-                while (true) {
+                while (!done) {
                    const SystemLongI ret = SystemCall(__NR_read, fd,
                                           reinterpret_cast<SystemLongI>(ptr + filled),
                                           (sizeof(aux) - filled));
 
                     if (ret > 0) {
                         filled += static_cast<SizeT32>(ret);
+                        SizeT32 index = 0;
 
-                        if (filled == sizeof(aux)) {
-                            // Got one full AUX record
-                            if (aux.Type == page_size_id) {
-                                page_size = aux.Value;
+                        while (filled >= sizeof(aux_st_)) {
+                            if (aux[index].Type == page_size_id) {
+                                page_size = aux[index].Value;
+                                done = true;
                                 break;
                             }
 
                             // Reset buffer for next record
-                            filled = 0;
+                            filled -= sizeof(aux_st_);
+                            ++index;
+                        }
+
+                        if (filled != 0) {
+                            SizeT32 offset = 0;
+                            // leftover bytes start immediately after the last fully processed record
+                            SizeT32 src_index = (index * sizeof(aux_st_));
+
+                            if (src_index != 0) {
+                                while(offset < filled) {
+                                    ptr[offset] =  ptr[src_index];
+                                    ++src_index;
+                                    ++offset;
+                                }
+                            }
                         }
 
                         continue;
@@ -318,7 +337,7 @@ struct SystemMemory {
      * @return Pointer to reserved memory, or nullptr on failure.
      */
     template <bool IS_STACK_MEMORY_T>
-    static void *reserve(SystemLong size, SizeT32 flags) noexcept {
+    QENTEM_INLINE static void *reserve(SystemLong size, SizeT32 flags) noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
