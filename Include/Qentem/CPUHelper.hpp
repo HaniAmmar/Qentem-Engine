@@ -184,31 +184,22 @@ struct CPUHelper {
 #endif
     }
 
-    /**
-     * @brief Retrieves the affinity mask of online CPU cores.
-     *
-     * Queries the operating system for the set of logical cores available
-     * to the calling thread. The resulting mask indicates which cores are
-     * currently online and eligible for scheduling.
-     *
-     * On Linux, this invokes the `sched_getaffinity` system call.
-     * On unsupported platforms, the mask will remain cleared and the
-     * function will return `false`.
-     *
-     * @param mask Reference to a CPUSet that will be populated with the
-     *             online core mask.
-     * @return `true` if the query succeeds and the mask is populated,
-     *         `false` otherwise.
-     */
-    QENTEM_INLINE static bool OnlineCoresMask(CPUSet &mask) noexcept {
 #if defined(__linux__)
-        return (SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(),
-                           reinterpret_cast<SystemLongI>(mask.Data())) >= 0);
-#else
-        (void)mask;
-#endif
-        return false;
+    /**
+     * @brief Returns the set of CPUs currently considered online.
+     *
+     * On Linux platforms, this provides direct access to the internally
+     * maintained CPUSet representing the online processor cores.
+     *
+     * The returned pointer refers to stable storage owned by the runtime
+     * and must not be modified by the caller.
+     *
+     * @return Pointer to the CPUSet describing online CPUs.
+     */
+    QENTEM_INLINE static const CPUSet *GetOnlineCPUSet() noexcept {
+        return &online_cores_;
     }
+#endif
 
     /**
      * @brief Parses a numeric CPU range list into a validated CPU bitmask array.
@@ -412,11 +403,13 @@ struct CPUHelper {
      *
      * @return Number of online logical cores available to the process (>= 1).
      */
-    QENTEM_INLINE static SizeT32 onlineCoresCount() noexcept {
+#if defined(__linux__)
+    QENTEM_NOINLINE static SizeT32 onlineCoresCount() noexcept {
         CPUSet cores{};
         cores.Clear();
 
-        if (OnlineCoresMask(cores)) {
+        if ((SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(), reinterpret_cast<SystemLongI>(cores.Data())) >=
+             0)) {
             SizeT32 index = CPUSet::Size();
             SizeT32 count = 0;
 
@@ -434,7 +427,17 @@ struct CPUHelper {
         return 1U;
     }
 
+    QENTEM_NOINLINE static CPUSet onlineCores() noexcept {
+        CPUSet cores{};
+        cores.Clear();
+
+        SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(), reinterpret_cast<SystemLongI>(cores.Data()));
+        return cores;
+    }
+#endif
+
     inline static const SizeT32 core_count_{coreCount()};
+    inline static const CPUSet  online_cores_{onlineCores()};
 };
 
 } // namespace Qentem
