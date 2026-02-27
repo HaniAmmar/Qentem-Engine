@@ -221,11 +221,14 @@ struct CPUHelper {
 #endif
 
     /**
-     * @brief Parses a numeric CPU range list into a validated CPU bitmask array.
+     * @brief Parses a numeric CPU range list into a CPU bitmask array.
      *
      * This function reads a textual list of CPU indices and ranges from
-     * @p content and sets the corresponding bits in @p list, **only if**
-     * the referenced CPUs are present in the system online-core mask.
+     * @p content and sets the corresponding bits in @p list.
+     *
+     * If @c Verify_T is set to true, each referenced CPU index is validated
+     * against the system online-core mask and the function returns false
+     * if any CPU is not marked online.
      *
      * The input format supports:
      * - Single values:        "3"
@@ -245,28 +248,37 @@ struct CPUHelper {
      * The function validates the input while parsing:
      * - Returns false if a malformed range is detected (e.g. "7-3").
      * - Returns false if an unexpected character is encountered.
-     * - Returns false if any referenced CPU index is not marked online
-     *   in the system CPU mask.
+     * - If @c Verify_T is true, returns false if any referenced CPU index
+     *   is not marked online in the system CPU mask.
      *
      * @tparam Array_SystemLong_T  Container type holding SystemLong values.
-     *                            Must provide:
-     *                            - Size()
-     *                            - ResizeInit(SizeT, ...)
-     *                            - Storage()
+     *                             Must provide:
+     *                             - Size()
+     *                             - ResizeInit(SizeT, ...)
+     *                             - Storage()
+     * @tparam Verify_T            If true, validates each parsed CPU index against
+     *                             the system online-core mask; if false, all parsed
+     *                             indices are accepted without validation.
      *
      * @param list     Destination array that receives the resulting bitmask.
      * @param content  Pointer to the character buffer containing the range text.
      * @param length   Length of the character buffer.
      *
      * @return true if the entire input string was parsed successfully and all
-     *         referenced CPUs are valid and online,
+     *         referenced CPUs are valid according to the selected policy,
      *         false if a syntax error, range error, or invalid CPU id is detected.
      */
     template <typename Array_SystemLong_T, typename Char_T, bool Verify_T = true>
     QENTEM_NOINLINE static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT32 length) noexcept {
         SystemLong bit;
-        SizeT32    offset{0};
         SizeT      bit_index;
+        SizeT32    number_index;
+        SizeT32    number_length;
+
+        SizeT32 last_number    = 0;
+        SizeT32 current_number = 0;
+        SizeT32 index          = 0;
+        bool    is_range       = false;
 
         auto checkArray = [&](SystemLong id) {
             bit_index = static_cast<SizeT>(id >> CPUSet::SHIFT);
@@ -276,24 +288,52 @@ struct CPUHelper {
             }
         };
 
-        while (offset < length) {
-            while ((offset < length) && ((content[offset] == ' ') || (content[offset] == ','))) {
-                ++offset;
+        while (index < length) {
+            while ((index < length) && (content[index] == ' ')) {
+                ++index;
             }
 
-            if (offset < length) {
-                SizeT start = offset;
+            number_index  = index;
+            number_length = 0;
 
-                while ((offset < length) && (content[offset] >= DigitUtils::DigitChar::Zero) &&
-                       (content[offset] <= DigitUtils::DigitChar::Nine)) {
-                    ++offset;
+            while ((index < length) && (content[index] != ',') && (content[index] != '-') && (content[index] != ' ')) {
+                ++index;
+                ++number_length;
+            }
+
+            while ((index < length) && (content[index] == ' ')) {
+                ++index;
+            }
+
+            if ((number_length != 0) && ((index == length) || (content[index] == ',') || (content[index] == '-'))) {
+                last_number = current_number;
+                Digit::FastStringToNumber(current_number, (content + number_index), number_length);
+
+                if (is_range) {
+                    is_range = false;
+
+                    if (current_number > last_number) {
+                        while (++last_number < current_number) {
+                            checkArray(last_number);
+                            bit = (SystemLong{1} << (last_number & CPUSet::BIT_WIDTH_M1));
+
+                            if constexpr (Verify_T) {
+                                if ((info_.OnlineCores.Data()[bit_index] & bit) != bit) {
+                                    return false;
+                                }
+                            }
+
+                            list.Storage()[bit_index] |= bit;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else if (index < length) {
+                    is_range = (content[index] == '-');
                 }
 
-                SystemLong id;
-                Digit::FastStringToNumber(id, (content + start), (offset - start));
-
-                checkArray(id);
-                bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
+                checkArray(current_number);
+                bit = (SystemLong{1} << (current_number & CPUSet::BIT_WIDTH_M1));
 
                 if constexpr (Verify_T) {
                     if ((info_.OnlineCores.Data()[bit_index] & bit) != bit) {
@@ -303,67 +343,15 @@ struct CPUHelper {
 
                 list.Storage()[bit_index] |= bit;
 
-                if (offset < length) {
-                    while ((offset < length) && (content[offset] != ',') && (content[offset] != '-')) {
-                        ++offset;
-                    }
+                ++index;
 
-                    if (offset < length) {
-                        if (content[offset] == '-') {
-                            // range
-                            do {
-                                ++offset;
-                            } while ((offset < length) && (content[offset] == ' '));
-
-                            start = offset;
-
-                            while ((offset < length) && (content[offset] >= DigitUtils::DigitChar::Zero) &&
-                                   (content[offset] <= DigitUtils::DigitChar::Nine)) {
-                                ++offset;
-                            }
-
-                            SystemLong id2;
-                            Digit::FastStringToNumber(id2, (content + start), (offset - start));
-
-                            if (id2 > id) {
-                                do {
-                                    ++id;
-                                    checkArray(id);
-                                    bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
-
-                                    if constexpr (Verify_T) {
-                                        if ((info_.OnlineCores.Data()[bit_index] & bit) != bit) {
-                                            return false;
-                                        }
-                                    }
-
-                                    list.Storage()[bit_index] |= bit;
-                                } while (id < id2);
-
-                                if (offset < length) {
-                                    continue;
-                                }
-
-                                return true;
-                            }
-
-                            return false;
-                        }
-
-                        if (content[offset] == ',') {
-                            ++offset;
-                            continue;
-                        }
-
-                        return false;
-                    }
-                }
-
-                return true;
+                continue;
             }
+
+            return false;
         }
 
-        return false;
+        return (length != 0);
     }
 
     /**
@@ -422,18 +410,18 @@ struct CPUHelper {
 
             SystemLong bit;
             SizeT32    bit_index;
-            SizeT32    number_index = 0;
-
-            SizeT32 last_number    = 0;
-            SizeT32 current_number = 0;
-            bool    is_range       = false;
+            SizeT32    number_index   = 0;
+            SizeT32    last_number    = 0;
+            SizeT32    current_number = 0;
+            SizeT32    index          = 0;
+            SizeT32    length;
+            bool       is_range = false;
 
             while (true) {
                 const SystemLongI ret = SystemCall(__NR_read, fd, reinterpret_cast<SystemLongI>(buffer), BUFFER_MAX);
 
                 if (ret >= 0) {
-                    SizeT32 index  = 0;
-                    SizeT32 length = static_cast<SizeT32>(ret);
+                    length = static_cast<SizeT32>(ret);
 
                     while (index < length) {
                         while ((index < length) && (number_index < NUMBER_MAX) && (buffer[index] != ',') &&
@@ -450,6 +438,7 @@ struct CPUHelper {
 
                             if (is_range) {
                                 is_range = false;
+
                                 while (++last_number < current_number) {
                                     bit_index = (static_cast<SizeT>(last_number) >> CPUSet::SHIFT);
                                     bit       = (SystemLong{1} << (last_number & CPUSet::BIT_WIDTH_M1));
@@ -457,7 +446,6 @@ struct CPUHelper {
 
                                     ++(info.CoreCount);
                                 }
-
                             } else if (index < length) {
                                 is_range = (buffer[index] == '-');
                             }
