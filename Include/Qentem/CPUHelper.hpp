@@ -144,7 +144,7 @@ struct CPUHelper {
      */
     static SizeT32 GetCurrentCore() noexcept {
 #if defined(__linux__)
-        long core = 0;
+        SystemLongI core = 0;
 
         SystemCall(__NR_getcpu, reinterpret_cast<SystemLongI>(&core), 0, 0);
 
@@ -171,7 +171,7 @@ struct CPUHelper {
      * @param core_id Zero-based index of the target logical CPU core.
      * @return `true` if affinity was successfully applied, `false` otherwise.
      */
-    static bool PinToCore(SizeT32 core_id) {
+    QENTEM_NOINLINE static bool PinToCore(SizeT32 core_id) {
 #if defined(__linux__)
         CPUSet cores{};
         cores.Clear();
@@ -389,7 +389,7 @@ struct CPUHelper {
      *
      * @return Number of logical CPU cores (at least 1).
      */
-    static SizeT32 coreCount() noexcept {
+    QENTEM_NOINLINE static SizeT32 coreCount() noexcept {
 #if defined(__linux__)
         const SizeT32 count = onlineCoresCount();
 #elif defined(_WIN32)
