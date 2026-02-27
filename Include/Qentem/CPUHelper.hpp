@@ -43,6 +43,15 @@ struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
 
     QENTEM_INLINE CPUSet() noexcept = default;
 
+    QENTEM_NOINLINE CPUSet(CPUSet &src) {
+        SizeT32 index = 0;
+
+        while (index < SIZE) {
+            mask_[index] = src.mask_[index];
+            ++index;
+        }
+    }
+
     QENTEM_INLINE void Clear() noexcept {
         SizeT32 index = SIZE;
 
