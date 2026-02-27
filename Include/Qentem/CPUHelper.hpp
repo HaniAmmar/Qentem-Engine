@@ -243,11 +243,10 @@ struct CPUHelper {
      *         referenced CPUs are valid and online,
      *         false if a syntax error, range error, or invalid CPU id is detected.
      */
-    template <typename Array_SystemLong_T, typename Char_T>
-    static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT length,
-                             CPUSet &online_cores) noexcept {
+    template <typename Array_SystemLong_T, typename Char_T, bool Verify_T = true>
+    QENTEM_NOINLINE static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT32 length) noexcept {
         SystemLong bit;
-        SizeT      offset{0};
+        SizeT32    offset{0};
         SizeT      index;
 
         auto checkArray = [&](SystemLong id) {
@@ -278,8 +277,10 @@ struct CPUHelper {
 
                 bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
 
-                if ((online_cores.Data()[index] & bit) != bit) {
-                    return false;
+                if constexpr (Verify_T) {
+                    if ((online_cores_.Data()[index] & bit) != bit) {
+                        return false;
+                    }
                 }
 
                 list.Storage()[index] |= bit;
@@ -311,12 +312,13 @@ struct CPUHelper {
 
                                 do {
                                     ++id;
-                                    index = static_cast<SizeT>(id >> CPUSet::SHIFT);
+                                    index = (static_cast<SizeT>(id) >> CPUSet::SHIFT);
+                                    bit   = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
 
-                                    bit = (SystemLong{1} << (id & CPUSet::BIT_WIDTH_M1));
-
-                                    if ((online_cores.Data()[index] & bit) != bit) {
-                                        return false;
+                                    if constexpr (Verify_T) {
+                                        if ((online_cores_.Data()[index] & bit) != bit) {
+                                            return false;
+                                        }
                                     }
 
                                     list.Storage()[index] |= bit;
