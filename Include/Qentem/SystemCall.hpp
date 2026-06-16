@@ -37,7 +37,6 @@ namespace Qentem {
  * @note This function is internal; use the templated `SystemCall()` wrapper
  *       for type-flexible argument passing.
  */
-
 QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLongI v1) noexcept {
 #if defined(__x86_64__)
     SystemLongI ret;

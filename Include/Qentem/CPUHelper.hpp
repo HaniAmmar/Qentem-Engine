@@ -26,6 +26,7 @@
 #include <windows.h> // GetSystemInfo
 #elif defined(__linux__)
 #include "Qentem/SystemCall.hpp"
+#include "Qentem/LinuxConstants.hpp"
 #else
 #include <sched.h>  // sched_setaffinity
 #include <unistd.h> // sysconf
@@ -427,13 +428,10 @@ struct CPUHelper {
         info.OnlineCores.Clear();
 
 #if defined(__linux__)
-        constexpr int at_fdcwd  = -100; // AT_FDCWD
-        constexpr int read_only = 0;    // O_RDONLY
-
         constexpr const char *PRESENT_PATH = "/sys/devices/system/cpu/online";
 
         const int fd = static_cast<int>(
-            SystemCall(__NR_openat, at_fdcwd, reinterpret_cast<SystemLongI>(PRESENT_PATH), read_only, 0));
+            SystemCall(__NR_openat, Q_AT_FDCWD, reinterpret_cast<SystemLongI>(PRESENT_PATH), Q_RDONLY, 0));
 
         if (fd >= 0) {
             constexpr SizeT32 NUMBER_MAX = 8U;
@@ -508,8 +506,6 @@ struct CPUHelper {
             SystemCall(__NR_close, fd);
         }
 
-        // SystemCall(__NR_sched_getaffinity, 0, CPUSet::TotalBytes(),
-        //            reinterpret_cast<SystemLongI>(info.OnlineCores.Data()));
 #elif defined(_WIN32)
         info.CoreCount = static_cast<SizeT32>(GetActiveProcessorCount(ALL_PROCESSOR_GROUPS));
         info.MaxID     = (info.CoreCount - 1U);

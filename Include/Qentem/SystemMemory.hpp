@@ -30,6 +30,7 @@
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #if defined(__linux__)
         #include "Qentem/SystemCall.hpp"
+        #include "Qentem/LinuxConstants.hpp"
         #include <linux/mman.h>
     #else
         // POSIX-style platforms: mmap, sysconf, etc.
@@ -241,16 +242,14 @@ struct SystemMemory {
         return static_cast<SystemLong>(info.dwPageSize);
     #else
         #if defined(__linux__)
-            constexpr int at_fdcwd      = -100; // AT_FDCWD
-            constexpr int read_only     = 0;    // O_RDONLY
             constexpr int page_size_id  = 6;    // AT_PAGESZ
             constexpr const char *AUXV_PATH = "/proc/self/auxv";
 
             SystemLong page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
 
-            const int fd = static_cast<int>(SystemCall(__NR_openat, at_fdcwd,
+            const int fd = static_cast<int>(SystemCall(__NR_openat, Q_AT_FDCWD,
                                                 reinterpret_cast<SystemLongI>(AUXV_PATH),
-                                                read_only, 0));
+                                                Q_RDONLY, 0));
 
             if (fd >= 0) {
                 struct aux_st_{
