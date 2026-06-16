@@ -239,6 +239,18 @@ struct CPUHelper {
     QENTEM_INLINE static const CPUSet *GetOnlineCPUSet() noexcept {
         return &(info_.OnlineCores);
     }
+
+    QENTEM_NOINLINE static void Sleep(SystemLongI ms) {
+        struct {
+            SystemLongI Seconds;
+            SystemLongI NanoSeconds;
+        } ts;
+
+        ts.Seconds     = (ms / SystemLongI{1000});
+        ts.NanoSeconds = ((ms - ts.Seconds * SystemLongI{1000}) * SystemLongI{1000000});
+
+        SystemCall(__NR_nanosleep, reinterpret_cast<SystemLongI>(&ts), 0);
+    }
 #endif
 
     /**
