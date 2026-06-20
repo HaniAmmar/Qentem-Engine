@@ -291,7 +291,7 @@ struct MemoryBlock {
             table[table_index] |= mask;
         }
 
-        next_index_ += SystemLong(table[table_index] == MAX_SYSTEM_INT_TYPE);
+        next_index_ += static_cast<SystemLong>(table[table_index] == MAX_SYSTEM_INT_TYPE);
         next_index_ = ((table_index != table_size_) ? table_index : 0);
 
         return ptr;
@@ -314,7 +314,7 @@ struct MemoryBlock {
             table[table_index] |= mask;
         }
 
-        next_index_ += SystemLong(table[table_index] == MAX_SYSTEM_INT_TYPE);
+        next_index_ += static_cast<SystemLong>(table[table_index] == MAX_SYSTEM_INT_TYPE);
         next_index_ = ((table_index != table_size_) ? table_index : 0);
     }
 
