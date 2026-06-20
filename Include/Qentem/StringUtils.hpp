@@ -113,6 +113,20 @@ struct StringUtils {
             }
         }
     }
+
+    template <typename Stream_T>
+    static void ShiftLeft(Stream_T &stream, SizeT shift, SizeT start_at = 0) {
+        if ((shift < stream.Length()) && (shift <= start_at)) {
+            typename Stream_T::CharType *storage = stream.Storage();
+            SizeT                        offset  = (start_at - shift);
+
+            while (start_at < stream.Length()) {
+                storage[offset] = storage[start_at];
+                ++offset;
+                ++start_at;
+            }
+
+            stream.SetLength(stream.Length() - shift);
         }
     }
 
