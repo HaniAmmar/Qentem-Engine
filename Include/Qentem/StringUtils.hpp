@@ -99,18 +99,20 @@ struct StringUtils {
     template <typename Stream_T>
     static void ShiftRight(Stream_T &stream, SizeT shift, SizeT start_at = 0) {
         if (start_at < stream.Length()) {
-            stream.SetLength(stream.Length() + shift);
-            SizeT offset  = (stream.Length() - SizeT{1});
-            SizeT offset2 = (offset - shift);
-
             typename Stream_T::CharType *storage = stream.Storage();
+            SizeT                        offset  = (stream.Length() + shift);
+            SizeT                        offset2 = stream.Length();
 
-            while ((offset2 >= start_at) && (offset >= shift)) {
-                storage[offset] = storage[offset2];
+            stream.SetLength(stream.Length() + shift);
+
+            while (offset2 > start_at) {
                 --offset;
+                --offset2;
 
-                offset2 = (offset - shift);
+                storage[offset] = storage[offset2];
             }
+        }
+    }
         }
     }
 
