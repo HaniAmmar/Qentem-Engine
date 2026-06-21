@@ -131,7 +131,7 @@ struct Digit {
                 return SizeT(storage - str);
             }
         } else {
-            BigInt<SystemLong, 64> b_int{number};
+            BigInt<SystemLong, (sizeof(Number_T) * 8U)> b_int{number};
 
             if constexpr (!Reverse_V_T) {
                 while (b_int >= Number_T{10}) {
