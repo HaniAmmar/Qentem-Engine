@@ -279,14 +279,14 @@ struct SystemMemory {
                             }
 
                             // Reset buffer for next record
-                            filled -= sizeof(aux_st_);
+                            filled -= static_cast<SizeT32>(sizeof(aux_st_));
                             ++index;
                         }
 
                         if (filled != 0) {
                             SizeT32 offset = 0;
                             // leftover bytes start immediately after the last fully processed record
-                            SizeT32 src_index = (index * sizeof(aux_st_));
+                            SizeT32 src_index = (index * static_cast<SizeT32>(sizeof(aux_st_)));
 
                             if (src_index != 0) {
                                 while(offset < filled) {
