@@ -245,8 +245,8 @@ struct QPool {
      *
      * The in-use counter is decremented accordingly.
      */
-    void Recycle(void *item) noexcept {
-        Item *r_item = static_cast<Item *>(item);
+    void Recycle(Type_T *item) noexcept {
+        Item *r_item = reinterpret_cast<Item *>(item);
         r_item->Next = list_;
         list_        = r_item;
         --in_use_;
