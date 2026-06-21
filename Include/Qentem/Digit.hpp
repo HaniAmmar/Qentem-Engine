@@ -1111,7 +1111,7 @@ struct Digit {
 
                     if (drop != 0) {
                         round_up = true;
-                        bigIntDropDigits(b_int, drop);
+                        bigIntDropDigits(b_int, drop, format.Precision);
                     }
                 } else {
                     SizeT32 shift   = 0;
@@ -1276,15 +1276,18 @@ struct Digit {
     }
 
     template <typename BigInt_T>
-    QENTEM_INLINE static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
+    QENTEM_INLINE static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop, SizeT32 precision) noexcept {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
 
-        // TODO: needs more work for extremely large values (e300)
-        // while (drop > (DigitConst::MaxPowerOfFive * 3)) {
-        //     b_int *= DigitConst::PowerOfOneOverFive[DigitConst::MaxPowerOfFive];
-        //     b_int >>= (DigitConst::PowerOfOneOverFiveShift[DigitConst::MaxPowerOfFive] + BigInt_T::BitWidth());
-        //     drop -= DigitConst::MaxPowerOfFive;
-        // }
+        if (precision < 8) {
+            while (drop >= DigitConst::MaxPowerOfFive) {
+                // b_int <<= DigitConst::MaxShift;
+                b_int *= DigitConst::PowerOfOneOverFive[DigitConst::MaxPowerOfFive];
+                b_int >>= (DigitConst::PowerOfOneOverFiveShift[DigitConst::MaxPowerOfFive] + BigInt_T::BitWidth());
+                // b_int >>= DigitConst::MaxShift;
+                drop -= DigitConst::MaxPowerOfFive;
+            }
+        }
 
         while (drop >= DigitConst::MaxPowerOfFive) {
             b_int /= DigitConst::PowerOfFive[DigitConst::MaxPowerOfFive];
