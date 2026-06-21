@@ -1157,7 +1157,7 @@ struct Digit {
                         or moderate precision.
                         */
                         const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
-                                                      ? ((format.Precision / DigitConst::MaxPowerOfTen) + 2U)
+                                                      ? ((format.Precision / DigitConst::MaxPowerOfTen) + 3U)
                                                       : b_int.MaxIndex();
 
                         do {
