@@ -137,7 +137,7 @@ struct JSON {
             ValueT         *obj_value{nullptr};
             bool            expecting_value{false};
 
-            // Comments at the begining
+            // Comments at the beginning
             if constexpr (WithComments_T) {
                 while (true) {
                     while ((offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
@@ -178,6 +178,10 @@ struct JSON {
                                              (content[offset] == WhiteSpaceChars::TabControlChar) ||
                                              (content[offset] == WhiteSpaceChars::CarriageControlChar))) {
                     ++offset;
+                }
+
+                if (offset >= length) {
+                    return;
                 }
             }
 
@@ -403,7 +407,7 @@ struct JSON {
 
                     default: {
                         if constexpr (WithComments_T) {
-                            if (content[offset] == '/') {
+                            if ((offset < length) && (content[offset] == '/')) {
                                 ++offset;
 
                                 if (offset < length) {
