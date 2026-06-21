@@ -3128,6 +3128,56 @@ static void TestDoubleToString4(QTest &test, StringStream<char> &stream) {
 
     RealToStreamEqual(test, stream, 95000000.0, 1U, "1e+08", __LINE__);
 
+    RealToStreamEqual(test, stream, 0.99999995, 7U, "0.9999999", __LINE__);
+    RealToStreamEqual(test, stream, 9.99999995, 7U, "10", __LINE__);
+    RealToStreamEqual(test, stream, 99.9999995, 8U, "100", __LINE__);
+    RealToStreamEqual(test, stream, 9999999.5, 8U, "9999999.5", __LINE__);
+
+    RealToStreamEqual(test, stream, 1.23456789e300, 7U, "1.234568e+300", __LINE__);
+    RealToStreamEqual(test, stream, 1.23456789e300, 8U, "1.2345679e+300", __LINE__);
+
+    RealToStreamEqual(test, stream, 1.23456789e-300, 7U, "1.234568e-300", __LINE__);
+    RealToStreamEqual(test, stream, 1.23456789e-300, 8U, "1.2345679e-300", __LINE__);
+
+    RealToStreamEqual(test, stream, 9765625.0, 20U, "9765625", __LINE__);   // 5^10
+    RealToStreamEqual(test, stream, 48828125.0, 20U, "48828125", __LINE__); // 5^11
+    RealToStreamEqual(test, stream, 0.0000001024, 20U, "1.0240000000000000373e-07", __LINE__);
+
+    RealToStreamEqual(test, stream, 4.9406564584124654e-324, 20U, "4.9406564584124654418e-324", __LINE__);
+    RealToStreamEqual(test, stream, 9.8813129168249309e-324, 20U, "9.8813129168249308835e-324", __LINE__);
+    RealToStreamEqual(test, stream, 2.4703282292062327e-323, 20U, "2.4703282292062327209e-323", __LINE__);
+
+    RealToStreamEqual(test, stream, 9.999999999999999e99, 6U, "1e+100", __LINE__);
+    RealToStreamEqual(test, stream, 9.9999995e-10, 8U, "9.9999995e-10", __LINE__);
+    RealToStreamEqual(test, stream, 9.9999995e-10, 7U, "1e-09", __LINE__);
+    RealToStreamEqual(test, stream, 9.9999995, 7U, "9.999999", __LINE__);
+
+    RealToStreamEqual(test, stream, 0.5, 20U, "0.5", __LINE__);
+    RealToStreamEqual(test, stream, 0.25, 20U, "0.25", __LINE__);
+    RealToStreamEqual(test, stream, 0.125, 20U, "0.125", __LINE__);
+    RealToStreamEqual(test, stream, 0.0625, 20U, "0.0625", __LINE__);
+
+    RealToStreamEqual(test, stream, -0.99999995, 7U, "-0.9999999", __LINE__);
+    RealToStreamEqual(test, stream, -9.999999999999999e99, 6U, "-1e+100", __LINE__);
+    RealToStreamEqual(test, stream, -4.9406564584124654e-324, 20U, "-4.9406564584124654418e-324", __LINE__);
+
+    RealToStreamEqual(test, stream, 1.8446744073709551615e20, 7U, "1.844674e+20", __LINE__);
+
+    RealToStreamEqual(test, stream, 1.8446744073709551615e20, 8U, "1.8446744e+20", __LINE__);
+
+    RealToStreamEqual(test, stream, 1.2499999999999999, 7U, "1.25", __LINE__);
+    RealToStreamEqual(test, stream, 1.2500000000000001, 7U, "1.25", __LINE__);
+
+    RealToStreamEqual(test, stream, 9.999999999999999e30, 6U, "1e+31", __LINE__);
+    RealToStreamEqual(test, stream, 1.0000000000000000e31, 6U, "1e+31", __LINE__);
+
+    RealToStreamEqual(test, stream, 2.225073858507201e-308, 20U, "2.225073858507200889e-308", __LINE__);
+    RealToStreamEqual(test, stream, 2.225073858507202e-308, 20U, "2.2250738585072018772e-308", __LINE__);
+
+    RealToStreamEqual(test, stream, 0.9999994, 7U, "0.9999994", __LINE__);
+    RealToStreamEqual(test, stream, 0.9999995, 7U, "0.9999995", __LINE__);
+    RealToStreamEqual(test, stream, 0.9999996, 7U, "0.9999996", __LINE__);
+
     RealToStreamEqual(test, stream, 3.0, 15U, "3", __LINE__);
     RealToStreamEqual(test, stream, 3.14, 15U, "3.14", __LINE__);
 
@@ -3149,6 +3199,8 @@ static void TestDoubleToString4(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 18446744073709551620.0, 20U, "18446744073709551616", __LINE__);
     RealToStreamEqual(test, stream, 184467440737095516150.0, 20U, "1.8446744073709551616e+20", __LINE__);
     RealToStreamEqual(test, stream, 1844674407370955161500.0, 20U, "1.8446744073709551616e+21", __LINE__);
+    RealToStreamEqual(test, stream, 18446744073709551615e99, 9U, "1.84467441e+118", __LINE__);
+    RealToStreamEqual(test, stream, 18446744073709551615e99, 10U, "1.844674407e+118", __LINE__);
     RealToStreamEqual(test, stream, 18446744073709551615e99, 20U, "1.8446744073709551013e+118", __LINE__);
     RealToStreamEqual(test, stream, 18446744073709551615e100, 20U, "1.8446744073709551909e+119", __LINE__);
     RealToStreamEqual(test, stream, 17446744073709551614.0, 21U, "17446744073709551616", __LINE__);
