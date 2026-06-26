@@ -10,7 +10,7 @@
 -   [Features](#features)
 -   [Requirements](#requirements)
 -   [Embedded / Microcontroller Support](#embedded--microcontroller-support)
--   [Reserver (Custom Memory Allocator)](#reserver-custom-memory-allocator)
+-   [Memory Model](#memory-model)
 -   [Documentation](#documentation)
 -   [Live Testing](#live-testing)
 -   [Template Example](#template-example)
@@ -22,34 +22,55 @@
 
 ## Introduction
 
-Qentem Engine is a C++ library offering high-performance template rendering and a fast, built-in JSON parser. It is lightweight, STL-free, dependency-free, and supports deployment on native backends as well as frontend environments such as web browsers via WebAssembly.
+Qentem Engine is a lightweight, high-performance C++ library built around custom memory management, containers, Unicode string processing, numeric utilities, template rendering, and JSON parsing. It is STL-free, dependency-free, and designed for use across native backends, embedded systems, and frontend environments through WebAssembly.
 
 ## Features
 
-### General
+### Core Runtime
 
--   Header-only, cross-platform, and fully self-contained—STL-free, no external dependencies.
--   High-performance numeric parsing and formatting (FPU-free).
--   Supports 32-bit and 64-bit systems; little-endian and big-endian architectures.
--   Exception-free design—no try, catch, or throw.
--   Full Unicode support: UTF-8, UTF-16, UTF-32.
--   Low memory footprint—ideal for resource-constrained environments.
--   No global mutable state; suitable for multi-threaded use with separate objects.
+* Header-only, cross-platform, and fully self-contained. No STL, no external dependencies.
+* Custom memory reservation system (`Reserver`) for predictable, low-overhead dynamic allocation.
+* Exception-free design with deterministic control flow.
+* No global mutable state; safe for isolated multi-threaded use with separate objects.
+* Supports both little-endian and big-endian architectures.
+* Optional libc-free Linux execution path through direct system call abstractions.
+* Low memory footprint.
 
-### Template Rendering
+### Numeric System
 
--   Ultra-fast and lightweight template rendering.
--   Safe expression evaluation with automatic HTML escaping (enabled by default).
--   Raw variable output (no escaping) when needed.
--   Nested loops with support for data sorting and grouping.
--   Conditional expressions with support for nesting and inline evaluation.
--   Fast and secure arithmetic evaluation.
+* High-performance integer and floating-point parsing (FPU-free).
+* Fast floating-point to string conversion.
+* Arbitrary-precision integer support (BigInt).
+* Efficient numeric formatting utilities.
+
+### Containers
+
+* Custom hash table implementation designed for low allocation overhead.
+* Lightweight arrays, lists, and deque structures.
+* STL-free container ecosystem.
+* Cache-friendly data layouts for performance-sensitive workloads.
+
+### Strings & Unicode
+
+* Native UTF-8, UTF-16, and UTF-32 support.
+* String views, mutable strings, and stream builders.
+* Fast Unicode-aware string manipulation.
+* Efficient encoding conversion utilities.
 
 ### JSON
 
--   Fast and efficient parsing and serialization.
--   Supports merging, sorting, and grouping of values.
--   Optional support for C-style line (`//`) and block (`/* */`) comments.
+* Fast JSON parsing and serialization.
+* Value merging, sorting, and grouping.
+* Optional C-style comment support (`//`, `/* */`).
+
+### Template Rendering
+
+* Ultra-fast template rendering engine.
+* Safe expression evaluation with automatic HTML escaping.
+* Raw output support when escaping is not desired.
+* Nested loops with sorting and grouping support.
+* Conditional and inline expression evaluation.
+* Built-in arithmetic expression engine.
 
 ## Requirements
 
@@ -57,34 +78,28 @@ A C++17 or later compiler.
 
 ## Embedded / Microcontroller Support
 
-Qentem Engine’s modular, STL-free architecture enables it to operate efficiently on embedded systems and microcontrollers with limited memory and no operating system. The core components—including template rendering, JSON parsing, and custom containers—have been validated on platforms such as the ESP32, and are suitable for use in bare-metal or Arduino-style C++ environments.
+Qentem Engine’s modular, STL-free design makes it well-suited for embedded systems and microcontrollers with limited memory and no operating system. Core components, including template rendering, JSON parsing, custom containers, and the internal memory system, have been validated on platforms such as the ESP32 and can operate in bare-metal or Arduino-style C++ environments.
 
-All modules are designed without exceptions, dynamic threading, or OS-specific dependencies, making them ideal for **single-threaded, memory-constrained targets**.
+The engine is built without exceptions, threading primitives, or OS-specific dependencies, making it suitable for single-threaded, memory-constrained targets where deterministic behavior and low overhead are essential.
 
-To tailor memory usage, developers may configure `QENTEM_RESERVER_BLOCK_SIZE` at compile time. This constant defines the block size (in bytes) used by the internal memory allocator (`Reserver`), allowing the engine to operate within tight memory budgets when static or deterministic allocation is required.
+Memory usage can be tuned at compile time through `QENTEM_RESERVER_BLOCK_SIZE`, which defines the block size used by the internal allocator (`Reserver`). This allows applications to adapt the engine to tight memory budgets while preserving predictable allocation behavior.
 
-> _Note_: Qentem Engine does not provide file or stream I/O abstractions for embedded environments. Developers are expected to supply their own I/O bindings as needed.
+> _Note_: Qentem Engine does not provide file or stream I/O abstractions for embedded targets. Platform-specific I/O integration is expected to be supplied by the host application.
 
-## Reserver (Custom Memory Allocator)
+## Memory Model
 
-**Reserver** is Qentem's internal memory system, engineered for high-performance, deterministic memory reuse. It replaces traditional heap allocation with block-based reservation, optimized for locality, alignment, and long-term reuse without runtime metadata.
+Qentem uses a custom memory reservation system (`Reserver`) designed for predictable, low-overhead allocation and long-term memory reuse.
 
-### Features
+### Key characteristics:
 
--   **Zero metadata** stored in allocated regions — memory remains clean and unpolluted.
--   **First-fit region selection** with bitfield-based tracking for fast lookup.
--   **Fixed-size preallocated blocks**, avoiding unpredictable growth or fragmentation.
--   **Per-core arenas** for thread-local routing and NUMA-friendliness.
--   **Optional memory recording** via `MemoryRecord`, useful for diagnostics and leak tracking.
+* Block-based reservation model with no allocation metadata stored inside user memory.
+* First-fit region selection with bitfield tracking for fast reuse.
+* Fixed-size preallocated blocks to reduce fragmentation.
+* Optional memory diagnostics via `MemoryRecord`.
 
-### Design Focus
+### Threading model:
 
-Reserver emphasizes predictable behavior and low overhead, especially under sustained allocation and release cycles. It is well-suited for systems where performance and control outweigh general-purpose flexibility — such as embedded servers, scripting engines, or custom object pools.
-
-Although thread-safe multithreaded support is not currently provided, the system is designed for **core-pinned, single-threaded workloads** and is future-compatible with per-core extension strategies.
-
-> **Note**: Reserver is under active refinement.
-> It is now fully integrated into QenWeb, and benchmarks show it consistently matches or outperforms `malloc` under real-world web workloads, especially in reuse-heavy scenarios.
+Reserver is intentionally designed for core-pinned, single-threaded workloads and does not currently provide internal synchronization. This model enables predictable allocation behavior and naturally extends to per-core allocator designs.
 
 ## Documentation
 
