@@ -807,7 +807,7 @@ struct HashTable {
 
         reorder();
 
-        if (Size() != old_size) {
+        if (IsNotEmpty() && (Size() != old_size)) {
             resetLinks(storage, (storage + Capacity()), Capacity());
             generateHash(); // Rebuild hash table mapping to match new item layout
         }
@@ -955,7 +955,7 @@ struct HashTable {
      * @return True if at least one item is stored.
      */
     QENTEM_INLINE bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
+        return (Size() != 0);
     }
 
     // ===== STL-style Iterators =====
@@ -1443,14 +1443,12 @@ struct HashTable {
      *
      * Used after operations that relocate or reorder items (e.g., resizing, sorting),
      * to ensure hash collisions are resolved against the current layout.
-     *
-     * This preserves O(1) average-time lookup while avoiding intrusive metadata.
      */
     void generateHash() noexcept {
         HItem_T       *src  = Storage();       // Pointer to start of storage array
         HItem_T       *item = src;             // Item pointer for iteration
         const HItem_T *end  = (item + Size()); // One-past-the-end
-        SizeT          i    = SizeT{0};        // 0-based index for hash chains
+        SizeT          i    = 0;               // 0-based index for hash chains
         const SizeT    base = getBase();
         SizeT         *index;
 
