@@ -203,6 +203,9 @@ struct ReserverCore {
      *   b) It was oversized or out of pattern — release it outright.
      *   c) It matches current growth size and no other blocks exist — reset and reuse.
      *
+     * @warning The pointer must reference an active allocation from this reserver.
+     *    Releasing invalid or already released memory results in undefined behavior.
+     *
      * @param ptr  Pointer to the memory region to be returned.
      * @param size Size in bytes of the region being returned.
      * @return True if successfully reclaimed, false if the pointer does not belong to any known block.
