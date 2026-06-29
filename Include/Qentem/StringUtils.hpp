@@ -243,22 +243,21 @@ struct StringUtils {
 
     template <typename Char_T>
     static constexpr SizeT Hash(const Char_T *str, SizeT length) noexcept {
-        constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
+        constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8U) - SizeT{1}));
 
         SizeT hash   = SizeT{11};
         SizeT base   = SizeT{33};
         SizeT offset = 0;
 
         while (offset < length) {
-            hash += SizeT(base * offset * SizeT(str[offset]));
+            hash += static_cast<SizeT>(base * offset * static_cast<SizeT>(str[offset]));
+            base += offset;
+            hash *= (length ^ offset);
             base += offset;
 
-            if (offset != length) {
-                hash *= (length ^ offset);
-                base += offset;
-                --length;
-                hash += SizeT(str[length]);
-            }
+            --length;
+
+            hash += static_cast<SizeT>(str[length]);
 
             ++offset;
         }
