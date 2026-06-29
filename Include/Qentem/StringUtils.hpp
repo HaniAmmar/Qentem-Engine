@@ -283,79 +283,89 @@ struct StringUtils {
     static void EscapeHTMLSpecialChars(StringStream_T &stream, const Char_T *str, SizeT length) {
         using HTMLSpecialChars = HTMLSpecialChars_T<Char_T, sizeof(Char_T)>;
 
-        if (QentemConfig::AutoEscapeHTML) {
+        if constexpr (QentemConfig::AutoEscapeHTML) {
             SizeT offset = 0;
             SizeT index  = 0;
 
             while (index < length) {
-                switch (str[index]) {
-                    case '&': {
-                        const SizeT   rem_length = (length - index);
-                        const Char_T *n_str      = (str + index);
+                while ((index < length) && ((str[index] < '"') || (str[index] > '>'))) {
+                    ++index;
+                }
 
-                        if ((rem_length > SizeT{5}) && (n_str[SizeT{5}] == HTMLSpecialChars::SemicolonChar)) {
-                            if (StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLQuote, SizeT{5}) ||
-                                StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLSingleQuote, SizeT{5})) {
-                                index += SizeT{6};
-                                break;
+                if (index < length) {
+                    switch (str[index]) {
+                        case '&': {
+                            const SizeT   rem_length = (length - index);
+                            const Char_T *n_str      = (str + index);
+
+                            if (rem_length > SizeT{3}) {
+                                if ((n_str[SizeT{3}] == HTMLSpecialChars::SemicolonChar) &&
+                                    (StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLLess, SizeT{3}) ||
+                                     StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLGreater, SizeT{3}))) {
+                                    index += SizeT{4};
+                                    break;
+                                }
+
+                                if (rem_length > SizeT{4}) {
+                                    if ((n_str[SizeT{4}] == HTMLSpecialChars::SemicolonChar) &&
+                                        StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLAnd, SizeT{4})) {
+                                        index += SizeT{5};
+                                        break;
+                                    }
+
+                                    if ((rem_length > SizeT{5}) &&
+                                        (n_str[SizeT{5}] == HTMLSpecialChars::SemicolonChar)) {
+                                        if (StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLQuote, SizeT{5}) ||
+                                            StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLSingleQuote, SizeT{5})) {
+                                            index += SizeT{6};
+                                            break;
+                                        }
+                                    }
+                                }
                             }
-                        }
 
-                        if ((rem_length > SizeT{4}) && (n_str[SizeT{4}] == HTMLSpecialChars::SemicolonChar) &&
-                            StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLAnd, SizeT{4})) {
-                            index += SizeT{5};
+                            stream.Write((str + offset), (index - offset));
+                            stream.Write(HTMLSpecialChars::HTMLAnd, HTMLSpecialChars::HTMLAndLength);
+                            ++index;
+                            offset = index;
                             break;
                         }
 
-                        if ((rem_length > SizeT{3}) && (n_str[SizeT{3}] == HTMLSpecialChars::SemicolonChar)) {
-                            if (StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLLess, SizeT{3}) ||
-                                StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLGreater, SizeT{3})) {
-                                index += SizeT{4};
-                                break;
-                            }
+                        case '<': {
+                            stream.Write((str + offset), (index - offset));
+                            stream.Write(HTMLSpecialChars::HTMLLess, HTMLSpecialChars::HTMLLessLength);
+                            ++index;
+                            offset = index;
+                            break;
                         }
 
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(HTMLSpecialChars::HTMLAnd, HTMLSpecialChars::HTMLAndLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
+                        case '>': {
+                            stream.Write((str + offset), (index - offset));
+                            stream.Write(HTMLSpecialChars::HTMLGreater, HTMLSpecialChars::HTMLGreaterLength);
+                            ++index;
+                            offset = index;
+                            break;
+                        }
 
-                    case '<': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(HTMLSpecialChars::HTMLLess, HTMLSpecialChars::HTMLLessLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
+                        case '"': {
+                            stream.Write((str + offset), (index - offset));
+                            stream.Write(HTMLSpecialChars::HTMLQuote, HTMLSpecialChars::HTMLQuoteLength);
+                            ++index;
+                            offset = index;
+                            break;
+                        }
 
-                    case '>': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(HTMLSpecialChars::HTMLGreater, HTMLSpecialChars::HTMLGreaterLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
+                        case '\'': {
+                            stream.Write((str + offset), (index - offset));
+                            stream.Write(HTMLSpecialChars::HTMLSingleQuote, HTMLSpecialChars::HTMLSingleQuoteLength);
+                            ++index;
+                            offset = index;
+                            break;
+                        }
 
-                    case '"': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(HTMLSpecialChars::HTMLQuote, HTMLSpecialChars::HTMLQuoteLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
-
-                    case '\'': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(HTMLSpecialChars::HTMLSingleQuote, HTMLSpecialChars::HTMLSingleQuoteLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
-
-                    default: {
-                        ++index;
+                        default: {
+                            ++index;
+                        }
                     }
                 }
             }
