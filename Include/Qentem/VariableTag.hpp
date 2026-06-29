@@ -17,12 +17,17 @@
 
 namespace Qentem {
 namespace Tags {
-// TODO: Add QNumber for hash value or string-to-number value
+//  TODO:
+// struct VariableChain {
+//     Array<VariableTag> Vars;
+// };
+// 'Hash' for VariableTag
 
 /**
  * @brief Represents the metadata for a template variable.
  */
 struct VariableTag {
+    // SizeT   Hash{0};
     SizeT   Offset{0};   ///< Offset of the variable within the template.
     SizeT16 Length{0};   ///< Length of the variable name.
     SizeT8  IDLength{0}; ///< Length of the variable identifier.

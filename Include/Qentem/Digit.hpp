@@ -1299,8 +1299,6 @@ struct Digit {
         }
     }
 
-    // TODO: Rewrite formatStringNumberDefault with same rigor as BigInt, post-QenWeb
-    // Note: Use (32 * Char_T) fixed buffer size
     template <typename Stream_T>
     static void formatStringNumberDefault(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                           const SizeT32 calculated_digits, SizeT32 fraction_length,

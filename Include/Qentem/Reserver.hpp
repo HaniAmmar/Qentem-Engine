@@ -42,7 +42,6 @@
 #include "Qentem/MemoryRecord.hpp"
 #endif
 
-/// TODO: NUMA-awareness
 namespace Qentem {
 
 /**
