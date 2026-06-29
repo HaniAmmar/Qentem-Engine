@@ -242,7 +242,7 @@ struct StringUtils {
     }
 
     template <typename Char_T>
-    static SizeT Hash(const Char_T *str, SizeT length) noexcept {
+    static constexpr SizeT Hash(const Char_T *str, SizeT length) noexcept {
         constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
 
         SizeT hash   = SizeT{11};
@@ -264,6 +264,11 @@ struct StringUtils {
         }
 
         return (hash | highest_bit);
+    }
+
+    template <typename String_T>
+    static constexpr SizeT Hash(const String_T &content) noexcept {
+        return Hash(content.First(), content.Length());
     }
 
     template <typename Char_T>
