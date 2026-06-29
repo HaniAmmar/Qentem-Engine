@@ -1110,21 +1110,22 @@ struct Value {
     }
 
     SizeT Size() const noexcept {
-        const ValueType type = Type();
+        switch (Type()) {
+            case ValueType::Object: {
+                return (object_.Size());
+            }
 
-        if (type == ValueType::Object) {
-            return (object_.Size());
+            case ValueType::Array: {
+                return (array_.Size());
+            }
+
+            case ValueType::ValuePtr: {
+                return (value_->Size());
+            }
+
+            default:
+                return 0;
         }
-
-        if (type == ValueType::Array) {
-            return (array_.Size());
-        }
-
-        if (type == ValueType::ValuePtr) {
-            return (value_->Size());
-        }
-
-        return 0;
     }
 
     Value *GetValueAt(SizeT index) noexcept {
