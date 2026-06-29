@@ -163,11 +163,11 @@ struct StringView {
         setLength(Length() - count);
     }
 
-    QENTEM_INLINE const Char_T *First() const noexcept {
+    QENTEM_INLINE constexpr const Char_T *First() const noexcept {
         return storage_;
     }
 
-    QENTEM_INLINE const Char_T *Last() const noexcept {
+    QENTEM_INLINE constexpr const Char_T *Last() const noexcept {
         if (Length() != 0) {
             return (First() + (Length() - SizeT{1}));
         }
