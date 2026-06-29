@@ -348,7 +348,8 @@ struct TemplateCore {
                         switch (tag_bit->GetType()) {
                             case TagType::SuperVariable: {
                                 SuperVariableTag &tag = tag_bit->GetSuperVariableTag();
-                                tag.EndOffset         = pattern_finder.GetOffset();
+                                tag.SubTags.Compress();
+                                tag.EndOffset = pattern_finder.GetOffset();
                                 break;
                             }
 
@@ -357,6 +358,8 @@ struct TemplateCore {
                                 const SizeT  end_offset = pattern_finder.GetOffset();
                                 const SizeT  true_offset =
                                     tag.TrueOffset; // See the end of 'case TagPatterns::InLineIfID:'
+
+                                tag.SubTags.Compress();
 
                                 SizeT offset = tag.Offset;
                                 offset += true_offset;
@@ -489,31 +492,7 @@ struct TemplateCore {
                     break;
                 }
 
-                case TagPatterns::VariableID: {
-                    const SizeT offset = pattern_finder.GetOffset();
-
-                    pattern_finder.NextSegment();
-
-                    if (pattern_finder.CurrentMatch() == TagPatterns::LineEndID) {
-                        const SizeT var_length =
-                            (((pattern_finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
-                             // Limit var length to 255 meter per second.;
-                             & SizeT{0xFF});
-
-                        if (var_length != 0) {
-                            VariableTag *tag = (storage->Insert(TagBit{})).MakeVariableTag();
-                            tag->Offset      = offset;
-                            tag->Length      = SizeT16(var_length);
-
-                            checkLoopVariable(content, *tag, loop_tag);
-                        }
-
-                        pattern_finder.NextSegment();
-                    }
-
-                    break;
-                }
-
+                case TagPatterns::VariableID:
                 case TagPatterns::RawVariableID: {
                     const SizeT offset = pattern_finder.GetOffset();
 
@@ -526,9 +505,15 @@ struct TemplateCore {
                              & SizeT{0xFF});
 
                         if (var_length != 0) {
-                            VariableTag *tag = (storage->Insert(TagBit{})).MakeRawVariableTag();
-                            tag->Offset      = offset;
-                            tag->Length      = SizeT16(var_length);
+                            VariableTag *tag;
+                            if (match == TagPatterns::VariableID) {
+                                tag = (storage->Insert(TagBit{})).MakeVariableTag();
+                            } else {
+                                tag = (storage->Insert(TagBit{})).MakeRawVariableTag();
+                            }
+
+                            tag->Offset = offset;
+                            tag->Length = SizeT16(var_length);
 
                             checkLoopVariable(content, *tag, loop_tag);
                         }
@@ -715,7 +700,9 @@ struct TemplateCore {
                         storage = *(parent_storage.Last());
                         parent_storage.Drop(SizeT{1});
 
-                        LoopTag &tag  = storage->Last()->GetLoopTag();
+                        LoopTag &tag = storage->Last()->GetLoopTag();
+
+                        tag.SubTags.Compress();
                         tag.EndOffset = (pattern_finder.GetOffset() - TagPatterns::LoopSuffixLength);
                         loop_tag      = tag.Parent;
                     }
@@ -758,9 +745,14 @@ struct TemplateCore {
                         if (tag_bit->GetType() == TagType::If) {
                             const SizeT offset = pattern_finder.GetOffset();
                             IfTag      &tag    = tag_bit->GetIfTag();
+                            tag.EndOffset      = offset;
 
-                            tag.Cases.Last()->EndOffset = (offset - TagPatterns::IfSuffixLength);
-                            tag.EndOffset               = offset;
+                            tag.Cases.Compress();
+
+                            IfTagCase *if_case_last = tag.Cases.Last();
+
+                            if_case_last->SubTags.Compress();
+                            if_case_last->EndOffset = (offset - TagPatterns::IfSuffixLength);
 
                             storage = tmp;
                             parent_storage.Drop(SizeT{1});
@@ -781,7 +773,10 @@ struct TemplateCore {
                             SizeT  offset     = pattern_finder.GetOffset();
                             bool   is_if_else = false;
 
-                            tag.Cases.Last()->EndOffset = (offset - TagPatterns::ElsePrefixLength);
+                            IfTagCase *if_case_last = tag.Cases.Last();
+
+                            if_case_last->SubTags.Compress();
+                            if_case_last->EndOffset = (offset - TagPatterns::ElsePrefixLength);
 
                             IfTagCase &if_case = tag.Cases.Insert(IfTagCase{});
 
@@ -834,6 +829,8 @@ struct TemplateCore {
                 }
             }
         }
+
+        tags_cache.Compress();
 
         while (parent_storage.Size() != 0) {
             storage = *(parent_storage.Last());
@@ -1781,6 +1778,8 @@ struct TemplateCore {
         }
 
         if (offset > end_offset) {
+            exprs.Compress();
+
             return exprs;
         }
 
