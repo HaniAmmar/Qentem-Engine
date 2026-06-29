@@ -366,7 +366,7 @@ struct TemplateCore {
                                 tag.TrueOffset = 0;
 
                                 bool is_true{false};
-                                tag.Length = SizeT16(end_offset - tag.Offset);
+                                tag.Length = static_cast<SizeT16>(end_offset - tag.Offset);
 
                                 do {
                                     while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
@@ -410,11 +410,11 @@ struct TemplateCore {
                                             if (offset < end_offset) {
                                                 if (is_true) {
                                                     is_true        = false;
-                                                    tag.TrueOffset = SizeT16(att_offset - tag.Offset);
-                                                    tag.TrueLength = SizeT16(offset - att_offset);
+                                                    tag.TrueOffset = static_cast<SizeT16>(att_offset - tag.Offset);
+                                                    tag.TrueLength = static_cast<SizeT16>(offset - att_offset);
                                                 } else {
-                                                    tag.FalseOffset = SizeT16(att_offset - tag.Offset);
-                                                    tag.FalseLength = SizeT16(offset - att_offset);
+                                                    tag.FalseOffset = static_cast<SizeT16>(att_offset - tag.Offset);
+                                                    tag.FalseLength = static_cast<SizeT16>(offset - att_offset);
                                                 }
 
                                                 continue;
@@ -424,7 +424,7 @@ struct TemplateCore {
                                             is_child = true;
                                             parent_storage += storage;
                                             storage        = &(tag.SubTags);
-                                            tag.TrueOffset = SizeT16(true_offset);
+                                            tag.TrueOffset = static_cast<SizeT16>(true_offset);
                                             break;
                                         }
                                     }
@@ -436,7 +436,8 @@ struct TemplateCore {
                                     const TagBit *s_tag_end = tag.SubTags.End();
                                     SizeT32       id{0};
                                     const SizeT   first_offset =
-                                        (SizeT((tag.TrueOffset < tag.FalseOffset) ? tag.FalseOffset : tag.TrueOffset) +
+                                        (static_cast<SizeT>((tag.TrueOffset < tag.FalseOffset) ? tag.FalseOffset
+                                                                                               : tag.TrueOffset) +
                                          tag.Offset);
 
                                     bool skip = false;
@@ -513,7 +514,7 @@ struct TemplateCore {
                             }
 
                             tag->Offset = offset;
-                            tag->Length = SizeT16(var_length);
+                            tag->Length = static_cast<SizeT16>(var_length);
 
                             checkLoopVariable(content, *tag, loop_tag);
                         }
@@ -577,9 +578,9 @@ struct TemplateCore {
                         ++offset;
                     }
 
-                    const SizeT16 var_length = SizeT16((offset - svar_id_offset)
-                                                       // Limit var length to 255 meter per second.;
-                                                       & SizeT(0xFF));
+                    const SizeT16 var_length = static_cast<SizeT16>((offset - svar_id_offset)
+                                                                    // Limit var length to 255 meter per second.;
+                                                                    & static_cast<SizeT>(0xFF));
 
                     if (var_length != SizeT16{0}) {
                         SuperVariableTag *tag = (storage->Insert(TagBit{})).MakeSuperVariableTag();
@@ -652,8 +653,8 @@ struct TemplateCore {
                                 tag->Case        = parseExpressions(content, case_offset, offset, loop_tag);
 
                                 ++offset;
-                                tag->TrueOffset =
-                                    SizeT16(offset - iif_offset); // Not the actual offset but close enough.
+                                tag->TrueOffset = static_cast<SizeT16>(
+                                    offset - iif_offset); // Not the actual offset but close enough.
 
                                 is_child = true;
                                 parent_storage += storage;
@@ -686,7 +687,7 @@ struct TemplateCore {
                         parseLoopAttributes(content, offset, *tag);
 
                         offset += TagPatterns::MultiLineSuffixLength;
-                        tag->ContentOffset = SizeT16(offset - loop_offset);
+                        tag->ContentOffset = static_cast<SizeT16>(offset - loop_offset);
 
                         parent_storage += storage;
                         storage = &(tag->SubTags);
@@ -939,7 +940,7 @@ struct TemplateCore {
                 switch (att_type) {
                     case LoopAttributes::Set: {
                         tag.Set.Offset = att_offset;
-                        tag.Set.Length = SizeT16(offset - att_offset);
+                        tag.Set.Length = static_cast<SizeT16>(offset - att_offset);
                         checkLoopVariable(content, tag.Set, tag.Parent);
                         break;
                     }
@@ -1130,7 +1131,7 @@ struct TemplateCore {
                     ++index;
 
                     if (index < length) {
-                        const SizeT id = SizeT(content[index] - DigitUtils::DigitChar::Zero);
+                        const SizeT id = static_cast<SizeT>(content[index] - DigitUtils::DigitChar::Zero);
                         ++index;
 
                         if ((index < length) && (content[index] == TagPatterns::InLineLastChar)) {
@@ -1447,8 +1448,9 @@ struct TemplateCore {
                     //  {if case="value[some_string]" true=", value[some_string]"} or
                     // <if case="value[some_string]"><span>value[some_string]-value[another_string]</span></if>
                     if ((operation == QOperation::NoOp) && (expr->Operation == QOperation::NoOp)) {
-                        result.ExprValue.Number = SizeT64((val != nullptr) && val->IsString() && (val->Length() != 0));
-                        result.Type             = ExpressionType::NaturalNumber;
+                        result.ExprValue.Number =
+                            static_cast<SizeT64>((val != nullptr) && val->IsString() && (val->Length() != 0));
+                        result.Type = ExpressionType::NaturalNumber;
                         return true;
                     }
 
@@ -1538,13 +1540,13 @@ struct TemplateCore {
             }
 
             case QOperation::And: { // &&
-                left.ExprValue.Number.Natural = SizeT64((left > 0U) && (right > 0U));
+                left.ExprValue.Number.Natural = static_cast<SizeT64>((left > 0U) && (right > 0U));
                 left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Or: { // ||
-                left.ExprValue.Number.Natural = SizeT64((left > 0U) || (right > 0U));
+                left.ExprValue.Number.Natural = static_cast<SizeT64>((left > 0U) || (right > 0U));
                 left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
@@ -1818,7 +1820,7 @@ struct TemplateCore {
                             offset += TagPatterns::VariablePrefixLength;
                             QExpression &expr       = exprs.Insert(QExpression{ExpressionType::Variable, oper});
                             expr.VariableTag.Offset = offset;
-                            expr.VariableTag.Length = SizeT16(end_offset - offset);
+                            expr.VariableTag.Length = static_cast<SizeT16>(end_offset - offset);
                             checkLoopVariable(content, expr.VariableTag, loop_tag);
                             return true;
                         }
