@@ -99,8 +99,16 @@ struct LiteStream {
         length_ = length;
     }
 
-    QENTEM_INLINE QENTEM_INLINE void Clear() noexcept {
+    QENTEM_INLINE void Clear() noexcept {
         length_ = 0;
+    }
+
+    QENTEM_INLINE void Reset() noexcept {
+        release(storage_, capacity_);
+
+        storage_  = nullptr;
+        capacity_ = 0;
+        length_   = 0;
     }
 
     QENTEM_INLINE char *Storage() noexcept {
