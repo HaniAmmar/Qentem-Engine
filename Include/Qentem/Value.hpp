@@ -1152,10 +1152,6 @@ struct Value {
                 return nullptr;
             }
 
-                // case ValueType::ValuePtr: {
-                //     return value_->GetValueAt(index);
-                // }
-
             default:
                 return nullptr;
         }
@@ -1194,6 +1190,120 @@ struct Value {
         }
     }
 
+    /**
+     * @brief Gets a pointer to a child value using a string key or array index with a precomputed hash.
+     *
+     * If this value is an object, the string is used as a key.
+     * If this value is an array, the string is converted to an index.
+     *
+     * Returns nullptr if the key or index is not found, or if the value is undefined.
+     *
+     * @note StringUtils::Hash() is constexpr and can compute the hash at compile time.
+     *       If the key is constant, using this overload is recommended to avoid
+     *       recomputing the hash at runtime.
+     *
+     * @param str The key string or index string.
+     * @param length The length of the string.
+     * @param hash The precomputed hash value of the key.
+     * @return Pointer to the value, or nullptr if not found.
+     */
+    Value *GetValue(const Char_T *str, SizeT length, SizeT hash) noexcept {
+        switch (Type()) {
+            case ValueType::Object: {
+                Value *val = object_.GetValue(str, length, hash);
+
+                if ((val != nullptr) && !(val->isUndefined())) {
+                    return val;
+                }
+
+                return nullptr;
+            }
+
+            case ValueType::Array: {
+                SizeT index;
+                Digit::FastStringToNumber(index, str, length);
+
+                if (index < array_.Size()) {
+                    Value *val = (array_.Storage() + index);
+
+                    if (!(val->isUndefined())) {
+                        return val;
+                    }
+                }
+
+                return nullptr;
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    /**
+     * @brief Gets a const pointer to a child value using a string key or array index with a precomputed hash.
+     *
+     * If this value is an object, the string is used as a key.
+     * If this value is an array, the string is converted to an index.
+     *
+     * Returns nullptr if the key or index is not found, or if the value is undefined.
+     *
+     * @note StringUtils::Hash() is constexpr and can compute the hash at compile time.
+     *       If the key is constant, using this overload is recommended to avoid
+     *       recomputing the hash at runtime.
+     *
+     * @param str The key string or index string.
+     * @param length The length of the string.
+     * @param hash The precomputed hash value of the key.
+     * @return Const pointer to the value, or nullptr if not found.
+     */
+    const Value *GetValue(const Char_T *str, SizeT length, SizeT hash) const noexcept {
+        switch (Type()) {
+            case ValueType::Object: {
+                const Value *val = object_.GetValue(str, length, hash);
+
+                if ((val != nullptr) && !(val->isUndefined())) {
+                    return val;
+                }
+
+                return nullptr;
+            }
+
+            case ValueType::Array: {
+                SizeT index;
+                Digit::FastStringToNumber(index, str, length);
+
+                if (index < array_.Size()) {
+                    const Value *val = (array_.Storage() + index);
+
+                    if (!(val->isUndefined())) {
+                        return val;
+                    }
+                }
+
+                return nullptr;
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->GetValue(str, length, hash);
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    /**
+     * @brief Gets a pointer to a child value using a string key or array index.
+     *
+     * If this value is an object, the string is used as a key.
+     * If this value is an array, the string is converted to an index.
+     *
+     * Returns nullptr if the key or index is not found, or if the value is undefined.
+     *
+     * @param str The key string or index string.
+     * @param length The length of the string.
+     * @return Pointer to the value, or nullptr if not found.
+     */
     Value *GetValue(const Char_T *str, SizeT length) noexcept {
         switch (Type()) {
             case ValueType::Object: {
@@ -1221,15 +1331,23 @@ struct Value {
                 return nullptr;
             }
 
-                // case ValueType::ValuePtr: {
-                //     return value_->GetValue(str, length);
-                // }
-
             default:
                 return nullptr;
         }
     }
 
+    /**
+     * @brief Gets a pointer to a child value using a string key or array index.
+     *
+     * If this value is an object, the string is used as a key.
+     * If this value is an array, the string is converted to an index.
+     *
+     * Returns nullptr if the key or index is not found, or if the value is undefined.
+     *
+     * @param str The key string or index string.
+     * @param length The length of the string.
+     * @return Pointer to the value, or nullptr if not found.
+     */
     const Value *GetValue(const Char_T *str, SizeT length) const noexcept {
         switch (Type()) {
             case ValueType::Object: {
@@ -1266,10 +1384,60 @@ struct Value {
         }
     }
 
+    /**
+     * @brief Gets a pointer to a child value using a string view and a precomputed hash.
+     *
+     * Returns nullptr if the key is not found or the value is undefined.
+     *
+     * @note StringUtils::Hash() is constexpr and can compute the hash at compile time.
+     *       If the key is constant, using this overload is recommended to avoid
+     *       recomputing the hash at runtime.
+     *
+     * @param key The key string view.
+     * @param hash The precomputed hash value of the key.
+     * @return Pointer to the value, or nullptr if not found.
+     */
+    QENTEM_INLINE Value *GetValue(const StringViewT &key, SizeT hash) noexcept {
+        return GetValue(key.First(), key.Length(), hash);
+    }
+
+    /**
+     * @brief Gets a const pointer to a child value using a string view and a precomputed hash.
+     *
+     * Returns nullptr if the key is not found or the value is undefined.
+     *
+     * @note StringUtils::Hash() is constexpr and can compute the hash at compile time.
+     *       If the key is constant, using this overload is recommended to avoid
+     *       recomputing the hash at runtime.
+     *
+     * @param key The key string view.
+     * @param hash The precomputed hash value of the key.
+     * @return Const pointer to the value, or nullptr if not found.
+     */
+    QENTEM_INLINE const Value *GetValue(const StringViewT &key, SizeT hash) const noexcept {
+        return GetValue(key.First(), key.Length(), hash);
+    }
+
+    /**
+     * @brief Gets a pointer to a child value using a string view.
+     *
+     * Returns nullptr if the key is not found or the value is undefined.
+     *
+     * @param key The key string view.
+     * @return Pointer to the value, or nullptr if not found.
+     */
     QENTEM_INLINE Value *GetValue(const StringViewT &key) noexcept {
         return GetValue(key.First(), key.Length());
     }
 
+    /**
+     * @brief Gets a const pointer to a child value using a string view.
+     *
+     * Returns nullptr if the key is not found or the value is undefined.
+     *
+     * @param key The key string view.
+     * @return Const pointer to the value, or nullptr if not found.
+     */
     QENTEM_INLINE const Value *GetValue(const StringViewT &key) const noexcept {
         return GetValue(key.First(), key.Length());
     }

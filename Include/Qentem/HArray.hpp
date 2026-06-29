@@ -281,6 +281,32 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>, Expans
     }
 
     /**
+     * @brief Gets a pointer to the value for a given key object using a precomputed hash.
+     *
+     * Returns nullptr if the key is not found.
+     *
+     * @note StringUtils::Hash() is constexpr and can compute the hash at compile time.
+     *       If the key is constant, using this overload is recommended to avoid
+     *       recomputing the hash at runtime.
+     *
+     * @param key The key object.
+     * @param hash The precomputed hash value of the key.
+     * @return Pointer to the value, or nullptr if not found.
+     */
+    QENTEM_INLINE Value_T *GetValue(const Key_T &key, const SizeT hash) noexcept {
+        if (Size() != 0) {
+            SizeT *index;
+            HItem *item = find(index, key, hash);
+
+            if (item != nullptr) {
+                return &(item->Value);
+            }
+        }
+
+        return nullptr;
+    }
+
+    /**
      * @brief Gets a const pointer to the value for a given key object.
      *
      * Returns nullptr if the key is not found.
@@ -292,6 +318,32 @@ struct HArrayBase : public AutoHashTable<Key_T, HAItem_T<Key_T, Value_T>, Expans
         if (Size() != 0) {
             SizeT        index;
             const HItem *item = find(index, key);
+
+            if (item != nullptr) {
+                return &(item->Value);
+            }
+        }
+
+        return nullptr;
+    }
+
+    /**
+     * @brief Gets a const pointer to the value for a given key object using a precomputed hash.
+     *
+     * Returns nullptr if the key is not found.
+     *
+     * @note StringUtils::Hash() is constexpr and can compute the hash at compile time.
+     *       If the key is constant, using this overload is recommended to avoid
+     *       recomputing the hash at runtime.
+     *
+     * @param key The key object.
+     * @param hash The precomputed hash value of the key.
+     * @return Const pointer to the value, or nullptr if not found.
+     */
+    QENTEM_INLINE const Value_T *GetValue(const Key_T &key, const SizeT hash) const noexcept {
+        if (Size() != 0) {
+            SizeT        index;
+            const HItem *item = find(index, key, hash);
 
             if (item != nullptr) {
                 return &(item->Value);
