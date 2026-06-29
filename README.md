@@ -70,7 +70,7 @@ Qentem Engine is a lightweight, high-performance C++ library built around custom
 * Raw output support when escaping is not desired.
 * Nested loops with sorting and grouping support.
 * Conditional and inline expression evaluation.
-* Built-in arithmetic expression engine.
+* Built-in sandboxed expression parser and evaluator with support for arithmetic, bitwise, comparison, and logical operations.
 
 ## Requirements
 
