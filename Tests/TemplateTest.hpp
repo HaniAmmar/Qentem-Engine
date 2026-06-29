@@ -2830,6 +2830,7 @@ static void TestLoopTag1(QTest &test) {
     StringStream<char> ss;
     Value<char>        value1;
     Value<char>        value3;
+    Value<char>        value4;
     const char        *content;
 
     value1 += 100;
@@ -2974,6 +2975,24 @@ static void TestLoopTag1(QTest &test) {
         Template::Render(content, value3, ss),
         R"({var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]})",
         __LINE__);
+    ss.Clear();
+
+    value4["nlist"][0] = 10;
+    value4["nlist"][1] = 5;
+    value4["nlist"][2] = 3;
+
+    value4["slist"]["0"] = 10;
+    value4["slist"]["1"] = 5;
+    value4["slist"]["2"] = 3;
+
+    value4[R"(x_y_z)"] = R"({0})";
+
+    content = R"(<loop set="nlist" value="loop_val">{svar:x_y_z, {var:loop_val}}, </loop>)";
+    test.IsEqual(Template::Render(content, value4, ss), R"(10, 5, 3, )", __LINE__);
+    ss.Clear();
+
+    content = R"(<loop set="slist" value="loop_val">{svar:x_y_z, {var:loop_val}}, </loop>)";
+    test.IsEqual(Template::Render(content, value4, ss), R"(10, 5, 3, )", __LINE__);
     ss.Clear();
 }
 
