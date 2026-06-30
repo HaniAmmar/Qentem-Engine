@@ -277,6 +277,8 @@ struct TagBit {
             switch (GetType()) {
                 case TagType::Variable:
                 case TagType::RawVariable: {
+                    VariableTag *ptr = &GetVariableTag();
+                    MemoryUtils::Destruct(ptr);
                     Reserver::Release(&GetVariableTag(), 1);
                     break;
                 }
