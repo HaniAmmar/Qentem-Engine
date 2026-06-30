@@ -291,6 +291,10 @@ struct TemplateCore {
     };
 
   public:
+    QENTEM_INLINE void SetRealFormat(SizeT32 precision, Digit::RealFormatType type) {
+        format_info_ = Digit::RealFormatInfo{precision, type};
+    }
+
     QENTEM_INLINE void Parse(Array<TagBit> &tags_cache) const {
         parse(content_, length_, tags_cache);
     }
@@ -1138,7 +1142,7 @@ struct TemplateCore {
         const Value_T *value = getValue(tag);
 
         if ((value == nullptr) ||
-            !(value->CopyValueTo(*stream_, {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT},
+            !(value->CopyValueTo(*stream_, format_info_,
                                  &(StringUtils::EscapeHTMLSpecialChars<StringStream_T, Char_T>)))) {
             if (tag.IDLength != 0) {
                 const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
@@ -1165,8 +1169,7 @@ struct TemplateCore {
 
         const Value_T *value = getValue(tag);
 
-        if ((value == nullptr) ||
-            !(value->CopyValueTo(*stream_, {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT}))) {
+        if ((value == nullptr) || !(value->CopyValueTo(*stream_, format_info_))) {
             stream_->Write((content_ + t_offset), length);
         }
     }
@@ -1192,8 +1195,7 @@ struct TemplateCore {
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit::NumberToString(*stream_, result.ExprValue.Number.Real,
-                                          {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT});
+                    Digit::NumberToString(*stream_, result.ExprValue.Number.Real, format_info_);
                     break;
                 }
 
@@ -2136,11 +2138,12 @@ struct TemplateCore {
         return false;
     }
 
-    const Value_T   *value_{nullptr};
-    StringStream_T  *stream_{nullptr};
-    Array<LoopItem> *loops_items_{nullptr};
-    const Char_T    *content_;
-    const SizeT      length_;
+    const Value_T        *value_{nullptr};
+    StringStream_T       *stream_{nullptr};
+    Array<LoopItem>      *loops_items_{nullptr};
+    const Char_T         *content_;
+    const SizeT           length_;
+    Digit::RealFormatInfo format_info_{QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT};
 };
 
 } // namespace Qentem
