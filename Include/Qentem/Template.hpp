@@ -22,6 +22,7 @@
 #include "Qentem/Digit.hpp"
 #include "Qentem/Tags.hpp"
 #include "Qentem/StringView.hpp"
+#include "Qentem/QConsole.hpp"
 
 namespace Qentem {
 
@@ -270,6 +271,7 @@ struct TemplateCore {
   private:
     using TagType          = Tags::TagType;
     using VariableTag      = Tags::VariableTag;
+    using VariableInfo     = Tags::VariableInfo;
     using MathTag          = Tags::MathTag;
     using SuperVariableTag = Tags::SuperVariableTag;
     using InLineIfTag      = Tags::InLineIfTag;
@@ -335,7 +337,7 @@ struct TemplateCore {
 
         pattern_finder.NextSegment();
 
-        while ((match = pattern_finder.CurrentMatch()) != 0U) {
+        while ((match = pattern_finder.CurrentMatch()) != 0) {
             switch (match) {
                 case TagPatterns::LineEndID: {
                     if (is_child && parent_storage.IsNotEmpty()) {
@@ -431,7 +433,7 @@ struct TemplateCore {
                                 } while (++offset < end_offset);
 
                                 // Set StartID
-                                if ((tag.TrueOffset != SizeT16{0}) || (tag.FalseOffset != SizeT16{0})) {
+                                if ((tag.TrueOffset != 0) || (tag.FalseOffset != 0)) {
                                     const TagBit *s_tag     = tag.SubTags.First();
                                     const TagBit *s_tag_end = tag.SubTags.End();
                                     SizeT32       id{0};
@@ -446,7 +448,10 @@ struct TemplateCore {
                                         switch (s_tag->GetType()) {
                                             case TagType::Variable:
                                             case TagType::RawVariable: {
-                                                offset = s_tag->GetVariableTag().Offset;
+                                                const VariableTag &tmp_tag = s_tag->GetVariableTag();
+
+                                                offset = ((tmp_tag.Count <= SizeT8{1}) ? tmp_tag.Info.Offset
+                                                                                       : tmp_tag.List[0].Offset);
                                                 break;
                                             }
 
@@ -472,12 +477,12 @@ struct TemplateCore {
 
                                     if (!skip) {
                                         if (tag.TrueOffset < tag.FalseOffset) {
-                                            tag.FalseTagsStartID = SizeT8(id);
+                                            tag.FalseTagsStartID = static_cast<SizeT8>(id);
                                         } else {
-                                            tag.TrueTagsStartID = SizeT8(id);
+                                            tag.TrueTagsStartID = static_cast<SizeT8>(id);
                                         }
                                     }
-                                } else if ((tag.TrueOffset == SizeT16{0}) && (tag.FalseOffset == SizeT16{0})) {
+                                } else if ((tag.TrueOffset == 0) && (tag.FalseOffset == 0)) {
                                     storage->Drop(SizeT{1});
                                 }
 
@@ -513,10 +518,10 @@ struct TemplateCore {
                                 tag = (storage->Insert(TagBit{})).MakeRawVariableTag();
                             }
 
-                            tag->Offset = offset;
-                            tag->Length = static_cast<SizeT16>(var_length);
+                            tag->Info.Offset = offset;
+                            tag->Length      = static_cast<SizeT8>(var_length);
 
-                            checkLoopVariable(content, *tag, loop_tag);
+                            parseVariable(content, *tag, loop_tag);
                         }
 
                         pattern_finder.NextSegment();
@@ -542,7 +547,7 @@ struct TemplateCore {
                         }
 
                         if (match == TagPatterns::LineEndID) {
-                            if (skip_var != 0U) {
+                            if (skip_var != 0) {
                                 pattern_finder.NextSegment();
                                 --skip_var;
                                 continue;
@@ -582,11 +587,12 @@ struct TemplateCore {
                                                                     // Limit var length to 255 meter per second.;
                                                                     & static_cast<SizeT>(0xFF));
 
-                    if (var_length != SizeT16{0}) {
-                        SuperVariableTag *tag = (storage->Insert(TagBit{})).MakeSuperVariableTag();
-                        tag->Offset           = svar_offset;
-                        tag->Variable.Offset  = svar_id_offset;
-                        tag->Variable.Length  = var_length;
+                    if (var_length != 0) {
+                        SuperVariableTag *tag     = (storage->Insert(TagBit{})).MakeSuperVariableTag();
+                        tag->Offset               = svar_offset;
+                        tag->Variable.Info.Offset = svar_id_offset;
+                        tag->Variable.Length      = static_cast<SizeT8>(var_length);
+                        parseVariable(content, tag->Variable, loop_tag);
 
                         is_child = true;
                         parent_storage += storage;
@@ -626,7 +632,7 @@ struct TemplateCore {
 
                             const SizeT case_offset = offset;
 
-                            while ((match = pattern_finder.CurrentMatch()) != 0U) {
+                            while ((match = pattern_finder.CurrentMatch()) != 0) {
                                 while ((offset < end_offset) && (content[offset] != quote_char)) {
                                     ++offset;
                                 }
@@ -681,7 +687,7 @@ struct TemplateCore {
                         LoopTag *tag = (storage->Insert(TagBit{})).MakeLoopTag();
                         tag->Offset  = loop_offset;
                         tag->Parent  = loop_tag;
-                        tag->Level   = SizeT8(parent_storage.Size());
+                        tag->Level   = static_cast<SizeT8>(parent_storage.Size());
                         loop_tag     = tag;
 
                         parseLoopAttributes(content, offset, *tag);
@@ -840,19 +846,107 @@ struct TemplateCore {
         }
     }
 
-    static void checkLoopVariable(const Char_T *content, VariableTag &tag, const LoopTag *loop_tag) noexcept {
-        const Char_T *var = (content + tag.Offset);
+    static void parseVariable(const Char_T *content, VariableTag &tag, const LoopTag *loop_tag) noexcept {
+        const Char_T *id        = (content + tag.Info.Offset);
+        SizeT         offset    = 0;
+        SizeT         length    = static_cast<SizeT>(tag.Length);
+        const bool    has_index = ((length != 0) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
 
         while (loop_tag != nullptr) {
-            if (StringUtils::IsEqual(var, (content + (loop_tag->Offset + loop_tag->ValueOffset)),
-                                     loop_tag->ValueLength)) {
-                tag.IDLength = loop_tag->ValueLength;
-                tag.Level    = loop_tag->Level;
+            if (StringUtils::IsEqual(id, (content + loop_tag->Offset + loop_tag->ValueOffset), loop_tag->ValueLength)) {
+                if ((id[loop_tag->ValueLength] == TagPatterns::VariableIndexPrefix) ||
+                    (tag.Length == loop_tag->ValueLength)) {
+                    tag.IDLength = loop_tag->ValueLength;
+                    tag.Level    = loop_tag->Level;
 
-                break;
+                    if (tag.Length == tag.IDLength) {
+                        return;
+                    }
+
+                    offset = static_cast<SizeT>(tag.IDLength);
+
+                    break;
+                }
             }
 
             loop_tag = loop_tag->Parent;
+        }
+
+        tag.Count = 1;
+
+        if (!has_index) {
+            tag.Info.Hash = StringUtils::Hash(id, tag.Length);
+        } else {
+            if (tag.IDLength == 0) {
+                while ((offset < tag.Length) && (id[offset] != TagPatterns::VariableIndexPrefix)) {
+                    ++offset;
+                }
+
+                tag.Info.Hash = StringUtils::Hash(id, offset);
+                ++(tag.Count);
+            }
+
+            ++offset; // The char after [
+
+            const SizeT start_offset = offset;
+            SizeT       offset2      = offset;
+
+            if (tag.Count == SizeT8{1}) {
+                while ((offset2 < tag.Length) && (id[offset2] != TagPatterns::VariableIndexSuffix)) {
+                    ++offset2;
+                }
+
+                tag.Info.Hash = StringUtils::Hash((id + offset), (offset2 - offset));
+            }
+
+            while ((offset2 < tag.Length)) {
+                while ((offset2 < tag.Length) && (id[offset2] != TagPatterns::VariableIndexSuffix)) {
+                    ++offset2;
+                }
+
+                ++offset2; // The char after ]
+
+                if (id[offset2] != TagPatterns::VariableIndexPrefix) {
+                    break;
+                }
+
+                ++(tag.Count);
+                ++offset2; // The char after [
+                offset = offset2;
+            }
+
+            if (tag.Count > SizeT8{1}) {
+                VariableInfo *list = Reserver::Reserve<VariableInfo>(static_cast<SystemLong>(tag.Count));
+
+                list->Offset = tag.Info.Offset;
+                list->Hash   = tag.Info.Hash;
+
+                tag.List = list;
+
+                SizeT index = 1;
+
+                offset  = start_offset;
+                offset2 = offset;
+
+                while ((offset2 < tag.Length)) {
+                    while ((offset2 < tag.Length) && (id[offset2] != TagPatterns::VariableIndexSuffix)) {
+                        ++offset2;
+                    }
+
+                    list[index].Offset = (list->Offset + offset);
+                    list[index].Hash   = StringUtils::Hash((id + offset), (offset2 - offset));
+
+                    ++offset2; // The char after ]
+
+                    if (id[offset2] != TagPatterns::VariableIndexPrefix) {
+                        break;
+                    }
+
+                    ++index;
+                    ++offset2; // The char after [
+                    offset = offset2;
+                }
+            }
         }
     }
 
@@ -939,15 +1033,15 @@ struct TemplateCore {
 
                 switch (att_type) {
                     case LoopAttributes::Set: {
-                        tag.Set.Offset = att_offset;
-                        tag.Set.Length = static_cast<SizeT16>(offset - att_offset);
-                        checkLoopVariable(content, tag.Set, tag.Parent);
+                        tag.Set.Info.Offset = att_offset;
+                        tag.Set.Length      = static_cast<SizeT8>(offset - att_offset);
+                        parseVariable(content, tag.Set, tag.Parent);
                         break;
                     }
 
                     case LoopAttributes::Value: {
-                        tag.ValueOffset = SizeT8(att_offset - tag.Offset);
-                        tag.ValueLength = SizeT8(offset - att_offset);
+                        tag.ValueOffset = static_cast<SizeT8>(att_offset - tag.Offset);
+                        tag.ValueLength = static_cast<SizeT8>(offset - att_offset);
                         break;
                     }
 
@@ -958,8 +1052,8 @@ struct TemplateCore {
                     }
 
                     case LoopAttributes::Group: {
-                        tag.GroupOffset = SizeT8(att_offset - tag.Offset);
-                        tag.GroupLength = SizeT8(offset - att_offset);
+                        tag.GroupOffset = static_cast<SizeT8>(att_offset - tag.Offset);
+                        tag.GroupLength = static_cast<SizeT8>(offset - att_offset);
                         break;
                     }
 
@@ -1017,14 +1111,14 @@ struct TemplateCore {
         using HandlerFunc = void (TemplateCore::*)(const TagBit *tag, SizeT &) const;
 
         // Note: merge all to prevent recursion
-        static constexpr HandlerFunc handlers[SizeT8(TagType::None)] = {
+        static constexpr HandlerFunc handlers[static_cast<SizeT8>(TagType::None)] = {
             &TemplateCore::renderVariable, &TemplateCore::renderRawVariable,
             &TemplateCore::renderMath,     &TemplateCore::renderSuperVariable,
             &TemplateCore::renderInLineIf, &TemplateCore::renderLoop,
             &TemplateCore::renderIf};
 
         while (tag < end) {
-            (this->*handlers[SizeT8(tag->GetType())])(tag, offset);
+            (this->*handlers[static_cast<SizeT8>(tag->GetType())])(tag, offset);
             ++tag;
         }
 
@@ -1032,9 +1126,10 @@ struct TemplateCore {
     }
 
     void renderVariable(const TagBit *tagbit, SizeT &offset) const {
-        const VariableTag &tag      = tagbit->GetVariableTag();
-        const SizeT        t_offset = (tag.Offset - TagPatterns::VariablePrefixLength);
-        const SizeT        length   = (tag.Length + TagPatterns::VariableFullLength);
+        const VariableTag &tag = tagbit->GetVariableTag();
+        const SizeT        t_offset =
+            (((tag.Count <= SizeT8{1}) ? tag.Info.Offset : tag.List[0].Offset) - TagPatterns::VariablePrefixLength);
+        const SizeT length = (tag.Length + TagPatterns::VariableFullLength);
 
         stream_->Write((content_ + offset), (t_offset - offset));
         offset = t_offset;
@@ -1045,7 +1140,7 @@ struct TemplateCore {
         if ((value == nullptr) ||
             !(value->CopyValueTo(*stream_, {QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT},
                                  &(StringUtils::EscapeHTMLSpecialChars<StringStream_T, Char_T>)))) {
-            if (tag.IDLength != SizeT8{0}) {
+            if (tag.IDLength != 0) {
                 const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
 
                 if (key.Length() != 0) {
@@ -1059,9 +1154,10 @@ struct TemplateCore {
     }
 
     void renderRawVariable(const TagBit *tagbit, SizeT &offset) const {
-        const VariableTag &tag      = tagbit->GetVariableTag();
-        const SizeT        t_offset = (tag.Offset - TagPatterns::RawVariablePrefixLength);
-        const SizeT        length   = (tag.Length + TagPatterns::RawVariableFullLength);
+        const VariableTag &tag = tagbit->GetVariableTag();
+        const SizeT        t_offset =
+            (((tag.Count <= SizeT8{1}) ? tag.Info.Offset : tag.List[0].Offset) - TagPatterns::RawVariablePrefixLength);
+        const SizeT length = (tag.Length + TagPatterns::RawVariableFullLength);
 
         stream_->Write((content_ + offset), (t_offset - offset));
         offset = t_offset;
@@ -1144,14 +1240,20 @@ struct TemplateCore {
                                 switch (sub_tag->GetType()) {
                                     case TagType::Variable: {
                                         const VariableTag &var = sub_tag->GetVariableTag();
-                                        SizeT var_offset       = (var.Offset - TagPatterns::VariablePrefixLength);
+                                        SizeT              var_offset =
+                                            (((var.Count <= SizeT8{1}) ? var.Info.Offset : var.List[0].Offset) -
+                                             TagPatterns::VariablePrefixLength);
+
                                         renderVariable(sub_tag, var_offset);
                                         break;
                                     }
 
                                     case TagType::RawVariable: {
                                         const VariableTag &r_var = sub_tag->GetVariableTag();
-                                        SizeT r_var_offset = (r_var.Offset - TagPatterns::RawVariablePrefixLength);
+                                        SizeT              r_var_offset =
+                                            (((r_var.Count <= SizeT8{1}) ? r_var.Info.Offset : r_var.List[0].Offset) -
+                                             TagPatterns::RawVariablePrefixLength);
+
                                         renderRawVariable(sub_tag, r_var_offset);
                                         break;
                                     }
@@ -1197,7 +1299,7 @@ struct TemplateCore {
             SizeT         value_offset;
             SizeT         value_end_offset;
 
-            if (result > 0U) {
+            if (result > 0) {
                 if (tag.TrueOffset < tag.FalseOffset) {
                     s_end = (s_tag + tag.FalseTagsStartID);
                 } else {
@@ -1310,7 +1412,7 @@ struct TemplateCore {
                 // <else> without if = (item->Case == nothing)
                 const QExpression *expr = item->Case.First();
 
-                if (item->Case.IsEmpty() || (evaluate(result, expr, QOperation::NoOp) && (result > 0U))) {
+                if (item->Case.IsEmpty() || (evaluate(result, expr, QOperation::NoOp) && (result > 0))) {
                     render(item->SubTags.First(), item->SubTags.End(), item->Offset, item->EndOffset);
                     break;
                 }
@@ -1320,54 +1422,49 @@ struct TemplateCore {
         }
     }
 
-    const Value_T *getValue(const VariableTag &variable) const noexcept {
-        const Value_T *value     = nullptr;
-        const Char_T  *id        = (content_ + variable.Offset);
-        const SizeT    length    = variable.Length;
-        SizeT          offset    = 0;
-        const bool     has_index = ((length != 0) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
+    const Value_T *getValue(const VariableTag &tag) const noexcept {
+        const Value_T      *value    = nullptr;
+        const VariableInfo *Info     = ((tag.Count <= SizeT8{1}) ? &(tag.Info) : tag.List);
+        const VariableInfo *Info_end = (Info + tag.Count);
+        const Char_T       *id       = (content_ + Info->Offset);
+        SizeT               offset   = 0;
 
-        if (variable.IDLength == SizeT8{0}) {
-            if (!has_index) {
-                return value_->GetValue(id, length);
+        if (tag.IDLength == 0) {
+            if (tag.Count == SizeT8{1}) {
+                return value_->GetValue(id, tag.Length, Info->Hash);
             }
 
-            while ((offset < length) && (id[offset] != TagPatterns::VariableIndexPrefix)) {
-                ++offset;
-            }
+            offset = (Info[1].Offset - Info->Offset);
+            --offset;
 
-            if (offset != 0) {
-                // {var:abc[...]}
-                // if offset == 0 then it's {var:[...]}
-                value = value_->GetValue(id, offset);
-            }
+            value = value_->GetValue(id, offset, Info->Hash);
+            ++Info;
         } else {
-            value = loops_items_->Storage()[variable.Level].Value;
+            value = loops_items_->Storage()[tag.Level].Value;
 
-            if (!has_index) {
+            if (tag.Count == 0) {
                 return value;
             }
 
-            offset += variable.IDLength;
+            offset += tag.IDLength;
         }
 
         ++offset; // The char after [
         SizeT offset2 = offset;
 
         while (value != nullptr) {
-            while ((offset2 < length) && (id[offset2] != TagPatterns::VariableIndexSuffix)) {
+            while ((offset2 < tag.Length) && (id[offset2] != TagPatterns::VariableIndexSuffix)) {
                 ++offset2;
-            };
+            }
 
-            value = value->GetValue((id + offset), (offset2 - offset));
+            value = value->GetValue((id + offset), (offset2 - offset), Info->Hash);
+            ++Info;
 
-            ++offset2; // The char after ]
-
-            if (id[offset2] != TagPatterns::VariableIndexPrefix) {
+            if (Info >= Info_end) {
                 break;
             }
 
-            ++offset2; // The char after [
+            offset2 += SizeT{2}; // []
             offset = offset2;
         }
 
@@ -1540,13 +1637,13 @@ struct TemplateCore {
             }
 
             case QOperation::And: { // &&
-                left.ExprValue.Number.Natural = static_cast<SizeT64>((left > 0U) && (right > 0U));
+                left.ExprValue.Number.Natural = static_cast<SizeT64>((left > 0) && (right > 0));
                 left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Or: { // ||
-                left.ExprValue.Number.Natural = static_cast<SizeT64>((left > 0U) || (right > 0U));
+                left.ExprValue.Number.Natural = static_cast<SizeT64>((left > 0) || (right > 0));
                 left.Type                     = ExpressionType::NaturalNumber;
                 break;
             }
@@ -1818,10 +1915,10 @@ struct TemplateCore {
 
                         if (content[end_offset] == TagPatterns::InLineLastChar) {
                             offset += TagPatterns::VariablePrefixLength;
-                            QExpression &expr       = exprs.Insert(QExpression{ExpressionType::Variable, oper});
-                            expr.VariableTag.Offset = offset;
-                            expr.VariableTag.Length = static_cast<SizeT16>(end_offset - offset);
-                            checkLoopVariable(content, expr.VariableTag, loop_tag);
+                            QExpression &expr            = exprs.Insert(QExpression{ExpressionType::Variable, oper});
+                            expr.VariableTag.Info.Offset = offset;
+                            expr.VariableTag.Length      = static_cast<SizeT8>(end_offset - offset);
+                            parseVariable(content, expr.VariableTag, loop_tag);
                             return true;
                         }
                     }
@@ -1965,11 +2062,11 @@ struct TemplateCore {
 
                 case QOperationSymbols::ParenthesesStart: {
                     ++offset;
-                    SizeT32 skip{0U};
+                    SizeT32 skip{0};
 
                     while (offset < end_offset) {
                         if (content[offset] == QOperationSymbols::ParenthesesEnd) {
-                            if (skip == 0U) {
+                            if (skip == 0) {
                                 break;
                             }
 
