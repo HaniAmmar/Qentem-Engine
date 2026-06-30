@@ -85,7 +85,7 @@ struct QExpression {
     QExpression(QExpression &&src) noexcept : Operation{src.Operation}, Type{src.Type} {
         switch (src.Type) {
             case ExpressionType::Variable: {
-                VariableTag = src.VariableTag;
+                VariableTag = QUtility::Move(src.VariableTag);
                 break;
             }
 
@@ -95,7 +95,7 @@ struct QExpression {
             }
 
             default: {
-                ExprValue = src.ExprValue;
+                ExprValue = QUtility::Move(src.ExprValue);
                 break;
             }
         }
