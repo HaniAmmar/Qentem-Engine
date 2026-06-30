@@ -1796,9 +1796,9 @@ struct Value {
     using CopyValueToStringFunction_T = void(StringStream_T &, const Char_T *, SizeT);
 
     template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>>
-    bool CopyValueTo(StringStream_T             &stream,
-                     const Digit::RealFormatInfo format          = Digit::RealFormatInfo{QentemConfig::DoublePrecision},
-                     StringFunction_T           *string_function = nullptr) const {
+    bool CopyValueTo(StringStream_T              &stream,
+                     const Digit::RealFormatInfo &format_info = Digit::RealFormatInfo{QentemConfig::DoublePrecision},
+                     StringFunction_T            *string_function = nullptr) const {
         switch (Type()) {
             case ValueType::String: {
                 if (string_function != nullptr) {
@@ -1821,7 +1821,7 @@ struct Value {
             }
 
             case ValueType::Double: {
-                Digit::NumberToString(stream, number_.Real, format);
+                Digit::NumberToString(stream, number_.Real, format_info);
                 break;
             }
 
@@ -1841,7 +1841,7 @@ struct Value {
             }
 
             case ValueType::ValuePtr: {
-                return value_->CopyValueTo(stream, format, string_function);
+                return value_->CopyValueTo(stream, format_info, string_function);
             }
 
             default: {

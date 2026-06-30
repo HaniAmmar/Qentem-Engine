@@ -58,7 +58,7 @@ struct Digit {
     /////////////////////////////////////////////////////////////////
     template <bool Reverse_V_T = false, typename Stream_T, typename Number_T>
     QENTEM_INLINE static void NumberToString(Stream_T &stream, Number_T number,
-                                             const RealFormatInfo format = RealFormatInfo{}) {
+                                             const RealFormatInfo &format_info = RealFormatInfo{}) {
         constexpr SizeT32 n_size = sizeof(Number_T);
         using Char_T             = typename Stream_T::CharType;
         using QNumberType_T      = typename QNumberAutoTypeT<Number_T, n_size>::QNumberType_T;
@@ -66,7 +66,7 @@ struct Digit {
         QNumberType_T qn{number};
 
         if constexpr (IsFloat<Number_T>()) {
-            realToString<Number_T>(stream, QNumberType_T{number}.Natural, format);
+            realToString<Number_T>(stream, QNumberType_T{number}.Natural, format_info);
         } else {
             constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000) + 1U);
             Char_T            storage[max_number_of_digits];
@@ -1060,7 +1060,7 @@ struct Digit {
     }
     /////////////////////////////////////////
     template <typename Float_T, typename Stream_T, typename Number_T>
-    static void realToString(Stream_T &stream, const Number_T number, const RealFormatInfo format) {
+    static void realToString(Stream_T &stream, const Number_T number, const RealFormatInfo &format_info) {
         constexpr SizeT32 number_size = sizeof(Number_T);
 
         using Info_T = DigitUtils::RealNumberInfo<Float_T, number_size>;
@@ -1091,14 +1091,14 @@ struct Digit {
                 const SizeT32 digits           = (((exp_actual_value * 30103U) / 100000) + 1U);
                 SizeT32       fraction_length  = 0;
                 const bool    fixed =
-                    ((format.Type == RealFormatType::SemiFixed) | (format.Type == RealFormatType::Fixed));
-                const bool extra_digits = ((digits > format.Precision) & !fixed);
+                    ((format_info.Type == RealFormatType::SemiFixed) | (format_info.Type == RealFormatType::Fixed));
+                const bool extra_digits = ((digits > format_info.Precision) & !fixed);
                 const bool big_offset   = (positive_exp >= first_bit);
                 const bool no_fraction  = (is_positive_exp & (big_offset | extra_digits));
                 bool       round_up     = false;
                 /////////////////////////////////////
                 if (no_fraction) {
-                    const SizeT32 drop    = (SizeT32(extra_digits) * (digits - (format.Precision + 1U)));
+                    const SizeT32 drop    = (SizeT32(extra_digits) * (digits - (format_info.Precision + 1U)));
                     const SizeT32 m_shift = (Info_T::MantissaSize + drop);
 
                     const int diff = (int(positive_exp) - int(m_shift));
@@ -1111,7 +1111,7 @@ struct Digit {
 
                     if (drop != 0) {
                         round_up = true;
-                        bigIntDropDigits(b_int, drop, format.Precision);
+                        bigIntDropDigits(b_int, drop, format_info.Precision);
                     }
                 } else {
                     SizeT32 shift   = 0;
@@ -1120,14 +1120,14 @@ struct Digit {
 
                     if (is_positive_exp) {
                         fraction_length -= positive_exp;
-                        needed = format.Precision;
+                        needed = format_info.Precision;
 
                         if (!fixed) {
                             needed -= digits;
                         }
                     } else {
                         fraction_length += positive_exp;
-                        needed = (digits + format.Precision);
+                        needed = (digits + format_info.Precision);
                     }
 
                     ++needed; // For rounding.
@@ -1156,8 +1156,8 @@ struct Digit {
                         the internal floating-point width, dramatically improving speed when formatting numbers to short
                         or moderate precision.
                         */
-                        const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
-                                                      ? ((format.Precision / DigitConst::MaxPowerOfTen) + 3U)
+                        const SizeT32 max_index = (format_info.Precision < Info_T::MaxCut)
+                                                      ? ((format_info.Precision / DigitConst::MaxPowerOfTen) + 3U)
                                                       : b_int.MaxIndex();
 
                         do {
@@ -1182,21 +1182,21 @@ struct Digit {
                 const SizeT start_at = stream.Length();
                 bigIntToString(stream, b_int);
 
-                switch (format.Type) {
+                switch (format_info.Type) {
                     case RealFormatType::Default: {
-                        formatStringNumberDefault(stream, start_at, format.Precision, digits, fraction_length,
+                        formatStringNumberDefault(stream, start_at, format_info.Precision, digits, fraction_length,
                                                   is_positive_exp, round_up);
                         break;
                     }
 
                     case RealFormatType::Fixed: {
-                        formatStringNumberFixed<true>(stream, start_at, format.Precision, digits, fraction_length,
+                        formatStringNumberFixed<true>(stream, start_at, format_info.Precision, digits, fraction_length,
                                                       round_up);
                         break;
                     }
 
                     case RealFormatType::SemiFixed: {
-                        formatStringNumberFixed<false>(stream, start_at, format.Precision, digits, fraction_length,
+                        formatStringNumberFixed<false>(stream, start_at, format_info.Precision, digits, fraction_length,
                                                        round_up);
                         break;
                     }
@@ -1209,9 +1209,9 @@ struct Digit {
             } else {
                 stream.Write(DigitUtils::DigitChar::Zero);
 
-                if (format.Type == RealFormatType::Fixed) {
+                if (format_info.Type == RealFormatType::Fixed) {
                     stream.Write(DigitUtils::DigitChar::Dot);
-                    insertZerosLarge(stream, format.Precision);
+                    insertZerosLarge(stream, format_info.Precision);
                 }
             }
         } else {
