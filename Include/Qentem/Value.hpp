@@ -1464,7 +1464,7 @@ struct Value {
     const Value *Storage() const {
         switch (Type()) {
             case ValueType::Object: {
-                const VItem *item = object_.Storage();
+                const VItem *item = object_.First();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1472,11 +1472,11 @@ struct Value {
             }
 
             case ValueType::Array: {
-                return array_.Storage();
+                return array_.First();
             }
 
             case ValueType::ValuePtr: {
-                return value_->Storage();
+                return value_->First();
             }
 
             default:
@@ -1524,10 +1524,6 @@ struct Value {
             case ValueType::Array: {
                 return array_.Last();
             }
-
-                // case ValueType::ValuePtr: {
-                //     return value_->Last();
-                // }
 
             default:
                 return nullptr;
@@ -2278,6 +2274,24 @@ struct Value {
     QENTEM_INLINE StringT Stringify(SizeT32 precision = QentemConfig::DoublePrecision) const {
         StringStream<Char_T> stream;
         return Stringify(stream, precision).GetString();
+    }
+
+    // ===== STL-style Iterators =====
+    // For STL
+    QENTEM_INLINE const Value *begin() const noexcept {
+        return First();
+    }
+
+    QENTEM_INLINE const Value *end() const noexcept {
+        return End();
+    }
+
+    QENTEM_INLINE Value *begin() noexcept {
+        return Storage();
+    }
+
+    QENTEM_INLINE Value *end() noexcept {
+        return (Storage() + Size());
     }
 
   private:
