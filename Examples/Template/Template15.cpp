@@ -1,9 +1,9 @@
 #include "Qentem/JSON.hpp"
 #include "Qentem/Template.hpp"
-
-#include <iostream>
+#include "Qentem/QConsole.hpp"
 
 using Qentem::JSON;
+using Qentem::QConsole;
 using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
@@ -28,7 +28,7 @@ int main() {
     StringStream<char> stream;
 
     Template::Render(content, value, stream);
-    std::cout << stream << '\n';
+    QConsole::Print(stream, '\n');
     /*
         Output:
             Year(2017):
@@ -57,5 +57,5 @@ int main() {
 
     stream.Clear();
     Template::Render(content2, value, stream);
-    std::cout << stream << '\n';
+    QConsole::Print(stream, '\n');
 }

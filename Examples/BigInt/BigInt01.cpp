@@ -1,6 +1,5 @@
 #include "Qentem/BigInt.hpp"
-
-#include <iostream>
+#include "Qentem/QConsole.hpp"
 
 /*
 mkdir Build
@@ -10,6 +9,7 @@ c++ -g ./Examples/BigInt/BigInt01.cpp -I ./Include -o ./Build/QTest.bin
 
 ///////////////////////////////////////
 using Qentem::BigInt;
+using Qentem::QConsole;
 ///////////////////////////////////////
 template <typename BigInt_T>
 static void StreamDigits(char *storage, unsigned int &index, BigInt_T &b_int) {
@@ -31,10 +31,10 @@ static void PrintDigits(BigInt_T b_int) {
 
     while (index != 0) {
         --index;
-        std::cout << storage[index];
+        QConsole::Print(storage[index]);
     }
 
-    std::cout << "\n\n";
+    QConsole::Print("\n\n");
 }
 ///////////////////////////////////////
 int main() {
@@ -115,7 +115,7 @@ int main() {
     PrintDigits(b_int3);
     // Output: 340282366762482138434845932253270245375
 
-    std::cout << "Remaining: " << b_int3.Divide(1000000000U) << '\n';
+    QConsole::Print("Remaining: ", b_int3.Divide(1000000000U), '\n');
     // Output: Remaining: 270245375
 
     PrintDigits(b_int3);

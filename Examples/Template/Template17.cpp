@@ -1,9 +1,9 @@
 #include "Qentem/JSON.hpp"
 #include "Qentem/Template.hpp"
 #include "Qentem/StringView.hpp"
+#include "Qentem/QConsole.hpp"
 
-#include <iostream>
-
+using Qentem::QConsole;
 using Qentem::StringStream;
 using Qentem::StringView;
 
@@ -105,5 +105,5 @@ int main() {
         CachedRender(content, value, stream, template_name);
     }
 
-    std::cout << stream << '\n';
+    QConsole::Print(stream, '\n');
 }

@@ -1,8 +1,8 @@
 #include "Qentem/Template.hpp"
 #include "Qentem/Value.hpp"
+#include "Qentem/QConsole.hpp"
 
-#include <iostream>
-
+using Qentem::QConsole;
 using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
@@ -31,7 +31,7 @@ int main() {
     StringStream<char> stream;
 
     Template::Render(content, value, stream);
-    std::cout << stream << '\n';
+    QConsole::Print(stream, '\n');
     /*
         Output: 1 2 3 4 5 6 7
     */
@@ -43,7 +43,7 @@ int main() {
     stream.Clear();
 
     Template::Render(content2, value, stream);
-    std::cout << stream << '\n';
+    QConsole::Print(stream, '\n');
     /*
         Output: 7 6 5 4 3 2 1
     */

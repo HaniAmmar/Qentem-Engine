@@ -1,9 +1,9 @@
 #include "Qentem/JSON.hpp"
-
-#include <iostream>
+#include "Qentem/QConsole.hpp"
 
 using Value = Qentem::Value<char>;
 using Qentem::JSON;
+using Qentem::QConsole;
 
 /*
 mkdir Build
@@ -29,7 +29,7 @@ int main() {
     // Unpack all the values and merge them into v_arr.
     v_arr.Merge(JSON::Parse(R"([100,200,300])"));
 
-    std::cout << v_arr.Stringify() << '\n';
+    QConsole::Print(v_arr.Stringify(), '\n');
     /* Output:
         [
             "text",
@@ -64,7 +64,7 @@ int main() {
     // Replace any value with the same key, or add it if it does not exist.
     v_obj += JSON::Parse(R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})");
 
-    std::cout << v_obj.Stringify() << '\n';
+    QConsole::Print(v_obj.Stringify(), '\n');
     /* Output:
        {
             "key0": "text",
@@ -104,12 +104,12 @@ int main() {
 
     v_arr.Sort(); // Ascending
 
-    std::cout << v_arr.Stringify() << '\n';
+    QConsole::Print(v_arr.Stringify(), '\n');
     // Output: [1,2,3,4,5,6,7]
 
     v_arr.Sort(false); // Descending
 
-    std::cout << v_arr.Stringify() << '\n';
+    QConsole::Print(v_arr.Stringify(), '\n');
     // Output: [7,6,5,4,3,2,1]
 
     ///////////////////////////////////////////
@@ -129,7 +129,7 @@ int main() {
     Value v_arr2;
     if (v_arr.GroupBy(v_arr2, "year")) {
         v_arr2.Sort();
-        std::cout << v_arr2.Stringify() << '\n';
+        QConsole::Print(v_arr.Stringify(), '\n');
     }
 
     /* Output:

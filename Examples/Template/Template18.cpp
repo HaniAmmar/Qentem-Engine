@@ -1,9 +1,9 @@
 #include "Qentem/Template.hpp"
 #include "Qentem/JSON.hpp"
-
-#include <iostream>
+#include "Qentem/QConsole.hpp"
 
 using Qentem::JSON;
+using Qentem::QConsole;
 using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
@@ -33,7 +33,7 @@ int main() {
     StringStream<char> stream;
 
     Template::Render(content, value, stream);
-    std::cout << stream << '\n';
+    QConsole::Print(stream, '\n');
     /*
         Output: Welcome X to Y. You have <span id="pid">10</span> points. Your points will become 20 next month. Your
                 points will be here when you login to Y every week.
@@ -68,7 +68,7 @@ int main() {
     content = R"(<loop set="list" value="val">{svar:phrase, {var:val[name]}, {var:val[last_seen]}}</loop>)";
 
     Template::Render(content, value, stream);
-    std::cout << '\n' << stream << '\n';
+    QConsole::Print('\n', stream, '\n');
 
     /*
     Output:
