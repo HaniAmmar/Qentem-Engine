@@ -298,12 +298,14 @@ struct CPUHelper {
      * @param content  Pointer to the character buffer containing the range text.
      * @param length   Length of the character buffer.
      *
-     * @return true if the entire input string was parsed successfully and all
-     *         referenced CPUs are valid according to the selected policy,
-     *         false if a syntax error, range error, or invalid CPU id is detected.
+     * @return Number of core parsed from the input string if parsing succeeds
+     *         and all referenced core are valid according to the selected
+     *         policy. Returns 0 if a syntax error, range error, or invalid
+     *         core id is detected.
      */
     template <typename Array_SystemLong_T, typename Char_T, bool Verify_T = true>
-    QENTEM_NOINLINE static bool RangeToArray(Array_SystemLong_T &list, const Char_T *content, SizeT32 length) noexcept {
+    QENTEM_NOINLINE static SizeT32 RangeToArray(Array_SystemLong_T &list, const Char_T *content,
+                                                SizeT32 length) noexcept {
         SystemLong bit;
         SizeT      bit_index;
         SizeT32    number_index;
@@ -312,6 +314,7 @@ struct CPUHelper {
         SizeT32 last_number    = 0;
         SizeT32 current_number = 0;
         SizeT32 index          = 0;
+        SizeT32 core_count     = 0;
         bool    is_range       = false;
 
         auto checkArray = [&](SystemLong id) {
@@ -353,14 +356,15 @@ struct CPUHelper {
 
                             if constexpr (Verify_T) {
                                 if ((info_.OnlineCores.Data()[bit_index] & bit) != bit) {
-                                    return false;
+                                    return 0;
                                 }
                             }
 
+                            ++core_count;
                             list.Storage()[bit_index] |= bit;
                         }
                     } else {
-                        return false;
+                        return 0;
                     }
                 } else if (index < length) {
                     is_range = (content[index] == '-');
@@ -371,10 +375,11 @@ struct CPUHelper {
 
                 if constexpr (Verify_T) {
                     if ((info_.OnlineCores.Data()[bit_index] & bit) != bit) {
-                        return false;
+                        return 0;
                     }
                 }
 
+                ++core_count;
                 list.Storage()[bit_index] |= bit;
 
                 ++index;
@@ -382,10 +387,10 @@ struct CPUHelper {
                 continue;
             }
 
-            return false;
+            return 0;
         }
 
-        return (length != 0);
+        return (length != 0) ? core_count : 0;
     }
 
     /**
