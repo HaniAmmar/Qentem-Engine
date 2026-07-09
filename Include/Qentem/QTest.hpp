@@ -15,8 +15,13 @@
 #ifndef QENTEM_Q_TEST_H
 #define QENTEM_Q_TEST_H
 
+#ifndef QENTEM_DEBUG
 #define QENTEM_DEBUG
+#endif
+
+#ifndef QENTEM_ENABLE_MEMORY_RECORD
 #define QENTEM_ENABLE_MEMORY_RECORD
+#endif
 
 #include "Qentem/QConsole.hpp"
 #include "Qentem/Reserver.hpp"

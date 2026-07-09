@@ -60,7 +60,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8) : "cc", "memory");
 
     return x0;
-#elif defined(__arm__) && defined(__ARM_EABI__)
+#elif defined(__arm__)
     register SystemLongI r7 __asm__("r7") = name;
     register SystemLongI r0 __asm__("r0") = v1;
 
@@ -104,7 +104,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
 
     return x0;
 
-#elif defined(__arm__) && defined(__ARM_EABI__)
+#elif defined(__arm__)
     register SystemLongI r7 __asm__("r7") = name;
     register SystemLongI r0 __asm__("r0") = v1;
     register SystemLongI r1 __asm__("r1") = v2;
@@ -153,7 +153,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2) : "cc", "memory");
 
     return x0;
-#elif defined(__arm__) && defined(__ARM_EABI__)
+#elif defined(__arm__)
     register SystemLongI r7 __asm__("r7") = name;
     register SystemLongI r0 __asm__("r0") = v1;
     register SystemLongI r1 __asm__("r1") = v2;
@@ -207,7 +207,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2), "r"(x3) : "cc", "memory");
 
     return x0;
-#elif defined(__arm__) && defined(__ARM_EABI__)
+#elif defined(__arm__)
     register SystemLongI r7 __asm__("r7") = name;
     register SystemLongI r0 __asm__("r0") = v1;
     register SystemLongI r1 __asm__("r1") = v2;
@@ -265,7 +265,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2), "r"(x3), "r"(x4) : "cc", "memory");
 
     return x0;
-#elif defined(__arm__) && defined(__ARM_EABI__)
+#elif defined(__arm__)
     register SystemLongI r7 __asm__("r7") = name;
     register SystemLongI r0 __asm__("r0") = v1;
     register SystemLongI r1 __asm__("r1") = v2;
@@ -337,7 +337,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(x0) : "r"(x8), "r"(x1), "r"(x2), "r"(x3), "r"(x4), "r"(x5) : "cc", "memory");
 
     return x0;
-#elif defined(__arm__) && defined(__ARM_EABI__)
+#elif defined(__arm__)
     // ARM32 EABI: r7=nr, r0..r5=args -> r0
     register SystemLongI r7 __asm__("r7") = name;
     register SystemLongI r0 __asm__("r0") = v1;
