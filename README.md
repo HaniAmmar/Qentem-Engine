@@ -14,7 +14,7 @@
 -   [Documentation](#documentation)
 -   [Live Testing](#live-testing)
 -   [Template Example](#template-example)
--   [Modules](#modules)
+-   [WebAssembly Module](#webassembly-module)
 -   [JSON Example](#json-example)
 -   [Tests](#tests)
 -   [Deprecation Notice (Windows)](#deprecation-notice-windows)
@@ -182,11 +182,9 @@ int main() {
 
 _Note_: the template does not have to be HTML.
 
-### Modules
+### WebAssembly Module
 
--   JavaScript: [JQen](https://github.com/HaniAmmar/JQen)
--   Python: [PiQen](https://github.com/HaniAmmar/PiQen)
--   PHP: [BQen](https://github.com/HaniAmmar/BQen)
+- [JQen](https://github.com/HaniAmmar/JQen) - Browser-focused WebAssembly template engine built on Qentem Engine.
 
 ## JSON Example
 
