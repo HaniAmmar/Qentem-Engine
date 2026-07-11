@@ -70,7 +70,69 @@ struct MemoryUtils {
             }
         }
     }
+    /////////////////////////////////////////////////////////////////////
+    /**
+     * @brief Securely overwrites a memory region with zeros.
+     *
+     * Writes zero values through a volatile pointer to prevent the compiler from
+     * optimizing away the memory stores. This function is intended for erasing
+     * sensitive information such as cryptographic keys, passwords, nonces, or
+     * other secret material after use.
+     *
+     * Depending on the size of @p Type_T, the implementation performs the erase
+     * using 64-bit, 32-bit, or 8-bit volatile stores to reduce the number of
+     * memory operations while preserving the erase semantics.
+     *
+     * @warning The memory region must be valid for writing and suitably aligned
+     *          for the selected store width.
+     *
+     * @tparam Type_T   Element type of the memory region.
+     * @tparam Number_T Integer type used for the element count.
+     *
+     * @param ptr  Pointer to the first element to erase.
+     * @param size Number of elements of type @p Type_T to erase.
+     */
+    template <typename Type_T, typename Number_T>
+    QENTEM_NOINLINE static void SecureErase(Type_T *ptr, Number_T size) noexcept {
+        constexpr Number_T type_size = sizeof(Type_T);
+        constexpr SizeT32  shift64   = 3U;
+        constexpr SizeT32  shift32   = 2U;
+        constexpr bool     is_mul8   = (type_size == ((type_size >> shift64) << shift64));
+        constexpr bool     is_mul4   = (type_size == ((type_size >> shift32) << shift32));
 
+        if constexpr (QentemConfig::Is64bit && is_mul8) {
+            Number_T          offset = 0;
+            volatile SizeT64 *des64  = reinterpret_cast<volatile SizeT64 *>(ptr);
+
+            size *= (type_size >> shift64);
+
+            while (offset < size) {
+                des64[offset] = SizeT64{0};
+                ++offset;
+            }
+        } else if constexpr (is_mul4) {
+            Number_T          offset = 0;
+            volatile SizeT32 *des32  = reinterpret_cast<volatile SizeT32 *>(ptr);
+
+            size *= (type_size >> shift32);
+
+            while (offset < size) {
+                des32[offset] = SizeT32{0};
+                ++offset;
+            }
+        } else {
+            Number_T         offset = 0;
+            volatile SizeT8 *des8   = reinterpret_cast<volatile SizeT8 *>(ptr);
+
+            size *= type_size;
+
+            while (offset < size) {
+                des8[offset] = SizeT8{0};
+                ++offset;
+            }
+        }
+    }
+    /////////////////////////////////////////////////////////////////////
     // size = the number of bytes
     // template <typename Number_T>
     // QENTEM_INLINE static void SetToZero(void *pointer, Number_T size) noexcept {
@@ -101,7 +163,7 @@ struct MemoryUtils {
     //         ++offset;
     //     }
     // }
-
+    /////////////////////////////////////////////////////////////////////
     template <typename Type_T, typename Value_T>
     QENTEM_INLINE static void SetToValue(Type_T *src, Value_T value, SizeT size) noexcept {
         SizeT offset = 0;
@@ -111,7 +173,7 @@ struct MemoryUtils {
             ++offset;
         }
     }
-
+    /////////////////////////////////////////////////////////////////////
     // size = the number of bytes
     // template <typename Number_T>
     // QENTEM_INLINE static void Copy(void *to, const void *from, Number_T size) noexcept {
