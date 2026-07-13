@@ -1209,12 +1209,15 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
  * @brief Double-width arithmetic for 64-bit limbs (128-bit intermediate math).
  *
  * This specialization is used by BigInt for division and multiplication when each limb
- * is 64 bits wide (e.g., `uint64_t`). It implements core algorithms for dividing and multiplying
- * a pair of 64-bit limbs as if they were a 128-bit value, allowing full-precision
- * multi-limb operations on hardware that does not provide native 128-bit types.
+ * is 64 bits wide (e.g., `uint64_t`). It implements core arithmetic operations on a
+ * two-limb value, allowing full-precision multi-limb math on platforms that do not
+ * provide native 128-bit arithmetic.
  *
- * The division algorithm is based on Knuth's Algorithm D, adapted for platforms lacking
- * intrinsic 128-bit division, and carefully handles carries, overflows, and normalization.
+ * The division implementation uses divisor normalization, quotient estimation,
+ * and correction techniques to perform 128-bit by 64-bit division using only
+ * native-width operations. The multiplication implementation computes the full
+ * 128-bit product by splitting operands into half-width components and combining
+ * the partial results.
  *
  * @tparam Number_T The unsigned integer type for one limb (must be 64 bits wide).
  */
@@ -1226,46 +1229,47 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      * Given dividend_high:dividend_low (forming a 128-bit integer), divides by @p divisor,
      * updating dividend_low with the quotient and dividend_high with the remainder.
      *
-     * This function is critical for algorithms such as long division, Barrett reduction,
-     * or modular exponentiation where 128-bit division is needed but only 64-bit types are available.
+     * This function is used by BigInt long-division routines when a double-width dividend
+     * must be divided using only native-width arithmetic.
      *
-     * @param[in,out] dividend_high The high 64 bits (will be replaced with the new high/remainder).
-     * @param[in,out] dividend_low  The low 64 bits (will be replaced with the new low/quotient).
-     * @param divisor  The 64-bit divisor.
-     * @param initial_shift The normalization shift required so that divisor's high bit is set.
+     * @param[in,out] dividend_high The upper half of the dividend and resulting remainder.
+     * @param[in,out] dividend_low  The lower half of the dividend and resulting quotient.
+     * @param divisor The divisor.
+     * @param initial_shift Normalization shift used to align the divisor's highest set bit.
      *
-     * Algorithm steps:
-     *   1. Normalize the divisor and dividend to ensure the highest bit of the divisor is set.
-     *   2. Compute the quotient and correct for possible overestimation.
-     *   3. Repeat for two quotient digits (since we are doing 128 / 64 division).
-     *   4. Unnormalize the remainder.
-     *   5. Handle carries and overflows.
+     * Algorithm overview:
+     *   1. Normalize the divisor and dividend.
+     *   2. Estimate and correct quotient digits.
+     *   3. Accumulate the quotient into the lower half.
+     *   4. Restore the remainder to its original scale.
+     *   5. Handle carry and overflow corrections.
      */
     static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                        const SizeT32 initial_shift) noexcept {
-        // Step 1: Save the remainder that results from dividing the low part
+        // Preserve the remainder from the initial low-limb division.
         const Number_T carry = (dividend_low % divisor);
         dividend_low /= divisor;
 
-        // Step 2: Normalize the divisor so its highest bit is set
+        // Normalize the divisor so its highest bit is set.
         const Number_T divisor_shifted = (divisor << initial_shift);
 
-        // Step 3: Split divisor into high and low halves for two-quotient computation
-        const Number_T divisor_low  = (divisor_shifted >> shift_); // Lower half of normalized divisor
-        const Number_T divisor_high = (divisor_shifted & mask_);   // Higher half of normalized divisor
+        // Split the normalized divisor into most- and least-significant halves.
+        const Number_T divisor_low  = (divisor_shifted >> shift_); // Most significant half
+        const Number_T divisor_high = (divisor_shifted & mask_);   // Least significant half
 
-        // Step 4: Normalize dividend high part
+        // Normalize the upper dividend limb.
         dividend_high <<= initial_shift;
 
-        // Step 5: Compute first quotient digit (high half of 128 bits divided by low half of divisor)
+        // Estimate the first quotient digit using the most-significant half
+        // of the normalized divisor.
         Number_T quotient = (dividend_high / divisor_low);
         dividend_high %= divisor_low;
         Number_T remainder = (quotient * divisor_high);
 
-        // Step 6: Shift for next digit
         dividend_high <<= shift_;
 
-        // Step 7: Adjust quotient if overestimated (Knuth's correction step)
+        // Quotient-correction step inspired by techniques used in
+        // multi-precision division algorithms.
         if (dividend_high < remainder) {
             --quotient;
 
@@ -1279,18 +1283,18 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
 
         dividend_high -= remainder;
 
-        // Step 8: Accumulate quotient in low part (move to lower 64 bits)
+        // Store the first quotient digit.
         quotient <<= shift_;
         dividend_low += quotient;
 
-        // Step 9: Repeat process for next digit (low half of the normalized dividend)
+        // Estimate the second quotient digit.
         quotient = (dividend_high / divisor_low);
         dividend_high %= divisor_low;
         remainder = (quotient * divisor_high);
 
         dividend_high <<= shift_;
 
-        // Step 10: Correction step for the new digit
+        // Correct an overestimated quotient digit.
         if (dividend_high < remainder) {
             --quotient;
 
@@ -1304,26 +1308,26 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
 
         dividend_high -= remainder;
 
-        // Step 11: Accumulate quotient
+        // Store the second quotient digit.
         dividend_low += quotient;
 
-        // Step 12: Unnormalize remainder
+        // Restore the remainder to its original scale.
         dividend_high >>= initial_shift;
 
-        // Step 13: Add back carry from original division
+        // Reintegrate the remainder from the initial low-limb division.
         const Number_T original_dividend_high = dividend_high;
         dividend_high += carry;
 
-        // Step 14: If adding carry overflowed, correct the overflow in both parts
+        // If adding the carried remainder overflows, adjust both the
+        // remainder and quotient accordingly.
         if (original_dividend_high > dividend_high) {
-            // Overflow: need to increment quotient
             constexpr Number_T overflow_dividend = (Number_T{1} << (width_ - 1U));
 
             dividend_high += ((overflow_dividend % (divisor >> 1U)) << 1U);
             ++dividend_low;
         }
 
-        // Step 15: If dividend_high >= divisor, reduce and increment low
+        // Final correction if the remainder is still larger than the divisor.
         if (dividend_high >= divisor) {
             dividend_high -= divisor;
             ++dividend_low;
@@ -1331,22 +1335,18 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
     }
 
     /**
-     * @brief Performs 128-bit multiplication (two 64-bit limbs).
+     * @brief Performs 128-bit multiplication using two 64-bit operands.
      *
-     * Multiplies @p number by @p multiplier, updating @p number with the lower 64 bits
-     * and returning the upper 64 bits as the carry/overflow.
+     * Multiplies @p number by @p multiplier, storing the lower 64 bits of the
+     * result in @p number and returning the upper 64 bits.
      *
-     * Splits both operands into high/low 32-bit halves to prevent overflow and
-     * assembles the result in two steps.
+     * The operands are split into half-width components and multiplied as partial
+     * products. The partial results are then combined to reconstruct the full
+     * 128-bit product using only native-width arithmetic.
      *
-     * @param[in,out] number The left operand (will hold the low result).
+     * @param[in,out] number The left operand. Replaced with the lower 64 bits of the result.
      * @param multiplier The right operand.
-     * @return The high 64 bits of the result.
-     *
-     * Steps:
-     *   1. Multiply lower halves and set the low part.
-     *   2. Accumulate all cross-products in the correct positions.
-     *   3. Return the high part as the carry.
+     * @return The upper 64 bits of the result.
      */
     static Number_T Multiply(Number_T &number, Number_T multiplier) noexcept {
         // Split operands into low and high 32-bit parts
