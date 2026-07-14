@@ -716,22 +716,22 @@ struct BigInt {
     }
 
     /**
-     * @brief Finds the index of the first set bit (least significant) in this BigInt.
-     * @return The bit position of the first set bit (starting from 0), or the last bit if all are zero.
+     * @brief Finds the index of the least significant set bit.
+     * @return The bit position of the least significant set bit (starting from 0).
      *
-     * Scans from the lowest limb upwards and returns the bit index of the first non-zero bit.
+     * @note This function requires the value to be non-zero.
      */
     QENTEM_INLINE SizeT32 FindFirstBit() const noexcept {
         SizeT32 index = 0;
 
         // Skip zero limbs from the least significant end
-        while ((storage_[index] == 0) && (index <= index_)) {
+        while ((storage_[index] == 0) && (index < index_)) {
             ++index;
         }
 
-        // Use platform-specific method to find bit in the first non-zero limb
-        // Bit index is (limb index * bits per limb) + offset within limb
-        return (Platform::FindFirstBit(storage_[index_]) + (index * BitWidth()));
+        // Use a platform-specific method to find the least significant set bit
+        // within the first non-zero limb
+        return (Platform::FindFirstBit(storage_[index]) + (index * BitWidth()));
     }
 
     /**

@@ -423,6 +423,14 @@ static void TestBigInt3(QTest &test) {
     b_int_1 >>= 64U;
     b_int_1 &= 65535ULL;
     test.IsEqual(SizeT64{s_64[0]}, SizeT64{65534ULL}, __LINE__);
+
+    b_int_1 = 18446744073709551615ULL;
+    b_int_1 <<= 64U;
+    test.IsEqual(b_int_1.FindFirstBit(), SizeT32{64}, __LINE__);
+
+    b_int_1 = 9223372036854775808ULL;
+    b_int_1 <<= 64U;
+    test.IsEqual(b_int_1.FindFirstBit(), SizeT32{127}, __LINE__);
 }
 
 static void TestBigInt4(QTest &test) {
