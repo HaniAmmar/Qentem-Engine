@@ -556,6 +556,73 @@ struct BigInt {
     }
 
     /**
+     * @brief Multiplies this BigInt by another BigInt.
+     * @param bint The multiplier.
+     * @return A DoubleBigInt containing the full multiplication result.
+     *
+     * Performs long multiplication using the smaller operand as the outer loop
+     * to reduce the number of iterations. Each limb of the smaller operand is
+     * multiplied by all limbs of the larger operand, and the partial products
+     * are accumulated into the result at the appropriate limb offsets.
+     *
+     * The returned DoubleBigInt preserves the complete product without
+     * truncation.
+     */
+    DoubleBigInt Multiply(const BigInt &bint) const noexcept {
+        DoubleBigInt d_bint{0};
+
+        const Number_T *storage_a;
+        const Number_T *storage_b;
+        SizeT32         max_index_a;
+        SizeT32         max_index_b;
+
+        // Select the larger operand for the inner loop and the smaller
+        // operand for the outer loop.
+        if (Index() >= bint.Index()) {
+            storage_a   = Storage();
+            max_index_a = Index();
+
+            storage_b   = bint.Storage();
+            max_index_b = bint.Index();
+        } else {
+            storage_a   = bint.Storage();
+            max_index_a = bint.Index();
+
+            storage_b   = Storage();
+            max_index_b = Index();
+        }
+
+        SizeT32 index2 = max_index_b;
+        SizeT32 offset = max_index_b;
+        ++index2;
+
+        // Multiply each limb of the smaller operand by the larger operand
+        // and accumulate the partial products into the result at the
+        // appropriate limb offsets.
+        do {
+            SizeT32 index1 = max_index_a;
+            ++index1;
+            --index2;
+
+            do {
+                const SizeT32 current_index = index1;
+                --index1;
+
+                Number_T number = storage_a[index1];
+
+                const Number_T carry = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number, storage_b[index2]);
+
+                d_bint.Add(number, (index1 + offset));
+                d_bint.Add(carry, (current_index + offset));
+            } while (index1 != 0);
+
+            --offset;
+        } while (index2 != 0);
+
+        return d_bint;
+    }
+
+    /**
      * @brief Divides this BigInt by a built-in integer value (in place).
      * @param divisor The value to divide by.
      * @return The remainder of the division.
