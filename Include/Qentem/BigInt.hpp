@@ -83,9 +83,10 @@ struct DoubleWidthArithmetic {};
  *     // 256-bit unsigned integer using 64-bit limbs:
  *     BigInt<uint64_t, 256U> val;
  */
-template <typename Number_T, SizeT32 Width_T>
+template <typename Number_T, SizeT32 Width_T, SizeT32 WidthMultiplier_T = 1U>
 struct BigInt {
-    using NumberType = Number_T;
+    using NumberType   = Number_T;
+    using DoubleBigInt = BigInt<Number_T, Width_T, 2U>;
 
     /**
      * @brief Internal operations used by BigInt for template-based arithmetic.
@@ -457,12 +458,12 @@ struct BigInt {
      */
     void Add(Number_T number, SizeT32 index = 0) noexcept {
         if ((number != 0) && (index <= MaxIndex())) {
-            SizeT32 offset = index_;
+            // SizeT32 offset = index_;
 
-            while (offset < index) {
-                ++offset;
-                storage_[offset] = 0;
-            }
+            // while (offset < index) {
+            //     ++offset;
+            //     storage_[offset] = 0;
+            // }
 
             // Propagate the addition and any carry across limbs
             do {
@@ -540,15 +541,17 @@ struct BigInt {
      * Each limb is multiplied by the multiplier, and any overflow is
      * propagated and added to the next higher limb.
      */
-    QENTEM_INLINE void Multiply(Number_T multiplier) noexcept {
+    void Multiply(Number_T multiplier) noexcept {
         // Start from the highest limb and propagate carries to higher limbs.
         SizeT32 index = index_;
         ++index;
 
         do {
+            const SizeT32 current_index = index;
             --index;
             // Multiply the current limb; Add() will handle carry propagation.
-            Add(DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(storage_[index], multiplier), (index + 1U));
+            // if (storage_[index] != 0)
+            Add(DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(storage_[index], multiplier), current_index);
         } while (index != 0);
     }
 
@@ -819,9 +822,10 @@ struct BigInt {
     QENTEM_INLINE static constexpr SizeT32 TotalBitWidth() noexcept {
         // If Width_T is a multiple of BitWidth(), just return Width_T.
         // Otherwise, add another limb to cover the excess bits.
-        return (((BitWidth() * (Width_T / BitWidth())) == Width_T)
-                    ? Width_T
-                    : ((BitWidth() * (Width_T / BitWidth())) + BitWidth()));
+        return ((((BitWidth() * (Width_T / BitWidth())) == Width_T)
+                     ? Width_T
+                     : ((BitWidth() * (Width_T / BitWidth())) + BitWidth())) *
+                WidthMultiplier_T);
 
         // Note: In C++, (X / Y) * Y may not equal X due to integer division truncation.
     }
@@ -884,7 +888,7 @@ struct BigInt {
         return storage_;
     }
 
-  private:
+  protected:
     /**
      * @brief Copies the value from another BigInt.
      * @param src The source BigInt to copy from.
@@ -1065,7 +1069,7 @@ struct BigInt {
      * Each element represents a fixed-width chunk ("limb") of the overall value.
      * Size is determined by MaxIndex() + 1 to cover all requested bits.
      */
-    Number_T storage_[MaxIndex() + Number_T{1}]{};
+    Number_T storage_[MaxIndex() + Number_T{1}]{0};
 
     /**
      * @brief Highest non-zero limb index currently used.
