@@ -1,49 +1,56 @@
 /**
  * @file BigInt.hpp
- * @brief High-performance arbitrary-precision integer arithmetic for Qentem Engine.
+ * @brief Arbitrary-precision unsigned integer arithmetic for Qentem Engine.
  *
- * This header defines the BigInt class template, providing efficient, portable support
- * for unsigned integers of virtually unlimited size. Designed for speed and reliability,
- * BigInt leverages advanced double-width arithmetic algorithms for multi-limb operations—
- * outperforming even compiler-provided 128-bit types on most platforms.
+ * This header provides the BigInt class template, a portable arbitrary-precision
+ * integer implementation for applications that require integer values larger than
+ * the native machine word size.
+ *
+ * BigInt uses a limb-based representation and implements the core arithmetic
+ * operations required for high-precision computation, including addition,
+ * subtraction, multiplication, division, shifting, comparison, and bitwise
+ * manipulation.
  *
  * Typical Use Cases:
  * - Accurate floating-point to string conversion
- * - Cryptography (RSA, Diffie-Hellman, ElGamal, elliptic curve field arithmetic)
- * - Modular exponentiation and modular inversion
- * - Barrett and Montgomery reduction for fast modular arithmetic
- * - Primality testing (Miller-Rabin, Fermat, etc.)
  * - Arbitrary-precision number theory and mathematics
- * - Scientific computation (very large integers or extended-precision math)
- * - Implementing custom numeric types (rational, big decimal, etc.)
- * - Parsing and encoding large binary fields (protocols, file formats, blockchain)
- * - Checksum and hashing algorithms with bignum state
- * - Simulation and symbolic computation
+ * - Cryptographic and finite-field arithmetic
+ * - Modular exponentiation and modular inversion
+ * - Barrett and Montgomery reduction
+ * - Primality testing (Miller-Rabin, Fermat, etc.)
+ * - Rational, fixed-point, and decimal numeric types
+ * - Parsing and encoding large numeric values
+ * - Protocols and file formats containing large integer fields
+ * - Custom arbitrary-precision arithmetic algorithms
+ * - Scientific, engineering, and symbolic computation
  *
  * Key Features:
- * - Optimized for modern C++: No external dependencies, header-only, and portable.
- * - Limb-based design: Uses any unsigned integer type for limbs (e.g., uint16_t, uint32_t, uint64_t).
- * - Superior performance: Includes hand-crafted double-limb multiplication and division,
- *   outpacing `__int128`-based approaches on major compilers (GCC, Clang, MSVC).
- * - Production-grade reliability: Clear separation of algorithms for add, subtract,
- *   multiply, divide, and bitwise operations—fully documented and tested.
+ * - Header-only and portable implementation
+ * - Configurable unsigned limb type (e.g. uint16_t, uint32_t, uint64_t)
+ * - Double-width multiplication and division algorithms
+ * - Deterministic arithmetic behavior across supported platforms
+ * - Suitable as a foundation for arbitrary-precision and number-theoretic algorithms
+ *
+ * @tparam Number_T Unsigned integer type used as the storage limb.
+ * @tparam Bits     Maximum number of bits available for the integer value.
  *
  * @author Hani Ammar
  * @date 2026
  * @copyright MIT License
  *
- * @note This implementation is tuned for unsigned integer limbs. Signed bignum support,
- *       if needed, can be layered on top.
- * @note For best performance, prefer 32- or 64-bit limbs on modern hardware.
+ * @note This implementation operates on unsigned integer limbs. Signed integer
+ *       support can be implemented as a higher-level abstraction.
+ * @note For best performance on modern systems, 32-bit or 64-bit limb types are
+ *       generally recommended.
  *
  * @usage
  *     #include "Qentem/BigInt.hpp"
  *     using Qentem::BigInt;
  *
- *     // 128-bit unsigned integer using 64-bit limbs:
- *     BigInt<unsigned long long, 128U> value = 0xFFFFFFFFFFFFFFFF;
+ *     // 128-bit unsigned integer using 64-bit limbs.
+ *     BigInt<unsigned long long, 128U> value = 0xFFFFFFFFFFFFFFFFULL;
  *     value <<= 64U;
- *     value |= 0xFFFFFFFFFFFFFFFF;
+ *     value |= 0xFFFFFFFFFFFFFFFFULL;
  */
 
 #ifndef QENTEM_BIG_INT_H
@@ -103,11 +110,11 @@ struct BigInt {
 
     /**
      * @brief Move constructor.
-     * @param src Source BigInt to move from. The source is cleared after move.
+     * @param src Source BigInt. Its contents are cleared after construction.
      */
     QENTEM_INLINE BigInt(BigInt &&src) noexcept : index_{src.index_} {
         SizeT32 index = 0;
-        // Move all limbs from src to this BigInt
+        // Copy all active limbs from src to this BigInt
         while (index <= index_) {
             storage_[index] = src.storage_[index];
             ++index;
@@ -570,7 +577,7 @@ struct BigInt {
         }
 
         // Update the number of used limbs if highest limb is now zero
-        index_ -= SizeT32((index_ != 0) && (storage_[index_] == 0));
+        index_ -= static_cast<SizeT32>((index_ != 0) && (storage_[index_] == 0));
 
         // Return the final remainder
         return remainder;
@@ -693,12 +700,10 @@ struct BigInt {
             storage_[index] <<= offset;
 
             // If carry bits spilled over, extend limb count and add carry
-            if (index_ != MaxIndex()) {
-                if (carry != 0) {
-                    ++index_;
-                    storage_[index_] = 0;
-                    storage_[index_] |= carry;
-                }
+            if (index_ != MaxIndex() && (carry != 0)) {
+                ++index_;
+                storage_[index_] = 0;
+                storage_[index_] |= carry;
             }
 
             // For each lower limb, propagate bits from the lower limb up
@@ -794,7 +799,7 @@ struct BigInt {
 
     /**
      * @brief Returns the total bit width of this BigInt.
-     * @return Total number of bits represented.
+     * @return Storage capacity in bits, rounded up to a full limb.
      *
      * If Width_T is not an exact multiple of BitWidth(), rounds up to the next full limb.
      */
@@ -1246,6 +1251,8 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      */
     static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                        const SizeT32 initial_shift) noexcept {
+        constexpr Number_T OVERFLOW_DIVIDEND = (Number_T{1} << (width_ - 1U));
+
         // Preserve the remainder from the initial low-limb division.
         const Number_T carry = (dividend_low % divisor);
         dividend_low /= divisor;
@@ -1268,8 +1275,7 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
 
         dividend_high <<= shift_;
 
-        // Quotient-correction step inspired by techniques used in
-        // multi-precision division algorithms.
+        // Correct an overestimated quotient digit.
         if (dividend_high < remainder) {
             --quotient;
 
@@ -1280,6 +1286,14 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
 
             remainder -= divisor_shifted;
         }
+
+        // Number_T tmp = static_cast<Number_T>(dividend_high < remainder);
+        // quotient -= tmp;
+
+        // Number_T tmp2 = (static_cast<Number_T>((remainder - dividend_high) > divisor_shifted) & tmp);
+        // quotient -= tmp2;
+        // remainder -= (divisor_shifted & (static_cast<Number_T>(0) - tmp2));
+        // remainder -= (divisor_shifted & (static_cast<Number_T>(0) - tmp));
 
         dividend_high -= remainder;
 
@@ -1306,6 +1320,14 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
             remainder -= divisor_shifted;
         }
 
+        // tmp = static_cast<Number_T>(dividend_high < remainder);
+        // quotient -= tmp;
+
+        // tmp2 = (static_cast<Number_T>((remainder - dividend_high) > divisor_shifted) & tmp);
+        // quotient -= tmp2;
+        // remainder -= (divisor_shifted & (static_cast<Number_T>(0) - tmp2));
+        // remainder -= (divisor_shifted & (static_cast<Number_T>(0) - tmp));
+
         dividend_high -= remainder;
 
         // Store the second quotient digit.
@@ -1321,17 +1343,24 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
         // If adding the carried remainder overflows, adjust both the
         // remainder and quotient accordingly.
         if (original_dividend_high > dividend_high) {
-            constexpr Number_T overflow_dividend = (Number_T{1} << (width_ - 1U));
-
-            dividend_high += ((overflow_dividend % (divisor >> 1U)) << 1U);
+            dividend_high += ((OVERFLOW_DIVIDEND % (divisor >> 1U)) << 1U);
             ++dividend_low;
         }
+
+        // tmp = static_cast<Number_T>(original_dividend_high > dividend_high);
+
+        // dividend_high += (((OVERFLOW_DIVIDEND % (divisor >> 1U)) << 1U) & (static_cast<Number_T>(0) - tmp));
+        // dividend_low += tmp;
 
         // Final correction if the remainder is still larger than the divisor.
         if (dividend_high >= divisor) {
             dividend_high -= divisor;
             ++dividend_low;
         }
+
+        // tmp = static_cast<Number_T>(dividend_high >= divisor);
+        // dividend_high -= (divisor & (static_cast<Number_T>(0) - tmp));
+        // dividend_low += tmp;
     }
 
     /**

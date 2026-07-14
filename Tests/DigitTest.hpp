@@ -38,7 +38,7 @@
 namespace Qentem {
 namespace Test {
 
-static SizeT64 HexStringToNumber(const char *str) noexcept {
+QENTEM_NOINLINE static SizeT64 HexStringToNumber(const char *str) noexcept {
     return Digit::HexStringToNumber<SizeT64>(str, Qentem::StringUtils::Count(str));
 }
 
@@ -3132,7 +3132,9 @@ static void TestDoubleToString4(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 9.99999995, 7U, "10", __LINE__);
     RealToStreamEqual(test, stream, 99.9999995, 8U, "100", __LINE__);
     RealToStreamEqual(test, stream, 9999999.5, 8U, "9999999.5", __LINE__);
+}
 
+static void TestDoubleToString5(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 1.23456789e300, 7U, "1.234568e+300", __LINE__);
     RealToStreamEqual(test, stream, 1.23456789e300, 8U, "1.2345679e+300", __LINE__);
 
@@ -3229,7 +3231,7 @@ static void TestDoubleToString4(QTest &test, StringStream<char> &stream) {
                       "340282366920938463463374607431768211456", __LINE__);
 }
 
-static void TestDoubleToString5(QTest &test, StringStream<char> &stream) {
+static void TestDoubleToString6(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -0.0, 15U, "-0", __LINE__);
     RealToStreamEqual(test, stream, 0.0, 15U, "0", __LINE__);
 
@@ -3387,7 +3389,7 @@ static void TestDoubleToString5(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 0.9000000000000006, 15U, "0.900000000000001", __LINE__);
 }
 
-static void TestDoubleToString6(QTest &test, StringStream<char> &stream) {
+static void TestDoubleToString7(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 9.999999999999999, 15U, "10", __LINE__);
     RealToStreamEqual(test, stream, 1999999.0, 15U, "1999999", __LINE__);
     RealToStreamEqual(test, stream, 9999999999999999.0, 15U, "1e+16", __LINE__);
@@ -3546,7 +3548,7 @@ static void TestDoubleToString6(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 0.9765625, 15U, "0.9765625", __LINE__);
 }
 
-static void TestDoubleToString7(QTest &test, StringStream<char> &stream) {
+static void TestDoubleToString8(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 2.165625, 15U, "2.165625", __LINE__);
     RealToStreamEqual(test, stream, 2.265625, 15U, "2.265625", __LINE__);
     RealToStreamEqual(test, stream, 2.365625, 15U, "2.365625", __LINE__);
@@ -3709,7 +3711,7 @@ static void TestDoubleToString7(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 8.005, 15U, "8.005", __LINE__);
 }
 
-static void TestDoubleToString8(QTest &test, StringStream<char> &stream) {
+static void TestDoubleToString9(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, -1.0, 6U, "-1", __LINE__);
 
     RealToStreamEqual(test, stream, 70.0, 6U, "70", __LINE__);
@@ -5366,6 +5368,7 @@ static int RunDigitTests() {
     test.Test("DoubleToString Test 6", TestDoubleToString6, false, stream);
     test.Test("DoubleToString Test 7", TestDoubleToString7, false, stream);
     test.Test("DoubleToString Test 8", TestDoubleToString8, false, stream);
+    test.Test("DoubleToString Test 9", TestDoubleToString9, false, stream);
 
     test.Test("DoubleToStringSemiFixed Test 3", TestDoubleToStringSemiFixed, false, stream);
     test.Test("DoubleToStringFixed Test 3", TestDoubleToStringFixed, false, stream);

@@ -5751,8 +5751,8 @@ static int RunEvaluateTests() {
     test.Test("Evaluate Test 17", TestEvaluate17);
     test.Test("Evaluate Test 18", TestEvaluate18);
     test.Test("Evaluate Test 19", TestEvaluate19);
-    test.Test("Evaluate Test 19", TestEvaluate20);
-    test.Test("Evaluate Test 19", TestEvaluate21);
+    test.Test("Evaluate Test 20", TestEvaluate20);
+    test.Test("Evaluate Test 21", TestEvaluate21);
 
     return test.EndTests();
 }
