@@ -745,6 +745,19 @@ struct BigInt {
         return (Platform::FindLastBit(storage_[index_]) + SizeT32(index_ * BitWidth()));
     }
 
+    /**
+     * @brief Normalizes the BigInt by updating the highest active limb index.
+     *
+     * Removes leading zero limbs from the most significant end and ensures
+     * index_ points to the highest non-zero limb. A zero value is represented
+     * with index_ equal to 0.
+     */
+    QENTEM_INLINE void Normalize() noexcept {
+        while ((storage_[index_] == 0) && (index_ > 0)) {
+            --index_;
+        }
+    }
+
     ////////////////////////////////////////////////////
     /**
      * @brief Returns the value of the least significant limb as a built-in integer.

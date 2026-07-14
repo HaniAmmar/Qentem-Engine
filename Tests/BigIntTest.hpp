@@ -1042,6 +1042,25 @@ static void TestBigInt8(QTest &test) {
         __LINE__);
 }
 
+static void TestBigInt9(QTest &test) {
+    BigInt_64_1024 b_int;
+
+    b_int.SetIndex(b_int.MaxIndex());
+    test.IsEqual(b_int.Index(), SizeT64{15}, __LINE__);
+
+    b_int.Normalize();
+    test.IsEqual(b_int.Index(), SizeT64{0}, __LINE__);
+
+    b_int = 0xFFFFFFFFFFFFFFFF;
+    b_int <<= 64U;
+    b_int |= 0xFFFFFFFFFFFFFFFF;
+    b_int <<= 64U;
+
+    b_int.SetIndex(b_int.MaxIndex());
+    b_int.Normalize();
+    test.IsEqual(b_int.Index(), SizeT64{2}, __LINE__);
+}
+
 static int RunBigIntTests() {
     QTest test{"BigInt.hpp", __FILE__};
 
@@ -1055,6 +1074,7 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 6", TestBigInt6);
     test.Test("BigInt Test 7", TestBigInt7);
     test.Test("BigInt Test 8", TestBigInt8);
+    test.Test("BigInt Test 9", TestBigInt9);
 
     return test.EndTests();
 }
