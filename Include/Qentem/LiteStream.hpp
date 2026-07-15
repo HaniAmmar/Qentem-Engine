@@ -199,9 +199,9 @@ struct LiteStream {
         capacity_ = capacity;
     }
 
-    char   *storage_;
-    SizeT32 capacity_;
-    SizeT32 length_;
+    char   *storage_{nullptr};
+    SizeT32 capacity_{0};
+    SizeT32 length_{0};
 };
 
 } // namespace Qentem
