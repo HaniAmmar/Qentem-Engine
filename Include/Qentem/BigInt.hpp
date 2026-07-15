@@ -474,37 +474,31 @@ struct BigInt {
      * Updates the internal limb count if necessary.
      */
     void Add(Number_T number, SizeT32 index = 0) noexcept {
-        if ((number != 0) && (index <= MaxIndex())) {
-            // SizeT32 offset = index_;
+        // Propagate the addition and any carry across limbs
+        do {
+            const Number_T tmp = storage_[index];
+            storage_[index] += number;
 
-            // while (offset < index) {
-            //     ++offset;
-            //     storage_[offset] = 0;
-            // }
+            // If no overflow occurred, addition is complete
+            if (storage_[index] >= tmp) {
+                break;
+            }
 
-            // Propagate the addition and any carry across limbs
-            do {
-                const Number_T tmp = storage_[index];
-                storage_[index] += number;
+            ++index;
 
-                // If no overflow occurred, addition is complete
-                if (storage_[index] > tmp) {
-                    break;
-                }
-
-                // Overflow occurred: set number to 1 to propagate carry
-                number = Number_T{1};
-                ++index;
-            } while (index <= MaxIndex());
-
-            // If we overflowed past the last limb, reset index_
             if (index > MaxIndex()) {
                 index_ = 0;
+                index  = 0;
+                break;
             }
-            // Otherwise, update the highest used limb index if necessary
-            else if (index > index_) {
-                index_ = index;
-            }
+
+            // Overflow occurred: set number to 1 to propagate carry
+            number = Number_T{1};
+        } while (true);
+
+        // update the highest used limb index if necessary
+        if ((index > index_) && (number != 0)) {
+            index_ = index;
         }
     }
 
@@ -518,35 +512,37 @@ struct BigInt {
      * Updates the internal limb count if higher limbs become zero.
      */
     void Subtract(Number_T number, SizeT32 index = 0) noexcept {
-        if (number != 0) {
-            // Propagate the subtraction and any borrow across limbs
-            while (index <= MaxIndex()) {
-                const Number_T tmp = storage_[index];
-                storage_[index] -= number;
+        // Propagate the subtraction and any borrow across limbs
+        do {
+            const Number_T tmp = storage_[index];
+            storage_[index] -= number;
 
-                // If no underflow occurred, subtraction is complete
-                if (storage_[index] < tmp) {
-                    break;
-                }
-
-                // Underflow occurred: set number to 1 to propagate borrow
-                number = Number_T{1};
-                ++index;
-
-                if ((index > index_) && (index <= MaxIndex())) {
-                    storage_[index] = 0;
-                }
+            // If no underflow occurred, subtraction is complete
+            if (storage_[index] <= tmp) {
+                break;
             }
 
-            // If borrow exceeded highest limb, set index_ to the max index
-            if (index > MaxIndex()) {
+            if (index == MaxIndex()) {
                 index_ = MaxIndex();
+                break;
             }
-            // Otherwise, trim trailing zero limbs if any
-            else if (index >= index_) {
-                while ((index_ != 0) && (storage_[index_] == 0)) {
-                    --index_;
-                }
+
+            ++index;
+
+            if (index > index_) {
+                storage_[index] = 0;
+            }
+
+            // Underflow occurred: set number to 1 to propagate borrow
+            number = Number_T{1};
+        } while (true);
+
+        // If borrow exceeded highest limb, set index_ to the max index
+
+        // Otherwise, trim trailing zero limbs if any
+        if (index >= index_) {
+            while ((index_ != 0) && (storage_[index_] == 0)) {
+                --index_;
             }
         }
     }
