@@ -74,6 +74,24 @@ namespace Qentem {
 template <typename Number_T, SizeT32>
 struct DoubleWidthArithmetic {};
 
+template <typename, SizeT32, SizeT32>
+struct BigInt;
+
+/**
+ * @brief BigInt type with sufficient storage for full-width results.
+ *
+ * Defined like BigInt:
+ *
+ *     BigInt<Type, BitWidth>
+ *     DoubleBigInt<Type, BitWidth>
+ *
+ * DoubleBigInt uses the same template arguments as BigInt while providing
+ * enough storage to hold the complete result of multiplication and
+ * squaring operations.
+ */
+template <typename Number_T, SizeT32 Width_T>
+using DoubleBigInt = BigInt<Number_T, Width_T, 2U>;
+
 /**
  * @brief Fixed-width arbitrary-precision unsigned integer.
  * @tparam Number_T Limb type (must be unsigned).
@@ -85,8 +103,7 @@ struct DoubleWidthArithmetic {};
  */
 template <typename Number_T, SizeT32 Width_T, SizeT32 WidthMultiplier_T = 1U>
 struct BigInt {
-    using NumberType   = Number_T;
-    using DoubleBigInt = BigInt<Number_T, Width_T, 2U>;
+    using NumberType = Number_T;
 
     /**
      * @brief Internal operations used by BigInt for template-based arithmetic.
@@ -557,27 +574,27 @@ struct BigInt {
 
     /**
      * @brief Multiplies this BigInt by another BigInt.
+     * @param d_bint Receives the full multiplication result.
      * @param bint The multiplier.
-     * @return A DoubleBigInt containing the full multiplication result.
      *
-     * Performs long multiplication using the smaller operand as the outer loop
-     * to reduce the number of iterations. Each limb of the smaller operand is
-     * multiplied by all limbs of the larger operand, and the partial products
-     * are accumulated into the result at the appropriate limb offsets.
+     * Performs long multiplication by accumulating each limb product at
+     * its corresponding result offset:
      *
-     * The returned DoubleBigInt preserves the complete product without
+     *     offset = i + j
+     *
+     * The smaller operand is used as the outer loop to reduce the number
+     * of iterations.
+     *
+     * The complete product is written to the supplied DoubleBigInt without
      * truncation.
      */
-    DoubleBigInt Multiply(const BigInt &bint) const noexcept {
-        DoubleBigInt d_bint{0};
-
+    void Multiply(DoubleBigInt<Number_T, Width_T> &d_bint, const BigInt &bint) const noexcept {
         const Number_T *storage_a;
         const Number_T *storage_b;
         SizeT32         max_index_a;
         SizeT32         max_index_b;
 
-        // Select the larger operand for the inner loop and the smaller
-        // operand for the outer loop.
+        // Use a consistent operand ordering for the multiplication loops.
         if (Index() >= bint.Index()) {
             storage_a   = Storage();
             max_index_a = Index();
@@ -618,8 +635,64 @@ struct BigInt {
 
             --offset;
         } while (index2 != 0);
+    }
 
-        return d_bint;
+    /**
+     * @brief Computes the square of this BigInt.
+     * @param d_bint Receives the full square result.
+     *
+     * Computes:
+     *
+     *     Σ(a[i]² · B^(2i))
+     *   + 2·Σ(a[i]a[j] · B^(i+j)), for i > j
+     *
+     * where B is the limb base (2^BitWidth()).
+     *
+     * The diagonal terms are accumulated once, while the off-diagonal
+     * terms are accumulated twice to account for the symmetry:
+     *
+     *     a[i]a[j] = a[j]a[i]
+     *
+     * The result is written to the supplied DoubleBigInt without
+     * truncation and is equivalent to Multiply(*this), but avoids
+     * redundant multiplications by exploiting the symmetry of squaring.
+     */
+    void Square(DoubleBigInt<Number_T, Width_T> &d_bint) const noexcept {
+        SizeT32 offset = Index();
+        ++offset;
+
+        do {
+            const SizeT32 current_offset = offset;
+            --offset;
+
+            Number_T number = storage_[offset];
+            Number_T carry  = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number, storage_[offset]);
+
+            SizeT32 sub_offset = (offset << 1U);
+
+            // Add the diagonal term: a[i]² at offset (2 * i).
+            d_bint.Add(number, sub_offset);
+            d_bint.Add(carry, (current_offset + offset));
+
+            SizeT32 sub_numer_offset = offset;
+
+            while (sub_numer_offset != 0) {
+                const SizeT32 current_sub_offset = sub_offset;
+
+                --sub_numer_offset;
+                --sub_offset;
+
+                number = storage_[offset];
+                carry  = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number, storage_[sub_numer_offset]);
+
+                // Add the off-diagonal term twice:
+                // 2 * a[i] * a[j] at offset (i + j).
+                d_bint.Add(number, sub_offset);
+                d_bint.Add(number, sub_offset);
+                d_bint.Add(carry, current_sub_offset);
+                d_bint.Add(carry, current_sub_offset);
+            }
+        } while (offset != 0);
     }
 
     /**

@@ -34,10 +34,10 @@ template <typename BigInt_T>
 static void StreamDigits(char *storage, unsigned int &index, BigInt_T &b_int) {
     index = 0;
 
-    while (b_int != 0) {
+    do {
         storage[index] = (static_cast<char>(b_int.Divide(10)) + '0');
         ++index;
-    }
+    } while (b_int != 0);
 }
 
 template <typename BigInt_T>
@@ -1049,6 +1049,8 @@ static void TestBigInt9(QTest &test) {
     BigInt_8_64    b_int_a;
     BigInt_8_64    b_int_b;
 
+    DoubleBigInt<SizeT8, 63U> b_int_c; // same as BigInt_8_64
+
     b_int.SetIndex(b_int.MaxIndex());
     test.IsEqual(b_int.Index(), SizeT64{15}, __LINE__);
 
@@ -1093,27 +1095,30 @@ static void TestBigInt9(QTest &test) {
     PrintDigits(b_int_b, stream);
     test.IsEqual(stream, "18446744073709551615", __LINE__);
 
-    auto b_int_c = b_int_a.Multiply(b_int_b);
+    b_int_a.Multiply(b_int_c, b_int_b);
 
     test.IsEqual(b_int_c.MaxIndex(), 15U, __LINE__);
     test.IsEqual(b_int_c.Index(), 15U, __LINE__);
 
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "340282366920938463426481119284349108225", __LINE__);
 
     b_int_a = 9205322385119247870ULL;
 
-    b_int_c = b_int_a.Multiply(b_int_b);
+    b_int_a.Multiply(b_int_c, b_int_b);
 
     test.IsEqual(b_int_c.MaxIndex(), 15U, __LINE__);
     test.IsEqual(b_int_c.Index(), 15U, __LINE__);
 
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "169808226154284360409097388803743810050", __LINE__);
 
-    b_int_c = b_int_b.Multiply(b_int_a);
+    b_int_b.Multiply(b_int_c, b_int_a);
 
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "169808226154284360409097388803743810050", __LINE__);
 
     b_int_b = 127;
@@ -1132,57 +1137,173 @@ static void TestBigInt9(QTest &test) {
     b_int_b <<= 8U;
     b_int_b |= 88;
 
-    b_int_c = b_int_b.Multiply(b_int_a);
+    b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "84737960211428776666119659056051974480", __LINE__);
 
     b_int_b = 127;
 
-    b_int_c = b_int_b.Multiply(b_int_a);
+    b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "1169075942910144479490", __LINE__);
 
     b_int_b <<= 8U;
     b_int_b |= 191;
 
-    b_int_c = b_int_b.Multiply(b_int_a);
+    b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "301041657960554763092610", __LINE__);
 
     b_int_b <<= 8U;
     b_int_b |= 223;
 
-    b_int_c = b_int_a.Multiply(b_int_b);
+    b_int_a.Multiply(b_int_c, b_int_b);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "77068717224793900943983170", __LINE__);
 
     b_int_b <<= 8U;
     b_int_b |= 239;
 
-    b_int_c = b_int_a.Multiply(b_int_b);
+    b_int_a.Multiply(b_int_c, b_int_b);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "19729593809619288685159932450", __LINE__);
 
     b_int_b <<= 8U;
     b_int_b |= 231;
 
-    b_int_c = b_int_b.Multiply(b_int_a);
+    b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "5050776017388967374363488965170", __LINE__);
 
     b_int_b <<= 8U;
     b_int_b |= 123;
 
-    b_int_c = b_int_b.Multiply(b_int_a);
+    b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "1292998660452707902490422842571530", __LINE__);
 
     b_int_b <<= 8U;
     b_int_b |= 47;
 
-    b_int_c = b_int_b.Multiply(b_int_a);
+    b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
     test.IsEqual(stream, "331007657075893655687700348302961570", __LINE__);
+    ////////////////////////////////////////////////
+    b_int_a = 4;
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "16", __LINE__);
+
+    b_int_a = 16;
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "256", __LINE__);
+
+    b_int_a = 4294967295;
+    b_int_a.Square(b_int_c);
+    b_int_c += 4294967295;
+    b_int_c += 4294967295;
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "18446744073709551615", __LINE__);
+
+    b_int_a = 0;
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int_a = 1;
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "1", __LINE__);
+    ////////////////////////////////////////////////
+    b_int_a = 255;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "65025", __LINE__);
+
+    b_int_a <<= 8U;
+    b_int_a |= 254;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "4294705156", __LINE__);
+
+    b_int_a <<= 8U;
+    b_int_a |= 53;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "281459575437049", __LINE__);
+
+    b_int_a <<= 8U;
+    b_int_a |= 252;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "18445736900446801936", __LINE__);
+
+    b_int_a <<= 8U;
+    b_int_a |= 251;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "1208859814059621380595225", __LINE__);
+
+    b_int_a <<= 8U;
+    b_int_a |= 250;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "79223836774352080444962648100", __LINE__);
+
+    b_int_a <<= 8U;
+    b_int_a |= 205;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "5192013366843967486848097953450025", __LINE__);
+
+    b_int_a <<= 8U;
+    b_int_a |= 155;
+
+    b_int_a.Square(b_int_c);
+
+    PrintDigits(b_int_c, stream);
+    b_int_c.Clear();
+    test.IsEqual(stream, "340263788009486258936411497651121265625", __LINE__);
 }
 
 static int RunBigIntTests() {
