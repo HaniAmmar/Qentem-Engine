@@ -640,6 +640,23 @@ static void TestBigInt5(QTest &test) {
     b_int.Subtract(2U, 1U);
     test.IsEqual(b_int.Index(), 0U, __LINE__);
     test.IsEqual(SizeT64(b_int), SizeT64{1ULL}, __LINE__);
+
+    b_int = 9223372036854775808ULL;
+    test.IsEqual(SizeT64(b_int), SizeT64{9223372036854775808ULL}, __LINE__);
+    b_int -= 1;
+    test.IsEqual(SizeT64(b_int), SizeT64{9223372036854775807ULL}, __LINE__);
+    b_int -= 255;
+    test.IsEqual(SizeT64(b_int), SizeT64{9223372036854775552ULL}, __LINE__);
+
+    b_int -= 65280;
+    test.IsEqual(SizeT64(b_int), SizeT64{9223372036854710272}, __LINE__);
+
+    b_int -= 4611686018427355136;
+    test.IsEqual(SizeT64(b_int), SizeT64{4611686018427355136}, __LINE__);
+
+    b_int -= 4611686018427355136;
+    test.IsEqual(SizeT64(b_int), SizeT64{0}, __LINE__);
+    test.IsTrue(b_int.IsZero(), __LINE__);
 }
 
 static void TestBigInt6(QTest &test) {
