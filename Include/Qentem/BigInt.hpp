@@ -702,12 +702,13 @@ struct BigInt {
      */
     Number_T Divide(const Number_T divisor) noexcept {
         // Start from the highest limb
-        const SizeT32 initial_shift = ((BitWidth() - 1U) - Platform::FindLastBit(divisor));
-        SizeT32       index         = index_;
-        Number_T      remainder     = (storage_[index_] % divisor);
+        const SizeT32  initial_shift = ((BitWidth() - 1U) - Platform::FindLastBit(divisor));
+        SizeT32        index         = index_;
+        const Number_T tmp           = storage_[index_];
 
         // Divide the highest limb and get the initial remainder
-        storage_[index_] /= divisor;
+        storage_[index_]   = (tmp / divisor);
+        Number_T remainder = (tmp % divisor);
 
         // Process all lower limbs, propagating remainder as needed
         while (index != 0) {
@@ -1233,12 +1234,15 @@ struct DoubleWidthArithmetic<Number_T, 8U> {
      */
     QENTEM_INLINE static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                                      SizeT32) noexcept {
-        SizeT16 dividend16{dividend_high};              // Pack high byte
-        dividend16 <<= shift_;                          // Shift up by 8 bits
-        dividend16 |= dividend_low;                     // Pack in low byte
-        dividend_high = Number_T(dividend16 % divisor); // New remainder in high
-        dividend16 /= divisor;                          // New quotient in low
-        dividend_low = Number_T(dividend16);
+        SizeT16 dividend16{dividend_high}; // Pack high byte
+        dividend16 <<= shift_;             // Shift up by 8 bits
+        dividend16 |= dividend_low;        // Pack in low byte
+
+        const SizeT16 tmp = dividend16;
+
+        dividend16    = static_cast<Number_T>(tmp / divisor); // New quotient in low
+        dividend_high = static_cast<Number_T>(tmp % divisor); // New remainder in high
+        dividend_low  = static_cast<Number_T>(dividend16);
     }
 
     /**
@@ -1280,12 +1284,15 @@ struct DoubleWidthArithmetic<Number_T, 16U> {
      */
     QENTEM_INLINE static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                                      SizeT32) noexcept {
-        SizeT32 dividend32{dividend_high};              // Pack high 16 bits
-        dividend32 <<= shift_;                          // Shift to high word
-        dividend32 |= dividend_low;                     // Add in low 16 bits
-        dividend_high = Number_T(dividend32 % divisor); // New remainder in high
-        dividend32 /= divisor;                          // New quotient in low
-        dividend_low = Number_T(dividend32);
+        SizeT32 dividend32{dividend_high}; // Pack high 16 bits
+        dividend32 <<= shift_;             // Shift to high word
+        dividend32 |= dividend_low;        // Add in low 16 bits
+
+        const SizeT32 tmp = dividend32;
+
+        dividend32    = static_cast<Number_T>(tmp / divisor); // New quotient in low
+        dividend_high = static_cast<Number_T>(tmp % divisor); // New remainder in high
+        dividend_low  = static_cast<Number_T>(dividend32);
     }
 
     /**
@@ -1331,12 +1338,15 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
             DoubleWidthArithmetic<Number_T, 64>::Divide(dividend_high, dividend_low, divisor, initial_shift);
             return;
         } else {
-            SizeT64 dividend64{dividend_high};              // Pack high 32 bits
-            dividend64 <<= shift_;                          // Shift to high dword
-            dividend64 |= dividend_low;                     // Add in low 32 bits
-            dividend_high = Number_T(dividend64 % divisor); // New remainder in high
-            dividend64 /= divisor;                          // New quotient in low
-            dividend_low = Number_T(dividend64);
+            SizeT64 dividend64{dividend_high}; // Pack high 32 bits
+            dividend64 <<= shift_;             // Shift to high dword
+            dividend64 |= dividend_low;        // Add in low 32 bits
+
+            const SizeT64 tmp = dividend64;
+
+            dividend64    = static_cast<Number_T>(tmp / divisor); // New quotient in low
+            dividend_high = static_cast<Number_T>(tmp % divisor); // New remainder in high
+            dividend_low  = static_cast<Number_T>(dividend64);
         }
     }
 
@@ -1407,8 +1417,9 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
         constexpr Number_T OVERFLOW_DIVIDEND = (Number_T{1} << (width_ - 1U));
 
         // Preserve the remainder from the initial low-limb division.
-        const Number_T carry = (dividend_low % divisor);
-        dividend_low /= divisor;
+        Number_T tmp         = dividend_low;
+        dividend_low         = (tmp / divisor);
+        const Number_T carry = (tmp % divisor);
 
         // Normalize the divisor so its highest bit is set.
         const Number_T divisor_shifted = (divisor << initial_shift);
@@ -1455,9 +1466,10 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
         dividend_low += quotient;
 
         // Estimate the second quotient digit.
-        quotient = (dividend_high / divisor_low);
-        dividend_high %= divisor_low;
-        remainder = (quotient * divisor_high);
+        tmp           = dividend_high;
+        quotient      = (tmp / divisor_low);
+        dividend_high = (tmp % divisor_low);
+        remainder     = (quotient * divisor_high);
 
         dividend_high <<= shift_;
 
