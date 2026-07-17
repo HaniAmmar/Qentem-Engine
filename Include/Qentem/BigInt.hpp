@@ -421,6 +421,16 @@ struct BigInt {
     }
 
     /**
+     * @brief Adds another BigInt to this BigInt.
+     * @param bint The BigInt value to add.
+     *
+     * Equivalent to calling Add(const BigInt &).
+     */
+    QENTEM_INLINE void operator+=(const BigInt &bint) noexcept {
+        Add(bint);
+    }
+
+    /**
      * @brief Subtracts a built-in integer from this BigInt (in place).
      * @tparam N_Number_T Any integer type (usually unsigned).
      * @param number Value to subtract.
@@ -428,6 +438,16 @@ struct BigInt {
     template <typename N_Number_T>
     QENTEM_INLINE void operator-=(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::Subtract>(number);
+    }
+
+    /**
+     * @brief Subtracts another BigInt from this BigInt.
+     * @param bint The BigInt value to subtract.
+     *
+     * Equivalent to calling Subtract(const BigInt &).
+     */
+    QENTEM_INLINE void operator-=(const BigInt &bint) noexcept {
+        Subtract(bint);
     }
 
     /**
@@ -485,6 +505,24 @@ struct BigInt {
     }
 
     /**
+     * @brief Adds another BigInt to this BigInt.
+     * @param bint The BigInt value to add.
+     *
+     * Performs limb-by-limb addition starting from the least-significant
+     * limb. Carry propagation is handled internally by Add(Number_T, SizeT32).
+     *
+     * The result is stored in this BigInt.
+     */
+    void Add(const BigInt &bint) noexcept {
+        SizeT32 index = 0;
+
+        do {
+            Add(bint.Storage()[index], index);
+            ++index;
+        } while (index <= bint.Index());
+    }
+
+    /**
      * @brief Subtracts a built-in integer value from this BigInt, starting at a given limb index.
      * @param number The value to subtract.
      * @param index  The starting limb index (default: 0).
@@ -511,10 +549,6 @@ struct BigInt {
 
             ++index;
 
-            if (index > index_) {
-                storage_[index] = 0;
-            }
-
             // Underflow occurred: set number to 1 to propagate borrow
             number = Number_T{1};
         } while (true);
@@ -527,6 +561,26 @@ struct BigInt {
                 --index_;
             }
         }
+    }
+
+    /**
+     * @brief Subtracts another BigInt from this BigInt.
+     * @param bint The BigInt value to subtract.
+     *
+     * Performs limb-by-limb subtraction starting from the least-significant
+     * limb. Borrow propagation is handled internally by
+     * Subtract(Number_T, SizeT32).
+     *
+     * The result is stored in this BigInt. If the subtraction underflows,
+     * the value wraps around within the fixed width of the BigInt.
+     */
+    void Subtract(const BigInt &bint) noexcept {
+        SizeT32 index = 0;
+
+        do {
+            Subtract(bint.Storage()[index], index);
+            ++index;
+        } while (index <= bint.Index());
     }
 
     /**
@@ -552,7 +606,7 @@ struct BigInt {
 
     /**
      * @brief Multiplies this BigInt by another BigInt.
-     * @param d_bint Receives the full multiplication result.
+     * @param result Receives the full multiplication result.
      * @param bint The multiplier.
      *
      * Performs long multiplication by accumulating each limb product at
@@ -566,7 +620,7 @@ struct BigInt {
      * The complete product is written to the supplied DoubleBigInt without
      * truncation.
      */
-    void Multiply(BigInt &d_bint, const BigInt &bint) const noexcept {
+    void Multiply(BigInt &result, const BigInt &bint) const noexcept {
         const Number_T *storage_a;
         const Number_T *storage_b;
         SizeT32         max_index_a;
@@ -607,8 +661,8 @@ struct BigInt {
 
                 const Number_T carry = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number, storage_b[index2]);
 
-                d_bint.Add(number, (index1 + offset));
-                d_bint.Add(carry, (current_index + offset));
+                result.Add(number, (index1 + offset));
+                result.Add(carry, (current_index + offset));
             } while (index1 != 0);
 
             --offset;
@@ -617,7 +671,7 @@ struct BigInt {
 
     /**
      * @brief Computes the square of this BigInt.
-     * @param d_bint Receives the full square result.
+     * @param result Receives the full square result.
      *
      * Computes:
      *
@@ -635,7 +689,7 @@ struct BigInt {
      * truncation and is equivalent to Multiply(*this), but avoids
      * redundant multiplications by exploiting the symmetry of squaring.
      */
-    void Square(BigInt &d_bint) const noexcept {
+    void Square(BigInt &result) const noexcept {
         SizeT32 offset = Index();
         ++offset;
 
@@ -649,8 +703,8 @@ struct BigInt {
             SizeT32 sub_offset = (offset << 1U);
 
             // Add the diagonal term: a[i]² at offset (2 * i).
-            d_bint.Add(number, sub_offset);
-            d_bint.Add(carry, (current_offset + offset));
+            result.Add(number, sub_offset);
+            result.Add(carry, (current_offset + offset));
 
             SizeT32 sub_numer_offset = offset;
 
@@ -665,10 +719,10 @@ struct BigInt {
 
                 // Add the off-diagonal term twice:
                 // 2 * a[i] * a[j] at offset (i + j).
-                d_bint.Add(number, sub_offset);
-                d_bint.Add(number, sub_offset);
-                d_bint.Add(carry, current_sub_offset);
-                d_bint.Add(carry, current_sub_offset);
+                result.Add(number, sub_offset);
+                result.Add(number, sub_offset);
+                result.Add(carry, current_sub_offset);
+                result.Add(carry, current_sub_offset);
             }
         } while (offset != 0);
     }

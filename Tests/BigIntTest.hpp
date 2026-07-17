@@ -1316,6 +1316,96 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "340263788009486258936411497651121265625", __LINE__);
 }
 
+static void TestBigInt10(QTest &test, StringStream<char> &stream) {
+    BigInt_8_64 b_int_a{};
+    BigInt_8_64 b_int_b{4294967295ULL};
+
+    b_int_a.Add(b_int_b);
+    b_int_a += b_int_b;
+    b_int_a.Add(b_int_b);
+    b_int_a.Add(b_int_b);
+    b_int_a += b_int_b;
+
+    PrintDigits(b_int_a, stream);
+    test.IsEqual(stream, "21474836475", __LINE__);
+
+    b_int_a.Subtract(b_int_b);
+    b_int_a -= b_int_b;
+    b_int_a.Subtract(b_int_b);
+    b_int_a.Subtract(b_int_b);
+    b_int_a -= b_int_b;
+
+    test.IsFalse(b_int_a.IsMultiLimb(), __LINE__);
+    test.IsTrue(b_int_a.IsZero(), __LINE__);
+
+    for (unsigned x = 0; x <= 1000; ++x) {
+        b_int_a += 155;
+    }
+
+    for (unsigned x = 0; x <= 1000; ++x) {
+        b_int_a -= 155;
+    }
+
+    test.IsFalse(b_int_a.IsMultiLimb(), __LINE__);
+    test.IsTrue(b_int_a.IsZero(), __LINE__);
+
+    for (unsigned x = 0; x <= 1000; ++x) {
+        b_int_a += 1;
+    }
+
+    for (unsigned x = 0; x <= 1000; ++x) {
+        b_int_a -= 1;
+    }
+
+    b_int_a = 18446744073709551615ULL;
+
+    b_int_b = 1;
+    b_int_a += b_int_b; // Overflow
+
+    test.IsFalse(b_int_a.IsMultiLimb(), __LINE__);
+    test.IsTrue(b_int_a.IsZero(), __LINE__);
+
+    b_int_a -= b_int_b;
+
+    test.IsEqual(b_int_a.Index(), b_int_a.MaxIndex(), __LINE__);
+    test.IsFalse(b_int_a.IsZero(), __LINE__);
+
+    PrintDigits(b_int_a, stream);
+    test.IsEqual(stream, "18446744073709551615", __LINE__);
+
+    b_int_a = 16777216ULL; // [0,0,0,1]
+    b_int_b = 1;
+
+    b_int_a -= b_int_b;
+
+    PrintDigits(b_int_a, stream);
+    test.IsEqual(stream, "16777215", __LINE__);
+
+    b_int_a = 16777216ULL;
+    b_int_b = 255ULL;
+
+    b_int_a -= b_int_b;
+
+    PrintDigits(b_int_a, stream);
+    test.IsEqual(stream, "16776961", __LINE__);
+
+    b_int_a = 65536ULL;
+    b_int_b = 65535ULL;
+
+    b_int_a -= b_int_b;
+
+    PrintDigits(b_int_a, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    b_int_a = 4294967296ULL; // [0,0,0,0,1]
+    b_int_b = 1;
+
+    b_int_a -= b_int_b;
+
+    PrintDigits(b_int_a, stream);
+    test.IsEqual(stream, "4294967295", __LINE__);
+}
+
 static int RunBigIntTests() {
     StringStream<char> stream{};
     QTest              test{"BigInt.hpp", __FILE__};
@@ -1331,6 +1421,7 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 7", TestBigInt7, false, stream);
     test.Test("BigInt Test 8", TestBigInt8, false, stream);
     test.Test("BigInt Test 9", TestBigInt9, false, stream);
+    test.Test("BigInt Test 10", TestBigInt10, false, stream);
 
     return test.EndTests();
 }
