@@ -74,24 +74,6 @@ namespace Qentem {
 template <typename Number_T, SizeT32>
 struct DoubleWidthArithmetic {};
 
-template <typename, SizeT32, SizeT32>
-struct BigInt;
-
-/**
- * @brief BigInt type with sufficient storage for full-width results.
- *
- * Defined like BigInt:
- *
- *     BigInt<Type, BitWidth>
- *     DoubleBigInt<Type, BitWidth>
- *
- * DoubleBigInt uses the same template arguments as BigInt while providing
- * enough storage to hold the complete result of multiplication and
- * squaring operations.
- */
-template <typename Number_T, SizeT32 Width_T>
-using DoubleBigInt = BigInt<Number_T, Width_T, 2U>;
-
 /**
  * @brief Fixed-width arbitrary-precision unsigned integer.
  * @tparam Number_T Limb type (must be unsigned).
@@ -101,7 +83,7 @@ using DoubleBigInt = BigInt<Number_T, Width_T, 2U>;
  *     // 256-bit unsigned integer using 64-bit limbs:
  *     BigInt<uint64_t, 256U> val;
  */
-template <typename Number_T, SizeT32 Width_T, SizeT32 WidthMultiplier_T = 1U>
+template <typename Number_T, SizeT32 Width_T>
 struct BigInt {
     using NumberType = Number_T;
 
@@ -584,7 +566,7 @@ struct BigInt {
      * The complete product is written to the supplied DoubleBigInt without
      * truncation.
      */
-    void Multiply(DoubleBigInt<Number_T, Width_T> &d_bint, const BigInt &bint) const noexcept {
+    void Multiply(BigInt &d_bint, const BigInt &bint) const noexcept {
         const Number_T *storage_a;
         const Number_T *storage_b;
         SizeT32         max_index_a;
@@ -653,7 +635,7 @@ struct BigInt {
      * truncation and is equivalent to Multiply(*this), but avoids
      * redundant multiplications by exploiting the symmetry of squaring.
      */
-    void Square(DoubleBigInt<Number_T, Width_T> &d_bint) const noexcept {
+    void Square(BigInt &d_bint) const noexcept {
         SizeT32 offset = Index();
         ++offset;
 
@@ -959,10 +941,9 @@ struct BigInt {
     QENTEM_INLINE static constexpr SizeT32 TotalBitWidth() noexcept {
         // If Width_T is a multiple of BitWidth(), just return Width_T.
         // Otherwise, add another limb to cover the excess bits.
-        return ((((BitWidth() * (Width_T / BitWidth())) == Width_T)
-                     ? Width_T
-                     : ((BitWidth() * (Width_T / BitWidth())) + BitWidth())) *
-                WidthMultiplier_T);
+        return (((BitWidth() * (Width_T / BitWidth())) == Width_T)
+                    ? Width_T
+                    : ((BitWidth() * (Width_T / BitWidth())) + BitWidth()));
 
         // Note: In C++, (X / Y) * Y may not equal X due to integer division truncation.
     }

@@ -1063,10 +1063,9 @@ static void TestBigInt9(QTest &test) {
     StringStream<char> stream;
 
     BigInt_64_1024 b_int;
-    BigInt_8_64    b_int_a;
-    BigInt_8_64    b_int_b;
-
-    DoubleBigInt<SizeT8, 63U> b_int_c; // same as BigInt_8_64
+    BigInt_8_128   b_int_a;
+    BigInt_8_128   b_int_b;
+    BigInt_8_128   b_int_c;
 
     b_int.SetIndex(b_int.MaxIndex());
     test.IsEqual(b_int.Index(), SizeT64{15}, __LINE__);
@@ -1102,9 +1101,9 @@ static void TestBigInt9(QTest &test) {
     b_int_b |= 255;
 
     test.IsEqual(b_int_a.Index(), 7U, __LINE__);
-    test.IsEqual(b_int_b.MaxIndex(), 7U, __LINE__);
+    test.IsEqual(b_int_b.MaxIndex(), 15U, __LINE__);
     test.IsEqual(b_int_b.Index(), 7U, __LINE__);
-    test.IsEqual(b_int_b.MaxIndex(), 7U, __LINE__);
+    test.IsEqual(b_int_b.MaxIndex(), 15U, __LINE__);
 
     PrintDigits(b_int_a, stream);
     test.IsEqual(stream, "18446744073709551615", __LINE__);
