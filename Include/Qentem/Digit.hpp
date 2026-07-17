@@ -1262,7 +1262,7 @@ struct Digit {
     static void bigIntToString(Stream_T &stream, BigInt_T &b_int) {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
 
-        while (b_int.IsBig()) {
+        while (b_int.IsMultiLimb()) {
             const SizeT length = stream.Length();
             NumberToString<true>(stream, b_int.Divide(DigitConst::MaxPowerOfTenValue));
 

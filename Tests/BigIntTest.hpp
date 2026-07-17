@@ -320,7 +320,7 @@ static void TestBigInt2(QTest &test) {
 }
 
 static void TestBigInt3(QTest &test) {
-    BigInt_64_128 b_int_1;
+    BigInt_64_128 b_int_1{};
 
     test.IsTrue(b_int_1.IsZero(), __LINE__);
     test.IsFalse(b_int_1.NotZero(), __LINE__);
@@ -328,11 +328,11 @@ static void TestBigInt3(QTest &test) {
     b_int_1 = 18446744073709551615ULL;
     test.IsFalse(b_int_1.IsZero(), __LINE__);
     test.IsTrue(b_int_1.NotZero(), __LINE__);
-    test.IsFalse(b_int_1.IsBig(), __LINE__);
+    test.IsFalse(b_int_1.IsMultiLimb(), __LINE__);
     b_int_1 <<= 64U;
-    test.IsTrue(b_int_1.IsBig(), __LINE__);
+    test.IsTrue(b_int_1.IsMultiLimb(), __LINE__);
     b_int_1 |= 18446744073709551615ULL;
-    test.IsTrue(b_int_1.IsBig(), __LINE__);
+    test.IsTrue(b_int_1.IsMultiLimb(), __LINE__);
 
     test.IsEqual(b_int_1.Index(), 1U, __LINE__);
     test.IsEqual(SizeT8{b_int_1}, SizeT8{255U}, __LINE__);
@@ -434,7 +434,7 @@ static void TestBigInt3(QTest &test) {
 }
 
 static void TestBigInt4(QTest &test) {
-    BigInt_32_128 b_int;
+    BigInt_32_128 b_int{};
 
     b_int = 9U;
 
@@ -604,7 +604,7 @@ static void TestBigInt4(QTest &test) {
 }
 
 static void TestBigInt5(QTest &test) {
-    BigInt_8_64 b_int;
+    BigInt_8_64 b_int{};
 
     b_int.Add(10U);
     test.IsEqual(b_int.Number(), SizeT32{10}, __LINE__);
@@ -659,9 +659,7 @@ static void TestBigInt5(QTest &test) {
     test.IsTrue(b_int.IsZero(), __LINE__);
 }
 
-static void TestBigInt6(QTest &test) {
-    StringStream<char> stream;
-
+static void TestBigInt6(QTest &test, StringStream<char> &stream) {
     BigInt_8_128   b_int_8_128;
     BigInt_16_128  b_int_16_128;
     BigInt_32_1024 b_int_32_1024;
@@ -961,9 +959,8 @@ static void TestBigInt6(QTest &test) {
     test.IsEqual(SizeT32(b_int_64_1024), 1U, __LINE__);
 }
 
-static void TestBigInt7(QTest &test) {
-    StringStream<char> stream;
-    BigInt_64_1024     b_int_64_1024{1U};
+static void TestBigInt7(QTest &test, StringStream<char> &stream) {
+    BigInt_64_1024 b_int_64_1024{1U};
 
     for (SizeT32 i = 0; i < 16; i++) {
         b_int_64_1024.Multiply(18446744073709551615UL);
@@ -1014,9 +1011,8 @@ static void TestBigInt7(QTest &test) {
     test.IsEqual(stream, "1", __LINE__);
 }
 
-static void TestBigInt8(QTest &test) {
-    StringStream<char> stream;
-    BigInt_64_1024     b_int;
+static void TestBigInt8(QTest &test, StringStream<char> &stream) {
+    BigInt_64_1024 b_int{};
 
     b_int = 0xFFFFFFFFFFFFFFFF;
     b_int <<= 64U;
@@ -1059,13 +1055,11 @@ static void TestBigInt8(QTest &test) {
         __LINE__);
 }
 
-static void TestBigInt9(QTest &test) {
-    StringStream<char> stream;
-
-    BigInt_64_1024 b_int;
-    BigInt_8_128   b_int_a;
-    BigInt_8_128   b_int_b;
-    BigInt_8_128   b_int_c;
+static void TestBigInt9(QTest &test, StringStream<char> &stream) {
+    BigInt_64_1024 b_int{};
+    BigInt_8_128   b_int_a{};
+    BigInt_8_128   b_int_b{};
+    BigInt_8_128   b_int_c{};
 
     b_int.SetIndex(b_int.MaxIndex());
     test.IsEqual(b_int.Index(), SizeT64{15}, __LINE__);
@@ -1323,7 +1317,8 @@ static void TestBigInt9(QTest &test) {
 }
 
 static int RunBigIntTests() {
-    QTest test{"BigInt.hpp", __FILE__};
+    StringStream<char> stream{};
+    QTest              test{"BigInt.hpp", __FILE__};
 
     test.PrintGroupName();
 
@@ -1332,10 +1327,10 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 3", TestBigInt3);
     test.Test("BigInt Test 4", TestBigInt4);
     test.Test("BigInt Test 5", TestBigInt5);
-    test.Test("BigInt Test 6", TestBigInt6);
-    test.Test("BigInt Test 7", TestBigInt7);
-    test.Test("BigInt Test 8", TestBigInt8);
-    test.Test("BigInt Test 9", TestBigInt9);
+    test.Test("BigInt Test 6", TestBigInt6, false, stream);
+    test.Test("BigInt Test 7", TestBigInt7, false, stream);
+    test.Test("BigInt Test 8", TestBigInt8, false, stream);
+    test.Test("BigInt Test 9", TestBigInt9, false, stream);
 
     return test.EndTests();
 }

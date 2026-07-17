@@ -960,7 +960,7 @@ struct BigInt {
      * @brief Checks if this BigInt uses more than one limb.
      * @return True if any higher limb is non-zero.
      */
-    QENTEM_INLINE bool IsBig() const noexcept {
+    QENTEM_INLINE bool IsMultiLimb() const noexcept {
         return (index_ != 0);
     }
 
