@@ -1027,11 +1027,19 @@ struct BigInt {
     }
 
     /**
-     * @brief Checks if this BigInt is zero.
+     * @brief Checks if this BigInt value is zero.
      * @return True if value is zero.
      */
     QENTEM_INLINE bool IsZero() const noexcept {
         return (*this == 0);
+    }
+
+    /**
+     * @brief Checks if this BigInt value is not zero.
+     * @return True if value is not zero.
+     */
+    QENTEM_INLINE bool IsNotZero() const noexcept {
+        return (*this != 0);
     }
 
     /**
