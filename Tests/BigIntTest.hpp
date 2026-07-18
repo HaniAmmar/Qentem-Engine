@@ -1404,6 +1404,182 @@ static void TestBigInt10(QTest &test, StringStream<char> &stream) {
 
     PrintDigits(b_int_a, stream);
     test.IsEqual(stream, "4294967295", __LINE__);
+
+    b_int_a = 255;
+    b_int_b = 256;
+
+    test.IsFalse(b_int_a >= b_int_b, __LINE__);
+    test.IsTrue(b_int_b >= b_int_a, __LINE__);
+    test.IsFalse(b_int_a > b_int_b, __LINE__);
+    test.IsTrue(b_int_b > b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a <= b_int_b, __LINE__);
+    test.IsFalse(b_int_b <= b_int_a, __LINE__);
+    test.IsTrue(b_int_a < b_int_b, __LINE__);
+    test.IsFalse(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsTrue(b_int_b != b_int_a, __LINE__);
+
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+    test.IsFalse(b_int_a == b_int_b, __LINE__);
+
+    b_int_a = 0;
+    b_int_b = 0;
+
+    test.IsTrue(b_int_a >= b_int_b, __LINE__);
+    test.IsTrue(b_int_b >= b_int_a, __LINE__);
+    test.IsFalse(b_int_a > b_int_b, __LINE__);
+    test.IsFalse(b_int_b > b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a <= b_int_b, __LINE__);
+    test.IsTrue(b_int_b <= b_int_a, __LINE__);
+    test.IsFalse(b_int_a < b_int_b, __LINE__);
+    test.IsFalse(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a == b_int_b, __LINE__);
+    test.IsTrue(b_int_a == b_int_b, __LINE__);
+    test.IsFalse(b_int_b != b_int_a, __LINE__);
+    test.IsFalse(b_int_b != b_int_a, __LINE__);
+
+    b_int_a = 123456;
+    b_int_b = 123456;
+
+    test.IsTrue(b_int_a >= b_int_b, __LINE__);
+    test.IsTrue(b_int_b >= b_int_a, __LINE__);
+    test.IsFalse(b_int_a > b_int_b, __LINE__);
+    test.IsFalse(b_int_b > b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a <= b_int_b, __LINE__);
+    test.IsTrue(b_int_b <= b_int_a, __LINE__);
+    test.IsFalse(b_int_a < b_int_b, __LINE__);
+    test.IsFalse(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a == b_int_b, __LINE__);
+    test.IsTrue(b_int_a == b_int_b, __LINE__);
+    test.IsFalse(b_int_b != b_int_a, __LINE__);
+    test.IsFalse(b_int_b != b_int_a, __LINE__);
+
+    b_int_a = 65536;  // [0,0,1]
+    b_int_b = 131072; // [0,0,2]
+
+    test.IsFalse(b_int_a >= b_int_b, __LINE__);
+    test.IsTrue(b_int_b >= b_int_a, __LINE__);
+    test.IsFalse(b_int_a > b_int_b, __LINE__);
+    test.IsTrue(b_int_b > b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a <= b_int_b, __LINE__);
+    test.IsFalse(b_int_b <= b_int_a, __LINE__);
+    test.IsTrue(b_int_a < b_int_b, __LINE__);
+    test.IsFalse(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+
+    b_int_a = 65792; // [0,1,1]
+    b_int_b = 65536; // [0,0,1]
+
+    test.IsTrue(b_int_a >= b_int_b, __LINE__);
+    test.IsFalse(b_int_b >= b_int_a, __LINE__);
+    test.IsTrue(b_int_a > b_int_b, __LINE__);
+    test.IsFalse(b_int_b > b_int_a, __LINE__);
+
+    test.IsFalse(b_int_a <= b_int_b, __LINE__);
+    test.IsTrue(b_int_b <= b_int_a, __LINE__);
+    test.IsFalse(b_int_a < b_int_b, __LINE__);
+    test.IsTrue(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+
+    b_int_a = 257; // [1,1]
+    b_int_b = 256; // [0,1]
+
+    test.IsTrue(b_int_a >= b_int_b, __LINE__);
+    test.IsFalse(b_int_b >= b_int_a, __LINE__);
+    test.IsTrue(b_int_a > b_int_b, __LINE__);
+    test.IsFalse(b_int_b > b_int_a, __LINE__);
+
+    test.IsFalse(b_int_a <= b_int_b, __LINE__);
+    test.IsTrue(b_int_b <= b_int_a, __LINE__);
+    test.IsFalse(b_int_a < b_int_b, __LINE__);
+    test.IsTrue(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+
+    b_int_a = 18446744073709551615ULL;
+    b_int_b = 18446744073709551614ULL;
+
+    test.IsTrue(b_int_a >= b_int_b, __LINE__);
+    test.IsFalse(b_int_b >= b_int_a, __LINE__);
+    test.IsTrue(b_int_a > b_int_b, __LINE__);
+    test.IsFalse(b_int_b > b_int_a, __LINE__);
+
+    test.IsFalse(b_int_a <= b_int_b, __LINE__);
+    test.IsTrue(b_int_b <= b_int_a, __LINE__);
+    test.IsFalse(b_int_a < b_int_b, __LINE__);
+    test.IsTrue(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+
+    b_int_a = 65536;
+    b_int_b = 65535;
+
+    test.IsTrue(b_int_a >= b_int_b, __LINE__);
+    test.IsFalse(b_int_b >= b_int_a, __LINE__);
+    test.IsTrue(b_int_a > b_int_b, __LINE__);
+    test.IsFalse(b_int_b > b_int_a, __LINE__);
+
+    test.IsFalse(b_int_a <= b_int_b, __LINE__);
+    test.IsTrue(b_int_b <= b_int_a, __LINE__);
+    test.IsFalse(b_int_a < b_int_b, __LINE__);
+    test.IsTrue(b_int_b < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+
+    b_int_a = 123456789;
+
+    test.IsTrue(b_int_a >= b_int_a, __LINE__);
+    test.IsFalse(b_int_a > b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a <= b_int_a, __LINE__);
+    test.IsFalse(b_int_a < b_int_a, __LINE__);
+
+    test.IsTrue(b_int_a == b_int_a, __LINE__);
+    test.IsFalse(b_int_a != b_int_a, __LINE__);
+
+    b_int_a = 65536;
+    b_int_b = 65535;
+
+    b_int_a -= b_int_b; // becomes 1
+
+    test.IsTrue(b_int_a >= b_int_a, __LINE__);
+    test.IsFalse(b_int_a >= b_int_b, __LINE__);
+    test.IsTrue(b_int_b > b_int_a, __LINE__);
+    test.IsFalse(b_int_a > b_int_b, __LINE__);
+
+    test.IsTrue(b_int_a <= b_int_a, __LINE__);
+    test.IsTrue(b_int_a <= b_int_b, __LINE__);
+    test.IsFalse(b_int_b < b_int_a, __LINE__);
+    test.IsTrue(b_int_a < b_int_b, __LINE__);
+
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsTrue(b_int_a != b_int_b, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
+    test.IsFalse(b_int_b == b_int_a, __LINE__);
 }
 
 static int RunBigIntTests() {

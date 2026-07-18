@@ -240,138 +240,328 @@ struct BigInt {
 
     /**
      * @brief Compares BigInt with a built-in integer for less-than.
-     * @param out   The BigInt instance (left operand).
+     * @param left   The BigInt instance (left operand).
      * @param number The built-in integer (right operand).
      * @return True if BigInt is less than number.
      *
      * Only true if the BigInt fits in a single limb.
      */
-    QENTEM_INLINE friend bool operator<(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator<(const BigInt &left, const Number_T number) noexcept {
         // If BigInt has only one limb, compare directly.
-        return ((out.index_ == 0) && (out.storage_[0] < number));
+        return ((left.index_ == 0) && (left.storage_[0] < number));
     }
 
     /**
      * @brief Compares a built-in integer with a BigInt for less-than.
      * @param number The built-in integer (left operand).
-     * @param out    The BigInt instance (right operand).
+     * @param right    The BigInt instance (right operand).
      * @return True if number is less than BigInt.
      */
-    QENTEM_INLINE friend bool operator<(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator<(const Number_T number, const BigInt &right) noexcept {
         // Reuse the greater-than operator
-        return (out > number);
+        return (right > number);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is less than another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with fewer used limbs is considered smaller. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @param left Left-hand BigInt operand.
+     * @param right Right-hand BigInt operand.
+     *
+     * @return True if @p left is less than @p right; otherwise, false.
+     */
+    friend bool operator<(const BigInt &left, const BigInt &right) noexcept {
+        if (left.Index() != right.Index()) {
+            return (left.Index() < right.Index());
+        }
+
+        SizeT32 index = left.Index();
+
+        while (index != 0) {
+            if (left.Storage()[index] == right.Storage()[index]) {
+                --index;
+                continue;
+            }
+
+            return (left.Storage()[index] < right.Storage()[index]);
+        }
+
+        return (left.Storage()[index] < right.Storage()[index]);
     }
 
     /**
      * @brief Compares BigInt with a built-in integer for less-than-or-equal.
-     * @param out    The BigInt instance (left operand).
+     * @param left    The BigInt instance (left operand).
      * @param number The built-in integer (right operand).
      * @return True if BigInt is less than or equal to number.
      */
-    QENTEM_INLINE friend bool operator<=(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator<=(const BigInt &left, const Number_T number) noexcept {
         // If BigInt has only one limb, compare directly.
-        return ((out.index_ == 0) && (out.storage_[0] <= number));
+        return ((left.index_ == 0) && (left.storage_[0] <= number));
     }
 
     /**
      * @brief Compares a built-in integer with a BigInt for less-than-or-equal.
      * @param number The built-in integer (left operand).
-     * @param out    The BigInt instance (right operand).
+     * @param right    The BigInt instance (right operand).
      * @return True if number is less than or equal to BigInt.
      */
-    QENTEM_INLINE friend bool operator<=(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator<=(const Number_T number, const BigInt &right) noexcept {
         // Reuse the greater-than-or-equal operator
-        return (out >= number);
+        return (right >= number);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is less than or equal to another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with fewer used limbs is considered smaller. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @param left Left-hand BigInt operand.
+     * @param right Right-hand BigInt operand.
+     *
+     * @return True if @p left is less than or equal to @p right;
+     *         otherwise, false.
+     */
+    friend bool operator<=(const BigInt &left, const BigInt &right) noexcept {
+        if (left.Index() != right.Index()) {
+            return (left.Index() < right.Index());
+        }
+
+        SizeT32 index = left.Index();
+
+        while (index != 0) {
+            if (left.Storage()[index] == right.Storage()[index]) {
+                --index;
+                continue;
+            }
+
+            return (left.Storage()[index] < right.Storage()[index]);
+        }
+
+        return (left.Storage()[index] <= right.Storage()[index]);
     }
 
     /**
      * @brief Compares BigInt with a built-in integer for greater-than.
-     * @param out    The BigInt instance (left operand).
+     * @param left    The BigInt instance (left operand).
      * @param number The built-in integer (right operand).
      * @return True if BigInt is greater than number.
      *
      * True if BigInt has more than one limb or the value is greater than number.
      */
-    QENTEM_INLINE friend bool operator>(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator>(const BigInt &left, const Number_T number) noexcept {
         // If any higher limb is used, BigInt is greater.
-        return ((out.index_ != 0) || (out.storage_[0] > number));
+        return ((left.index_ != 0) || (left.storage_[0] > number));
     }
 
     /**
      * @brief Compares a built-in integer with a BigInt for greater-than.
      * @param number The built-in integer (left operand).
-     * @param out    The BigInt instance (right operand).
+     * @param right    The BigInt instance (right operand).
      * @return True if number is greater than BigInt.
      */
-    QENTEM_INLINE friend bool operator>(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator>(const Number_T number, const BigInt &right) noexcept {
         // Reuse less-than operator
-        return (out < number);
+        return (right < number);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is greater than another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with more used limbs is considered greater. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @param left Left-hand BigInt operand.
+     * @param right Right-hand BigInt operand.
+     *
+     * @return True if @p left is greater than @p right; otherwise, false.
+     */
+    friend bool operator>(const BigInt &left, const BigInt &right) noexcept {
+        if (left.Index() != right.Index()) {
+            return (left.Index() > right.Index());
+        }
+
+        SizeT32 index = left.Index();
+
+        while (index != 0) {
+            if (left.Storage()[index] == right.Storage()[index]) {
+                --index;
+                continue;
+            }
+
+            return (left.Storage()[index] > right.Storage()[index]);
+        }
+
+        return (left.Storage()[index] > right.Storage()[index]);
     }
 
     /**
      * @brief Compares BigInt with a built-in integer for greater-than-or-equal.
-     * @param out    The BigInt instance (left operand).
+     * @param left    The BigInt instance (left operand).
      * @param number The built-in integer (right operand).
      * @return True if BigInt is greater than or equal to number.
      */
-    QENTEM_INLINE friend bool operator>=(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator>=(const BigInt &left, const Number_T number) noexcept {
         // If any higher limb is used, BigInt is greater, or equal if single limb equals number.
-        return ((out.index_ != 0) || (out.storage_[0] >= number));
+        return ((left.index_ != 0) || (left.storage_[0] >= number));
     }
 
     /**
      * @brief Compares a built-in integer with a BigInt for greater-than-or-equal.
      * @param number The built-in integer (left operand).
-     * @param out    The BigInt instance (right operand).
+     * @param right    The BigInt instance (right operand).
      * @return True if number is greater than or equal to BigInt.
      */
-    QENTEM_INLINE friend bool operator>=(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator>=(const Number_T number, const BigInt &right) noexcept {
         // Reuse less-than-or-equal operator
-        return (out <= number);
+        return (right <= number);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is greater than or equal to another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with more used limbs is considered greater. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @param left Left-hand BigInt operand.
+     * @param right Right-hand BigInt operand.
+     *
+     * @return True if @p left is greater than or equal to @p right;
+     *         otherwise, false.
+     */
+    friend bool operator>=(const BigInt &left, const BigInt &right) noexcept {
+        if (left.Index() != right.Index()) {
+            return (left.Index() > right.Index());
+        }
+
+        SizeT32 index = left.Index();
+
+        while (index != 0) {
+            if (left.Storage()[index] == right.Storage()[index]) {
+                --index;
+                continue;
+            }
+
+            return (left.Storage()[index] > right.Storage()[index]);
+        }
+
+        return (left.Storage()[index] >= right.Storage()[index]);
     }
 
     /**
      * @brief Compares BigInt with a built-in integer for equality.
-     * @param out    The BigInt instance (left operand).
+     * @param left    The BigInt instance (left operand).
      * @param number The built-in integer (right operand).
      * @return True if BigInt equals number and uses only a single limb.
      */
-    QENTEM_INLINE friend bool operator==(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator==(const BigInt &left, const Number_T number) noexcept {
         // Only equal if BigInt fits in one limb and matches number.
-        return ((out.index_ == 0) && (out.storage_[0] == number));
+        return ((left.index_ == 0) && (left.storage_[0] == number));
     }
 
     /**
      * @brief Compares a built-in integer with a BigInt for equality.
      * @param number The built-in integer (left operand).
-     * @param out    The BigInt instance (right operand).
+     * @param right    The BigInt instance (right operand).
      * @return True if number equals BigInt.
      */
-    QENTEM_INLINE friend bool operator==(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator==(const Number_T number, const BigInt &right) noexcept {
         // Delegate to BigInt == number
-        return (out == number);
+        return (right == number);
+    }
+
+    /**
+     * @brief Checks whether two BigInt values are equal.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the values are considered unequal. Otherwise, all limbs are compared
+     * from the most significant limb down to the least significant limb.
+     *
+     * @param left Left-hand BigInt operand.
+     * @param right Right-hand BigInt operand.
+     *
+     * @return True if the values are equal; otherwise, false.
+     */
+    friend bool operator==(const BigInt &left, const BigInt &right) noexcept {
+        if (left.Index() != right.Index()) {
+            return false;
+        }
+
+        SizeT32 index = left.Index();
+
+        while (index != 0) {
+            if (left.Storage()[index] != right.Storage()[index]) {
+                return false;
+            }
+
+            --index;
+        }
+
+        return (left.Storage()[0] == right.Storage()[0]);
     }
 
     /**
      * @brief Compares BigInt with a built-in integer for inequality.
-     * @param out    The BigInt instance (left operand).
+     * @param left    The BigInt instance (left operand).
      * @param number The built-in integer (right operand).
      * @return True if BigInt is not equal to number or has more than one limb.
      */
-    QENTEM_INLINE friend bool operator!=(const BigInt &out, const Number_T number) noexcept {
+    QENTEM_INLINE friend bool operator!=(const BigInt &left, const Number_T number) noexcept {
         // Not equal if higher limbs are used or value does not match number.
-        return ((out.index_ != 0) || (out.storage_[0] != number));
+        return ((left.index_ != 0) || (left.storage_[0] != number));
     }
 
     /**
      * @brief Compares a built-in integer with a BigInt for inequality.
      * @param number The built-in integer (left operand).
-     * @param out    The BigInt instance (right operand).
+     * @param right    The BigInt instance (right operand).
      * @return True if number is not equal to BigInt.
      */
-    QENTEM_INLINE friend bool operator!=(const Number_T number, const BigInt &out) noexcept {
+    QENTEM_INLINE friend bool operator!=(const Number_T number, const BigInt &right) noexcept {
         // Delegate to BigInt != number
-        return (out != number);
+        return (right != number);
+    }
+
+    /**
+     * @brief Checks whether two BigInt values are not equal.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the values are considered unequal. Otherwise, all limbs are compared
+     * from the most significant limb down to the least significant limb.
+     *
+     * @param left Left-hand BigInt operand.
+     * @param right Right-hand BigInt operand.
+     *
+     * @return True if the values are not equal; otherwise, false.
+     */
+    friend bool operator!=(const BigInt &left, const BigInt &right) noexcept {
+        if (left.Index() != right.Index()) {
+            return true;
+        }
+
+        SizeT32 index = left.Index();
+
+        while (index != 0) {
+            if (left.Storage()[index] != right.Storage()[index]) {
+                return true;
+            }
+
+            --index;
+        }
+
+        return (left.Storage()[index] != right.Storage()[index]);
     }
 
     /**
