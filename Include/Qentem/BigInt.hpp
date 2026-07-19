@@ -176,7 +176,7 @@ struct BigInt {
      */
     QENTEM_INLINE BigInt &operator=(BigInt &&src) noexcept {
         if (this != &src) {
-            copy(src);
+            Copy(src);
             src.Clear();
         }
 
@@ -190,7 +190,7 @@ struct BigInt {
      */
     QENTEM_INLINE BigInt &operator=(const BigInt &src) noexcept {
         if (this != &src) {
-            copy(src);
+            Copy(src);
         }
 
         return *this;
@@ -276,6 +276,24 @@ struct BigInt {
      * @return True if @p left is less than @p right; otherwise, false.
      */
     friend bool operator<(const BigInt &left, const BigInt &right) noexcept {
+        return Isless(left, right);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is less than another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with fewer used limbs is considered smaller. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @tparam left Left-hand BigInt operand.
+     * @tparam right Right-hand BigInt operand.
+     *
+     * @return True if @p left is less than @p right; otherwise, false.
+     */
+    template <typename BigInt_Left_T, typename BigInt_Right_T>
+    QENTEM_NOINLINE static bool Isless(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return (left.Index() < right.Index());
         }
@@ -331,6 +349,25 @@ struct BigInt {
      *         otherwise, false.
      */
     friend bool operator<=(const BigInt &left, const BigInt &right) noexcept {
+        return IslessOrEqual(left, right);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is less than or equal to another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with fewer used limbs is considered smaller. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @tparam left Left-hand BigInt operand.
+     * @tparam right Right-hand BigInt operand.
+     *
+     * @return True if @p left is less than or equal to @p right;
+     *         otherwise, false.
+     */
+    template <typename BigInt_Left_T, typename BigInt_Right_T>
+    QENTEM_NOINLINE static bool IslessOrEqual(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return (left.Index() < right.Index());
         }
@@ -387,6 +424,24 @@ struct BigInt {
      * @return True if @p left is greater than @p right; otherwise, false.
      */
     friend bool operator>(const BigInt &left, const BigInt &right) noexcept {
+        return IsGreater(left, right);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is greater than another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with more used limbs is considered greater. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @tparam left Left-hand BigInt operand.
+     * @tparam right Right-hand BigInt operand.
+     *
+     * @return True if @p left is greater than @p right; otherwise, false.
+     */
+    template <typename BigInt_Left_T, typename BigInt_Right_T>
+    QENTEM_NOINLINE static bool IsGreater(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return (left.Index() > right.Index());
         }
@@ -442,6 +497,25 @@ struct BigInt {
      *         otherwise, false.
      */
     friend bool operator>=(const BigInt &left, const BigInt &right) noexcept {
+        return IsGreaterOrEqual(left, right);
+    }
+
+    /**
+     * @brief Checks whether a BigInt value is greater than or equal to another.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the value with more used limbs is considered greater. Otherwise, the
+     * limbs are compared from the most significant limb down to the least
+     * significant limb until a difference is found.
+     *
+     * @tparam left Left-hand BigInt operand.
+     * @tparam right Right-hand BigInt operand.
+     *
+     * @return True if @p left is greater than or equal to @p right;
+     *         otherwise, false.
+     */
+    template <typename BigInt_Left_T, typename BigInt_Right_T>
+    QENTEM_NOINLINE static bool IsGreaterOrEqual(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return (left.Index() > right.Index());
         }
@@ -495,6 +569,23 @@ struct BigInt {
      * @return True if the values are equal; otherwise, false.
      */
     friend bool operator==(const BigInt &left, const BigInt &right) noexcept {
+        return IsEqual(left, right);
+    }
+
+    /**
+     * @brief Checks whether two BigInt values are equal.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the values are considered unequal. Otherwise, all limbs are compared
+     * from the most significant limb down to the least significant limb.
+     *
+     * @tparam left Left-hand BigInt operand.
+     * @tparam right Right-hand BigInt operand.
+     *
+     * @return True if the values are equal; otherwise, false.
+     */
+    template <typename BigInt_Left_T, typename BigInt_Right_T>
+    QENTEM_NOINLINE static bool IsEqual(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return false;
         }
@@ -547,6 +638,23 @@ struct BigInt {
      * @return True if the values are not equal; otherwise, false.
      */
     friend bool operator!=(const BigInt &left, const BigInt &right) noexcept {
+        return IsNotEqual(left, right);
+    }
+
+    /**
+     * @brief Checks whether two BigInt values are not equal.
+     *
+     * Compares the number of used limbs first. If the limb counts differ,
+     * the values are considered unequal. Otherwise, all limbs are compared
+     * from the most significant limb down to the least significant limb.
+     *
+     * @tparam left Left-hand BigInt operand.
+     * @tparam right Right-hand BigInt operand.
+     *
+     * @return True if the values are not equal; otherwise, false.
+     */
+    template <typename BigInt_Left_T, typename BigInt_Right_T>
+    QENTEM_NOINLINE static bool IsNotEqual(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return true;
         }
@@ -713,6 +821,25 @@ struct BigInt {
     }
 
     /**
+     * @brief Adds another BigInt to this BigInt.
+     * @tparam bint The BigInt value to add.
+     *
+     * Performs limb-by-limb addition starting from the least-significant
+     * limb. Carry propagation is handled internally by Add(Number_T, SizeT32).
+     *
+     * The result is stored in this BigInt.
+     */
+    template <typename BigInt_T>
+    void AddBigInt(const BigInt_T &bint) noexcept {
+        SizeT32 index = 0;
+
+        do {
+            Add(bint.Storage()[index], index);
+            ++index;
+        } while ((index <= bint.Index()) && (index <= MaxIndex()));
+    }
+
+    /**
      * @brief Subtracts a built-in integer value from this BigInt, starting at a given limb index.
      * @param number The value to subtract.
      * @param index  The starting limb index (default: 0).
@@ -774,8 +901,29 @@ struct BigInt {
     }
 
     /**
+     * @brief Subtracts another BigInt from this BigInt.
+     * @tparam bint The BigInt value to subtract.
+     *
+     * Performs limb-by-limb subtraction starting from the least-significant
+     * limb. Borrow propagation is handled internally by
+     * Subtract(Number_T, SizeT32).
+     *
+     * The result is stored in this BigInt. If the subtraction underflows,
+     * the value wraps around within the fixed width of the BigInt.
+     */
+    template <typename BigInt_T>
+    void SubtractBigInt(const BigInt_T &bint) noexcept {
+        SizeT32 index = 0;
+
+        do {
+            Subtract(bint.Storage()[index], index);
+            ++index;
+        } while ((index <= bint.Index()) && (index <= MaxIndex()));
+    }
+
+    /**
      * @brief Multiplies this BigInt by a built-in integer value (in place).
-     * @param multiplier The value to multiply by.
+     * @tparam multiplier The value to multiply by.
      *
      * Each limb is multiplied by the multiplier, and any overflow is
      * propagated and added to the next higher limb.
@@ -796,7 +944,7 @@ struct BigInt {
 
     /**
      * @brief Multiplies this BigInt by another BigInt.
-     * @param result Receives the full multiplication result.
+     * @tparam result Receives the full multiplication result.
      * @param bint The multiplier.
      *
      * Performs long multiplication by accumulating each limb product at
@@ -810,7 +958,8 @@ struct BigInt {
      * The complete product is written to the supplied DoubleBigInt without
      * truncation.
      */
-    void Multiply(BigInt &result, const BigInt &bint) const noexcept {
+    template <typename BigInt_T>
+    void Multiply(BigInt_T &result, const BigInt &bint) const noexcept {
         const Number_T *storage_a;
         const Number_T *storage_b;
         SizeT32         max_index_a;
@@ -1258,32 +1407,33 @@ struct BigInt {
         return storage_;
     }
 
-  protected:
     /**
      * @brief Copies the value from another BigInt.
-     * @param src The source BigInt to copy from.
+     * @tparam src The source BigInt to copy from.
      *
      * Copies all active limbs and zeros out any unused higher limbs.
      */
-    void copy(const BigInt &src) noexcept {
+    template <typename BigInt_T>
+    void Copy(const BigInt_T &src) noexcept {
         SizeT32 index = 0;
 
-        // Copy each used limb from source
-        while (index <= src.index_) {
-            storage_[index] = src.storage_[index];
-            ++index;
-        }
-
         // Zero out any extra limbs from previous state
-        while (index_ > index) {
+        while (index_ > src.Index()) {
             storage_[index_] = 0;
             --index_;
         }
 
-        // Update current highest index in use
-        index_ = src.index_;
+        // Copy each used limb from source
+        while ((index <= src.Index()) && (index <= MaxIndex())) {
+            storage_[index] = src.Storage()[index];
+            ++index;
+        }
+
+        index_ = index;
+        --index_;
     }
 
+  protected:
     /**
      * @brief Internal helper to perform an arithmetic or bitwise operation on this BigInt and a built-in integer.
      * @tparam Operation The operation to perform (Set, Or, And, Add, Subtract).
