@@ -1676,6 +1676,48 @@ struct BigInt {
         --index_;
     }
 
+    /**
+     * @brief Copies a range of limbs from a source BigInt.
+     *
+     * Copies @p count limbs starting at @p index from the source BigInt and
+     * stores them starting at limb index 0 in the destination BigInt.
+     *
+     * Example:
+     *
+     * Source:
+     *     [11, 22, 33, 44, 55]
+     *
+     * CopyRange(src, 2, 3):
+     *     [33, 44, 55]
+     *
+     * @tparam BigInt_T Source BigInt type.
+     * @param[in] src Source BigInt.
+     * @param[in] index Starting limb index.
+     * @param[in] count Number of limbs to copy.
+     */
+    template <typename BigInt_T>
+    void CopyRange(const BigInt_T &src, SizeT32 index, const SizeT32 count) noexcept {
+        const SizeT32 end_index = (count + index);
+        SizeT32       offset    = 0;
+
+        if (index <= src.Index()) {
+            while ((index < end_index) && (offset <= MaxIndex())) {
+                storage_[offset] = src.Storage()[index];
+                ++offset;
+                ++index;
+            }
+        }
+
+        const SizeT32 new_index = ((offset != 0) ? (offset - 1) : 0);
+
+        while (offset <= index_) {
+            storage_[offset] = 0;
+            ++offset;
+        }
+
+        index_ = new_index;
+    }
+
   protected:
     /**
      * @brief Internal helper to perform an arithmetic or bitwise operation on this BigInt and a built-in integer.
