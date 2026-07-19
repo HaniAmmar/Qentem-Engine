@@ -1259,10 +1259,9 @@ struct BigInt {
                 }
 
                 if (IsGreaterOrEqual(residual, product)) {
-                    estimate.Copy(residual);
-                    estimate.SubtractBigInt(product);
+                    residual.SubtractBigInt(product);
 
-                    if (Isless(estimate, divisor)) {
+                    if (Isless(residual, divisor)) {
                         if (!undershot) {
                             *this -= Number_T{1};
                         }
@@ -1270,13 +1269,12 @@ struct BigInt {
                         break;
                     }
 
+                    estimate.Copy(residual);
                     undershot = true;
                 } else {
-                    estimate.Copy(product);
-                    product.Copy(residual);
-                    estimate.SubtractBigInt(product);
+                    product.SubtractBigInt(residual);
 
-                    if (Isless(estimate, divisor)) {
+                    if (Isless(product, divisor)) {
                         if (undershot) {
                             *this -= Number_T{1};
                         }
@@ -1284,10 +1282,10 @@ struct BigInt {
                         break;
                     }
 
+                    estimate.Copy(product);
+                    residual.Copy(product);
                     undershot = !undershot;
                 }
-
-                residual.Copy(estimate);
             }
 
             remainder.Copy(dividend);
