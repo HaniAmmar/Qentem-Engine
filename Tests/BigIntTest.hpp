@@ -1111,7 +1111,6 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     test.IsEqual(b_int_c.Index(), 15U, __LINE__);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
     test.IsEqual(stream, "340282366920938463426481119284349108225", __LINE__);
 
     b_int_a = 9205322385119247870ULL;
@@ -1122,13 +1121,13 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     test.IsEqual(b_int_c.Index(), 15U, __LINE__);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "169808226154284360409097388803743810050", __LINE__);
 
     b_int_b.Multiply(b_int_c, b_int_a);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "169808226154284360409097388803743810050", __LINE__);
 
     b_int_b = 127;
@@ -1149,14 +1148,14 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
 
     b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "84737960211428776666119659056051974480", __LINE__);
 
     b_int_b = 127;
 
     b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "1169075942910144479490", __LINE__);
 
     b_int_b <<= 8U;
@@ -1164,7 +1163,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
 
     b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "301041657960554763092610", __LINE__);
 
     b_int_b <<= 8U;
@@ -1172,7 +1171,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
 
     b_int_a.Multiply(b_int_c, b_int_b);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "77068717224793900943983170", __LINE__);
 
     b_int_b <<= 8U;
@@ -1180,7 +1179,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
 
     b_int_a.Multiply(b_int_c, b_int_b);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "19729593809619288685159932450", __LINE__);
 
     b_int_b <<= 8U;
@@ -1188,7 +1187,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
 
     b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "5050776017388967374363488965170", __LINE__);
 
     b_int_b <<= 8U;
@@ -1196,7 +1195,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
 
     b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "1292998660452707902490422842571530", __LINE__);
 
     b_int_b <<= 8U;
@@ -1204,21 +1203,21 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
 
     b_int_b.Multiply(b_int_c, b_int_a);
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "331007657075893655687700348302961570", __LINE__);
     ////////////////////////////////////////////////
     b_int_a = 4;
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "16", __LINE__);
 
     b_int_a = 16;
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "256", __LINE__);
 
     b_int_a = 4294967295;
@@ -1227,21 +1226,21 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_c += 4294967295;
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "18446744073709551615", __LINE__);
 
     b_int_a = 0;
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "0", __LINE__);
 
     b_int_a = 1;
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "1", __LINE__);
     ////////////////////////////////////////////////
     b_int_a = 255;
@@ -1249,7 +1248,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "65025", __LINE__);
 
     b_int_a <<= 8U;
@@ -1258,7 +1257,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "4294705156", __LINE__);
 
     b_int_a <<= 8U;
@@ -1267,7 +1266,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "281459575437049", __LINE__);
 
     b_int_a <<= 8U;
@@ -1276,7 +1275,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "18445736900446801936", __LINE__);
 
     b_int_a <<= 8U;
@@ -1285,7 +1284,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "1208859814059621380595225", __LINE__);
 
     b_int_a <<= 8U;
@@ -1294,7 +1293,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "79223836774352080444962648100", __LINE__);
 
     b_int_a <<= 8U;
@@ -1303,7 +1302,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "5192013366843967486848097953450025", __LINE__);
 
     b_int_a <<= 8U;
@@ -1312,7 +1311,7 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int_a.Square(b_int_c);
 
     PrintDigits(b_int_c, stream);
-    b_int_c.Clear();
+
     test.IsEqual(stream, "340263788009486258936411497651121265625", __LINE__);
 }
 
@@ -1590,7 +1589,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 4293967295;
     divisor = 63807;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "67296", __LINE__);
@@ -1601,7 +1600,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 4293967295;
     divisor = 4293967295;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "1", __LINE__);
@@ -1612,7 +1611,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 1;
     divisor = 1;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "1", __LINE__);
@@ -1623,7 +1622,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 0;
     divisor = 1;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "0", __LINE__);
@@ -1634,7 +1633,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 3;
     divisor = 10;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "0", __LINE__);
@@ -1645,7 +1644,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 10;
     divisor = 3;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "3", __LINE__);
@@ -1656,7 +1655,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 65536;
     divisor = 256;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "256", __LINE__);
@@ -1667,7 +1666,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 65535;
     divisor = 256;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "255", __LINE__);
@@ -1678,7 +1677,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 4294967295;
     divisor = 39835;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "107818", __LINE__);
@@ -1689,7 +1688,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 1;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "18446744073709551615", __LINE__);
@@ -1700,7 +1699,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 2;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "9223372036854775807", __LINE__);
@@ -1711,7 +1710,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 254;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "72624976668147841", __LINE__);
@@ -1722,7 +1721,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 62344361146301421;
     divisor = 254;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "245450240733470", __LINE__);
@@ -1733,7 +1732,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 255;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "72340172838076673", __LINE__);
@@ -1744,7 +1743,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 9223372036854775807;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "2", __LINE__);
@@ -1755,7 +1754,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 4611686018427387903;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "4", __LINE__);
@@ -1766,7 +1765,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 2305843009213693951;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "8", __LINE__);
@@ -1777,7 +1776,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 1152921504606846975;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "16", __LINE__);
@@ -1788,7 +1787,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 72057594037927935;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "256", __LINE__);
@@ -1799,7 +1798,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 281474976710655;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "65536", __LINE__);
@@ -1810,7 +1809,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 65280;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "282578800148737", __LINE__);
@@ -1821,7 +1820,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 65535;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "281479271743489", __LINE__);
@@ -1832,7 +1831,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 32767;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "562967133814800", __LINE__);
@@ -1843,7 +1842,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 16383;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "1125968630513920", __LINE__);
@@ -1854,7 +1853,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 8191;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "2252074725150720", __LINE__);
@@ -1865,7 +1864,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 4095;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "4504699407499280", __LINE__);
@@ -1876,7 +1875,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 39835;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "463078801900578", __LINE__);
@@ -1887,7 +1886,7 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 19917;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "926180854230534", __LINE__);
@@ -1898,13 +1897,118 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
     b_int   = 18446744073709551615ULL;
     divisor = 256;
 
-    b_int.Divide(divisor, remainder);
+    b_int.Divide(remainder, divisor);
 
     PrintDigits(b_int, stream);
     test.IsEqual(stream, "72057594037927935", __LINE__);
 
     PrintDigits(remainder, stream);
     test.IsEqual(stream, "255", __LINE__);
+}
+
+static void TestBigInt12(QTest &test, StringStream<char> &stream) {
+    // BigInt_8_128 b_int{};
+    BigInt_8_128 divisor{};
+    BigInt_8_128 mu{};
+
+    // b_int   = 612489549322387456;
+
+    divisor = 17;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "3855", __LINE__);
+
+    divisor = 251;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "261", __LINE__);
+
+    divisor = 33312;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "128931", __LINE__);
+
+    divisor = 65535;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "65537", __LINE__);
+
+    divisor = 1000000;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "281474976", __LINE__);
+
+    divisor = 123456789;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "149418628356", __LINE__);
+
+    divisor = 4294967295;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "4294967297", __LINE__);
+
+    divisor = 9876543210;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "122403739234451", __LINE__);
+
+    divisor = 1099511627776;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "72057594037927936", __LINE__);
+
+    divisor = 281474976710655;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "281474976710657", __LINE__);
+
+    divisor = 72057594037927935;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "72057594037927937", __LINE__);
+
+    // 1329227995784915872903807060280344575
+    divisor = 72057594037927935;
+    divisor <<= 64U;
+    divisor |= 18446744073709551615ULL;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "1329227995784915872903807060280344577", __LINE__);
+
+    // 1160456797507998090227392912199359392
+    divisor = 62908489046687131;
+    divisor <<= 64U;
+    divisor |= 16104573195951905696ULL;
+
+    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+
+    PrintDigits(mu, stream);
+    test.IsEqual(stream, "1522544457124615086448315513449856110", __LINE__);
 }
 
 static int RunBigIntTests() {
@@ -1924,6 +2028,7 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 9", TestBigInt9, false, stream);
     test.Test("BigInt Test 10", TestBigInt10, false, stream);
     test.Test("BigInt Test 11", TestBigInt11, false, stream);
+    test.Test("BigInt Test 12", TestBigInt12, false, stream);
 
     return test.EndTests();
 }

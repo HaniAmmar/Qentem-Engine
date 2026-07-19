@@ -1029,6 +1029,8 @@ struct BigInt {
         SizeT32         max_index_a;
         SizeT32         max_index_b;
 
+        result.Clear();
+
         // Use a consistent operand ordering for the multiplication loops.
         if (Index() >= bint.Index()) {
             storage_a   = Storage();
@@ -1095,6 +1097,8 @@ struct BigInt {
     void Square(BigInt &result) const noexcept {
         SizeT32 offset = Index();
         ++offset;
+
+        result.Clear();
 
         do {
             const SizeT32 current_offset = offset;
@@ -1205,7 +1209,7 @@ struct BigInt {
      * remainder < divisor
      * @endcode
      */
-    void Divide(const BigInt &divisor, BigInt &remainder) noexcept {
+    void Divide(BigInt &remainder, const BigInt &divisor) noexcept {
         if (divisor < *this) {
             BigInt  dividend{*this};
             BigInt  residual{};
@@ -1237,7 +1241,6 @@ struct BigInt {
                     estimate.ShiftRight(divisor_highest_bit);
                 }
 
-                product.Clear();
                 estimate.Multiply(product, divisor);
 
                 const SizeT32 product_highest_bit = product.FindLastBit();
@@ -1288,7 +1291,6 @@ struct BigInt {
             }
 
             remainder.Copy(dividend);
-            product.Clear();
             Multiply(product, divisor);
             remainder.SubtractBigInt(product);
         } else if (IsEqual(*this, divisor)) {
@@ -1300,6 +1302,44 @@ struct BigInt {
             Clear();
         }
     }
+
+    /**
+     * @brief Computes the Barrett reciprocal for a divisor.
+     *
+     * Computes:
+     *
+     *     mu = floor(B^(2k) / divisor)
+     *
+     * where:
+     *
+     *     B = 2^(BitWidth())
+     *     k = divisor.Index() + 1
+     *
+     * The reciprocal is used by Barrett reduction to replace expensive
+     * division operations with multiplication, shifting, and correction
+     * steps during modular arithmetic.
+     *
+     * @param[out] mu The computed Barrett reciprocal.
+     * @param[in] divisor The divisor (modulus) used to compute the reciprocal.
+     */
+    static void ComputeBarrettReciprocal(BigInt &mu, const BigInt &divisor) noexcept {
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+
+        BiggerBigInt remainder{};
+        BiggerBigInt numerator{};
+        BiggerBigInt expanded_divisor{};
+
+        expanded_divisor.Copy(divisor);
+
+        const SizeT32 index = ((divisor.Index() + 1U) * 2U);
+
+        numerator.SetIndex(index);
+        numerator.Storage()[index] = Number_T{1};
+        numerator.Divide(remainder, expanded_divisor);
+
+        mu.Copy(numerator);
+    }
+
 
     /**
      * @brief Shifts this BigInt right by the specified number of bits.
