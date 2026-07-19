@@ -1582,6 +1582,331 @@ static void TestBigInt10(QTest &test, StringStream<char> &stream) {
     test.IsFalse(b_int_b == b_int_a, __LINE__);
 }
 
+static void TestBigInt11(QTest &test, StringStream<char> &stream) {
+    BigInt_8_64 b_int{};
+    BigInt_8_64 divisor{};
+    BigInt_8_64 remainder{};
+
+    b_int   = 4293967295;
+    divisor = 63807;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "67296", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "11423", __LINE__);
+
+    b_int   = 4293967295;
+    divisor = 4293967295;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int   = 1;
+    divisor = 1;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int   = 0;
+    divisor = 1;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int   = 3;
+    divisor = 10;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "3", __LINE__);
+
+    b_int   = 10;
+    divisor = 3;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "3", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    b_int   = 65536;
+    divisor = 256;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "256", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int   = 65535;
+    divisor = 256;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "255", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "255", __LINE__);
+
+    b_int   = 4294967295;
+    divisor = 39835;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "107818", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "37265", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 1;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "18446744073709551615", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 2;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "9223372036854775807", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 254;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "72624976668147841", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    b_int   = 62344361146301421;
+    divisor = 254;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "245450240733470", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "41", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 255;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "72340172838076673", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 9223372036854775807;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "2", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 4611686018427387903;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "4", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "3", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 2305843009213693951;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "8", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "7", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 1152921504606846975;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "16", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "15", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 72057594037927935;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "256", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "255", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 281474976710655;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "65536", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "65535", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 65280;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "282578800148737", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "255", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 65535;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "281479271743489", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 32767;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "562967133814800", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "15", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 16383;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "1125968630513920", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "255", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 8191;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "2252074725150720", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "4095", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 4095;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "4504699407499280", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "15", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 39835;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "463078801900578", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "26985", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 19917;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "926180854230534", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "5937", __LINE__);
+
+    b_int   = 18446744073709551615ULL;
+    divisor = 256;
+
+    b_int.Divide(divisor, remainder);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "72057594037927935", __LINE__);
+
+    PrintDigits(remainder, stream);
+    test.IsEqual(stream, "255", __LINE__);
+}
+
 static int RunBigIntTests() {
     StringStream<char> stream{};
     QTest              test{"BigInt.hpp", __FILE__};
@@ -1598,6 +1923,7 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 8", TestBigInt8, false, stream);
     test.Test("BigInt Test 9", TestBigInt9, false, stream);
     test.Test("BigInt Test 10", TestBigInt10, false, stream);
+    test.Test("BigInt Test 11", TestBigInt11, false, stream);
 
     return test.EndTests();
 }

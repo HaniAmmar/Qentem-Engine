@@ -13,7 +13,8 @@
  *
  * Typical Use Cases:
  * - Accurate floating-point to string conversion
- * - Arbitrary-precision number theory and mathematics
+ * - Arbitrary-precision integer arithmetic
+ * - Number theory and mathematical algorithms
  * - Cryptographic and finite-field arithmetic
  * - Modular exponentiation and modular inversion
  * - Barrett and Montgomery reduction
@@ -21,15 +22,14 @@
  * - Rational, fixed-point, and decimal numeric types
  * - Parsing and encoding large numeric values
  * - Protocols and file formats containing large integer fields
- * - Custom arbitrary-precision arithmetic algorithms
  * - Scientific, engineering, and symbolic computation
  *
- * Key Features:
- * - Header-only and portable implementation
- * - Configurable unsigned limb type (e.g. uint16_t, uint32_t, uint64_t)
- * - Double-width multiplication and division algorithms
+ * Features:
+ * - Configurable unsigned limb type (e.g. uint8_t, uint16_t, uint32_t, uint64_t)
+ * - Arbitrary-precision addition, subtraction, multiplication, and division
+ * - Quotient and remainder computation
+ * - Bitwise AND, OR, shifts, and comparison operations
  * - Deterministic arithmetic behavior across supported platforms
- * - Suitable as a foundation for arbitrary-precision and number-theoretic algorithms
  *
  * @tparam Number_T Unsigned integer type used as the storage limb.
  * @tparam Bits     Maximum number of bits available for the integer value.
@@ -1160,6 +1160,145 @@ struct BigInt {
 
         // Return the final remainder
         return remainder;
+    }
+
+    /**
+     * @brief Divides this BigInt by another BigInt.
+     *
+     * Computes the integer quotient and remainder of:
+     *
+     * @code
+     * quotient  = (*this) / divisor
+     * remainder = (*this) % divisor
+     * @endcode
+     *
+     * The quotient replaces the current value, while the remainder is written
+     * to the supplied output parameter.
+     *
+     * This implementation uses an iterative approximation approach. An initial
+     * quotient estimate is generated from the highest limb of the divisor and
+     * the most significant portion of the current dividend. The estimate is
+     * multiplied by the divisor and compared against the remaining value. The
+     * quotient is then refined by alternately adding or subtracting correction
+     * terms until the remaining difference becomes smaller than the divisor.
+     *
+     * A temporary BigInt with additional bit capacity is used during
+     * multiplication to prevent intermediate overflow while evaluating
+     * quotient estimates.
+     *
+     * Special cases:
+     * - If the dividend is smaller than the divisor, the quotient becomes 0
+     *   and the remainder becomes the original dividend.
+     * - If the dividend is equal to the divisor, the quotient becomes 1
+     *   and the remainder becomes 0.
+     * - Otherwise, the quotient and remainder are computed iteratively.
+     *
+     * @param divisor The value used as the divisor.
+     * @param remainder Receives the division remainder.
+     *
+     * @note The current BigInt is modified and becomes the quotient.
+     * @note Division by zero must be prevented by the caller.
+     *
+     * @post
+     * @code
+     * original_dividend = (*this * divisor) + remainder
+     * remainder < divisor
+     * @endcode
+     */
+    void Divide(const BigInt &divisor, BigInt &remainder) noexcept {
+        if (divisor < *this) {
+            BigInt  dividend{*this};
+            BigInt  residual{};
+            BigInt &estimate{remainder};
+
+            BigInt<Number_T, TotalBitWidth() + BitWidth()> product{};
+
+            SizeT32 divisor_highest_bit  = Platform::FindLastBit(divisor.Storage()[divisor.Index()]);
+            bool divisor_is_power_of_two = (divisor.Storage()[divisor.Index()] == (Number_T{1} << divisor_highest_bit));
+            bool undershot               = true;
+
+            if (divisor_is_power_of_two) {
+                residual.SetIndex(divisor.Index());
+                residual.Storage()[divisor.Index()] = divisor.Storage()[divisor.Index()];
+
+                divisor_is_power_of_two = IsEqual(residual, divisor);
+            }
+
+            residual.Copy(*this);
+            Clear();
+
+            while (true) {
+                SizeT32 current_highest_bit = estimate.FindLastBit();
+                estimate.ShiftRight(divisor.Index() * divisor.BitWidth());
+
+                if (!divisor_is_power_of_two) {
+                    estimate.Divide(divisor.Storage()[divisor.Index()]);
+                } else {
+                    estimate.ShiftRight(divisor_highest_bit);
+                }
+
+                product.Clear();
+                estimate.Multiply(product, divisor);
+
+                const SizeT32 product_highest_bit = product.FindLastBit();
+
+                if (product_highest_bit < current_highest_bit) {
+                    current_highest_bit -= product_highest_bit;
+
+                    estimate <<= current_highest_bit;
+                    product <<= current_highest_bit;
+                }
+
+                if (undershot) {
+                    Add(estimate);
+                } else {
+                    Subtract(estimate);
+                }
+
+                if (IsGreaterOrEqual(residual, product)) {
+                    estimate.Copy(residual);
+                    estimate.SubtractBigInt(product);
+
+                    if (Isless(estimate, divisor)) {
+                        if (!undershot) {
+                            *this -= Number_T{1};
+                        }
+
+                        break;
+                    }
+
+                    undershot = true;
+                } else {
+                    estimate.Copy(product);
+                    product.Copy(residual);
+                    estimate.SubtractBigInt(product);
+
+                    if (Isless(estimate, divisor)) {
+                        if (undershot) {
+                            *this -= Number_T{1};
+                        }
+
+                        break;
+                    }
+
+                    undershot = !undershot;
+                }
+
+                residual.Copy(estimate);
+            }
+
+            remainder.Copy(dividend);
+            product.Clear();
+            Multiply(product, divisor);
+            remainder.SubtractBigInt(product);
+        } else if (IsEqual(*this, divisor)) {
+            remainder.Clear();
+            Clear();
+            Storage()[0] = Number_T{1};
+        } else {
+            remainder.Copy(*this);
+            Clear();
+        }
     }
 
     /**
