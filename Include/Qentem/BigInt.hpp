@@ -699,6 +699,33 @@ struct BigInt {
     }
 
     /**
+     * @brief Performs a bitwise OR operation with another BigInt type.
+     *
+     * Updates this BigInt in place by applying a bitwise OR between each
+     * corresponding storage element of this object and @p bint.
+     *
+     * Only storage elements up to the smaller of the two active indices are
+     * processed. Any higher storage elements already present in this object remain
+     * unchanged.
+     *
+     * @tparam BigInt_T A BigInt.
+     * @param bint The value to OR with this BigInt.
+     *
+     * @note The operation modifies the current object.
+     */
+    template <typename BigInt_T>
+    void Or(const BigInt_T &bint) noexcept {
+        SizeT32 index = (Index() <= bint.Index() ? Index() : bint.Index());
+
+        while (index > 0) {
+            Storage()[index] |= bint.Storage()[index];
+            --index;
+        }
+
+        Storage()[0] |= bint.Storage()[0];
+    }
+
+    /**
      * @brief Bitwise AND assignment with a built-in integer.
      * @tparam N_Number_T Any integer type (usually unsigned).
      * @param number Value to AND with.
@@ -706,6 +733,43 @@ struct BigInt {
     template <typename N_Number_T>
     QENTEM_INLINE void operator&=(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::And>(number);
+    }
+
+    /**
+     * @brief Performs a bitwise AND operation with another BigInt type.
+     *
+     * Updates this BigInt in place by applying a bitwise AND between each
+     * corresponding storage element of this object and @p bint.
+     *
+     * Any storage elements beyond the highest valid index of @p bint are cleared,
+     * since they cannot contribute to the result. After the operation, leading
+     * zero storage elements are removed by adjusting the internal index.
+     *
+     * @tparam BigInt_T A BigInt.
+     * @param bint The value to AND with this BigInt.
+     *
+     * @note The operation modifies the current object.
+     * @note The result is normalized by trimming leading zero storage elements.
+     */
+    template <typename BigInt_T>
+    void And(const BigInt_T &bint) noexcept {
+        SizeT32 index = (Index() <= bint.Index() ? Index() : bint.Index());
+
+        while (index_ > index) {
+            Storage()[index_] = 0;
+            --index_;
+        }
+
+        while (index > 0) {
+            Storage()[index] &= bint.Storage()[index];
+            --index;
+        }
+
+        Storage()[0] &= bint.Storage()[0];
+
+        while ((index_ > 0) && (Storage()[index_] == 0)) {
+            --index_;
+        }
     }
 
     /**
