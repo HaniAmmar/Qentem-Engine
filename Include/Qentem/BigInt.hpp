@@ -299,7 +299,7 @@ struct BigInt {
      * @return True if @p left is less than @p right; otherwise, false.
      */
     QENTEM_NOINLINE friend bool operator<(const BigInt &left, const BigInt &right) noexcept {
-        return Isless(left, right);
+        return IsLess(left, right);
     }
 
     /**
@@ -316,7 +316,7 @@ struct BigInt {
      * @return True if @p left is less than @p right; otherwise, false.
      */
     template <typename BigInt_Left_T, typename BigInt_Right_T>
-    QENTEM_NOINLINE static bool Isless(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
+    QENTEM_NOINLINE static bool IsLess(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return (left.Index() < right.Index());
         }
@@ -372,7 +372,7 @@ struct BigInt {
      *         otherwise, false.
      */
     QENTEM_NOINLINE friend bool operator<=(const BigInt &left, const BigInt &right) noexcept {
-        return IslessOrEqual(left, right);
+        return IsLessOrEqual(left, right);
     }
 
     /**
@@ -390,7 +390,7 @@ struct BigInt {
      *         otherwise, false.
      */
     template <typename BigInt_Left_T, typename BigInt_Right_T>
-    QENTEM_NOINLINE static bool IslessOrEqual(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
+    QENTEM_NOINLINE static bool IsLessOrEqual(const BigInt_Left_T &left, const BigInt_Right_T &right) noexcept {
         if (left.Index() != right.Index()) {
             return (left.Index() < right.Index());
         }
@@ -1235,7 +1235,7 @@ struct BigInt {
      */
     template <typename BigInt_Divisor_T>
     void Divide(BigInt &remainder, const BigInt_Divisor_T &divisor) noexcept {
-        if (Isless(divisor, *this)) {
+        if (IsLess(divisor, *this)) {
             BigInt  dividend{*this};
             BigInt  residual{};
             BigInt &estimate{remainder};
@@ -1286,7 +1286,7 @@ struct BigInt {
                 if (IsGreaterOrEqual(residual, product)) {
                     residual.SubtractBigInt(product);
 
-                    if (Isless(residual, divisor)) {
+                    if (IsLess(residual, divisor)) {
                         if (!undershot) {
                             *this -= Number_T{1};
                         }
@@ -1299,7 +1299,7 @@ struct BigInt {
                 } else {
                     product.SubtractBigInt(residual);
 
-                    if (Isless(product, divisor)) {
+                    if (IsLess(product, divisor)) {
                         if (undershot) {
                             *this -= Number_T{1};
                         }
