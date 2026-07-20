@@ -1669,6 +1669,88 @@ struct BigInt {
     }
 
     /**
+     * @brief Computes the greatest common divisor (GCD) using the Euclidean algorithm.
+     *
+     * The algorithm repeatedly computes the remainder of the division between
+     * the current operands until the right-hand value becomes zero.
+     *
+     * @param remainder Temporary BigInt used to store intermediate remainders.
+     *                  Its contents are overwritten during the computation.
+     * @param right Right-hand operand. Its value is consumed and replaced with
+     *              intermediate remainders during the computation.
+     *
+     * @note Upon completion, the current value contains the GCD.
+     * @note The value of @p right is modified.
+     */
+    void GCD(BigInt &remainder, BigInt &right) noexcept {
+        // Iterative Euclidean algorithm.
+
+        // temp = a % b;
+        // a    = b;
+        // b    = temp;
+
+        remainder.Clear();
+
+        while (right.IsNotZero()) {
+            Divide(remainder, right);
+
+            Copy(right);
+            right.Copy(remainder);
+        }
+    }
+
+    /**
+     * @brief Computes the greatest common divisor (GCD) using the Euclidean algorithm.
+     *
+     * A temporary remainder value is allocated internally.
+     *
+     * @param right Right-hand operand. Its value is consumed and replaced with
+     *              intermediate remainders during the computation.
+     *
+     * @note Upon completion, the current value contains the GCD.
+     * @note The value of @p right is modified.
+     */
+    void GCD(BigInt &right) noexcept {
+        BigInt remainder{};
+
+        GCD(remainder, right);
+    }
+
+    /**
+     * @brief Computes the least common multiple (LCM).
+     *
+     * The result is computed using:
+     *
+     *     LCM(a, b) = (a * b) / GCD(a, b)
+     *
+     * A temporary wider BigInt type is used internally to preserve the full
+     * multiplication result before division.
+     *
+     * @param right Right-hand operand. Its value is consumed during the GCD
+     *              computation and is modified.
+     *
+     * @note If the current value is zero, the result remains zero.
+     * @note The value of @p right is modified.
+     */
+    void LCM(BigInt &right) noexcept {
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+        BiggerBigInt product{};
+        BigInt       remainder{};
+
+        if (IsNotZero()) {
+            // (a * b) / GCD(a, b).
+            Multiply(product, right);
+
+            GCD(remainder, right);
+
+            remainder.Clear();
+            product.Divide(remainder, *this);
+
+            Copy(product);
+        }
+    }
+
+    /**
      * @brief Shifts this BigInt right by the specified number of bits.
      * @param offset Number of bits to shift.
      *

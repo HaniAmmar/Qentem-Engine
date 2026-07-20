@@ -2332,6 +2332,150 @@ static void TestBigInt14(QTest &test, StringStream<char> &stream) {
 
     PrintDigits(value1, stream);
     test.IsEqual(stream, "104262798", __LINE__);
+
+    value1 = 48;
+    value2 = 18;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "144", __LINE__);
+
+    value1 = 54;
+    value2 = 24;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "216", __LINE__);
+
+    value1 = 270;
+    value2 = 192;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "8640", __LINE__);
+
+    value1 = 12345;
+    value2 = 54321;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "223530915", __LINE__);
+
+    value1 = 65535;
+    value2 = 255;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "65535", __LINE__);
+
+    value1 = 1048576;
+    value2 = 32768;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "1048576", __LINE__);
+
+    value1 = 999999;
+    value2 = 777777;
+
+    value1.GCD(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "111111", __LINE__);
+
+    value1 = 999999;
+    value2 = 777777;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "6999993", __LINE__);
+
+    value1 = 0;
+    value2 = 15;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    value1 = 15;
+    value2 = 0;
+
+    value1.GCD(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "15", __LINE__);
+
+    value1 = 15;
+    value2 = 0;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    value1 = 1;
+    value2 = 99999999;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "99999999", __LINE__);
+
+    value1 = 99999999;
+    value2 = 1;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "99999999", __LINE__);
+
+    value1 = 99999999;
+    value2 = 99999999;
+
+    value1.GCD(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "99999999", __LINE__);
+
+    value1 = 99999999;
+    value2 = 99999999;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "99999999", __LINE__);
+
+    value1 = 1234567890123456789;
+    value2 = 987654321098765432;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "1219326311370217952114007012098917848", __LINE__);
+
+    value1 = 18446744073709551615ULL;
+    value2 = 12297829382473034415ULL;
+
+    value1.GCD(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "15", __LINE__);
+
+    value1 = 18446744073709551615ULL;
+    value2 = 12297829382473034415ULL;
+
+    value1.LCM(value2);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "15123660752041709491770297770540922015", __LINE__);
 }
 
 static int RunBigIntTests() {
