@@ -1421,8 +1421,9 @@ struct BigInt {
      * @note The input value must be less than b^(2k), where k is the number
      *       of limbs in the modulus and b = 2^BitWidth().
      */
-    void ReduceBarrett(const BigInt &modulus, const BigInt &mu) noexcept {
-        if (*this > modulus) {
+    template <typename BigInt_T>
+    void ReduceBarrett(const BigInt_T &modulus, const BigInt_T &mu) noexcept {
+        if (IsGreater(*this, modulus)) {
             using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() + BitWidth())>;
             // using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
 
@@ -1497,6 +1498,12 @@ struct BigInt {
      *
      * @note If exponent is zero, the result is one.
      * @note The current value is treated as the base value.
+     * @note Barrett reduction requires:
+     *
+     *           0 ≤ x < b^(2k)
+     *
+     *       where b is the limb base and k is the number of limbs in the
+     *       modulus.
      */
     void ModExpBarrett(BigInt exponent, const BigInt &modulus) {
         // using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() + BitWidth())>;
@@ -1600,6 +1607,64 @@ struct BigInt {
                 break;
             }
         }
+    }
+
+    /**
+     * @brief Computes modular multiplication.
+     *
+     * Replaces the current value with:
+     *
+     *     this = (this * right) mod modulus
+     *
+     * A temporary wider BigInt type is used internally to hold the
+     * multiplication result before modular reduction.
+     *
+     * @param right Right-hand multiplicand.
+     * @param modulus Modulus used for reduction.
+     */
+    void ModMul(const BigInt &right, const BigInt &modulus) noexcept {
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+        BiggerBigInt product{};
+        BiggerBigInt remainder{};
+
+        Multiply(product, right);
+
+        product.Divide(remainder, modulus);
+
+        Copy(remainder);
+    }
+
+    /**
+     * @brief Computes modular multiplication using Barrett reduction.
+     *
+     * Replaces the current value with:
+     *
+     *     this = (this * right) mod modulus
+     *
+     * The multiplication is performed using a temporary wider BigInt type
+     * to preserve the full product before reduction.
+     *
+     * @param right Right-hand multiplicand.
+     * @param modulus Modulus used for reduction.
+     * @param mu Barrett reciprocal computed for the supplied modulus.
+     *
+     * @note The Barrett reciprocal must be computed from the same modulus.
+     * @note Barrett reduction requires:
+     *
+     *           0 ≤ (this * right) < b^(2k)
+     *
+     *       where b is the limb base and k is the number of limbs in the
+     *       modulus.
+     */
+    void ModMulBarrett(const BigInt &right, const BigInt &modulus, const BigInt &mu) noexcept {
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+        BiggerBigInt product{};
+
+        Multiply(product, right);
+
+        product.ReduceBarrett(modulus, mu);
+
+        Copy(product);
     }
 
     /**

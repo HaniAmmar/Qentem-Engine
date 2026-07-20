@@ -2292,6 +2292,40 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "765463067831795765155076543083762527", __LINE__);
 }
 
+static void TestBigInt14(QTest &test, StringStream<char> &stream) {
+    BigInt_8_128 value1{};
+    BigInt_8_128 value2{};
+    BigInt_8_128 modulus{};
+    BigInt_8_128 mu{};
+
+    value1 = 4160217067;
+    value2 = 780053355;
+
+    modulus = 600;
+
+    value1.ModMul(value2, modulus);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "585", __LINE__);
+
+    value1 = 4160217067;
+    value2 = 780053355;
+
+    modulus = 110057349;
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
+
+    value1.ModMul(value2, modulus);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "104262798", __LINE__);
+
+    value1 = 4160217067;
+    value1.ModMulBarrett(value2, modulus, mu);
+
+    PrintDigits(value1, stream);
+    test.IsEqual(stream, "104262798", __LINE__);
+}
+
 static int RunBigIntTests() {
     StringStream<char> stream{};
     QTest              test{"BigInt.hpp", __FILE__};
@@ -2310,7 +2344,8 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 10", TestBigInt10, false, stream);
     test.Test("BigInt Test 11", TestBigInt11, false, stream);
     test.Test("BigInt Test 12", TestBigInt12, false, stream);
-    test.Test("BigInt Test 12", TestBigInt13, false, stream);
+    test.Test("BigInt Test 13", TestBigInt13, false, stream);
+    test.Test("BigInt Test 14", TestBigInt14, false, stream);
 
     return test.EndTests();
 }
