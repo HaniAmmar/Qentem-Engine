@@ -1480,6 +1480,129 @@ struct BigInt {
     }
 
     /**
+     * @brief Computes modular exponentiation using Barrett reduction.
+     *
+     * Replaces the current value with:
+     *
+     *     this = (this^exponent) mod modulus
+     *
+     * The exponent is processed using the binary square-and-multiply algorithm.
+     * All modular reductions are performed using Barrett reduction. A Barrett
+     * reciprocal is computed once from the supplied modulus and reused
+     * throughout the exponentiation, avoiding repeated division operations.
+     *
+     * @param exponent Exponent value. A local copy is consumed during bit
+     *                 processing.
+     * @param modulus Modulus used for reduction operations.
+     *
+     * @note If exponent is zero, the result is one.
+     * @note The current value is treated as the base value.
+     */
+    void ModExpBarrett(BigInt exponent, const BigInt &modulus) {
+        // using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() + BitWidth())>;
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+
+        BiggerBigInt base{};
+
+        base.Copy(*this);
+        *this = Number_T{1}; // result
+
+        if (exponent.IsNotZero()) {
+            BiggerBigInt product{};
+
+            BigInt mu{};
+            ComputeBarrettMu(mu, modulus);
+
+            // base = base % modulus;
+            base.ReduceBarrett(modulus, mu);
+
+            while (true) {
+                if ((exponent.Storage()[0] & Number_T{1}) != 0) {
+                    // result = (result * base) % modulus;
+                    Multiply(product, base); // product = result * base
+
+                    product.ReduceBarrett(modulus, mu); // result  = product % modulus
+                    Copy(product);
+                }
+
+                if (exponent != Number_T{1}) {
+                    exponent.ShiftRight(1U);
+
+                    // base = (base * base) % modulus;
+                    base.Square(product); // product = (base * base)
+
+                    product.ReduceBarrett(modulus, mu); // base = product % modulus
+                    base.Copy(product);
+
+                    continue;
+                }
+
+                break;
+            }
+        }
+    }
+
+    /**
+     * @brief Computes modular exponentiation.
+     *
+     * Replaces the current value with:
+     *
+     *     this = (this^exponent) mod modulus
+     *
+     * The exponent is processed using the binary square-and-multiply algorithm.
+     * Intermediate multiplication results are reduced modulo the supplied
+     * modulus to prevent unbounded growth. A temporary wider BigInt type is
+     * used internally to hold multiplication results prior to reduction.
+     *
+     * @param exponent Exponent value. A local copy is consumed during bit
+     *                 processing.
+     * @param modulus Modulus used for reduction operations.
+     *
+     * @note If exponent is zero, the result is one.
+     * @note The current value is treated as the base value.
+     */
+    void ModExp(BigInt exponent, const BigInt &modulus) noexcept {
+        // using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() + BitWidth())>;
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+
+        BiggerBigInt base{};
+
+        base.Copy(*this);
+        *this = Number_T{1}; // result
+
+        if (exponent.IsNotZero()) {
+            BiggerBigInt product{};
+            BiggerBigInt remainder{};
+
+            // base = base % modulus;
+            base.Divide(remainder, modulus);
+            base.Copy(remainder);
+
+            while (true) {
+                if ((exponent.Storage()[0] & Number_T{1}) != 0) {
+                    // result = (result * base) % modulus;
+                    Multiply(product, base);            // product = result * base
+                    product.Divide(remainder, modulus); // result  = product % modulus
+                    Copy(remainder);
+                }
+
+                if (exponent != Number_T{1}) {
+                    exponent.ShiftRight(1U);
+
+                    // base = (base * base) % modulus;
+                    base.Square(product); // product = (base * base)
+
+                    product.Divide(base, modulus); // base = product % modulus
+
+                    continue;
+                }
+
+                break;
+            }
+        }
+    }
+
+    /**
      * @brief Shifts this BigInt right by the specified number of bits.
      * @param offset Number of bits to shift.
      *

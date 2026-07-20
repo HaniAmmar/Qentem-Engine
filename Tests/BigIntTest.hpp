@@ -2087,6 +2087,211 @@ static void TestBigInt12(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "1522544457124615086448315513449856110", __LINE__);
 }
 
+static void TestBigInt13(QTest &test, StringStream<char> &stream) {
+    BigInt_8_128 base{};
+    BigInt_8_128 exponent{};
+    BigInt_8_128 modulus{};
+
+    base     = 0;
+    exponent = 123456;
+    modulus  = 12345;
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    base = 0;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    base     = 10;
+    exponent = 10;
+    modulus  = 100;
+
+    base.ModExp(exponent, modulus);
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    base = 10;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    base     = 10;
+    exponent = 9;
+    modulus  = 100;
+
+    base.ModExp(exponent, modulus);
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    base = 10;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    base     = 1;
+    exponent = 10;
+    modulus  = 100;
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    base = 1;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    exponent = 2;
+    modulus  = 11;
+
+    base = 11 - 1;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    base = 11 - 1;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    modulus  = 11;
+    exponent = 65537;
+
+    base = 11;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    base = 11;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    exponent = 0;
+    modulus  = 11;
+
+    base = 123456789;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    base = 123456789;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    exponent = 13;
+    modulus  = 11;
+
+    base = 7;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "2", __LINE__);
+
+    base = 7;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "2", __LINE__);
+
+    exponent = 560;
+    modulus  = 561;
+
+    base = 7;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    base = 7;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    exponent = 1234567;
+    modulus  = 9876543210987654321ULL;
+
+    base = 1234567890123456789ULL;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "5665503960566550396", __LINE__);
+
+    base = 1234567890123456789ULL;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "5665503960566550396", __LINE__);
+
+    exponent = 65537;
+    modulus  = 18446744073709551557ULL;
+
+    base = 18446744073709551615ULL;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "11852812834839358633", __LINE__);
+
+    base = 18446744073709551615ULL;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "11852812834839358633", __LINE__);
+
+    exponent = 123456789;
+    modulus  = 72057594037927935ULL;
+
+    base = 18446744073709551615ULL;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "17588285005349985", __LINE__);
+
+    base = 18446744073709551615ULL;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "17588285005349985", __LINE__);
+
+    return;
+    exponent = 65537;
+
+    // 1160456797507998090227392912199359392
+    modulus = 62908489046687131;
+    modulus <<= 64;
+    modulus |= 16104573195951905696ULL;
+
+    // 1329227995784915872903807060280344575
+    base = 72057594037927935;
+    base <<= 64;
+    base |= 18446744073709551615ULL;
+    base.ModExp(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "765463067831795765155076543083762527", __LINE__);
+
+    base = 72057594037927935;
+    base <<= 64;
+    base |= 18446744073709551615ULL;
+    base.ModExpBarrett(exponent, modulus);
+
+    PrintDigits(base, stream);
+    test.IsEqual(stream, "765463067831795765155076543083762527", __LINE__);
+}
+
 static int RunBigIntTests() {
     StringStream<char> stream{};
     QTest              test{"BigInt.hpp", __FILE__};
@@ -2105,6 +2310,7 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 10", TestBigInt10, false, stream);
     test.Test("BigInt Test 11", TestBigInt11, false, stream);
     test.Test("BigInt Test 12", TestBigInt12, false, stream);
+    test.Test("BigInt Test 12", TestBigInt13, false, stream);
 
     return test.EndTests();
 }
