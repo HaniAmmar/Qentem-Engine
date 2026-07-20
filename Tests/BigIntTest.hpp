@@ -1919,7 +1919,7 @@ static void TestBigInt12(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "3855", __LINE__);
 
     value = 1234;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "10", __LINE__);
@@ -1932,7 +1932,7 @@ static void TestBigInt12(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "261", __LINE__);
 
     value = 100000;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "102", __LINE__);
@@ -1945,55 +1945,55 @@ static void TestBigInt12(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "128931", __LINE__);
 
     value = 233307;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "123", __LINE__);
 
     value = modulus;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "0", __LINE__);
 
     value += 1;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "1", __LINE__);
 
     value = 123456789;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "2517", __LINE__);
 
     value = 35651584;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "7744", __LINE__);
 
     value = 33312 * 33312;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "0", __LINE__);
 
     value += 80;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "80", __LINE__);
 
     value = 70000;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "3376", __LINE__);
 
     value = 7000000;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "4480", __LINE__);
@@ -2006,7 +2006,7 @@ static void TestBigInt12(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "65537", __LINE__);
 
     value = 123456789;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "54384", __LINE__);
@@ -2033,7 +2033,7 @@ static void TestBigInt12(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "4294967297", __LINE__);
 
     value = 18446744073709551615ULL;
-    value.ReduceBarrett(mu, modulus);
+    value.ReduceBarrett(modulus, mu);
 
     PrintDigits(value, stream);
     test.IsEqual(stream, "0", __LINE__);

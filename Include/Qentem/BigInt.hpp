@@ -101,7 +101,14 @@ struct BigInt {
     /**
      * @brief Default constructor. Initializes to zero.
      */
-    QENTEM_INLINE BigInt() noexcept = default;
+    BigInt() noexcept {
+        SizeT32 index = 0;
+
+        while (index <= MaxIndex()) {
+            Storage()[index] = 0;
+            ++index;
+        }
+    }
 
     /**
      * @brief Destructor.
@@ -112,11 +119,16 @@ struct BigInt {
      * @brief Move constructor.
      * @param src Source BigInt. Its contents are cleared after construction.
      */
-    QENTEM_INLINE BigInt(BigInt &&src) noexcept : index_{src.index_} {
+    BigInt(BigInt &&src) noexcept : index_{src.index_} {
         SizeT32 index = 0;
         // Copy all active limbs from src to this BigInt
         while (index <= index_) {
             storage_[index] = src.storage_[index];
+            ++index;
+        }
+
+        while (index <= MaxIndex()) {
+            Storage()[index] = 0;
             ++index;
         }
 
@@ -127,11 +139,16 @@ struct BigInt {
      * @brief Copy constructor.
      * @param src Source BigInt to copy from.
      */
-    QENTEM_INLINE BigInt(const BigInt &src) noexcept : index_{src.index_} {
+    BigInt(const BigInt &src) noexcept : index_{src.index_} {
         SizeT32 index = 0;
         // Copy all limbs from src to this BigInt
         while (index <= index_) {
             storage_[index] = src.storage_[index];
+            ++index;
+        }
+
+        while (index <= MaxIndex()) {
+            Storage()[index] = 0;
             ++index;
         }
     }
@@ -142,8 +159,14 @@ struct BigInt {
      * @param number Value to initialize with.
      */
     template <typename N_Number_T>
-    QENTEM_INLINE BigInt(const N_Number_T number) noexcept : index_{0} {
-        storage_[0] = 0;
+    BigInt(const N_Number_T number) noexcept : index_{0} {
+        SizeT32 index = 0;
+
+        while (index <= MaxIndex()) {
+            Storage()[index] = 0;
+            ++index;
+        }
+
         doOperation<BigIntOperation::Set>(number);
     }
 
@@ -156,7 +179,7 @@ struct BigInt {
      * Unused higher limbs are cleared.
      */
     template <typename N_Number_T>
-    QENTEM_INLINE BigInt &operator=(const N_Number_T number) noexcept {
+    BigInt &operator=(const N_Number_T number) noexcept {
         SizeT32 index = index_;
         doOperation<BigIntOperation::Set>(number);
 
@@ -174,7 +197,7 @@ struct BigInt {
      * @param src Source BigInt to move from. The source is cleared after assignment.
      * @return Reference to this BigInt.
      */
-    QENTEM_INLINE BigInt &operator=(BigInt &&src) noexcept {
+    BigInt &operator=(BigInt &&src) noexcept {
         if (this != &src) {
             Copy(src);
             src.Clear();
@@ -188,7 +211,7 @@ struct BigInt {
      * @param src Source BigInt to copy from.
      * @return Reference to this BigInt.
      */
-    QENTEM_INLINE BigInt &operator=(const BigInt &src) noexcept {
+    BigInt &operator=(const BigInt &src) noexcept {
         if (this != &src) {
             Copy(src);
         }
@@ -275,7 +298,7 @@ struct BigInt {
      *
      * @return True if @p left is less than @p right; otherwise, false.
      */
-    friend bool operator<(const BigInt &left, const BigInt &right) noexcept {
+    QENTEM_NOINLINE friend bool operator<(const BigInt &left, const BigInt &right) noexcept {
         return Isless(left, right);
     }
 
@@ -348,7 +371,7 @@ struct BigInt {
      * @return True if @p left is less than or equal to @p right;
      *         otherwise, false.
      */
-    friend bool operator<=(const BigInt &left, const BigInt &right) noexcept {
+    QENTEM_NOINLINE friend bool operator<=(const BigInt &left, const BigInt &right) noexcept {
         return IslessOrEqual(left, right);
     }
 
@@ -423,7 +446,7 @@ struct BigInt {
      *
      * @return True if @p left is greater than @p right; otherwise, false.
      */
-    friend bool operator>(const BigInt &left, const BigInt &right) noexcept {
+    QENTEM_NOINLINE friend bool operator>(const BigInt &left, const BigInt &right) noexcept {
         return IsGreater(left, right);
     }
 
@@ -496,7 +519,7 @@ struct BigInt {
      * @return True if @p left is greater than or equal to @p right;
      *         otherwise, false.
      */
-    friend bool operator>=(const BigInt &left, const BigInt &right) noexcept {
+    QENTEM_NOINLINE friend bool operator>=(const BigInt &left, const BigInt &right) noexcept {
         return IsGreaterOrEqual(left, right);
     }
 
@@ -568,7 +591,7 @@ struct BigInt {
      *
      * @return True if the values are equal; otherwise, false.
      */
-    friend bool operator==(const BigInt &left, const BigInt &right) noexcept {
+    QENTEM_NOINLINE friend bool operator==(const BigInt &left, const BigInt &right) noexcept {
         return IsEqual(left, right);
     }
 
@@ -637,7 +660,7 @@ struct BigInt {
      *
      * @return True if the values are not equal; otherwise, false.
      */
-    friend bool operator!=(const BigInt &left, const BigInt &right) noexcept {
+    QENTEM_NOINLINE friend bool operator!=(const BigInt &left, const BigInt &right) noexcept {
         return IsNotEqual(left, right);
     }
 
@@ -875,7 +898,7 @@ struct BigInt {
      *
      * The result is stored in this BigInt.
      */
-    void Add(const BigInt &bint) noexcept {
+    QENTEM_NOINLINE void Add(const BigInt &bint) noexcept {
         SizeT32 index = 0;
 
         do {
@@ -894,7 +917,7 @@ struct BigInt {
      * The result is stored in this BigInt.
      */
     template <typename BigInt_T>
-    void AddBigInt(const BigInt_T &bint) noexcept {
+    QENTEM_NOINLINE void AddBigInt(const BigInt_T &bint) noexcept {
         SizeT32 index = 0;
 
         do {
@@ -955,7 +978,7 @@ struct BigInt {
      * The result is stored in this BigInt. If the subtraction underflows,
      * the value wraps around within the fixed width of the BigInt.
      */
-    void Subtract(const BigInt &bint) noexcept {
+    QENTEM_NOINLINE void Subtract(const BigInt &bint) noexcept {
         SizeT32 index = 0;
 
         do {
@@ -976,7 +999,7 @@ struct BigInt {
      * the value wraps around within the fixed width of the BigInt.
      */
     template <typename BigInt_T>
-    void SubtractBigInt(const BigInt_T &bint) noexcept {
+    QENTEM_NOINLINE void SubtractBigInt(const BigInt_T &bint) noexcept {
         SizeT32 index = 0;
 
         do {
@@ -1094,7 +1117,8 @@ struct BigInt {
      * truncation and is equivalent to Multiply(*this), but avoids
      * redundant multiplications by exploiting the symmetry of squaring.
      */
-    void Square(BigInt &result) const noexcept {
+    template <typename BigInt_T>
+    void Square(BigInt_T &result) const noexcept {
         SizeT32 offset = Index();
         ++offset;
 
@@ -1209,8 +1233,9 @@ struct BigInt {
      * remainder < divisor
      * @endcode
      */
-    void Divide(BigInt &remainder, const BigInt &divisor) noexcept {
-        if (divisor < *this) {
+    template <typename BigInt_Divisor_T>
+    void Divide(BigInt &remainder, const BigInt_Divisor_T &divisor) noexcept {
+        if (Isless(divisor, *this)) {
             BigInt  dividend{*this};
             BigInt  residual{};
             BigInt &estimate{remainder};
@@ -1392,10 +1417,14 @@ struct BigInt {
      *
      * @param mu Precomputed Barrett reciprocal for the modulus.
      * @param modulus Divisor used for the reduction.
+     *
+     * @note The input value must be less than b^(2k), where k is the number
+     *       of limbs in the modulus and b = 2^BitWidth().
      */
-    void ReduceBarrett(const BigInt &mu, const BigInt &modulus) noexcept {
+    void ReduceBarrett(const BigInt &modulus, const BigInt &mu) noexcept {
         if (*this > modulus) {
-            using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+            using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() + BitWidth())>;
+            // using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
 
             BigInt        q1{};
             BiggerBigInt  q2{};
@@ -1437,14 +1466,14 @@ struct BigInt {
                 Copy(b_k);
             }
 
-            if (*this >= modulus) {
+            if (IsGreaterOrEqual(*this, modulus)) {
                 SubtractBigInt(modulus);
 
-                if (*this >= modulus) {
+                if (IsGreaterOrEqual(*this, modulus)) {
                     SubtractBigInt(modulus);
                 }
             }
-        } else if (*this == modulus) {
+        } else if (IsEqual(*this, modulus)) {
             *this = Number_T{0};
         }
     }
@@ -1874,7 +1903,7 @@ struct BigInt {
      * Used by assignment and compound operators for in-place modification.
      */
     template <BigIntOperation Operation, typename N_Number_T>
-    QENTEM_INLINE void doOperation(N_Number_T number) noexcept {
+    void doOperation(N_Number_T number) noexcept {
         // True if N_Number_T is wider than one limb.
         constexpr bool is_bigger_size = (((sizeof(N_Number_T) * 8U) / BitWidth()) > 1U);
 
@@ -1974,7 +2003,7 @@ struct BigInt {
      * Each element represents a fixed-width chunk ("limb") of the overall value.
      * Size is determined by MaxIndex() + 1 to cover all requested bits.
      */
-    Number_T storage_[MaxIndex() + Number_T{1}]{0};
+    Number_T storage_[MaxIndex() + Number_T{1}];
 
     /**
      * @brief Highest non-zero limb index currently used.
