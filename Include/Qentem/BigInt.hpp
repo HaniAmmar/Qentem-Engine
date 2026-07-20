@@ -15,20 +15,27 @@
  * - Accurate floating-point to string conversion
  * - Arbitrary-precision integer arithmetic
  * - Number theory and mathematical algorithms
+ * - Modular arithmetic, exponentiation, and inversion
  * - Cryptographic and finite-field arithmetic
- * - Modular exponentiation and modular inversion
- * - Barrett and Montgomery reduction
+ * - Public-key cryptography (RSA, Diffie-Hellman, etc.)
+ * - Barrett reduction and reciprocal-based modular reduction
  * - Primality testing (Miller-Rabin, Fermat, etc.)
  * - Rational, fixed-point, and decimal numeric types
- * - Parsing and encoding large numeric values
+ * - Parsing, encoding, and serialization of large numeric values
  * - Protocols and file formats containing large integer fields
  * - Scientific, engineering, and symbolic computation
  *
  * Features:
- * - Configurable unsigned limb type (e.g. uint8_t, uint16_t, uint32_t, uint64_t)
- * - Arbitrary-precision addition, subtraction, multiplication, and division
+ * - Configurable unsigned limb type
+ *   (e.g. uint8_t, uint16_t, uint32_t, uint64_t)
+ * - Fixed-capacity arbitrary-precision integer representation
+ * - Addition, subtraction, multiplication, division, and squaring
  * - Quotient and remainder computation
- * - Bitwise AND, OR, shifts, and comparison operations
+ * - Bit-shift and bitwise operations
+ * - Comparison operations
+ * - Modular exponentiation
+ * - Barrett reciprocal computation and Barrett reduction
+ * - Configurable limb width and storage size
  * - Deterministic arithmetic behavior across supported platforms
  *
  * @tparam Number_T Unsigned integer type used as the storage limb.
@@ -1493,10 +1500,10 @@ struct BigInt {
      * The exponent is processed using the binary square-and-multiply algorithm.
      * All modular reductions are performed using Barrett reduction. A Barrett
      * reciprocal is computed once from the supplied modulus and reused
-     * throughout the exponentiation, avoiding repeated division operations.
+     * throughout the exponentiation, avoiding repeated division operations and
+     * keeping all arithmetic within the modular domain.
      *
-     * @param exponent Exponent value. A local copy is consumed during bit
-     *                 processing.
+     * @param exponent Exponent value. Modified during processing.
      * @param modulus Modulus used for reduction operations.
      *
      * @note If exponent is zero, the result is one.
@@ -1507,8 +1514,11 @@ struct BigInt {
      *
      *       where b is the limb base and k is the number of limbs in the
      *       modulus.
+     *
+     * @warning The exponent is consumed during processing and will be modified.
+     *          Make a copy before calling if the original value must be preserved.
      */
-    void ModExpBarrett(BigInt exponent, const BigInt &modulus) {
+    void ModExpBarrett(BigInt &exponent, const BigInt &modulus) {
         // using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() + BitWidth())>;
         using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
 
@@ -1561,17 +1571,20 @@ struct BigInt {
      *
      * The exponent is processed using the binary square-and-multiply algorithm.
      * Intermediate multiplication results are reduced modulo the supplied
-     * modulus to prevent unbounded growth. A temporary wider BigInt type is
-     * used internally to hold multiplication results prior to reduction.
+     * modulus to keep all operations within the modular domain. A temporary
+     * wider BigInt type is used internally to hold multiplication results
+     * prior to reduction.
      *
-     * @param exponent Exponent value. A local copy is consumed during bit
-     *                 processing.
+     * @param exponent Exponent value. Modified during processing.
      * @param modulus Modulus used for reduction operations.
      *
      * @note If exponent is zero, the result is one.
      * @note The current value is treated as the base value.
+     *
+     * @warning The exponent is consumed during processing and will be modified.
+     *          Make a copy before calling if the original value must be preserved.
      */
-    void ModExp(BigInt exponent, const BigInt &modulus) noexcept {
+    void ModExp(BigInt &exponent, const BigInt &modulus) noexcept {
         // using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() + BitWidth())>;
         using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
 

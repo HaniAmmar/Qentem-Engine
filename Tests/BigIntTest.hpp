@@ -2115,7 +2115,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "0", __LINE__);
 
-    base = 0;
+    base     = 0;
+    exponent = 123456;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2129,7 +2130,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "0", __LINE__);
 
-    base = 10;
+    base     = 10;
+    exponent = 10;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2143,7 +2145,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "0", __LINE__);
 
-    base = 10;
+    base     = 10;
+    exponent = 9;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2156,22 +2159,24 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "1", __LINE__);
 
-    base = 1;
+    base     = 1;
+    exponent = 10;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
     test.IsEqual(stream, "1", __LINE__);
 
+    base     = 11 - 1;
     exponent = 2;
     modulus  = 11;
 
-    base = 11 - 1;
     base.ModExp(exponent, modulus);
 
     PrintDigits(base, stream);
     test.IsEqual(stream, "1", __LINE__);
 
-    base = 11 - 1;
+    base     = 11 - 1;
+    exponent = 2;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2180,7 +2185,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     modulus  = 11;
     exponent = 65537;
 
-    base = 11;
+    base     = 11;
+    exponent = 65537;
     base.ModExp(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2195,7 +2201,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     exponent = 0;
     modulus  = 11;
 
-    base = 123456789;
+    base     = 123456789;
+    exponent = 0;
     base.ModExp(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2216,7 +2223,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "2", __LINE__);
 
-    base = 7;
+    base     = 7;
+    exponent = 13;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2231,7 +2239,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "1", __LINE__);
 
-    base = 7;
+    base     = 7;
+    exponent = 560;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2246,7 +2255,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "5665503960566550396", __LINE__);
 
-    base = 1234567890123456789ULL;
+    base     = 1234567890123456789ULL;
+    exponent = 1234567;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2261,7 +2271,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "11852812834839358633", __LINE__);
 
-    base = 18446744073709551615ULL;
+    base     = 18446744073709551615ULL;
+    exponent = 65537;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2276,7 +2287,8 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "17588285005349985", __LINE__);
 
-    base = 18446744073709551615ULL;
+    base     = 18446744073709551615ULL;
+    exponent = 123456789;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2301,6 +2313,7 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     base = 72057594037927935;
     base <<= 64;
     base |= 18446744073709551615ULL;
+    exponent = 65537;
     base.ModExpBarrett(exponent, modulus);
 
     PrintDigits(base, stream);
@@ -2492,7 +2505,7 @@ static void TestBigInt15(QTest &test, StringStream<char> &stream) {
 
     value1 = 18446744073709551615ULL;
     value1 += 1;
-    test.IsEqual(value1.Index(), 0, __LINE__);
+    test.IsEqual(value1.Index(), 0U, __LINE__);
 
     value1 = 144115188075855871;
     value2 = 256;
@@ -2511,6 +2524,29 @@ static void TestBigInt15(QTest &test, StringStream<char> &stream) {
     // Expected low 64 bits of:
     // 20769187434139310225891609165168641
     test.IsEqual(stream, "18158513697557839873", __LINE__);
+
+    // SizeT32 a_number{65535};
+    // SizeT32 b_number{65535};
+
+    // while (a_number != 0) {
+    //     while (b_number != 0) {
+    //         value1 = a_number;
+    //         value2 = b_number;
+
+    //         SizeT32 q = a_number / b_number;
+    //         SizeT32 r = a_number % b_number;
+
+    //         value1.Divide(result, value2);
+
+    //         test.IsEqual(SizeT32{value1}, q, __LINE__);
+    //         test.IsEqual(SizeT32{result}, r, __LINE__);
+
+    //         --b_number;
+    //     }
+
+    //     --a_number;
+    //     b_number = a_number;
+    // }
 }
 
 static int RunBigIntTests() {
