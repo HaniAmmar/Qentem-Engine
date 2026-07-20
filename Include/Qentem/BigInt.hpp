@@ -1432,10 +1432,11 @@ struct BigInt {
             BiggerBigInt &r2{q2};
             BigInt        b_k{};
 
-            const SizeT32 k = (modulus.Index() + 1U);
+            const SizeT32 k    = (modulus.Index() + 1U);
+            const SizeT32 k_p1 = (k + 1U);
 
-            b_k.SetIndex(k);
-            b_k.Storage()[k] = Number_T{1};
+            b_k.SetIndex(k_p1);
+            b_k.Storage()[k_p1] = Number_T{1};
             b_k.Subtract(Number_T{1});
 
             // q1.Copy(*this);
@@ -1458,8 +1459,8 @@ struct BigInt {
                 Copy(r1);
             } else {
                 b_k.Clear();
-                b_k.SetIndex(k);
-                b_k.Storage()[k] = Number_T{1};
+                b_k.SetIndex(k_p1);
+                b_k.Storage()[k_p1] = Number_T{1};
 
                 r2.SubtractBigInt(r1);
                 b_k.SubtractBigInt(r2);
