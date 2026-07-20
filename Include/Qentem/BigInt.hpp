@@ -867,25 +867,23 @@ struct BigInt {
             storage_[index] += number;
 
             // If no overflow occurred, addition is complete
-            if (storage_[index] >= tmp) {
+            if ((storage_[index] >= tmp) || (index == MaxIndex())) {
                 break;
             }
 
             ++index;
-
-            if (index > MaxIndex()) {
-                index_ = 0;
-                index  = 0;
-                break;
-            }
 
             // Overflow occurred: set number to 1 to propagate carry
             number = Number_T{1};
         } while (true);
 
         // update the highest used limb index if necessary
-        if ((index > index_) && (number != 0)) {
+        if ((index >= index_) && (number != 0)) {
             index_ = index;
+
+            while ((storage_[index_] == 0) && (index_ != 0)) {
+                --index_;
+            }
         }
     }
 
