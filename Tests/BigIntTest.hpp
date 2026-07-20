@@ -323,11 +323,11 @@ static void TestBigInt3(QTest &test) {
     BigInt_64_128 b_int_1{};
 
     test.IsTrue(b_int_1.IsZero(), __LINE__);
-    test.IsFalse(b_int_1.NotZero(), __LINE__);
+    test.IsFalse(b_int_1.IsNotZero(), __LINE__);
 
     b_int_1 = 18446744073709551615ULL;
     test.IsFalse(b_int_1.IsZero(), __LINE__);
-    test.IsTrue(b_int_1.NotZero(), __LINE__);
+    test.IsTrue(b_int_1.IsNotZero(), __LINE__);
     test.IsFalse(b_int_1.IsMultiLimb(), __LINE__);
     b_int_1 <<= 64U;
     test.IsTrue(b_int_1.IsMultiLimb(), __LINE__);
@@ -362,7 +362,7 @@ static void TestBigInt3(QTest &test) {
     test.IsEqual(SizeT64{s_64[0]}, SizeT64{0}, __LINE__);
     test.IsEqual(SizeT64{s_64[1]}, SizeT64{0}, __LINE__);
     test.IsTrue(b_int_1.IsZero(), __LINE__);
-    test.IsFalse(b_int_1.NotZero(), __LINE__);
+    test.IsFalse(b_int_1.IsNotZero(), __LINE__);
 
     b_int_1 = 18446744073709551615ULL;
     b_int_1 <<= 96U;
@@ -374,7 +374,7 @@ static void TestBigInt3(QTest &test) {
     test.IsEqual(SizeT64{s_64[0]}, SizeT64{4294967295ULL}, __LINE__);
     test.IsEqual(SizeT64{s_64[1]}, SizeT64{0}, __LINE__);
     test.IsFalse(b_int_1.IsZero(), __LINE__);
-    test.IsTrue(b_int_1.NotZero(), __LINE__);
+    test.IsTrue(b_int_1.IsNotZero(), __LINE__);
 
     b_int_1 = 18446744073709551615ULL;
     b_int_1 <<= 32U;
@@ -399,7 +399,7 @@ static void TestBigInt3(QTest &test) {
     b_int_1 >>= 1U;
     test.IsEqual(SizeT64{s_64[0]}, SizeT64{0}, __LINE__);
     test.IsTrue(b_int_1.IsZero(), __LINE__);
-    test.IsFalse(b_int_1.NotZero(), __LINE__);
+    test.IsFalse(b_int_1.IsNotZero(), __LINE__);
 
     b_int_1 = 18446744073709551615ULL;
     b_int_1 <<= 128U;

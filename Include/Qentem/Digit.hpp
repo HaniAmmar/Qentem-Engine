@@ -1270,7 +1270,7 @@ struct Digit {
             InsertZeros(stream, (DigitConst::MaxPowerOfTen - (stream.Length() - length)));
         }
 
-        if (b_int.NotZero()) {
+        if (b_int.IsNotZero()) {
             NumberToString<true>(stream, b_int.Number());
         }
     }

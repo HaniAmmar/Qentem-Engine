@@ -1709,14 +1709,6 @@ struct BigInt {
     }
 
     /**
-     * @brief Checks if this BigInt is not zero.
-     * @return True if value is not zero.
-     */
-    QENTEM_INLINE bool NotZero() const noexcept {
-        return (*this != 0);
-    }
-
-    /**
      * @brief Checks if this BigInt value is zero.
      * @return True if value is zero.
      */
@@ -1725,7 +1717,7 @@ struct BigInt {
     }
 
     /**
-     * @brief Checks if this BigInt value is not zero.
+     * @brief Checks if this BigInt is not zero.
      * @return True if value is not zero.
      */
     QENTEM_INLINE bool IsNotZero() const noexcept {
