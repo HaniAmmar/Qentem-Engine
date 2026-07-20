@@ -1904,6 +1904,14 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
 
     PrintDigits(remainder, stream);
     test.IsEqual(stream, "255", __LINE__);
+
+    b_int   = 9999999800000001;
+    divisor = 99999999;
+
+    b_int.Divide(remainder, divisor);
+
+    PrintDigits(b_int, stream);
+    test.IsEqual(stream, "99999999", __LINE__);
 }
 
 static void TestBigInt12(QTest &test, StringStream<char> &stream) {

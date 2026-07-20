@@ -1233,12 +1233,13 @@ struct BigInt {
      * remainder < divisor
      * @endcode
      */
-    template <typename BigInt_Divisor_T>
-    void Divide(BigInt &remainder, const BigInt_Divisor_T &divisor) noexcept {
+    template <typename BigInt_Remainder_T, typename BigInt_Divisor_T>
+    void Divide(BigInt_Remainder_T &remainder, const BigInt_Divisor_T &divisor) noexcept {
         if (IsLess(divisor, *this)) {
-            BigInt  dividend{*this};
-            BigInt  residual{};
-            BigInt &estimate{remainder};
+            BigInt dividend{*this};
+            BigInt residual{};
+
+            BigInt_Remainder_T &estimate{remainder};
 
             BigInt<Number_T, TotalBitWidth() + BitWidth()> product{};
 
@@ -1287,7 +1288,7 @@ struct BigInt {
                     residual.SubtractBigInt(product);
 
                     if (IsLess(residual, divisor)) {
-                        if (!undershot) {
+                        if (!undershot && residual.IsNotZero()) {
                             *this -= Number_T{1};
                         }
 
