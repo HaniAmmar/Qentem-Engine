@@ -1320,24 +1320,134 @@ struct BigInt {
      * @param[out] mu The computed Barrett reciprocal.
      * @param[in] divisor The divisor (modulus) used to compute the reciprocal.
      */
-    static void ComputeBarrettReciprocal(BigInt &mu, const BigInt &divisor) noexcept {
+    static void ComputeBarrettMu(BigInt &mu, const BigInt &modulus) noexcept {
         using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
 
         BiggerBigInt remainder{};
         BiggerBigInt numerator{};
-        BiggerBigInt expanded_divisor{};
+        BiggerBigInt expanded_modulus{};
 
-        expanded_divisor.Copy(divisor);
+        expanded_modulus.Copy(modulus);
 
-        const SizeT32 index = ((divisor.Index() + 1U) * 2U);
+        const SizeT32 index = ((modulus.Index() + 1U) * 2U);
 
         numerator.SetIndex(index);
         numerator.Storage()[index] = Number_T{1};
-        numerator.Divide(remainder, expanded_divisor);
+        numerator.Divide(remainder, expanded_modulus);
 
         mu.Copy(numerator);
     }
 
+    /**
+     * @brief Reduces the current value modulo a divisor using Barrett reduction.
+     *
+     * Barrett reduction replaces an expensive division with a precomputed reciprocal
+     * and a small number of multiplications, shifts, and subtractions.
+     *
+     * The reciprocal (`mu`) must be computed beforehand using
+     * ComputeBarrettMu():
+     *
+     * @code
+     * BigInt mu{};
+     * BigInt::ComputeBarrettMu(mu, modulus);
+     *
+     * value.ReduceBarrett(mu, modulus);
+     * @endcode
+     *
+     * This function modifies the current value in place:
+     *
+     * @code
+     * this = this % modulus;
+     * @endcode
+     *
+     * The reduction follows the Barrett algorithm:
+     *
+     * @code
+     * q1 = floor(x / b^(k - 1))
+     * q2 = q1 * mu
+     * q3 = floor(q2 / b^(k + 1))
+     * r1 = x mod b^k
+     * r2 = (q3 * n) mod b^k
+     * r  = r1 - r2
+     *
+     * if (r < 0) {
+     *     r += b^k;
+     * }
+     *
+     * if (r >= n) {
+     *     r -= n;
+     *     if (r >= n) {
+     *         r -= n;
+     *     }
+     * }
+     *
+     * @endcode
+     *
+     * where:
+     * - x is the current value.
+     * - n is the modulus.
+     * - b is the internal limb base (2^BitWidth()).
+     * - k is the number of limbs used by the modulus.
+     * - mu is the Barrett reciprocal.
+     *
+     * @param mu Precomputed Barrett reciprocal for the modulus.
+     * @param modulus Divisor used for the reduction.
+     */
+    void ReduceBarrett(const BigInt &mu, const BigInt &modulus) noexcept {
+        if (*this > modulus) {
+            using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+
+            BigInt        q1{};
+            BiggerBigInt  q2{};
+            BigInt       &r1{q1};
+            BiggerBigInt &r2{q2};
+            BigInt        b_k{};
+
+            const SizeT32 k = (modulus.Index() + 1U);
+
+            b_k.SetIndex(k);
+            b_k.Storage()[k] = Number_T{1};
+            b_k.Subtract(Number_T{1});
+
+            // q1.Copy(*this);
+            // q1.ShiftRight(modulus.Index() * BitWidth());
+            q1.CopyRange(*this, modulus.Index(), ((Index() + 1) - modulus.Index()));
+
+            q1.Multiply(q2, mu);
+            q2.ShiftRight((k + 1U) * BitWidth());
+
+            r1.Copy(*this);
+            r1.And(b_k);
+
+            Copy(q2); // q2.Multiply(r2, modulus);
+            Multiply(q2, modulus);
+            // &r2 = q2
+            r2.And(b_k);
+
+            if (IsGreaterOrEqual(r1, r2)) {
+                r1.SubtractBigInt(r2);
+                Copy(r1);
+            } else {
+                b_k.Clear();
+                b_k.SetIndex(k);
+                b_k.Storage()[k] = Number_T{1};
+
+                r2.SubtractBigInt(r1);
+                b_k.SubtractBigInt(r2);
+                Copy(b_k);
+            }
+
+            if (*this >= modulus) {
+                SubtractBigInt(modulus);
+
+                if (*this >= modulus) {
+                    SubtractBigInt(modulus);
+                }
+            }
+        } else if (*this == modulus) {
+            *this = Number_T{0};
+        }
+    }
 
     /**
      * @brief Shifts this BigInt right by the specified number of bits.

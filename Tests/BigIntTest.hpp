@@ -1907,105 +1907,181 @@ static void TestBigInt11(QTest &test, StringStream<char> &stream) {
 }
 
 static void TestBigInt12(QTest &test, StringStream<char> &stream) {
-    // BigInt_8_128 b_int{};
-    BigInt_8_128 divisor{};
+    BigInt_8_128 value{};
+    BigInt_8_128 modulus{};
     BigInt_8_128 mu{};
 
-    // b_int   = 612489549322387456;
+    modulus = 17;
 
-    divisor = 17;
-
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "3855", __LINE__);
 
-    divisor = 251;
+    value = 1234;
+    value.ReduceBarrett(mu, modulus);
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "10", __LINE__);
+
+    modulus = 251;
+
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "261", __LINE__);
 
-    divisor = 33312;
+    value = 100000;
+    value.ReduceBarrett(mu, modulus);
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "102", __LINE__);
+
+    modulus = 33312;
+
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "128931", __LINE__);
 
-    divisor = 65535;
+    value = 233307;
+    value.ReduceBarrett(mu, modulus);
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "123", __LINE__);
+
+    value = modulus;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    value += 1;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "1", __LINE__);
+
+    value = 123456789;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "2517", __LINE__);
+
+    value = 35651584;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "7744", __LINE__);
+
+    value = 33312 * 33312;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    value += 80;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "80", __LINE__);
+
+    value = 70000;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "3376", __LINE__);
+
+    value = 7000000;
+    value.ReduceBarrett(mu, modulus);
+
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "4480", __LINE__);
+
+    modulus = 65535;
+
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "65537", __LINE__);
 
-    divisor = 1000000;
+    value = 123456789;
+    value.ReduceBarrett(mu, modulus);
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "54384", __LINE__);
+
+    modulus = 1000000;
+
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "281474976", __LINE__);
 
-    divisor = 123456789;
+    modulus = 123456789;
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "149418628356", __LINE__);
 
-    divisor = 4294967295;
+    modulus = 4294967295;
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "4294967297", __LINE__);
 
-    divisor = 9876543210;
+    value = 18446744073709551615ULL;
+    value.ReduceBarrett(mu, modulus);
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    PrintDigits(value, stream);
+    test.IsEqual(stream, "0", __LINE__);
+
+    modulus = 9876543210;
+
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "122403739234451", __LINE__);
 
-    divisor = 1099511627776;
+    modulus = 1099511627776;
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "72057594037927936", __LINE__);
 
-    divisor = 281474976710655;
+    modulus = 281474976710655;
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "281474976710657", __LINE__);
 
-    divisor = 72057594037927935;
+    modulus = 72057594037927935;
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "72057594037927937", __LINE__);
 
     // 1329227995784915872903807060280344575
-    divisor = 72057594037927935;
-    divisor <<= 64U;
-    divisor |= 18446744073709551615ULL;
+    modulus = 72057594037927935;
+    modulus <<= 64U;
+    modulus |= 18446744073709551615ULL;
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "1329227995784915872903807060280344577", __LINE__);
 
     // 1160456797507998090227392912199359392
-    divisor = 62908489046687131;
-    divisor <<= 64U;
-    divisor |= 16104573195951905696ULL;
+    modulus = 62908489046687131;
+    modulus <<= 64U;
+    modulus |= 16104573195951905696ULL;
 
-    BigInt_8_128::ComputeBarrettReciprocal(mu, divisor);
+    BigInt_8_128::ComputeBarrettMu(mu, modulus);
 
     PrintDigits(mu, stream);
     test.IsEqual(stream, "1522544457124615086448315513449856110", __LINE__);
