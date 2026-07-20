@@ -1076,6 +1076,14 @@ static void TestBigInt9(QTest &test, StringStream<char> &stream) {
     b_int.Normalize();
     test.IsEqual(b_int.Index(), SizeT64{2}, __LINE__);
 
+    b_int_a = 144115188075855871;
+    b_int_b = 256;
+
+    b_int_b.Multiply(b_int_c, b_int_a);
+    PrintDigits(b_int_c, stream);
+
+    test.IsEqual(stream, "36893488147419102976", __LINE__);
+
     b_int_a = 18446744073709551615ULL;
 
     b_int_b = 255;
@@ -2274,7 +2282,6 @@ static void TestBigInt13(QTest &test, StringStream<char> &stream) {
     PrintDigits(base, stream);
     test.IsEqual(stream, "17588285005349985", __LINE__);
 
-    return;
     exponent = 65537;
 
     // 1160456797507998090227392912199359392
@@ -2478,6 +2485,34 @@ static void TestBigInt14(QTest &test, StringStream<char> &stream) {
     test.IsEqual(stream, "15123660752041709491770297770540922015", __LINE__);
 }
 
+static void TestBigInt15(QTest &test, StringStream<char> &stream) {
+    BigInt_8_64 value1{};
+    BigInt_8_64 value2{};
+    BigInt_8_64 result{};
+
+    value1 = 18446744073709551615ULL;
+    value1 += 1;
+    test.IsEqual(value1.Index(), 0, __LINE__);
+
+    value1 = 144115188075855871;
+    value2 = 256;
+
+    value1.Multiply(result, value2);
+    PrintDigits(result, stream);
+    // Expected low 64 bits of:
+    // 36893488147419102976
+    test.IsEqual(stream, "18446744073709551360", __LINE__);
+
+    value1 = 144115188075855871;
+    value2 = 144115188075855871;
+
+    value1.Multiply(result, value2);
+    PrintDigits(result, stream);
+    // Expected low 64 bits of:
+    // 20769187434139310225891609165168641
+    test.IsEqual(stream, "18158513697557839873", __LINE__);
+}
+
 static int RunBigIntTests() {
     StringStream<char> stream{};
     QTest              test{"BigInt.hpp", __FILE__};
@@ -2498,6 +2533,7 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 12", TestBigInt12, false, stream);
     test.Test("BigInt Test 13", TestBigInt13, false, stream);
     test.Test("BigInt Test 14", TestBigInt14, false, stream);
+    test.Test("BigInt Test 15", TestBigInt15, false, stream);
 
     return test.EndTests();
 }

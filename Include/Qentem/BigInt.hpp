@@ -1067,32 +1067,36 @@ struct BigInt {
             max_index_b = Index();
         }
 
-        SizeT32 index2 = max_index_b;
-        SizeT32 offset = max_index_b;
-        ++index2;
+        SizeT32 index_a = 0;
+        while (index_a <= max_index_a) {
+            SizeT32 index_b = 0;
 
-        // Multiply each limb of the smaller operand by the larger operand
-        // and accumulate the partial products into the result at the
-        // appropriate limb offsets.
-        do {
-            SizeT32 index1 = max_index_a;
-            ++index1;
-            --index2;
+            while (index_b <= max_index_b) {
+                Number_T number_a = storage_a[index_a];
 
-            do {
-                const SizeT32 current_index = index1;
-                --index1;
+                const Number_T carry =
+                    DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number_a, storage_b[index_b]);
 
-                Number_T number = storage_a[index1];
+                SizeT32 current_index = (index_a + index_b);
 
-                const Number_T carry = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number, storage_b[index2]);
+                result.Add(number_a, current_index);
+                ++current_index;
 
-                result.Add(number, (index1 + offset));
-                result.Add(carry, (current_index + offset));
-            } while (index1 != 0);
+                if (current_index <= result.MaxIndex()) {
+                    result.Add(carry, current_index);
 
-            --offset;
-        } while (index2 != 0);
+                    ++index_b;
+
+                    continue;
+                }
+
+                // Remaining products can only contribute to higher limbs,
+                // which are outside the destination range.
+                break;
+            }
+
+            ++index_a;
+        }
     }
 
     /**
