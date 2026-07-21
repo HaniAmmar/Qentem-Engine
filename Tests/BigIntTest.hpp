@@ -2499,9 +2499,16 @@ static void TestBigInt14(QTest &test, StringStream<char> &stream) {
 }
 
 static void TestBigInt15(QTest &test, StringStream<char> &stream) {
-    BigInt_8_64 value1{};
-    BigInt_8_64 value2{};
-    BigInt_8_64 result{};
+    BigInt_8_64  value1{};
+    BigInt_8_64  value2{};
+    BigInt_8_64  result{};
+    BigInt_8_128 b_result{};
+
+    BigInt_32_63  value_32{};
+    BigInt_32_128 b_result_32{};
+
+    BigInt_64_128         value_64{};
+    BigInt<SizeT64, 256U> b_result_64{};
 
     value1 = 18446744073709551615ULL;
     value1 += 1;
@@ -2524,6 +2531,60 @@ static void TestBigInt15(QTest &test, StringStream<char> &stream) {
     // Expected low 64 bits of:
     // 20769187434139310225891609165168641
     test.IsEqual(stream, "18158513697557839873", __LINE__);
+
+    value1 = 4294967295;
+
+    value1.Square(result);
+
+    PrintDigits(result, stream);
+    test.IsEqual(stream, "18446744065119617025", __LINE__);
+
+    value1 = 18446744073709551615ULL;
+
+    value1.Square(b_result);
+
+    PrintDigits(b_result, stream);
+    test.IsEqual(stream, "340282366920938463426481119284349108225", __LINE__);
+
+    value_32 = 18446744073709551615ULL;
+
+    value_32.Square(b_result_32);
+
+    PrintDigits(b_result_32, stream);
+    test.IsEqual(stream, "340282366920938463426481119284349108225", __LINE__);
+
+    value_64 = 1;
+    value_64 <<= 64U;
+
+    value_64.Square(b_result_64);
+
+    PrintDigits(b_result_64, stream);
+    test.IsEqual(stream, "340282366920938463463374607431768211456", __LINE__);
+
+    value_64 = 4294967297;
+    value_64 <<= 64U;
+    value_64 |= 4294967297;
+
+    value_64.Square(b_result_64);
+
+    PrintDigits(b_result_64, stream);
+    test.IsEqual(stream, "6277101738309684039518442360694764122037442888675098624001", __LINE__);
+
+    value_64 = 18446744069414584320ULL;
+
+    value_64.Square(b_result_64);
+
+    PrintDigits(b_result_64, stream);
+    test.IsEqual(stream, "340282366762482138453292676318389862400", __LINE__);
+
+    value_64 = 18446744073709551615ULL;
+    value_64 <<= 64U;
+    value_64 |= 18446744073709551615ULL;
+
+    value_64.Square(b_result_64);
+
+    PrintDigits(b_result_64, stream);
+    test.IsEqual(stream, "115792089237316195423570985008687907852589419931798687112530834793049593217025", __LINE__);
 
     // SizeT32 a_number{65535};
     // SizeT32 b_number{65535};

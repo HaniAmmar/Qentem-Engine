@@ -1136,11 +1136,10 @@ struct BigInt {
         do {
             const SizeT32 current_offset = offset;
             --offset;
+            SizeT32 sub_offset = (offset << 1U);
 
             Number_T number = storage_[offset];
-            Number_T carry  = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number, storage_[offset]);
-
-            SizeT32 sub_offset = (offset << 1U);
+            Number_T carry  = DoubleWidthArithmetic<Number_T, BitWidth()>::Square(number);
 
             // Add the diagonal term: a[i]² at offset (2 * i).
             result.Add(number, sub_offset);
@@ -2198,33 +2197,33 @@ struct BigInt {
         switch (Operation) {
             case BigIntOperation::Set: {
                 // Assign lowest limb, clear higher limbs
-                storage_[0] = Number_T(number);
+                storage_[0] = static_cast<Number_T>(number);
                 index_      = 0;
                 break;
             }
 
             case BigIntOperation::Or: {
                 // Bitwise OR with the lowest limb only
-                storage_[0] |= Number_T(number);
+                storage_[0] |= static_cast<Number_T>(number);
                 break;
             }
 
             case BigIntOperation::And: {
                 // Bitwise AND with the lowest limb, clear higher limbs
-                storage_[0] &= Number_T(number);
+                storage_[0] &= static_cast<Number_T>(number);
                 index_ = 0;
                 break;
             }
 
             case BigIntOperation::Add: {
                 // Add to the lowest limb
-                Add(Number_T(number));
+                Add(static_cast<Number_T>(number));
                 break;
             }
 
             case BigIntOperation::Subtract: {
                 // Subtract from the lowest limb
-                Subtract(Number_T(number));
+                Subtract(static_cast<Number_T>(number));
                 break;
             }
         }
@@ -2238,14 +2237,14 @@ struct BigInt {
                 switch (Operation) {
                     case BigIntOperation::Set: {
                         // Assign higher limb
-                        storage_[index] = Number_T(number);
+                        storage_[index] = static_cast<Number_T>(number);
                         ++index_;
                         break;
                     }
 
                     case BigIntOperation::Or: {
                         // Bitwise OR with higher limb
-                        storage_[index] |= Number_T(number);
+                        storage_[index] |= static_cast<Number_T>(number);
                         // Update index_ if we've touched a new higher limb
                         if (index > index_) {
                             index_ = index;
@@ -2256,7 +2255,7 @@ struct BigInt {
 
                     case BigIntOperation::And: {
                         // Bitwise AND with higher limb
-                        storage_[index] &= Number_T(number);
+                        storage_[index] &= static_cast<Number_T>(number);
                         // Only keep index_ high if this limb is nonzero
                         if (storage_[index] != 0) {
                             index_ = index;
@@ -2267,13 +2266,13 @@ struct BigInt {
 
                     case BigIntOperation::Add: {
                         // Add to higher limb
-                        Add(Number_T(number), index);
+                        Add(static_cast<Number_T>(number), index);
                         break;
                     }
 
                     case BigIntOperation::Subtract: {
                         // Subtract from higher limb
-                        Subtract(Number_T(number), index);
+                        Subtract(static_cast<Number_T>(number), index);
                         break;
                     }
                 }
@@ -2338,10 +2337,14 @@ struct DoubleWidthArithmetic<Number_T, 8U> {
      * Used for multi-limb multiplication.
      */
     QENTEM_INLINE static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
-        SizeT16 number16{number};            // Promote to 16 bits
-        number16 *= multiplier;              // Perform 16-bit multiplication
-        number = Number_T(number16);         // Store the low 8 bits in 'number'
-        return Number_T(number16 >> shift_); // Return upper 8 bits as carry
+        SizeT16 number16{number};                         // Promote to 16 bits
+        number16 *= multiplier;                           // Perform 16-bit multiplication
+        number = static_cast<Number_T>(number16);         // Store the low 8 bits in 'number'
+        return static_cast<Number_T>(number16 >> shift_); // Return upper 8 bits as carry
+    }
+
+    QENTEM_INLINE static Number_T Square(Number_T &number) noexcept {
+        return Multiply(number, number);
     }
 
   private:
@@ -2388,10 +2391,14 @@ struct DoubleWidthArithmetic<Number_T, 16U> {
      * Used for multi-limb multiplication.
      */
     QENTEM_INLINE static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
-        SizeT32 number32{number};            // Promote to 32 bits
-        number32 *= multiplier;              // 32-bit multiplication
-        number = Number_T(number32);         // Store low 16 bits
-        return Number_T(number32 >> shift_); // Return high 16 bits as carry
+        SizeT32 number32{number};                         // Promote to 32 bits
+        number32 *= multiplier;                           // 32-bit multiplication
+        number = static_cast<Number_T>(number32);         // Store low 16 bits
+        return static_cast<Number_T>(number32 >> shift_); // Return high 16 bits as carry
+    }
+
+    QENTEM_INLINE static Number_T Square(Number_T &number) noexcept {
+        return Multiply(number, number);
     }
 
   private:
@@ -2446,10 +2453,44 @@ struct DoubleWidthArithmetic<Number_T, 32U> {
         if constexpr (!QentemConfig::Is64bit) {
             return DoubleWidthArithmetic<Number_T, 64>::Multiply(number, multiplier);
         } else {
-            SizeT64 number64{number};            // Promote to 64 bits
-            number64 *= multiplier;              // 64-bit multiplication
-            number = Number_T(number64);         // Store low 32 bits
-            return Number_T(number64 >> shift_); // Return high 32 bits as carry
+            SizeT64 number64{number};                         // Promote to 64 bits
+            number64 *= multiplier;                           // 64-bit multiplication
+            number = static_cast<Number_T>(number64);         // Store low 32 bits
+            return static_cast<Number_T>(number64 >> shift_); // Return high 32 bits as carry
+        }
+    }
+
+    /**
+     * @brief Squares a limb value and returns the upper half of the result.
+     *
+     * Computes:
+     *
+     *     number = number * number
+     *
+     * On return:
+     *
+     *     number  = lower half of the square
+     *     return  = upper half of the square
+     *
+     * yielding the full double-width result:
+     *
+     *     (return << 32) | number
+     *
+     * On 32-bit systems, the operation is performed using the 64-bit
+     * DoubleWidthArithmetic specialization to obtain the required
+     * double-width intermediate result. On 64-bit systems, the
+     * general multiplication routine is used.
+     *
+     * @param[in,out] number Limb value to square. Replaced with the lower
+     *                       half of the square result.
+     *
+     * @return Upper half of the square result.
+     */
+    QENTEM_INLINE static Number_T Square(Number_T &number) noexcept {
+        if constexpr (!QentemConfig::Is64bit) {
+            return DoubleWidthArithmetic<Number_T, 64>::Square(number);
+        } else {
+            return Multiply(number, number);
         }
     }
 
@@ -2627,19 +2668,19 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      * @return The upper 64 bits of the result.
      */
     static Number_T Multiply(Number_T &number, Number_T multiplier) noexcept {
-        // Split operands into low and high 32-bit parts
+        // Split operands into low and high parts
         const Number_T number_low     = (number & mask_);
         Number_T       number_high    = number;
         Number_T       multiplier_low = (multiplier & mask_);
 
-        // Multiply low parts; store in 'number' (the low 64 bits)
+        // Multiply low parts; store in 'number' (the low half bits)
         number = (number_low * multiplier_low);
 
         // Compute cross products and accumulate their carries
         number_high >>= shift_;
         multiplier_low *= number_high;        // Cross: number_high * multiplier_low
         multiplier_low += (number >> shift_); // Add upper half of current low product
-        number &= mask_;                      // Mask out the lower part (keep 64 bits)
+        number &= mask_;                      // Mask out the lower part
 
         // Prepare for next cross product
         multiplier >>= shift_;
@@ -2657,9 +2698,51 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
         return number_high; // Return upper 64 bits
     }
 
+    /**
+     * @brief Squares a limb value and returns the upper half of the result.
+     *
+     * Computes the full double-width square of the supplied value using a
+     * specialized algorithm that exploits operand symmetry, requiring fewer
+     * half-width multiplications than the general multiplication routine.
+     *
+     * On return:
+     *
+     *     number  = lower half of the square
+     *     return  = upper half of the square
+     *
+     * @param[in,out] number Value to square. Replaced with the lower half
+     *                       of the result.
+     *
+     * @return Upper half of the square result.
+     */
+    static Number_T Square(Number_T &number) noexcept {
+        Number_T       result2 = (number & mask_);
+        const Number_T high    = (number >> shift_);
+
+        number = (result2 * result2);
+        result2 *= high;
+
+        Number_T result1 = (result2 & mask_);
+        result2 >>= shift_;
+
+        result1 += result1;
+        result1 += (number >> shift_);
+
+        result2 += result2;
+        result2 += (result1 >> shift_);
+        result2 += (high * high);
+
+        result1 &= mask_;
+        result1 <<= shift_;
+        number &= mask_;
+        number |= result1;
+
+        return result2;
+    }
+
   private:
     static constexpr SizeT32  width_ = (sizeof(Number_T) * 8U);    ///< Total bits in a limb.
-    static constexpr SizeT32  shift_ = (width_ / 2U);              ///< Shift for half-width partitioning.
+    static constexpr SizeT32  shift_ = (width_ >> 1U);             ///< Shift for half-width partitioning.
     static constexpr Number_T mask_  = (~(Number_T{0}) >> shift_); ///< Mask for extracting lower half.
 };
 
