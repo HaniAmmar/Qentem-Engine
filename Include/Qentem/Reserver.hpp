@@ -31,6 +31,14 @@
  * @license MIT
  */
 
+// TODO:
+// Current allocator assumes:
+//   - one arena per CPU
+//   - one worker per CPU
+//
+// Multi-server configurations can place multiple workers on the same CPU.
+// Revisit arena ownership model (thread-local, worker-local, or shared arena).
+
 #ifndef QENTEM_RESERVER_HPP
 #define QENTEM_RESERVER_HPP
 
@@ -761,6 +769,7 @@ struct ReserverCore {
      * it may be moved to `exhausted_blocks_`. The first block is usually the one with the largest
      * usable capacity, aiding first-fit scans for performance.
      */
+    // TODO: Consider linked storage for active/exhausted blocks.
     LiteArray<MemoryBlockT> blocks_{};
 
     /**
@@ -781,6 +790,13 @@ struct ReserverCore {
  */
 struct Reserver {
     using Core = ReserverCore<>;
+
+    Reserver()                            = delete;
+    Reserver(Reserver &&)                 = delete;
+    Reserver(const Reserver &)            = delete;
+    Reserver &operator=(Reserver &&)      = delete;
+    Reserver &operator=(const Reserver &) = delete;
+    ~Reserver()                           = delete;
 
     static constexpr SystemLong DEFAULT_ALIGNMENT_M1 = static_cast<SystemLong>(QENTEM_RESERVER_DEFAULT_ALIGNMENT - 1U);
     static constexpr SystemLong DEFAULT_ALIGNMENT_N  = ~DEFAULT_ALIGNMENT_M1;
@@ -1009,53 +1025,6 @@ struct Reserver {
 #endif
     }
 
-    /**
-     * @brief Provides access to the arena associated with the calling thread’s core.
-     *
-     * Each logical CPU owns a dedicated arena to promote spatial locality and
-     * eliminate cross-thread contention.
-     *
-     * For optimal correctness and performance, the calling thread should remain
-     * bound to a single logical core for its lifetime (e.g. via CPU affinity),
-     * as the arena selection is cached per thread.
-     *
-     * @return Reference to the active core’s memory management unit.
-     */
-    QENTEM_INLINE static Core *GetCurrentInstance() noexcept {
-#if defined(__linux__) || defined(_WIN32)
-        thread_local Core &reserver = reservers_.Storage()[CPUHelper::GetCurrentCore()];
-
-        return &reserver;
-#else
-        return &reserver_;
-#endif
-    }
-
-    /**
-     * @brief Returns the reserver instance at the given index.
-     *
-     * On platforms supporting multiple static reserver instances, this provides
-     * direct access to the underlying storage backing the reserver array at
-     * the specified index.
-     * On other platforms, it resolves to the single global reserver object,
-     * ignoring the index.
-     *
-     * This is intended for early-use scenarios (e.g., during program startup)
-     * where a stable reserver address is required before full initialization
-     * paths are established.
-     *
-     * @param core_id Index of the reserver instance to retrieve.
-     * @return Pointer to the reserver instance at the specified index.
-     */
-    QENTEM_INLINE static Core *GetInstanceAt(SizeT core_id) noexcept {
-#if defined(__linux__) || defined(_WIN32)
-        return (reservers_.Storage() + core_id);
-#else
-        (void)core_id;
-        return &reserver_;
-#endif
-    }
-
     // malloc
     QENTEM_NOINLINE static void *LibcReserve(SystemLong size) noexcept {
         size += sizeof(SystemLong);
@@ -1125,9 +1094,59 @@ struct Reserver {
         }
     }
 
+    /**
+     * @brief Provides access to the arena associated with the calling thread’s core.
+     *
+     * Each logical CPU owns a dedicated arena to promote spatial locality and
+     * eliminate cross-thread contention.
+     *
+     * For optimal correctness and performance, the calling thread should remain
+     * bound to a single logical core for its lifetime (e.g. via CPU affinity),
+     * as the arena selection is cached per thread.
+     *
+     * @return Reference to the active core’s memory management unit.
+     */
+    QENTEM_INLINE static Core *GetCurrentInstance() noexcept {
+#if defined(__linux__) || defined(_WIN32)
+        thread_local Core &reserver = reservers_.Storage()[CPUHelper::GetCurrentCore()];
+
+        return &reserver;
+#else
+        return &reserver_;
+#endif
+    }
+
+    /**
+     * @brief Returns the reserver instance at the given index.
+     *
+     * On platforms supporting multiple static reserver instances, this provides
+     * direct access to the underlying storage backing the reserver array at
+     * the specified index.
+     * On other platforms, it resolves to the single global reserver object,
+     * ignoring the index.
+     *
+     * This is intended for early-use scenarios (e.g., during program startup)
+     * where a stable reserver address is required before full initialization
+     * paths are established.
+     *
+     * @param core_id Index of the reserver instance to retrieve.
+     * @return Pointer to the reserver instance at the specified index.
+     */
+    QENTEM_INLINE static Core *GetInstanceAt(SizeT core_id) noexcept {
+#if defined(__linux__) || defined(_WIN32)
+        return (reservers_.Storage() + core_id);
+#else
+        (void)core_id;
+        return &reserver_;
+#endif
+    }
+
   private:
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
     QENTEM_NOINLINE static Type_T *reserve(SystemLong size) noexcept {
+        // TODO: Replace CPU-based arena routing with thread-local arenas to support
+        // multiple workers sharing the same CPU.
+
         if constexpr (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
             // constexpr SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
             // (align>=CustomAlignment_T?align:(align+1))
@@ -1138,6 +1157,8 @@ struct Reserver {
         }
     }
 
+// TODO: Replace CPU-indexed reservers with thread-local arenas.
+// Temporary plan: protect block attach/detach using linked lists and locks.
 #if defined(__linux__) || defined(_WIN32)
     inline static LiteArray<ReserverCore<>> reservers_{static_cast<SizeT>(CPUHelper::GetMaxCPUID() + 1U), true};
 #else
