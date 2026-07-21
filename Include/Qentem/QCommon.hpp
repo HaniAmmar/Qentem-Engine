@@ -126,6 +126,10 @@ namespace Qentem {
 #define QENTEM_TEMPLATE_DOUBLE_FORMAT Digit::RealFormatType::SemiFixed // Default, Fixed, SemiFixed
 #endif
 
+#if defined(__SIZEOF_INT128__) && !defined(QENTEM_FORCE_FALLBACK_ARITHMETIC)
+#define QENTEM_HAS_INT128
+#endif
+
 ///////////////////////////////////////////////////////////////
 //               Type Width Detection (32/64-bit)            //
 ///////////////////////////////////////////////////////////////

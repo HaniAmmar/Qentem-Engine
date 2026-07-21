@@ -2539,6 +2539,18 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      */
     static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                        const SizeT32 initial_shift) noexcept {
+#ifdef QENTEM_HAS_INT128
+        unsigned __int128 dividend128{dividend_high}; // Pack high 64 bits
+        dividend128 <<= 64U;                          // Shift to high dword
+        dividend128 |= dividend_low;                  // Add in low 64 bits
+
+        const unsigned __int128 tmp128 = dividend128;
+        dividend128                    = static_cast<Number_T>(tmp128 / divisor); // New quotient in low
+        dividend_high                  = static_cast<Number_T>(tmp128 % divisor); // New remainder in high
+        dividend_low                   = static_cast<Number_T>(dividend128);
+
+        (void)initial_shift;
+#else
         constexpr Number_T OVERFLOW_DIVIDEND = (Number_T{1} << (width_ - 1U));
 
         // Preserve the remainder from the initial low-limb division.
@@ -2651,6 +2663,7 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
         // tmp = static_cast<Number_T>(dividend_high >= divisor);
         // dividend_high -= (divisor & (static_cast<Number_T>(0) - tmp));
         // dividend_low += tmp;
+#endif
     }
 
     /**
@@ -2668,6 +2681,12 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      * @return The upper 64 bits of the result.
      */
     static Number_T Multiply(Number_T &number, Number_T multiplier) noexcept {
+#ifdef QENTEM_HAS_INT128
+        unsigned __int128 number128{number};            // Promote to 128 bits
+        number128 *= multiplier;                        // 128-bit multiplication
+        number = static_cast<Number_T>(number128);      // Store low 64 bits
+        return static_cast<Number_T>(number128 >> 64U); // Return high 64 bits as carry
+#else
         // Split operands into low and high parts
         const Number_T number_low     = (number & mask_);
         Number_T       number_high    = number;
@@ -2696,6 +2715,7 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
         number_high += multiplier_low;
 
         return number_high; // Return upper 64 bits
+#endif
     }
 
     /**
@@ -2716,6 +2736,12 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
      * @return Upper half of the square result.
      */
     static Number_T Square(Number_T &number) noexcept {
+#ifdef QENTEM_HAS_INT128
+        unsigned __int128 number128{number};            // Promote to 128 bits
+        number128 *= number;                            // 128-bit multiplication
+        number = static_cast<Number_T>(number128);      // Store low 64 bits
+        return static_cast<Number_T>(number128 >> 64U); // Return high 64 bits as carry
+#else
         Number_T       result2 = (number & mask_);
         const Number_T high    = (number >> shift_);
 
@@ -2738,6 +2764,7 @@ struct DoubleWidthArithmetic<Number_T, 64U> {
         number |= result1;
 
         return result2;
+#endif
     }
 
   private:
