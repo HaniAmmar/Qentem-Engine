@@ -111,6 +111,32 @@ static const char DigitTable2[] = {"0123456789"};
 template <SizeT32>
 struct DigitConst {};
 
+// uint8_t
+template <>
+struct DigitConst<1U> {
+    static constexpr SizeT32 MaxShift           = 8U;
+    static constexpr SizeT32 MaxPowerOfFive     = 3U;
+    static constexpr SizeT32 MaxPowerOfTen      = 2U;
+    static constexpr SizeT32 MaxPowerOfTenValue = 100U;
+    static constexpr SizeT8  MaxUIntV10         = 25U; // (25U*10) +5 = 255
+
+    inline static constexpr SizeT8 PowerOfFive[] = {1U, 5U, 25U, 125U};
+
+    inline static constexpr SizeT8 PowerOfOneOverFive[] = {
+
+        // 2^N/5
+        1U, 205U, 164U, 132U
+
+    };
+
+    inline static constexpr SizeT8 PowerOfOneOverFiveShift[] = {
+
+        // 2^N/5
+        0U, 2U, 4U, 6U
+
+    };
+};
+
 // uint16_t
 template <>
 struct DigitConst<2U> {
@@ -118,8 +144,7 @@ struct DigitConst<2U> {
     static constexpr SizeT32 MaxPowerOfFive     = 6U;
     static constexpr SizeT32 MaxPowerOfTen      = 4U;
     static constexpr SizeT32 MaxPowerOfTenValue = 10000U;
-    // Maximum value before multiplying by 10 would overflow uint16_t
-    static constexpr SizeT16 MaxUIntV10 = 6553U;
+    static constexpr SizeT16 MaxUIntV10         = 6553U;
 
     inline static constexpr SizeT16 PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
 
@@ -147,8 +172,7 @@ struct DigitConst<4U> {
     static constexpr SizeT32 MaxPowerOfFive     = 13U;
     static constexpr SizeT32 MaxPowerOfTen      = 9U;
     static constexpr SizeT32 MaxPowerOfTenValue = 1000000000U;
-    // Maximum value before multiplying by 10 would overflow uint32_t
-    static constexpr SizeT32 MaxUIntV10 = 429496729U;
+    static constexpr SizeT32 MaxUIntV10         = 429496729U;
 
     inline static constexpr SizeT32 PowerOfFive[] = {
         // clang-format off
@@ -182,10 +206,7 @@ struct DigitConst<8U> {
     static constexpr SizeT32 MaxPowerOfFive     = 27U;
     static constexpr SizeT32 MaxPowerOfTen      = 19U;
     static constexpr SizeT64 MaxPowerOfTenValue = 10000000000000000000ULL;
-    // Maximum value before multiplying by 10 would overflow uint64_t
-    static constexpr SizeT64 MaxUIntV10 = 1844674407370955161ULL;
-    // Maximum value before multiplying by 10 would overflow uint128_t
-    // static constexpr SizeT128 MaxUIntV10 = 34028236692093846346337460743176821145UDL;
+    static constexpr SizeT64 MaxUIntV10         = 1844674407370955161ULL; // (*10)+5= 18446744073709551615
 
     inline static constexpr SizeT64 PowerOfFive[] = {
         // clang-format off
