@@ -81,6 +81,12 @@ namespace Qentem {
 template <typename Number_T, SizeT32>
 struct DoubleWidthArithmetic {};
 
+template <typename BigInt_T>
+struct SignedBigInt {
+    BigInt_T Value;
+    bool     Negative;
+};
+
 /**
  * @brief Fixed-width arbitrary-precision unsigned integer.
  * @tparam Number_T Limb type (must be unsigned).
