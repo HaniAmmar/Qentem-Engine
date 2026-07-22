@@ -549,6 +549,23 @@ struct Digit {
         stream.Write(DigitUtils::DigitString<Char_T, size>::Zeros, length);
     }
 
+    template <typename Stream_T, typename BigInt_T>
+    static void BigIntToString(Stream_T &stream, BigInt_T &b_int) {
+        using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
+
+        while (b_int.IsMultiLimb()) {
+            const SizeT length = stream.Length();
+            NumberToString<true>(stream, b_int.Divide(DigitConst::MaxPowerOfTenValue));
+
+            // dividing '1000000000000000000' by '1000000000' yield zeros remainder
+            InsertZeros(stream, (DigitConst::MaxPowerOfTen - (stream.Length() - length)));
+        }
+
+        if (b_int.IsNotZero()) {
+            NumberToString<true>(stream, b_int.Number());
+        }
+    }
+
   private:
     template <typename QNumber_T, typename Char_T>
     static QNumberType stringToNumber(QNumber_T &number, const Char_T *content, SizeT &offset,
@@ -1180,7 +1197,7 @@ struct Digit {
                 }
 
                 const SizeT start_at = stream.Length();
-                bigIntToString(stream, b_int);
+                BigIntToString(stream, b_int);
 
                 switch (format_info.Type) {
                     case RealFormatType::Default: {
@@ -1256,23 +1273,6 @@ struct Digit {
         }
 
         stream.Write(DigitString::Zeros, length);
-    }
-
-    template <typename Stream_T, typename BigInt_T>
-    static void bigIntToString(Stream_T &stream, BigInt_T &b_int) {
-        using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
-
-        while (b_int.IsMultiLimb()) {
-            const SizeT length = stream.Length();
-            NumberToString<true>(stream, b_int.Divide(DigitConst::MaxPowerOfTenValue));
-
-            // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            InsertZeros(stream, (DigitConst::MaxPowerOfTen - (stream.Length() - length)));
-        }
-
-        if (b_int.IsNotZero()) {
-            NumberToString<true>(stream, b_int.Number());
-        }
     }
 
     template <typename BigInt_T>
