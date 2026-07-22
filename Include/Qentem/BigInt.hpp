@@ -15,9 +15,9 @@
  * - Accurate floating-point to string conversion
  * - Arbitrary-precision integer arithmetic
  * - Number theory and mathematical algorithms
+ * - Greatest common divisor (GCD) and Extended GCD computations
  * - Modular arithmetic, exponentiation, and inversion
  * - Cryptographic and finite-field arithmetic
- * - Public-key cryptography (RSA, Diffie-Hellman, etc.)
  * - Barrett reduction and reciprocal-based modular reduction
  * - Primality testing (Miller-Rabin, Fermat, etc.)
  * - Rational, fixed-point, and decimal numeric types
@@ -31,6 +31,9 @@
  * - Fixed-capacity arbitrary-precision integer representation
  * - Addition, subtraction, multiplication, division, and squaring
  * - Quotient and remainder computation
+ * - Greatest common divisor (GCD)
+ * - Extended Euclidean Algorithm (Extended GCD)
+ * - Modular multiplicative inverse computation
  * - Bit-shift and bitwise operations
  * - Comparison operations
  * - Modular exponentiation
@@ -1764,6 +1767,7 @@ struct BigInt {
      */
     void LCM(BigInt &right) noexcept {
         using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+
         BiggerBigInt product{};
         BigInt       remainder{};
 
@@ -1777,6 +1781,293 @@ struct BigInt {
             product.Divide(remainder, *this);
 
             Copy(product);
+        }
+    }
+
+    /**
+     * @brief Computes the modular multiplicative inverse of this value.
+     *
+     * Computes a value x such that:
+     *
+     * @code
+     * (*this * x) mod modulus = 1
+     * @endcode
+     *
+     * using the Extended Euclidean Algorithm.
+     *
+     * If an inverse exists, the current value is replaced with the modular
+     * inverse in the range [0, modulus).
+     *
+     * The inverse exists only when:
+     *
+     * @code
+     * gcd(*this, modulus) = 1
+     * @endcode
+     *
+     * @param modulus Modulus used for the modular inverse computation.
+     *
+     * @return true if a modular inverse exists and the current value was
+     *         replaced with it; otherwise false.
+     *
+     * @note This function operates in-place.
+     *
+     * @note On success, the current value contains the modular inverse.
+     *
+     * @note If no modular inverse exists, the current value is left containing
+     *       the greatest common divisor of the original value and modulus.
+     *
+     * @warning A modulus of zero is invalid and always returns false.
+     *
+     * @warning The modular inverse is defined only when the original value
+     *          and the modulus are coprime.
+     */
+    bool ModInverse(const BigInt &modulus) noexcept {
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+
+        BiggerBigInt product{};
+        BigInt       quotient{};
+        BigInt       mod{modulus};
+        BigInt       remainder{};
+
+        SignedBigInt<BigInt> tmp{Number_T{0}, false};
+
+        SignedBigInt<BigInt> x0{Number_T{1}, false};
+        SignedBigInt<BigInt> x1{Number_T{0}, false};
+
+        if (modulus.IsNotZero()) {
+            while (mod.IsNotZero()) {
+                quotient.Copy(*this);
+                quotient.Divide(remainder, mod);
+
+                Copy(mod);
+                mod.Copy(remainder);
+
+                quotient.Multiply(product, x1.Value);
+
+                tmp.Value.Copy(x1.Value);
+                tmp.Negative = x1.Negative;
+
+                if (x1.Negative != x0.Negative) {
+                    x1.Value.Copy(product);
+                    x1.Value.AddBigInt(x0.Value);
+                    x1.Negative = x0.Negative;
+                } else if (IsLess(x0.Value, product)) {
+                    product.SubtractBigInt(x0.Value);
+                    x1.Value.Copy(product);
+                    x1.Negative = !(x1.Negative);
+                } else if (IsNotEqual(x0.Value, product)) {
+                    x1.Value.Copy(x0.Value);
+                    x1.Value.SubtractBigInt(product);
+                } else {
+                    x1.Value.Clear();
+                    x1.Negative = false;
+                }
+
+                x0.Value.Copy(tmp.Value);
+                x0.Negative = tmp.Negative;
+            }
+
+            if (*this == Number_T{1}) {
+                if (x0.Negative) {
+                    // 0 < |x0| < modulus
+                    Copy(modulus);
+                    SubtractBigInt(x0.Value);
+                } else {
+                    Copy(x0.Value);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @brief Computes the extended greatest common divisor (Extended GCD).
+     *
+     * Applies the Extended Euclidean Algorithm to compute the greatest common
+     * divisor of the current value and @p right while also producing the
+     * corresponding Bézout coefficients.
+     *
+     * Given the original input values:
+     *
+     * @code
+     * a = original value of *this
+     * b = original value of right
+     * @endcode
+     *
+     * the function computes coefficients @p X and @p Y such that:
+     *
+     * @code
+     * a * X + b * Y = gcd(a, b)
+     * @endcode
+     *
+     * Since BigInt stores only unsigned magnitudes, the Bézout coefficients are
+     * returned through SignedBigInt objects containing a magnitude and a sign flag.
+     *
+     * Internally, the algorithm maintains the coefficient sequences:
+     *
+     * @code
+     * (s0, s1) = (1, 0)
+     * (t0, t1) = (0, 1)
+     * @endcode
+     *
+     * and repeatedly performs:
+     *
+     * @code
+     * q = a / b
+     *
+     * (a, b)   = (b, a % b)
+     * (s0, s1) = (s1, s0 - q * s1)
+     * (t0, t1) = (t1, t0 - q * t1)
+     * @endcode
+     *
+     * until the second operand becomes zero.
+     *
+     * A wider temporary BigInt type is used internally to accommodate
+     * intermediate products generated while evaluating:
+     *
+     * @code
+     * q * s1
+     * q * t1
+     * @endcode
+     *
+     * Upon completion:
+     *
+     * @code
+     * (*this) = gcd(a, b)
+     * right   = 0
+     * X       = s0
+     * Y       = t0
+     * @endcode
+     *
+     * and the Bézout identity holds:
+     *
+     * @code
+     * a * X + b * Y = gcd(a, b)
+     * @endcode
+     *
+     * @param right Right-hand operand. Its value is consumed during the
+     *              computation and becomes zero upon completion.
+     * @param X Receives the Bézout coefficient associated with the original
+     *          value of the current object.
+     * @param Y Receives the Bézout coefficient associated with the original
+     *          value of @p right.
+     *
+     * @note Both operands are modified.
+     *
+     * @note The Bézout coefficients correspond to the original input values,
+     *       not the modified values remaining after the function returns.
+     *
+     * @note The current value becomes the computed GCD.
+     *
+     * @note The returned coefficients may be negative.
+     *
+     * @post
+     * @code
+     * right == 0
+     * (*this) == gcd(a, b)
+     *
+     * a * X + b * Y == (*this)
+     * @endcode
+     *
+     * @warning If both input values are zero, the GCD is mathematically
+     *          undefined. The function returns:
+     *
+     * @code
+     * gcd = 0
+     * X   = 1
+     * Y   = 0
+     * @endcode
+     *
+     *          This result follows the algorithm's initialization state and
+     *          does not represent a unique mathematical solution.
+     */
+    void ExtendedGCD(BigInt &right, SignedBigInt<BigInt> &X, SignedBigInt<BigInt> &Y) noexcept {
+        using BiggerBigInt = BigInt<Number_T, (TotalBitWidth() * 2U)>;
+
+        BiggerBigInt product{};
+        BigInt       quotient{};
+        BigInt       remainder{};
+
+        SignedBigInt<BigInt> tmp{Number_T{0}, false};
+
+        SignedBigInt<BigInt> &s0{X};
+        SignedBigInt<BigInt>  s1{Number_T{0}, false};
+
+        SignedBigInt<BigInt> &t0{Y};
+        SignedBigInt<BigInt>  t1{Number_T{1}, false};
+
+        s0.Value    = Number_T{1};
+        s0.Negative = false;
+        t0.Value    = Number_T{0};
+        t0.Negative = false;
+
+        while (right.IsNotZero()) {
+            // q = a / b
+            quotient.Copy(*this);
+            quotient.Divide(remainder, right);
+
+            // (a,b) = (b, a%b)
+            Copy(right);
+            right.Copy(remainder);
+
+            // tmp_s = s1;
+            // s1    = s0 - quotient * s1;
+            // s0    = tmp_s;
+
+            // (s0,s1) = (s1, s0 - q*s1)
+            quotient.Multiply(product, s1.Value);
+
+            tmp.Value.Copy(s1.Value);
+            tmp.Negative = s1.Negative;
+
+            //  s0 - p
+            if (s1.Negative != s0.Negative) {
+                s1.Value.Copy(product);
+                s1.Value.AddBigInt(s0.Value);
+                s1.Negative = s0.Negative;
+            } else if (IsLess(s0.Value, product)) {
+                product.SubtractBigInt(s0.Value);
+                s1.Value.Copy(product);
+                s1.Negative = !(s1.Negative);
+            } else if (IsNotEqual(s0.Value, product)) {
+                s1.Value.Copy(s0.Value);
+                s1.Value.SubtractBigInt(product);
+            } else {
+                s1.Value.Clear();
+                s1.Negative = false;
+            }
+
+            s0.Value.Copy(tmp.Value);
+            s0.Negative = tmp.Negative;
+
+            // (t0,t1) = (t1, t0 - q*t1)
+            quotient.Multiply(product, t1.Value);
+
+            tmp.Value.Copy(t1.Value);
+            tmp.Negative = t1.Negative;
+
+            //  t0 - p
+            if (t1.Negative != t0.Negative) {
+                t1.Value.Copy(product);
+                t1.Value.AddBigInt(t0.Value);
+                t1.Negative = t0.Negative;
+            } else if (IsLess(t0.Value, product)) {
+                product.SubtractBigInt(t0.Value);
+                t1.Value.Copy(product);
+                t1.Negative = !(t1.Negative);
+            } else if (IsNotEqual(t0.Value, product)) {
+                t1.Value.Copy(t0.Value);
+                t1.Value.SubtractBigInt(product);
+            } else {
+                t1.Value.Clear();
+                t1.Negative = false;
+            }
+
+            t0.Value.Copy(tmp.Value);
+            t0.Negative = tmp.Negative;
         }
     }
 

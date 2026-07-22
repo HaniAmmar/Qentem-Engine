@@ -2605,6 +2605,442 @@ static void TestBigInt15(QTest &test, StringStream<char> &stream) {
     // }
 }
 
+static void TestBigInt16(QTest &test) {
+    BigInt_8_64 value1{};
+    BigInt_8_64 value2{};
+
+    SignedBigInt<BigInt_8_64> x{};
+    SignedBigInt<BigInt_8_64> y{};
+
+    bool inv;
+
+    value1 = 30;
+    value2 = 21;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{3}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{2}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{3}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 99;
+    value2 = 78;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{3}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{11}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{14}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 17;
+    value2 = 3120;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{367}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{2}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 65537;
+    value2 = 3120;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{367}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{7709}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 21;
+    value2 = 7;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{7}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{0}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 8;
+    value2 = 3;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{3}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 1000;
+    value2 = 3;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{333}, __LINE__);
+    test.IsTrue(y.Negative, __LINE__);
+
+    value1 = 17;
+    value2 = 3120;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{367}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{2}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 12200160415121876738ULL;
+    value2 = 7540113804746346429;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1ULL}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{2880067194370816120ULL}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{4660046610375530309ULL}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 4660046610375530309;
+    value2 = 7540113804746346429;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{2880067194370816120}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1779979416004714189}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 7540113804746346429ULL; // F92
+    value2 = 4660046610375530309ULL; // F91
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1779979416004714189}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{2880067194370816120}, __LINE__);
+    test.IsTrue(y.Negative, __LINE__);
+
+    value1 = 9223372036854775807; // INT64_MAX
+    value2 = 9223372036854775806;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1}, __LINE__);
+    test.IsTrue(y.Negative, __LINE__);
+
+    value1 = 9223372036854775807; // INT64_MAX
+    value2 = 4660046610375530309; // F91
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{801827198034725995}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1587012142813553796}, __LINE__);
+    test.IsTrue(y.Negative, __LINE__);
+
+    value1 = 12345;
+    value2 = 12345;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{12345}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{0}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 0;
+    value2 = 0;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{0}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 0;
+    value2 = 7;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{7}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{0}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 7;
+    value2 = 0;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{7}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{0}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 18446744073709551615ULL;
+    value2 = 18446744073709551615ULL;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{18446744073709551615ULL}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{0}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 18446744073709551614ULL;
+    value2 = 18446744073709551615ULL;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1}, __LINE__);
+    test.IsTrue(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(y.Negative, __LINE__);
+
+    value1 = 18446744073709551615ULL;
+    value2 = 18446744073709551614ULL;
+
+    value1.ExtendedGCD(value2, x, y);
+
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsEqual(SizeT64{value2}, SizeT64{0}, __LINE__);
+    test.IsEqual(SizeT64{x.Value}, SizeT64{1}, __LINE__);
+    test.IsFalse(x.Negative, __LINE__);
+    test.IsEqual(SizeT64{y.Value}, SizeT64{1}, __LINE__);
+    test.IsTrue(y.Negative, __LINE__);
+
+    // for (SizeT64 a = 1; a < 10000U; ++a) {
+    //     for (SizeT64 m = 2; m < 10000U; ++m) {
+    //         value1 = a;
+    //         value2 = m;
+
+    //         if (value1.ModInverse(value2)) {
+    //             test.IsEqual(((a * SizeT64{value1}) % m), 1, __LINE__);
+    //         }
+    //     }
+    // }
+
+    value1 = 1;
+    value2 = 2;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 1;
+    value2 = 17;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 2;
+    value2 = 5;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{3}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 3;
+    value2 = 11;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{4}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 7;
+    value2 = 13;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{2}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 8;
+    value2 = 17;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{15}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 17;
+    value2 = 3120;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{2753}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 65537;
+    value2 = 3120;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{2753}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 3;
+    value2 = 1000;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{667}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 999;
+    value2 = 1000;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{999}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 1000;
+    value2 = 3;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 2;
+    value2 = 4;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{2}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 6;
+    value2 = 15;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{3}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 21;
+    value2 = 7;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{7}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 99;
+    value2 = 78;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{3}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 0;
+    value2 = 7;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{7}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 7;
+    value2 = 0;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{7}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 0;
+    value2 = 0;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{0}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 0;
+    value2 = 0;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{0}, __LINE__);
+    test.IsFalse(inv, __LINE__);
+
+    value1 = 4660046610375530309ULL;
+    value2 = 7540113804746346429ULL;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{4660046610375530309}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 7540113804746346429ULL;
+    value2 = 4660046610375530309ULL;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{1779979416004714189}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 9223372036854775806ULL;
+    value2 = 9223372036854775807ULL;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{9223372036854775806}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 9223372036854775807ULL;
+    value2 = 9223372036854775806ULL;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 18446744073709551614ULL;
+    value2 = 18446744073709551615ULL;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{18446744073709551614ULL}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+
+    value1 = 18446744073709551615ULL;
+    value2 = 18446744073709551614ULL;
+
+    inv = value1.ModInverse(value2);
+    test.IsEqual(SizeT64{value1}, SizeT64{1}, __LINE__);
+    test.IsTrue(inv, __LINE__);
+}
+
 static int RunBigIntTests() {
     StringStream<char> stream{};
     QTest              test{"BigInt.hpp", __FILE__};
@@ -2626,6 +3062,10 @@ static int RunBigIntTests() {
     test.Test("BigInt Test 13", TestBigInt13, false, stream);
     test.Test("BigInt Test 14", TestBigInt14, false, stream);
     test.Test("BigInt Test 15", TestBigInt15, false, stream);
+
+    stream.Reset();
+
+    test.Test("BigInt Test 16", TestBigInt16);
 
     return test.EndTests();
 }
