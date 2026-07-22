@@ -1,4 +1,5 @@
 #include "Qentem/BigInt.hpp"
+#include "Qentem/StringStream.hpp"
 #include "Qentem/QConsole.hpp"
 
 /*
@@ -10,6 +11,7 @@ c++ -g ./Examples/BigInt/BigInt01.cpp -I ./Include -o ./Build/QTest.bin
 ///////////////////////////////////////
 using Qentem::BigInt;
 using Qentem::QConsole;
+using Qentem::StringStream;
 ///////////////////////////////////////
 template <typename BigInt_T>
 static void StreamDigits(char *storage, unsigned int &index, BigInt_T &b_int) {
@@ -35,6 +37,34 @@ static void PrintDigits(BigInt_T b_int) {
     }
 
     QConsole::Print("\n\n");
+}
+
+template <typename BigInt_T>
+static void BigIntToStream(StringStream<char> &stream, BigInt_T b_int) {
+    using namespace Qentem;
+
+    using DigitConst = DigitUtils::DigitConst<BigInt_T::ByteWidth()>;
+
+    stream.Clear();
+
+    if (b_int.IsNotZero()) {
+        while (b_int.IsMultiLimb()) {
+            const SizeT length = stream.Length();
+            Digit::NumberToString<true>(stream, b_int.Divide(DigitConst::MaxPowerOfTenValue));
+
+            // dividing '1000000000000000000' by '1000000000' yield zeros remainder
+            Digit::InsertZeros(stream, (DigitConst::MaxPowerOfTen - (stream.Length() - length)));
+        }
+
+        if (b_int.IsNotZero()) {
+            Digit::NumberToString<true>(stream, b_int.Number());
+        }
+
+        StringUtils::Reverse(stream.Storage(), SizeT{0}, static_cast<SizeT>(stream.Length()),
+                             static_cast<SizeT>(stream.Length()));
+    } else {
+        stream.Write('0');
+    }
 }
 ///////////////////////////////////////
 int main() {
@@ -118,7 +148,10 @@ int main() {
     QConsole::Print("Remaining: ", b_int3.Divide(1000000000U), '\n');
     // Output: Remaining: 270245375
 
-    PrintDigits(b_int3);
+    StringStream<char> ss;
+    BigIntToStream(ss, b_int3);
+    QConsole::Print('\n', ss, '\n');
+
     // Output: 340282366762482138434845932253
 
     // Also
