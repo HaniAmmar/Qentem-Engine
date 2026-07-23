@@ -106,6 +106,20 @@ struct LiteArray {
         ++size_;
     }
 
+    template <typename... Values_T>
+    void ResizeInit(SizeT new_size, Values_T &&...values) {
+        if (new_size >= capacity_) {
+            expand((capacity_ != 0) ? (capacity_ * SizeT{2}) : SizeT{1});
+        }
+
+        if (new_size > size_) {
+            Type_T *current = storage_;
+            MemoryUtils::ConstructRange((current + size_), (current + new_size),
+                                        QUtility::Forward<Values_T>(values)...);
+            size_ = new_size;
+        }
+    }
+
     QENTEM_INLINE Type_T &Insert(Type_T &&item) noexcept {
         const SizeT size = size_;
 
