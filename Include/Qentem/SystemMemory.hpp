@@ -227,13 +227,12 @@ struct SystemMemory {
     }
 #endif
 
-  private:
     /**
      * @brief Returns the native system page size (e.g., 4096 bytes on x86).
      *
      * @return Size of a memory page in bytes.
      */
-    QENTEM_NOINLINE static SystemLong getPageSize() noexcept {
+    QENTEM_NOINLINE static SystemLong ReadPageSize() noexcept {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
@@ -325,6 +324,7 @@ struct SystemMemory {
         // clang-format on
     }
 
+  private:
     /**
      * @brief Internal implementation of memory allocation.
      *
@@ -448,7 +448,7 @@ struct SystemMemory {
         // clang-format on
     }
 
-    inline static const SizeT32 page_size_{static_cast<SizeT32>(getPageSize())};
+    inline static const SizeT32 page_size_{static_cast<SizeT32>(ReadPageSize())};
 };
 
 } // namespace Qentem
