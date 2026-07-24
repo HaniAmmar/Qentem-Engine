@@ -23,6 +23,10 @@
 #include "Qentem/SystemMemory.hpp"
 #include "Qentem/Platform.hpp"
 
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+#include "Qentem/MemoryRecord.hpp"
+#endif
+
 namespace Qentem {
 
 /**
@@ -36,12 +40,12 @@ namespace Qentem {
  */
 template <SizeT32 Alignment_T>
 struct MemoryBlock {
-    static constexpr SystemLong BITS_IN_CHAR        = 8;
+    static constexpr SystemLong BITS_IN_CHAR        = SystemLong{8};
     static constexpr SystemLong MAX_SYSTEM_INT_TYPE = ~SystemLong{0};
-    static constexpr SizeT32    PTR_SIZE            = sizeof(SystemLong);
+    static constexpr SizeT32    PTR_SIZE            = sizeof(void *);
     static constexpr SizeT32    BIT_WIDTH           = (PTR_SIZE * 8U);
-    static constexpr SystemLong ALIGNMENT_M1        = static_cast<SystemLong>(Alignment_T - 1U);
-    static constexpr SystemLong ALIGNMENT_N         = ~ALIGNMENT_M1;
+    static constexpr SystemLong ALIGNMENT_MASK      = static_cast<SystemLong>(Alignment_T - 1U);
+    static constexpr SystemLong ALIGNMENT_MASK_INV  = ~ALIGNMENT_MASK;
 
     QENTEM_INLINE MemoryBlock() noexcept        = default;
     MemoryBlock(const MemoryBlock &)            = delete;
@@ -75,8 +79,9 @@ struct MemoryBlock {
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
         {
-            const SystemLong aligned_address = ((reinterpret_cast<SystemLong>(base_raw_) + ALIGNMENT_M1) & ALIGNMENT_N);
-            base_                            = reinterpret_cast<void *>(aligned_address);
+            const SystemLong aligned_address =
+                ((reinterpret_cast<SystemLong>(base_raw_) + ALIGNMENT_MASK) & ALIGNMENT_MASK_INV);
+            base_ = reinterpret_cast<void *>(aligned_address);
         }
 #endif
 
@@ -90,9 +95,9 @@ struct MemoryBlock {
         }
 
         const SystemLong usable_base_raw     = reinterpret_cast<SystemLong>((static_cast<char *>(base_) + table_size_));
-        const SystemLong aligned_usable_base = ((usable_base_raw + ALIGNMENT_M1) & ALIGNMENT_N);
+        const SystemLong aligned_usable_base = ((usable_base_raw + ALIGNMENT_MASK) & ALIGNMENT_MASK_INV);
         const SystemLong unusable =
-            (((table_size_ + (aligned_usable_base - usable_base_raw)) + ALIGNMENT_M1) & ALIGNMENT_N);
+            (((table_size_ + (aligned_usable_base - usable_base_raw)) + ALIGNMENT_MASK) & ALIGNMENT_MASK_INV);
 
         table_size_ /= PTR_SIZE;
 
@@ -109,6 +114,10 @@ struct MemoryBlock {
 
         usable_size_ = (capacity_ - unusable);
         available_   = usable_size_;
+
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+        MemoryRecord::ReservedBlock(capacity_);
+#endif
     }
 
     QENTEM_INLINE ~MemoryBlock() noexcept {
@@ -117,8 +126,8 @@ struct MemoryBlock {
 
     QENTEM_INLINE MemoryBlock(MemoryBlock &&src) noexcept
         : base_raw_{src.base_raw_}, data_{src.data_}, usable_size_{src.usable_size_}, available_{src.available_},
-          next_index_{src.next_index_}, table_size_{src.table_size_}, data_alignment_{src.data_alignment_},
-          table_mask_shift_{src.table_mask_shift_}, capacity_{src.capacity_} {
+          next_index_{src.next_index_}, table_size_{src.table_size_}, capacity_{src.capacity_},
+          data_alignment_{src.data_alignment_}, table_mask_shift_{src.table_mask_shift_} {
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
         base_ = src.base_;
 #endif
@@ -139,9 +148,9 @@ struct MemoryBlock {
             available_        = src.available_;
             next_index_       = src.next_index_;
             table_size_       = src.table_size_;
+            capacity_         = src.capacity_;
             data_alignment_   = src.data_alignment_;
             table_mask_shift_ = src.table_mask_shift_;
-            capacity_         = src.capacity_;
 
             src.base_raw_ = nullptr;
         }
@@ -150,24 +159,35 @@ struct MemoryBlock {
     }
 
     /**
-     * @brief Returns the base address of the memory block.
+     * @brief Returns the beginning of the memory block.
      *
-     * This is the start of the reserved region, including both the bitfield table
-     * and the aligned usable memory.
+     * This is the first byte of the reserved block and includes both
+     * allocator-managed structures (such as the region tracking table)
+     * and the usable allocation area.
      *
-     * @return Pointer to the base of the reserved memory region.
+     * Unlike `Data()`, this pointer does not necessarily refer to memory
+     * that can be returned by normal allocation requests.
+     *
+     * @return Pointer to the beginning of the memory block.
+     *
+     * @see Data
      */
     QENTEM_INLINE void *Base() noexcept {
         return base_;
     }
 
     /**
-     * @brief Returns the start of the usable, aligned memory region.
+     * @brief Returns the beginning of the usable allocation area.
      *
-     * This pointer is aligned according to the chunk alignment and follows the
-     * allocation bitfield.
+     * This pointer is aligned according to the block's alignment requirements
+     * and marks the first byte that may be returned by normal allocation
+     * requests.
      *
-     * @return Aligned pointer to the first usable byte of memory.
+     * Memory preceding this address is reserved for allocator-managed data.
+     *
+     * @return Pointer to the first allocatable byte of the block.
+     *
+     * @see Base
      */
     QENTEM_INLINE void *Data() noexcept {
         return data_;
@@ -393,6 +413,11 @@ struct MemoryBlock {
     QENTEM_INLINE void release() {
         if (base_raw_ != nullptr) {
             SystemMemory::Release(base_raw_, capacity_);
+#ifdef QENTEM_ENABLE_MEMORY_RECORD
+            MemoryRecord::ReleasedBlock(capacity_);
+#endif
+
+            base_raw_ = nullptr;
         }
     }
 
@@ -411,9 +436,9 @@ struct MemoryBlock {
     SystemLong available_{0};
     SystemLong next_index_{0};
     SystemLong table_size_{0};
+    SystemLong capacity_{0};
     SizeT32    data_alignment_{0};
     SizeT32    table_mask_shift_{0};
-    SystemLong capacity_{0};
 };
 
 } // namespace Qentem
