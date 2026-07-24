@@ -2,5 +2,8 @@
 
 int main() {
     Qentem::QTest::PrintInfo();
-    return Qentem::Test::RunMemoryBlockTests();
+    const int ret = Qentem::Test::RunMemoryBlockTests();
+    Qentem::QTest::PrintMemoryStatus();
+
+    return ret;
 }
