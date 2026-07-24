@@ -33,210 +33,305 @@ static void TestReserver1(QTest &test) {
     constexpr SizeT32 size      = (sizeof(void *) * 2);
     constexpr SizeT32 page_size = 4096;
 
-    ReserverCore<(sizeof(void *) * 2), page_size> r{};
-
-    void *var1;
-    void *var2;
-    void *var3;
-    void *var4;
-
-    var1 = r.Reserve(size);
-    var2 = r.Reserve(size);
-    var3 = r.Reserve(page_size * 2);
-    var4 = r.Reserve(page_size * 2);
-    r.Release(var3, page_size * 2);
-    r.Release(var1, size);
-    r.Release(var2, size);
-    r.Release(var4, page_size * 2);
-
-    test.IsTrue(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
-}
-
-static void TestReserver2(QTest &test) {
-    constexpr SizeT32 size      = (sizeof(void *) * 2);
-    constexpr SizeT32 page_size = 4096;
-
-    ReserverCore<(sizeof(void *) * 2), page_size> r{};
-
-    void *var1;
-    void *var2;
-    void *var3;
-    void *var4;
-
-    var1 = r.Reserve(size);
-    var2 = r.Reserve(size);
-    var3 = r.Reserve(page_size * 2);
-    var4 = r.Reserve(page_size * 2);
-    r.Release(var3, page_size * 2);
-    r.Release(var1, size);
-    r.Release(var2, size);
-    r.Release(var4, page_size * 2);
-    var1 = r.Reserve(page_size);
-    r.Release(var1, page_size);
-
-    test.IsTrue(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
-}
-
-static void TestReserver3(QTest &test) {
-    ReserverCore<> r{};
-    void          *var1;
-    void          *var2;
-    void          *var3;
-    void          *var4;
-    void          *var5;
-    void          *var6;
-    void          *var7;
-    void          *var8;
-    void          *var9;
-    void          *var10;
-
-    var1 = r.Reserve(16);
-    var2 = r.Reserve(32);
-    r.Release(var1, 16);
-    var4 = r.Reserve(64);
-    r.Release(var2, 32);
-    var3 = r.Reserve(128);
-    r.Release(var4, 64);
-    var5 = r.Reserve(256);
-    r.Release(var3, 128);
-    var6 = r.Reserve(512);
-    r.Release(var5, 256);
-    var7 = r.Reserve(1024);
-    r.Release(var6, 512);
-    var8 = r.Reserve(2048);
-    r.Release(var7, 1024);
-    var9 = r.Reserve(4096);
-    r.Release(var8, 2048);
-    var10 = r.Reserve(8192);
-    r.Release(var9, 4096);
-    r.Release(var10, 8192);
-
-    test.IsTrue(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
-}
-
-static void TestReserverShrink(QTest &test) {
-    // Initialize Reserver with 4 KiB block size and 16-byte alignment.
-    ReserverCore<16, (4 * 1024)> r{};
-
-    char *var1;
-    char *var2;
-
-    // Allocate 48 bytes and shrink it to 16 bytes.
-    var1 = static_cast<char *>(r.Reserve(48));
-    test.IsTrue(r.Shrink(var1, 48, 16), __LINE__);
-
-    // Allocate 16 bytes — it should reuse the tail of the shrunk region.
-    var2 = static_cast<char *>(r.Reserve(16));
-    test.IsEqual(var1 + 16, var2, __LINE__); // Should follow immediately.
-
-    // Clean up both regions.
-    r.Release(var1, 16);
-    r.Release(var2, 16);
-
-    // Confirm memory is fully released, and only one block remains.
-    test.IsTrue(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
-
-    // Full allocation from the top block.
-    SystemLong max  = r.GetBlocks().First()->UsableSize();
-    SystemLong half = max / 2;
-    var1            = static_cast<char *>(r.Reserve(max));
-
-    // Shrink the large allocation by half.
-    test.IsTrue(r.Shrink(var1, max, half), __LINE__);
-
-    test.IsFalse(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
-
-    // Attempt to allocate more than remaining capacity — triggers new block.
-    var2 = static_cast<char *>(r.Reserve(8 * 1024));
-    test.IsEqual(r.TotalBlocks(), SizeT{2}, __LINE__);
-
-    // Release the second block's allocation.
-    r.Release(var2, 8 * 1024);
-    test.IsFalse(r.IsEmpty(), __LINE__);
-
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-    test.IsEqual(r.TotalBlocks(), SizeT{2}, __LINE__);
-#else
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
-#endif
-
-    // Finally release the remaining half of var1.
-    r.Release(var1, max - half);
-
-    test.IsTrue(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
-}
-
-static void TestReserverExpand(QTest &test) {
-    ReserverCore<16, (8 * 1024)> r{};
-    constexpr SystemLong         full_bit_region = sizeof(void *) * 8 * 16;
+    using Core = ReserverCore<(sizeof(void *) * 2), page_size>;
 
     char *var1;
     char *var2;
     char *var3;
     char *var4;
 
-    var1 = static_cast<char *>(r.Reserve(16));
-    test.IsEqual(r.TryExpand(var1, 16, 32), SystemLong{32}, __LINE__);
-    r.Release(var1, 32);
-    test.IsTrue(r.IsEmpty(), __LINE__);
+    var1 = Core::Reserve<char>(size);
+    var2 = Core::Reserve<char>(size);
+    var3 = Core::Reserve<char>(page_size * 2);
+    var4 = Core::Reserve<char>(page_size * 2);
+    Core::Release(var3, page_size * 2);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+    Core::Release(var4, page_size * 2);
 
-    var1 = static_cast<char *>(r.Reserve(64));
-    test.IsEqual(r.TryExpand(var1, 64, 128), SystemLong{128}, __LINE__);
-    r.Release(var1, 128);
-    test.IsTrue(r.IsEmpty(), __LINE__);
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
 
-    var1 = static_cast<char *>(r.Reserve(full_bit_region - 16));
-    test.IsEqual(r.TryExpand(var1, (full_bit_region - 16), full_bit_region), full_bit_region, __LINE__);
-    test.IsEqual(r.TryExpand(var1, full_bit_region, (full_bit_region * 2)), SystemLong(full_bit_region * 2), __LINE__);
-    r.Release(var1, full_bit_region * 2);
-    test.IsTrue(r.IsEmpty(), __LINE__);
+    var1 = Core::Reserve<char>(size);
 
-    var1 = static_cast<char *>(r.Reserve(64));
-    var2 = static_cast<char *>(r.Reserve(64));
-    var3 = static_cast<char *>(r.Reserve(2 * 1024));
-    var4 = static_cast<char *>(r.Reserve(2 * 1024));
-    r.Release(var4, 2 * 1024);
+    SystemLong ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (size - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
 
-    test.IsTrue(r.Shrink(var1, 64, 16), __LINE__);
-    test.IsEqual(r.TryExpand(var1, 16, 128), SystemLong{16}, __LINE__);
-    test.IsEqual(r.TryExpand(var1, 16, 64), SystemLong{64}, __LINE__);
-    r.Release(var1, 64);
-    r.Release(var2, 64);
-    r.Release(var3, 2 * 1024);
-    test.IsTrue(r.IsEmpty(), __LINE__);
+    var1       = Core::Reserve<char, 32U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (32U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
 
-    var1 = static_cast<char *>(r.Reserve(full_bit_region / 2));
-    test.IsEqual(r.TryExpand(var1, (full_bit_region / 2), ((full_bit_region / 2) + full_bit_region)),
-                 ((full_bit_region / 2) + full_bit_region), __LINE__);
-    r.Release(var1, ((full_bit_region / 2) + full_bit_region));
-    test.IsTrue(r.IsEmpty(), __LINE__);
+    var1       = Core::Reserve<char, 64U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (64U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
 
-    var1 = static_cast<char *>(r.Reserve(2 * 1024));
-    var2 = static_cast<char *>(r.Reserve(2 * 1024));
+    var1       = Core::Reserve<char, 128U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (128U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
 
-    test.IsTrue(r.Shrink(var1, 2 * 1024, 16), __LINE__);
-    test.IsEqual(r.TryExpand(var1, 16, 2 * 1024), SystemLong{2 * 1024}, __LINE__);
+    var1       = Core::Reserve<char, 256U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (256U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
 
-    r.Release(var1, 2 * 1024);
-    r.Release(var2, 2 * 1024);
+    var1       = Core::Reserve<char, 32U>(1);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (32U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, 1);
 
-    var1 = static_cast<char *>(r.Reserve(((2 * 1024) + 512)));
-    var2 = static_cast<char *>(r.Reserve(1536));
+    var1       = Core::Reserve<char, 64U>(1);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (64U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, 1);
 
-    test.IsTrue(r.Shrink(var1, ((2 * 1024) + 512), 512), __LINE__);
-    test.IsEqual(r.TryExpand(var1, 512, ((2 * 1024) + 512)), SystemLong((2 * 1024) + 512), __LINE__);
+    var1       = Core::Reserve<char, 128U>(1);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (128U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, 1);
 
-    r.Release(var2, 1536);
-    r.Release(var1, ((2 * 1024) + 512));
+    var1       = Core::Reserve<char, 256U>(1);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (256U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, 1);
 
-    test.IsTrue(r.IsEmpty(), __LINE__);
-    test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
+    struct Small {
+        char Data[3];
+    };
+
+    auto var_s = Core::Reserve<Small, 256U>(1);
+    ptr_number = reinterpret_cast<SystemLong>(var_s);
+    test.IsEqual((ptr_number & (256U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var_s, 1);
+
+    Core::Reset();
+}
+
+static void TestReserver2(QTest &test) {
+    constexpr SizeT32 size      = (sizeof(void *) * 2);
+    constexpr SizeT32 page_size = 4096;
+
+    using Core = ReserverCore<(sizeof(void *) * 2), page_size>;
+
+    char *var1;
+    char *var2;
+    char *var3;
+    char *var4;
+
+    var1 = Core::Reserve<char>(size);
+    var2 = Core::Reserve<char>(size);
+    var3 = Core::Reserve<char>(page_size * 2);
+    var4 = Core::Reserve<char>(page_size * 2);
+    Core::Release(var3, page_size * 2);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+    Core::Release(var4, page_size * 2);
+    var1 = Core::Reserve<char>(page_size);
+    Core::Release(var1, page_size);
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    Core::Reset();
+}
+
+static void TestReserver3(QTest &test) {
+    using Core = ReserverCore<>;
+
+    char *var1;
+    char *var2;
+    char *var3;
+    char *var4;
+    char *var5;
+    char *var6;
+    char *var7;
+    char *var8;
+    char *var9;
+    char *var10;
+
+    var1 = Core::Reserve<char>(16);
+    var2 = Core::Reserve<char>(32);
+    Core::Release(var1, 16);
+    var4 = Core::Reserve<char>(64);
+    Core::Release(var2, 32);
+    var3 = Core::Reserve<char>(128);
+    Core::Release(var4, 64);
+    var5 = Core::Reserve<char>(256);
+    Core::Release(var3, 128);
+    var6 = Core::Reserve<char>(512);
+    Core::Release(var5, 256);
+    var7 = Core::Reserve<char>(1024);
+    Core::Release(var6, 512);
+    var8 = Core::Reserve<char>(2048);
+    Core::Release(var7, 1024);
+    var9 = Core::Reserve<char>(4096);
+    Core::Release(var8, 2048);
+    var10 = Core::Reserve<char>(8192);
+    Core::Release(var9, 4096);
+    Core::Release(var10, 8192);
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    for (SystemLong i = 0; i < 10000; ++i) {
+        auto *ptr = Core::Reserve<char>(17);
+        Core::Release(ptr, 17);
+    }
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    for (SystemLong i = 1; i <= 10000; ++i) {
+        auto *ptr = Core::Reserve<char>((i % 128) + 1);
+        Core::Release(ptr, (i % 128) + 1);
+    }
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    char *block[32];
+
+    for (SystemLong i = 0; i < 32; ++i) {
+        block[i] = Core::Reserve<char>(354);
+    }
+
+    for (SystemLong i = 0; i < 32; ++i) {
+        Core::Release(block[i], 354);
+    }
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    Core::Reset();
+}
+
+static void TestReserverShrink(QTest &test) {
+    // Initialize Reserver with 4 KiB block size and 16-byte alignment.
+    using Core = ReserverCore<16, (4 * 1024)>;
+
+    char *var1;
+    char *var2;
+
+    // Allocate 48 bytes and shrink it to 16 bytes.
+    var1 = static_cast<char *>(Core::Reserve<char>(48));
+    test.IsTrue(Core::Shrink(var1, 48, 16), __LINE__);
+
+    // Allocate 16 bytes — it should reuse the tail of the shrunk region.
+    var2 = static_cast<char *>(Core::Reserve<char>(16));
+    test.IsEqual(var1 + 16, var2, __LINE__); // Should follow immediately.
+
+    // Clean up both regions.
+    Core::Release(var1, 16);
+    Core::Release(var2, 16);
+
+    // Confirm memory is fully released, and only one block remains.
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    // Full allocation from the top block.
+    SystemLong max  = Core::GetActiveBlocks()->First()->UsableSize();
+    SystemLong half = max / 2;
+    var1            = static_cast<char *>(Core::Reserve<char>(max));
+
+    // Shrink the large allocation by half.
+    test.IsTrue(Core::Shrink(var1, max, half), __LINE__);
+
+    test.IsFalse(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    // Attempt to allocate more than remaining capacity — triggers new block.
+    var2 = static_cast<char *>(Core::Reserve<char>(8 * 1024));
+    test.IsEqual(Core::TotalBlocks(), SizeT{2}, __LINE__);
+
+    // Release the second block's allocation.
+    Core::Release(var2, 8 * 1024);
+    test.IsFalse(Core::IsEmpty(), __LINE__);
+
+#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
+    test.IsEqual(Core::TotalBlocks(), SizeT{2}, __LINE__);
+#else
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+#endif
+
+    // Finally release the remaining half of var1.
+    Core::Release(var1, max - half);
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    Core::Reset();
+}
+
+static void TestReserverExpand(QTest &test) {
+    using Core = ReserverCore<16, (8 * 1024)>;
+
+    constexpr SystemLong full_bit_region = sizeof(void *) * 8 * 16;
+
+    char *var1;
+    char *var2;
+    char *var3;
+    char *var4;
+
+    var1 = static_cast<char *>(Core::Reserve<char>(16));
+    test.IsTrue(Core::TryExpand(var1, 16, 32), __LINE__);
+    Core::Release(var1, 32);
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(Core::Reserve<char>(64));
+    test.IsTrue(Core::TryExpand(var1, 64, 128), __LINE__);
+    Core::Release(var1, 128);
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(Core::Reserve<char>(full_bit_region - 16));
+    test.IsTrue(Core::TryExpand(var1, (full_bit_region - 16), full_bit_region), __LINE__);
+    test.IsTrue(Core::TryExpand(var1, full_bit_region, (full_bit_region * 2)), __LINE__);
+    Core::Release(var1, full_bit_region * 2);
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(Core::Reserve<char>(64));
+    var2 = static_cast<char *>(Core::Reserve<char>(64));
+    var3 = static_cast<char *>(Core::Reserve<char>(2 * 1024));
+    var4 = static_cast<char *>(Core::Reserve<char>(2 * 1024));
+    Core::Release(var4, 2 * 1024);
+
+    test.IsTrue(Core::Shrink(var1, 64, 16), __LINE__);
+    test.IsFalse(Core::TryExpand(var1, 16, 128), __LINE__);
+    test.IsTrue(Core::TryExpand(var1, 16, 64), __LINE__);
+    Core::Release(var1, 64);
+    Core::Release(var2, 64);
+    Core::Release(var3, 2 * 1024);
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(Core::Reserve<char>(full_bit_region / 2));
+    test.IsTrue(Core::TryExpand(var1, (full_bit_region / 2), ((full_bit_region / 2) + full_bit_region)), __LINE__);
+    Core::Release(var1, ((full_bit_region / 2) + full_bit_region));
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+
+    var1 = static_cast<char *>(Core::Reserve<char>(2 * 1024));
+    var2 = static_cast<char *>(Core::Reserve<char>(2 * 1024));
+
+    test.IsTrue(Core::Shrink(var1, 2 * 1024, 16), __LINE__);
+    test.IsTrue(Core::TryExpand(var1, 16, 2 * 1024), __LINE__);
+
+    Core::Release(var1, 2 * 1024);
+    Core::Release(var2, 2 * 1024);
+
+    var1 = static_cast<char *>(Core::Reserve<char>(((2 * 1024) + 512)));
+    var2 = static_cast<char *>(Core::Reserve<char>(1536));
+
+    test.IsTrue(Core::Shrink(var1, ((2 * 1024) + 512), 512), __LINE__);
+    test.IsTrue(Core::TryExpand(var1, 512, ((2 * 1024) + 512)), __LINE__);
+
+    Core::Release(var2, 1536);
+    Core::Release(var1, ((2 * 1024) + 512));
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
+
+    Core::Reset();
 }
 
 static int RunReserverTests() {

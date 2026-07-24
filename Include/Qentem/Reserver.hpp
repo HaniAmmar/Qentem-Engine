@@ -2,43 +2,38 @@
  * @file Reserver.hpp
  * @brief High-performance memory reservation system with zero internal metadata.
  *
- * This module implements Qentem's low-level allocator — Reserver — a deterministic,
- * reusable memory region manager built to replace traditional heap mechanisms
- * with precise, high-efficiency block control.
+ * This file implements Qentem's low-level allocator, Reserver, a deterministic
+ * memory reservation and reuse system designed for high-performance applications
+ * that require predictable allocation behavior and minimal overhead.
  *
- * Each memory block is divided and tracked via compact bit tables, avoiding
- * per-region metadata and ensuring tight memory boundaries. Allocations are aligned,
- * coalescible, and free of runtime headers. All tracking is external and
- * architecture-aware, making it ideal for systems with strict performance constraints.
+ * Memory is managed through fixed-size blocks that are divided and tracked using
+ * compact external bit tables. Allocations contain no internal headers or
+ * per-region metadata, preserving clean memory boundaries and maximizing usable
+ * space. Region tracking, reuse, and coalescence are performed entirely outside
+ * the allocated memory itself.
  *
- * Reserver is designed for per-core use, with one instance per logical CPU to avoid
- * contention and preserve cache locality. Memory requests are routed to the current
- * core's arena, with optional cross-core fallback for safe reclamation. The system
- * supports NUMA-friendly placement and configurable block sizes for tuning.
+ * Reserver is built around thread-local arenas to eliminate synchronization
+ * overhead and improve cache locality. Each thread maintains its own independent
+ * arena, allowing allocation and release operations to execute without locking
+ * while preserving deterministic behavior and efficient memory reuse.
  *
  * Features:
- *  - Zero internal metadata: allocations remain clean and unencumbered.
- *  - Bitfield-based region tracking for fast reuse and coalescence.
- *  - Per-core arenas for scalable, lock-free performance.
- *  - Fixed block sizing with fast first-fit region selection.
- *  - Supports `MemoryRecord` for usage tracking and debugging.
+ *  - Zero internal metadata: allocated memory remains clean and unencumbered.
+ *  - External bitfield-based region tracking for fast reuse and coalescence.
+ *  - Thread-local arenas for scalable, contention-free allocation.
+ *  - Fixed block sizing with efficient first-fit region selection.
+ *  - Supports `MemoryRecord` for allocation tracking and debugging.
  *
- * @warning Not thread-safe. Intended for core-pinned, single-threaded use cases.
- * @note    Depends on MemoryBlock and LiteArray. Behavior customizable via macros.
+ * @warning Arenas are thread-local and must only be accessed by their owning
+ *          thread. Concurrent access to the same arena is unsupported.
+ *
+ * @note    Depends on MemoryBlock and LiteArray. Behavior is customizable
+ *          through compile-time macros.
  *
  * @author  Hani Ammar
  * @date    2026
  * @license MIT
  */
-
-// TODO:
-// Current allocator assumes:
-//   - one arena per CPU
-//   - one worker per CPU
-//
-// Multi-server configurations can place multiple workers on the same CPU.
-// Revisit arena ownership model (thread-local, worker-local, or shared arena).
-
 #ifndef QENTEM_RESERVER_HPP
 #define QENTEM_RESERVER_HPP
 
@@ -53,109 +48,504 @@
 namespace Qentem {
 
 /**
- * @brief Per-core memory manager for fast, reusable allocations.
+ * @brief Thread-local memory manager for fast, reusable allocations.
  *
- * This structure handles memory reservations for a single CPU core.
- * It allocates memory in blocks, splits them into regions, and keeps
- * track of what's free using bitfields —  without embedding metadata
- * into the allocated regions, preserving clean memory boundaries and
- * minimizing overhead.
+ * This structure manages memory reservations within a thread-local arena.
+ * Memory is allocated in fixed-size blocks, divided into regions, and tracked
+ * using compact bitfields. Allocation tracking is stored externally, avoiding
+ * embedded metadata and preserving clean memory boundaries while minimizing
+ * overhead.
  *
- * Because each core has its own manager, memory stays local (and fast),
- * and there's no locking or contention between threads. Memory can be
- * returned, reused, or released depending on usage patterns.
+ * Regions can be reserved, released, expanded, or reused with deterministic
+ * behavior and efficient memory locality. The allocator is designed to reduce
+ * allocation overhead while maintaining predictable performance characteristics.
  *
- * @tparam Alignment_T Minimum alignment for allocations (in bytes).
- * @tparam BlockSize_T Size of each memory block managed (default: QENTEM_RESERVER_BLOCK_SIZE).
+ * Each thread owns its own arena, eliminating synchronization overhead and
+ * avoiding contention during normal operation. Memory remains local to the
+ * owning thread, improving cache utilization and reuse efficiency.
+ *
+ * @tparam Alignment_T Minimum alignment for allocations, in bytes. Defaults to
+ *                     QENTEM_RESERVER_DEFAULT_ALIGNMENT.
+ * @tparam BlockSize_T Size of each managed memory block. Defaults to
+ *                     QENTEM_RESERVER_BLOCK_SIZE.
  */
 template <SizeT32 Alignment_T = QENTEM_RESERVER_DEFAULT_ALIGNMENT, SystemLong BlockSize_T = QENTEM_RESERVER_BLOCK_SIZE>
 struct ReserverCore {
-    /// Alias for the managed memory block type, bound to the default alignment.
+    /// Alias for the memory block type managed by this allocator.
     using MemoryBlockT = MemoryBlock<Alignment_T>;
 
-    /// Maximum representable system integer value (used for limit checks or sentinels).
+    /// Maximum value representable by SystemLong.
     static constexpr SystemLong MAX_SYSTEM_INT_TYPE = ~SystemLong{0};
 
-    /// Alignment mask used to round up sizes to the nearest boundary.
-    static constexpr SystemLong DEFAULT_ALIGNMENT_M1 = static_cast<SystemLong>(Alignment_T - 1U);
+    /// Alignment mask used when rounding sizes up to Alignment_T.
+    static constexpr SystemLong ALIGNMENT_MASK = static_cast<SystemLong>(Alignment_T - 1U);
 
-    /// Inverse alignment mask for fast alignment rounding via bitwise operations.
-    static constexpr SystemLong DEFAULT_ALIGNMENT_N = ~DEFAULT_ALIGNMENT_M1;
+    /// Inverse alignment mask used for alignment rounding operations.
+    static constexpr SystemLong ALIGNMENT_MASK_INV = ~ALIGNMENT_MASK;
 
-    /// Native width of SystemLong in bits — typically 32 or 64.
+    /// Number of bits in SystemLong (typically 32 or 64).
     static constexpr SizeT32 BIT_WIDTH = (sizeof(SystemLong) * 8U);
 
-    // Deleted copy and move operations: instances are anchored per core and must not be copied.
+    QENTEM_INLINE ReserverCore() noexcept         = delete;
     ReserverCore(ReserverCore &&)                 = delete;
     ReserverCore &operator=(ReserverCore &&)      = delete;
     ReserverCore(const ReserverCore &)            = delete;
     ReserverCore &operator=(const ReserverCore &) = delete;
+    QENTEM_INLINE ~ReserverCore() noexcept        = delete;
 
-    static_assert(Alignment_T >= sizeof(void *),
-                  "Alignment_T must be at least the size of a pointer to ensure correct placement.");
+    static_assert(Alignment_T >= sizeof(void *), "Alignment_T must be at least the size of a pointer.");
+    static_assert((Alignment_T & (sizeof(void *) - 1U)) == 0, "Alignment_T must be a multiple of sizeof(void *).");
+
     /**
-     * @brief Constructs a fresh memory manager for a single core.
+     * @brief Rounds an allocation size up to the allocator's default alignment.
      *
-     * Begins with a smaller-than-target block to allow gradual scaling.
-     * Each block obtained is internally subdivided, zero-overhead, and alignment-aware.
+     * Converts a count of objects into a total byte size and rounds the result
+     * up to the nearest allocator alignment boundary. This ensures that all
+     * reserved regions satisfy the allocator's minimum alignment requirements.
+     *
+     * @tparam Type_T Type being allocated.
+     * @param size Number of objects to allocate.
+     *
+     * @return Total allocation size in bytes, rounded up to the allocator's
+     *         default alignment.
      */
-    QENTEM_INLINE ReserverCore() noexcept = default;
+    template <typename Type_T>
+    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong size) noexcept {
+        size *= sizeof(Type_T);
+        size += ALIGNMENT_MASK;
+        size &= ALIGNMENT_MASK_INV;
 
-    QENTEM_INLINE ~ReserverCore() noexcept {
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-        for (MemoryBlockT &block : blocks_) {
-            MemoryRecord::ReleasedBlock(block.Capacity());
-        }
-
-        // for (MemoryBlockT &block : exhausted_blocks_) {
-        //     MemoryRecord::ReleasedBlock(block.Capacity());
-        // }
-#endif
+        return size;
     }
 
     /**
-     * @brief Reserves a memory region from the current core's fixed-size block pool.
+     * @brief Reserves memory for one or more objects of the specified type.
      *
-     * This function reserves `size` bytes of memory, aligned to `CustomAlignment_T`, and sourced
-     * from the calling CPU core's `ReserverCore` instance. All memory is drawn from fixed-size
-     * blocks (defined by `QENTEM_RESERVER_BLOCK_SIZE`) and allocated without metadata.
+     * Computes the total allocation size for `size` objects of `Type_T`,
+     * rounds the result up to the allocator's default alignment boundary,
+     * and reserves a suitably aligned memory region.
      *
-     * Allocation process:
-     *   1. The caller must precompute a rounded-up byte size using `RoundUpBytes<T>()`.
-     *   2. The region is located using a first-fit scan over existing blocks.
-     *   3. If no space is found, a new block is allocated from system memory.
+     * The returned memory is aligned according to `CustomAlignment_T`,
+     * making it suitable for constructing objects with placement-new.
+     * No objects are constructed by this function.
      *
-     * No block resizing or reallocation occurs. All regions are aligned and suitable
-     * for `CustomAlignment_T` or greater.
+     * The effective alignment is never less than the allocator's minimum
+     * alignment (`Alignment_T`).
      *
-     * @tparam CustomAlignment_T Desired byte alignment (defaults to engine's standard).
-     * @param size                Rounded-up size in bytes (not element count).
-     * @return Aligned pointer to reserved region, or nullptr if allocation failed.
+     * @tparam Type_T Type of object to reserve memory for.
+     * @tparam CustomAlignment_T Desired alignment in bytes. Defaults to
+     *         `alignof(Type_T)`.
      *
-     * @note The size must already be aligned. Use `RoundUpBytes<T>()` before calling.
+     * @param size Number of `Type_T` objects to reserve space for.
+     *
+     * @return Pointer to an aligned memory region capable of storing
+     *         `size` objects of type `Type_T`.
+     *
+     * @see reserveRound
+     */
+    template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
+    QENTEM_NOINLINE static Type_T *Reserve(SystemLong size) noexcept {
+        return static_cast<Type_T *>(reserveRound<Type_T, CustomAlignment_T>(size));
+    }
+
+    /**
+     * @brief Releases a previously reserved memory region.
+     *
+     * Converts the original object count into the aligned byte size used during
+     * reservation and returns the region to the allocator for reuse.
+     *
+     * The supplied `size` must match the number of objects originally passed to
+     * `Reserve()`. The allocator uses this value to reconstruct the reservation's
+     * aligned byte size before releasing the region.
+     *
+     * A null pointer is ignored.
+     *
+     * @tparam Type_T Type originally used when reserving the memory region.
+     * @param ptr Pointer to the memory region to release.
+     * @param size Number of `Type_T` objects originally requested.
+     *
+     * @see Reserve
+     * @see RoundUpBytes
+     */
+    template <typename Type_T>
+    QENTEM_NOINLINE static void Release(Type_T *ptr, SystemLong size) noexcept {
+        if (ptr != nullptr) {
+            release(ptr, RoundUpBytes<Type_T>(size));
+        }
+    }
+
+    /**
+     * @brief Shrinks a previously reserved memory region.
+     *
+     * Reduces the size of an existing reservation by releasing the unused tail
+     * portion back to the allocator. Both the original size and the target size
+     * are converted to aligned byte counts using `RoundUpBytes<Type_T>()` before
+     * the shrink operation is performed.
+     *
+     * If `to_size` is smaller than `from_size`, the region spanning from the new
+     * end of the allocation to the original end is returned to the allocator for
+     * future reuse. The leading portion of the reservation remains unchanged.
+     *
+     * Typical use cases include:
+     * - Containers that over-allocate capacity and later reclaim unused space.
+     * - Buffers that shrink after parsing, serialization, or compaction.
+     * - Dynamic data structures that reduce memory usage after growth.
+     *
+     * @tparam Type_T Type originally used when reserving the memory region.
+     * @param ptr Pointer to the reserved memory region.
+     * @param from_size Original number of `Type_T` objects reserved.
+     * @param to_size New number of `Type_T` objects to retain.
+     *
+     * @return `true` if the reservation was successfully shrunk;
+     *         otherwise `false`.
+     *
+     * @note Both sizes are internally converted to aligned byte counts before
+     *       the shrink operation is performed.
+     *
+     * @see shrink
+     * @see RoundUpBytes
+     */
+    template <typename Type_T>
+    QENTEM_NOINLINE static bool Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+        from_size = RoundUpBytes<Type_T>(from_size);
+        to_size   = RoundUpBytes<Type_T>(to_size);
+
+        if ((from_size > to_size) && (ptr != nullptr)) {
+            return shrink(ptr, from_size, to_size);
+        }
+
+        return false;
+    }
+
+    /**
+     * @brief Attempts to expand a previously reserved region in-place.
+     *
+     * Increases the size of an existing reservation from `from_size` to
+     * `to_size` without relocating the allocation. Both sizes are converted
+     * to aligned byte counts using `RoundUpBytes<Type_T>()` before the
+     * expansion is attempted.
+     *
+     * Expansion succeeds only if sufficient free space exists immediately
+     * after the current reservation. The allocation remains at the same
+     * address and no data is moved.
+     *
+     * If `to_size` is less than or equal to `from_size`, no expansion is
+     * required and the function returns `true`.
+     *
+     * @tparam Type_T Type originally used when reserving the memory region.
+     * @param ptr Pointer to the existing reservation.
+     * @param from_size Current number of `Type_T` objects reserved.
+     * @param to_size Desired number of `Type_T` objects.
+     *
+     * @return `true` if the reservation already satisfies the requested size
+     *         or was successfully expanded in-place; otherwise `false`.
+     *
+     * @see tryExpand
+     * @see RoundUpBytes
+     */
+    template <typename Type_T>
+    QENTEM_NOINLINE static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+        if (ptr != nullptr) {
+            from_size = RoundUpBytes<Type_T>(from_size);
+            to_size   = RoundUpBytes<Type_T>(to_size);
+
+            return (from_size >= to_size) || (tryExpand(ptr, from_size, to_size) == to_size);
+        }
+
+        return false;
+    }
+
+    /**
+     * @brief Resets the allocator to its initial state.
+     *
+     * Releases all managed memory blocks and clears both the active and
+     * exhausted block lists. After this operation, the allocator contains
+     * no managed blocks and behaves as if it were newly initialized.
+     *
+     * If memory tracking is enabled, the released memory is reported through
+     * the configured MemoryRecord hooks.
+     *
+     * @note All outstanding reservations become invalid after this call.
+     */
+    QENTEM_INLINE static void Reset() noexcept {
+        // Drop all memory blocks from both active and retired lists.
+        active_blocks_.Reset();
+        exhausted_blocks_.Reset();
+    }
+
+    /**
+     * @brief Determines whether the allocator contains no active reservations.
+     *
+     * This check verifies that:
+     * - Every active block contains no reserved regions.
+     * - No exhausted blocks remain managed by the allocator.
+     *
+     * @return `true` if all managed memory is currently free;
+     *         otherwise `false`.
+     */
+    QENTEM_INLINE static bool IsEmpty() noexcept {
+        // Scan all active blocks. Any reserved region means the allocator is not empty.
+        for (const MemoryBlockT &block : active_blocks_) {
+            if (!(block.IsEmpty())) {
+                return false;
+            }
+        }
+
+        return exhausted_blocks_.IsEmpty();
+    }
+
+    /**
+     * @brief Returns the total number of managed memory blocks.
+     *
+     * Counts both active blocks and exhausted blocks currently owned by
+     * the allocator, regardless of whether they are participating in
+     * allocation requests.
+     *
+     * This function is primarily intended for diagnostics, testing,
+     * and allocator state inspection.
+     *
+     * @return Total number of managed memory blocks.
+     */
+    QENTEM_INLINE static SizeT TotalBlocks() noexcept {
+        return (active_blocks_.Size() + exhausted_blocks_.Size());
+    }
+
+    /**
+     * @brief Returns the active memory blocks managed by the allocator.
+     *
+     * Provides read-only access to the collection of active blocks currently
+     * participating in allocation requests. This function is primarily intended
+     * for diagnostics, debugging, and unit testing.
+     *
+     * @return Pointer to the array of active memory blocks.
+     */
+    QENTEM_INLINE static const LiteArray<MemoryBlockT> *GetActiveBlocks() noexcept {
+        return &active_blocks_;
+    }
+
+    /**
+     * @brief Returns the exhausted memory blocks managed by the allocator.
+     *
+     * Provides read-only access to blocks that are currently excluded from the
+     * primary allocation path. This function is primarily intended for
+     * diagnostics, debugging, and unit testing.
+     *
+     * @return Pointer to the array of exhausted memory blocks.
+     */
+    QENTEM_INLINE static const LiteArray<MemoryBlockT> *GetExhaustedBlocks() noexcept {
+        return &exhausted_blocks_;
+    }
+
+    /**
+     * @brief Allocates a libc-style memory block (malloc).
+     *
+     * Reserves a memory region large enough to store both the requested
+     * allocation size and an internal size header. The header is stored
+     * immediately before the returned pointer and is later used by
+     * `LibcResize()` and `LibcRelease()`.
+     *
+     * The returned memory is uninitialized.
+     *
+     * @param size Number of bytes to allocate.
+     *
+     * @return Pointer to the allocated memory region, or nullptr on failure.
+     *
+     * @note An internal size header of type `SystemLong` is stored directly
+     *       before the returned pointer.
+     *
+     * @see LibcResize
+     * @see LibcRelease
+     */
+    QENTEM_NOINLINE static void *LibcReserve(SystemLong size) noexcept {
+        SystemLong  r_size = RoundUpBytes<char>(size + sizeof(SystemLong));
+        void       *ptr    = reserveNoRound<Alignment_T>(r_size);
+        SystemLong *l_ptr  = static_cast<SystemLong *>(ptr);
+
+        *l_ptr = r_size;
+        ++l_ptr;
+
+        return l_ptr;
+    }
+
+    /**
+     * @brief Allocates and zero-initializes a libc-style memory block (calloc).
+     *
+     * Reserves a memory region large enough to store both the requested
+     * allocation and an internal size header. The usable portion of the
+     * allocation is then initialized to zero.
+     *
+     * The header is stored immediately before the returned pointer and is
+     * later used by `LibcResize()` and `LibcRelease()`.
+     *
+     * @param count Number of elements to allocate.
+     * @param item_size Size of each element in bytes.
+     *
+     * @return Pointer to the allocated and zero-initialized memory region,
+     *         or nullptr on failure.
+     *
+     * @note An internal size header of type `SystemLong` is stored directly
+     *       before the returned pointer.
+     *
+     * @see LibcReserve
+     * @see LibcResize
+     * @see LibcRelease
+     */
+    QENTEM_NOINLINE static void *LibcReserveClear(SystemLong count, SystemLong item_size) noexcept {
+        SystemLong  r_size = RoundUpBytes<char>((count * item_size) + sizeof(SystemLong));
+        void       *ptr    = reserveNoRound<Alignment_T>(r_size);
+        SystemLong *l_ptr  = static_cast<SystemLong *>(ptr);
+
+        *l_ptr = r_size;
+        ++l_ptr;
+
+        r_size -= sizeof(SystemLong);
+
+        if (r_size != 0) {
+            MemoryUtils::SetToZeroByType(l_ptr, (r_size / sizeof(SystemLong)));
+        }
+
+        return l_ptr;
+    }
+
+    /**
+     * @brief Releases a libc-style memory block (free).
+     *
+     * Returns a memory region previously allocated by `LibcReserve()`,
+     * `LibcReserveClear()`, or successfully managed through `LibcResize()`.
+     *
+     * The allocation size is obtained from the internal size header stored
+     * immediately before the user-visible memory region.
+     *
+     * A null pointer is ignored.
+     *
+     * @param ptr Pointer to the memory region to release.
+     *
+     * @see LibcReserve
+     * @see LibcReserveClear
+     * @see LibcResize
+     */
+    QENTEM_NOINLINE static void LibcRelease(void *ptr) noexcept {
+        if (ptr != nullptr) {
+            SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
+
+            --l_ptr;
+
+            release(l_ptr, *l_ptr);
+        }
+    }
+
+    /**
+     * @brief Resizes a libc-style memory block (realloc).
+     *
+     * Attempts to adjust the size of a previously allocated memory region.
+     * If the allocation can be expanded or shrunk in place, the original
+     * pointer is preserved. Otherwise, a new region is allocated, the
+     * existing data is copied, and the old region is released.
+     *
+     * The original allocation size is obtained from the internal size header
+     * stored immediately before the user-visible memory region.
+     *
+     * If `ptr` is nullptr, this function behaves like `LibcReserve()`.
+     * If `new_size` is zero, the allocation is released and nullptr is
+     * returned.
+     *
+     * @param ptr Pointer previously returned by `LibcReserve()` or
+     *            `LibcReserveClear()`.
+     * @param new_size Desired size in bytes.
+     *
+     * @return Pointer to the resized memory region, or nullptr when
+     *         `new_size` is zero or allocation fails.
+     *
+     * @see LibcReserve
+     * @see LibcReserveClear
+     * @see LibcRelease
+     */
+    QENTEM_NOINLINE static void *LibcResize(void *ptr, SystemLong size) {
+        if (ptr != nullptr) {
+            SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
+            --l_ptr;
+            const SystemLong old_size = *l_ptr;
+
+            if (size != 0) {
+                SystemLong new_size = (size + sizeof(SystemLong));
+
+                if (new_size > old_size) {
+                    if (TryExpand(reinterpret_cast<char *>(l_ptr), old_size, new_size)) {
+                        return ptr;
+                    }
+
+                    char *new_ptr = static_cast<char *>(LibcReserve(size));
+                    MemoryUtils::CopyTo(new_ptr, ptr, (old_size - sizeof(SystemLong)));
+                    release(l_ptr, old_size);
+
+                    return new_ptr;
+                }
+
+                if (new_size < old_size) {
+                    Shrink(reinterpret_cast<char *>(l_ptr), old_size, new_size);
+                }
+
+                return ptr;
+            }
+
+            release(l_ptr, old_size);
+
+            return nullptr;
+        }
+
+        return LibcReserve(size);
+    }
+
+  private:
+    /**
+     * @brief Reserves a memory region from the allocator's managed block pool.
+     *
+     * Reserves `size` bytes of memory aligned to `CustomAlignment_T`.
+     * The supplied size must already be rounded to the allocator's
+     * alignment boundary.
+     *
+     * Allocation proceeds in two phases:
+     *   1. Search existing active blocks using a first-fit strategy.
+     *   2. If no suitable region is found, allocate a new memory block
+     *      and satisfy the request from that block.
+     *
+     * Blocks that become fully consumed are moved to the exhausted block
+     * list and excluded from the primary allocation path.
+     *
+     * Large allocations that consume an entire block are placed directly
+     * into the exhausted block list since they cannot satisfy additional
+     * allocation requests.
+     *
+     * @tparam CustomAlignment_T Required alignment in bytes.
+     * @param size Allocation size in bytes. The value must already be
+     *             rounded to the allocator's alignment boundary.
+     *
+     * @return Pointer to the reserved memory region.
+     *
+     * @note Callers are responsible for rounding sizes before invoking
+     *       this function. Use `RoundUpBytes<T>()` when appropriate.
      */
     template <SizeT32 CustomAlignment_T = Alignment_T>
-    void *Reserve(SystemLong size) {
+    static void *reserve(SystemLong size) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
-        // Optionally track memory usage for debugging/statistics.
         MemoryRecord::Reserved(size);
 #endif
 
         ///////////////////////////////////////////////////////////
-        // Phase 1: Try to serve from existing active blocks.
+        // Phase 1: Search existing active blocks.
 
         const SystemLong chunks = (size >> MemoryBlockT::DefaultAlignmentBit());
 
-        for (MemoryBlockT &current_block : blocks_) {
+        for (MemoryBlockT &current_block : active_blocks_) {
             if (current_block.Available() >= size) {
                 void *ptr = reserveFirstFit<CustomAlignment_T>(&current_block, chunks);
 
                 if (ptr != nullptr) {
                     current_block.DecreaseAvailable(size);
 
-                    // If the block is now exhausted, move it to the detached list.
+                    // Move fully consumed blocks to the exhausted list.
                     if (current_block.Available() == 0) {
-                        detachBlock(&current_block);
+                        moveToExhaustedBlock(&current_block);
                     }
 
                     return ptr;
@@ -164,63 +554,114 @@ struct ReserverCore {
         }
 
         ///////////////////////////////////////////////////////////
-        // Phase 2: No block could fulfill it — reserve a new one.
+        // Phase 2: No existing block could satisfy the request.
 
-        // Pick either the current growth size or just enough for the request.
+        // Allocate a new block large enough for the request.
         MemoryBlockT new_block{(size <= BlockSize_T) ? BlockSize_T : size};
-
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-        MemoryRecord::ReservedBlock(new_block.Capacity());
-#endif
 
         new_block.DecreaseAvailable(size);
 
         MemoryBlockT *new_block_ptr;
 
-        // Phase 2a: The block can serve more than this request — add it to active pool.
+        // The new block has remaining capacity after this allocation.
         if (size < new_block.UsableSize()) {
-            new_block_ptr = &(blocks_.Insert(QUtility::Move(new_block)));
-            new_block_ptr->ClearTable(); // Reset internal region tracking.
+            new_block_ptr = &(active_blocks_.Insert(QUtility::Move(new_block)));
+
+            // Initialize region tracking for the newly inserted block.
+            new_block_ptr->ClearTable();
 
             void *ptr = reserveFirstFit<CustomAlignment_T>(new_block_ptr, chunks);
 
-            // Keep the largest block first for optimal scanning.
-            if (blocks_.First()->UsableSize() < new_block_ptr->UsableSize()) {
-                QUtility::Swap(*(blocks_.Storage()), *new_block_ptr);
+            // Keep the largest active block at the front to improve search efficiency.
+            if (active_blocks_.First()->UsableSize() < new_block_ptr->UsableSize()) {
+                QUtility::Swap(*(active_blocks_.Storage()), *new_block_ptr);
             }
 
             return ptr;
         }
 
-        // Phase 2b: The block can serve only this request — don't track it, just return the base.
+        // The request consumes the entire block; place it directly
+        // in the exhausted list and return its base address.
         new_block_ptr = &(exhausted_blocks_.Insert(QUtility::Move(new_block)));
+
         return new_block_ptr->Base();
     }
 
     /**
-     * @brief Returns a previously reserved memory region back to the pool.
+     * @brief Reserves a memory region without size rounding.
      *
-     * This function gracefully reclaims memory by identifying which block the pointer belongs to,
-     * restoring availability, and reintegrating or removing blocks from the pool as needed.
+     * Uses the greater of `CustomAlignment_T` and the allocator's minimum
+     * alignment (`Alignment_T`) to ensure the returned region satisfies
+     * the allocator's alignment requirements.
      *
-     * - If the memory lies within an active block, the region is marked free.
-     *   If the entire block becomes empty (and it's not the primary one), it's released.
+     * @tparam CustomAlignment_T Requested alignment in bytes.
+     * @param size Allocation size in bytes.
      *
-     * - If the memory belongs to a detached (exhausted) block, one of three fates awaits:
-     *   a) It had spare capacity — reclaim it and return to active rotation.
-     *   b) It was oversized or out of pattern — release it outright.
-     *   c) It matches current growth size and no other blocks exist — reset and reuse.
-     *
-     * @warning The pointer must reference an active allocation from this reserver.
-     *    Releasing invalid or already released memory results in undefined behavior.
-     *
-     * @param ptr  Pointer to the memory region to be returned.
-     * @param size Size in bytes of the region being returned.
-     * @return True if successfully reclaimed, false if the pointer does not belong to any known block.
+     * @return Pointer to the reserved memory region.
      */
-    bool Release(void *ptr, SystemLong size) {
-        // Phase 1: Search within active blocks.
-        for (MemoryBlockT &block : blocks_) {
+    template <SizeT32 CustomAlignment_T>
+    QENTEM_NOINLINE static void *reserveNoRound(SystemLong size) noexcept {
+        if constexpr (CustomAlignment_T >= Alignment_T) {
+            return reserve<CustomAlignment_T>(size);
+        } else {
+            return reserve<Alignment_T>(size);
+        }
+    }
+
+    /**
+     * @brief Reserves a memory region after rounding its size.
+     *
+     * Converts an object count into an aligned byte size using
+     * `RoundUpBytes<Type_T>()`, then reserves the resulting memory region
+     * using the specified alignment.
+     *
+     * The effective alignment is the greater of `CustomAlignment_T`
+     * and the allocator's minimum alignment (`Alignment_T`).
+     *
+     * @tparam Type_T Type being allocated.
+     * @tparam CustomAlignment_T Requested alignment in bytes.
+     * @param size Number of objects to allocate.
+     *
+     * @return Pointer to the reserved memory region.
+     */
+    template <typename Type_T, SizeT32 CustomAlignment_T>
+    QENTEM_NOINLINE static void *reserveRound(SystemLong size) noexcept {
+        return reserveNoRound<CustomAlignment_T>(RoundUpBytes<Type_T>(size));
+    }
+
+    /**
+     * @brief Releases a previously reserved memory region.
+     *
+     * Returns a memory region to the allocator and updates the owning block's
+     * availability information. The allocator first locates the block that owns
+     * the supplied pointer, then performs the appropriate reclamation strategy.
+     *
+     * Active blocks:
+     * - The released region is marked free.
+     * - Availability is increased.
+     * - Fully empty blocks may be released to reduce memory usage.
+     *
+     * Exhausted blocks:
+     * - Released regions within the usable area restore available space and
+     *   return the block to the active block list.
+     * - Dedicated oversized blocks may be released entirely.
+     * - A standard-sized exhausted block may be reset and reused when no
+     *   active blocks remain.
+     *
+     * @param ptr Pointer to the memory region being released.
+     * @param size Size of the region in bytes.
+     *
+     * @return `true` if the region was successfully released;
+     *         otherwise `false`.
+     *
+     * @warning The pointer must originate from this allocator and must not
+     *          have been released previously. Violating these requirements
+     *          results in undefined behavior.
+     */
+    static bool release(void *ptr, SystemLong size) {
+        // Phase 1: Search active blocks.
+        for (MemoryBlockT &block : active_blocks_) {
+            // Regular allocation from the block's usable region.
             if ((ptr >= block.Data()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Released(size);
@@ -228,8 +669,9 @@ struct ReserverCore {
                 block.IncreaseAvailable(size);
                 block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
 
-                // If block became fully free and isn't the leading one, retire it.
-                if ((&block != blocks_.First()) && block.IsEmpty()) {
+                // If the block becomes fully empty and is not the primary block,
+                // release it to reduce memory usage.
+                if ((&block != active_blocks_.First()) && block.IsEmpty()) {
                     releaseBlock(&block);
                 }
 
@@ -237,59 +679,71 @@ struct ReserverCore {
             }
         }
 
-        // Phase 2: Search within exhausted (detached) blocks.
+        // Phase 2: Search exhausted blocks.
         for (MemoryBlockT &block : exhausted_blocks_) {
+            // Whole-block allocation returned from Base().
             if ((ptr >= block.Base()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Released(size);
 #endif
                 if (ptr >= block.Data()) {
-                    // Block still has value — return it to the active roster.
+                    // Restore available space and return the block to the active list.
                     block.IncreaseAvailable(size);
                     block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
-                    reattachBlock(&block);
-                } else if ((block.Capacity() != BlockSize_T) || blocks_.IsNotEmpty()) {
-                    // Block is large and atypical — release it outright.
-                    releaseDetachedBlock(&block);
+                    moveToActiveBlock(&block);
+                } else if ((block.Capacity() != BlockSize_T) || active_blocks_.IsNotEmpty()) {
+                    // Release oversized blocks or extra standard blocks.
+                    releaseExhaustedBlock(&block);
                 } else {
-                    // Block is normal-sized and we have no others — reset it.
+                    // Reuse the last remaining standard-sized block.
                     block.ClearTable();
                     block.IncreaseAvailable(size);
-                    reattachBlock(&block);
+                    moveToActiveBlock(&block);
                 }
 
                 return true;
             }
         }
 
+#if defined(QENTEM_DEBUG) && !defined(_WIN32)
+        __builtin_trap(); // Pointer released from a different thread than the allocating thread.
+#endif
+
         // Unknown origin — pointer does not belong to any known region.
         return false;
     }
 
     /**
-     * @brief Attempts to shrink a previously allocated memory region in-place.
+     * @brief Shrinks an existing allocation in-place.
      *
-     * This function reduces the usable size of a given memory allocation by `diff = from_size - to_size`,
-     * reclaiming the unused tail and marking it as free for reuse. The pointer itself remains valid
-     * and unchanged, but only the first `to_size` bytes are considered retained.
+     * Reduces an allocation from `from_size` bytes to `to_size` bytes by
+     * reclaiming the unused tail region. The allocation address remains
+     * unchanged and the leading `to_size` bytes remain valid.
      *
-     * The function searches both active and exhausted blocks for the owning region:
+     * The allocator locates the block that owns the allocation and returns
+     * the released portion to that block's available space.
      *
-     * - If found in an active block, the unused region is released immediately.
-     * - If found in an exhausted block and the pointer falls within its usable region,
-     *   the block is optionally reattached to allow further reuse.
+     * For allocations originating from a block's normal allocation region,
+     * the released tail is also returned to the block's region tracking
+     * table and the block may be returned to the active block list.
      *
-     * @param ptr       Pointer to the original allocation.
-     * @param from_size The current size of the allocation in bytes.
-     * @param to_size   The desired new (smaller) size in bytes.
-     * @return True if the shrink operation succeeded and memory was reclaimed; false otherwise.
+     * Whole-block allocations are handled separately since they do not
+     * participate in normal region tracking.
+     *
+     * @param ptr Pointer to the allocation being shrunk.
+     * @param from_size Current allocation size in bytes.
+     * @param to_size Desired allocation size in bytes.
+     *
+     * @return `true` if the allocation was successfully shrunk;
+     *         otherwise `false`.
      */
-    bool Shrink(void *ptr, SystemLong from_size, SystemLong to_size) {
+    static bool shrink(void *ptr, SystemLong from_size, SystemLong to_size) {
         char            *shrink_from = (static_cast<char *>(ptr) + to_size);
         const SystemLong diff        = (from_size - to_size);
 
-        // Phase 1: Search within active blocks.
-        for (MemoryBlockT &block : blocks_) {
+        // Phase 1: Search active blocks.
+        for (MemoryBlockT &block : active_blocks_) {
+            // Allocation from the block's normal allocation region.
             if ((ptr >= block.Data()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Shrink(diff);
@@ -302,8 +756,9 @@ struct ReserverCore {
             }
         }
 
-        // Phase 2: Search within exhausted (detached) blocks.
+        // Phase 2: Search exhausted blocks.
         for (MemoryBlockT &block : exhausted_blocks_) {
+            // Allocation belongs to this exhausted block.
             if ((ptr >= block.Base()) && (ptr < block.End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Shrink(diff);
@@ -312,54 +767,55 @@ struct ReserverCore {
                 block.IncreaseAvailable(diff);
 
                 if (ptr >= block.Data()) {
-                    // Has table
+                    // Normal allocation tracked by the block's region table.
                     block.ReleaseRegion(shrink_from, (diff >> block.DefaultAlignmentBit()));
-                    reattachBlock(&block);
+                    moveToActiveBlock(&block);
                 }
 
-                // Note: Bitfield table shrink is unsupported due to offset recalculation
-                // and platform-specific constraints (e.g., Windows page handling).
+                // Whole-block allocations do not use the region tracking table.
+                // Physically shrinking the underlying block would require rebuilding
+                // allocator metadata and may involve platform-specific memory management
+                // constraints, so only the available-byte count is updated.
 
                 return true;
             }
         }
+
+#if defined(QENTEM_DEBUG) && !defined(_WIN32)
+        __builtin_trap(); // Pointer released from a different thread than the allocating thread.
+#endif
 
         // Unknown origin — pointer does not belong to any known region.
         return false;
     }
 
     /**
-     * @brief Attempts to expand a previously reserved region in-place.
+     * @brief Attempts to expand an allocation in-place.
      *
-     * This function checks whether the allocation pointed to by `ptr` can be
-     * safely expanded from `from_size` to `to_size` **without relocation**.
-     * It searches all local memory blocks to find the containing region and
-     * verifies whether the additional memory following the allocation is
-     * available for immediate reservation.
+     * Tries to increase an existing allocation from `from_size` bytes to
+     * `to_size` bytes without relocating the allocation. The allocator
+     * locates the active block that owns the allocation and checks whether
+     * the region immediately following the allocation is available.
      *
-     * If the expansion succeeds:
-     * - The additional region is marked as reserved.
-     * - The available space in the block is reduced.
-     * - MemoryRecord::Expand is called (if enabled).
+     * If sufficient contiguous space exists, the additional region is
+     * reserved and the block's available space is updated accordingly.
      *
-     * If the expansion fails:
-     * - The allocation remains unchanged.
-     * - The function returns `from_size` to signal no growth occurred.
+     * If expansion is not possible, the allocation remains unchanged.
      *
-     * If the pointer is not recognized (not within any known block):
-     * - Returns 0 to indicate an invalid or external pointer.
+     * @param ptr Pointer to the beginning of an existing allocation.
+     * @param from_size Current allocation size in bytes.
+     * @param to_size Desired allocation size in bytes.
      *
-     * @param ptr        Pointer to the beginning of an existing allocation.
-     * @param from_size  The current size of the allocation (in bytes).
-     * @param to_size    The desired expanded size of the allocation (in bytes).
-     * @return The new size of the allocation if expanded successfully,
-     *         `from_size` if expansion failed, or 0 if the pointer is unrecognized.
+     * @return `to_size` if the allocation was successfully expanded,
+     *         `from_size` if expansion was not possible, or
+     *         `0` if the pointer does not belong to any active block.
      */
-    SystemLong TryExpand(void *ptr, SystemLong from_size, SystemLong to_size) {
+    static SystemLong tryExpand(void *ptr, SystemLong from_size, SystemLong to_size) {
         const SystemLong diff = (to_size - from_size);
 
-        for (MemoryBlockT &block : blocks_) {
+        for (MemoryBlockT &block : active_blocks_) {
             if ((ptr >= block.Data()) && (ptr < block.End())) {
+                // Attempt to reserve the region immediately following the allocation.
                 if (reserveAt(&block, (static_cast<char *>(ptr) + from_size),
                               (diff >> MemoryBlockT::DefaultAlignmentBit()))) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
@@ -379,124 +835,21 @@ struct ReserverCore {
     }
 
     /**
-     * @brief Determines whether all memory blocks are currently unused.
+     * @brief Finds and reserves the first suitable free region.
      *
-     * This check ensures that:
-     * - Every active block contains no used regions.
-     * - No exhausted (detached) blocks remain in the system.
+     * Implements the allocator's internal first-fit reservation strategy.
      *
-     * @return True if no reserved memory exists, false otherwise.
-     */
-    QENTEM_INLINE bool IsEmpty() const noexcept {
-        // Scan all active blocks. Any used memory voids emptiness.
-        for (const MemoryBlockT &block : blocks_) {
-            if (!(block.IsEmpty())) {
-                return false;
-            }
-        }
-
-        // Only fully qualifies if exhausted blocks are also gone.
-        return exhausted_blocks_.IsEmpty();
-    }
-
-    /**
-     * @brief Clears all blocks and resets internal configuration.
+     * @param block Memory block to search.
+     * @param chunks Number of allocation units requested.
      *
-     * This operation performs a full internal purge:
-     * - All active and exhausted memory blocks are released.
-     * - The internal size growth tracker is reset to its initial threshold.
-     *
-     * MemoryRecord hooks (if enabled) report the total release for audit.
-     */
-    QENTEM_INLINE void Reset() noexcept {
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-        for (const MemoryBlockT &block : blocks_) {
-            MemoryRecord::ReleasedBlock(block.Capacity());
-        }
-
-        for (const MemoryBlockT &block : exhausted_blocks_) {
-            MemoryRecord::ReleasedBlock(block.Capacity());
-        }
-#endif
-
-        // Drop all memory blocks from both active and retired lists.
-        blocks_.Reset();
-        exhausted_blocks_.Reset();
-    }
-
-    /**
-     * @brief Returns the total number of managed memory blocks.
-     *
-     * This includes:
-     * - Active blocks currently participating in memory servicing.
-     * - Exhausted blocks temporarily removed from the main reserve path.
-     *
-     * Useful for diagnostics, performance tuning, or asserting internal balance.
-     *
-     * @return Total count of both active and exhausted memory blocks.
-     */
-    QENTEM_INLINE SizeT TotalBlocks() const noexcept {
-        return (blocks_.Size() + exhausted_blocks_.Size());
-    }
-
-    /**
-     * @brief Returns a const reference to the active memory blocks array.
-     *
-     * This is intended for diagnostic or testing purposes. It exposes the internal
-     * array of active blocks currently managed by the ReserverCore instance.
-     *
-     * @return Reference to the array of active blocks.
-     */
-    QENTEM_INLINE const LiteArray<MemoryBlockT> &GetBlocks() const noexcept {
-        return blocks_;
-    }
-
-    /**
-     * @brief Returns a const reference to the exhausted (fully used or detached) blocks.
-     *
-     * These blocks are no longer serving allocation requests but may still hold
-     * usable regions for future reuse. This accessor is primarily intended for
-     * debugging, inspection, or unit testing.
-     *
-     * @return Reference to the array of exhausted blocks.
-     */
-    QENTEM_INLINE const LiteArray<MemoryBlockT> &GetExhaustedBlocks() const noexcept {
-        return exhausted_blocks_;
-    }
-
-  private:
-    /**
-     * @brief Attempts to find the first suitable free region within a memory block.
-     *
-     * This function scans the internal bitfield table of a MemoryBlock to locate the
-     * first contiguous sequence of unset bits (`0`) large enough to fulfill the
-     * requested `chunks`. The result is then adjusted to satisfy the requested alignment.
-     *
-     * @tparam CustomAlignment_T Optional override for alignment (in bytes).
-     *
-     * @param block   Pointer to the memory block to search.
-     * @param chunks  Number of aligned chunks requested (already adjusted for type size).
-     *
-     * @return Pointer to usable region within the block, or nullptr if none is found.
-     *
-     * @note Internal scanning logic is intentionally obfuscated to discourage appropriation.
-     *       See the inline region comment for details.
-     *
-     * @see MemoryBlock::ReserveRegion
+     * @return Pointer to the reserved region, or nullptr if no suitable
+     *         region exists.
      */
     template <SizeT32 CustomAlignment_T>
-    void *reserveFirstFit(MemoryBlockT *block, SystemLong chunks) noexcept {
+    static void *reserveFirstFit(MemoryBlockT *block, SystemLong chunks) noexcept {
         constexpr SystemLong alignment_m1 = static_cast<SystemLong>(CustomAlignment_T - 1U);
         constexpr SystemLong alignment_n  = ~alignment_m1;
         constexpr SizeT32    bit_width_m1 = (BIT_WIDTH - 1U);
-
-        // -----------------------------------------------------------------------------
-        // NOTE: This section is deliberately *undocumented* to deter misuse, imitation,
-        //       or uncredited replication. Any attempt to extract logic without deep
-        //       comprehension will fail or mislead.
-        //
-        // You are welcome to use this system — but you *will* credit the architect.
-        // -----------------------------------------------------------------------------
 
         const SystemLong *table       = static_cast<const SystemLong *>(block->Base());
         const SystemLong  table_size  = block->TableSize();
@@ -540,8 +893,8 @@ struct ReserverCore {
                         const SystemLong alignment_shift_count =
                             ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
 
+                        // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
                         if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
-                            // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
                             return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
                         }
                     }
@@ -574,8 +927,8 @@ struct ReserverCore {
                     const SystemLong alignment_shift_count =
                         ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
 
+                    // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
                     if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
-                        // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
                         return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
                     }
                 }
@@ -588,22 +941,27 @@ struct ReserverCore {
     }
 
     /**
-     * @brief Attempts to reserve a specific region within a memory block at the given pointer.
+     * @brief Attempts to reserve a specific region within a memory block.
      *
-     * This function checks if `chunks` contiguous allocation units can be reserved
-     * starting precisely at `ptr`. It decodes the pointer into bitmap coordinates,
-     * scans forward through the bitmap to verify availability, and reserves the region
-     * if sufficient space is found. No relocation or shifting occurs — this is a strictly
-     * in-place reservation.
+     * Verifies that `chunks` contiguous allocation units are available
+     * beginning exactly at `ptr`. If the entire range is free, the region
+     * is marked as reserved and the function returns `true`.
      *
-     * Typical usage: expanding an allocation in-place (e.g., via `TryExpand()`).
+     * Unlike normal allocation searches, this function does not look for
+     * alternative locations. Reservation succeeds only if the requested
+     * address and all following chunks are immediately available.
      *
-     * @param block   Pointer to the memory block to operate on.
-     * @param ptr     The exact address at which the new region must begin.
-     * @param chunks  The number of allocation units (aligned blocks) to reserve.
-     * @return true if the region was successfully reserved; false otherwise.
+     * This helper is primarily used to support in-place allocation
+     * expansion.
+     *
+     * @param block Pointer to the memory block being examined.
+     * @param ptr Exact address at which the reservation must begin.
+     * @param chunks Number of contiguous allocation units to reserve.
+     *
+     * @return `true` if the requested region was reserved;
+     *         otherwise `false`.
      */
-    bool reserveAt(MemoryBlockT *block, void *ptr, SystemLong chunks) {
+    static bool reserveAt(MemoryBlockT *block, void *ptr, SystemLong chunks) {
         constexpr SizeT32 bit_width_m1 = (BIT_WIDTH - 1U);
 
         const SystemLong *table = static_cast<const SystemLong *>(block->Base());
@@ -671,42 +1029,44 @@ struct ReserverCore {
     }
 
     /**
-     * @brief Discards an active memory block from the reserve.
+     * @brief Releases an active memory block from the allocator.
      *
-     * If the given block is not the last in the `blocks_` array,
-     * it is swapped with the last to preserve removal efficiency.
+     * Removes the specified block from the active block list. To keep
+     * removal efficient, the block is swapped with the last element
+     * before being removed when it is not already the final entry.
      *
-     * @param block Pointer to the block to remove.
+     * The underlying memory owned by the block is released when the
+     * block object is destroyed during removal.
+     *
+     * @param block Pointer to the active block to release.
      */
-    void releaseBlock(MemoryBlockT *block) noexcept {
-        MemoryBlockT *last_block = blocks_.Last();
+    static void releaseBlock(MemoryBlockT *block) noexcept {
+        MemoryBlockT *last_block = active_blocks_.Last();
 
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-        MemoryRecord::ReleasedBlock(block->Capacity());
-#endif
-
+        // Move the target block to the end for O(1) removal.
         if (block != last_block) {
             QUtility::Swap(*block, *last_block);
         }
 
-        blocks_.Drop(SizeT{1});
+        active_blocks_.Drop(SizeT{1});
     }
 
     /**
-     * @brief Removes a memory block from the exhausted pool.
+     * @brief Releases an exhausted memory block from the allocator.
      *
-     * This is used when a detached block is deemed unnecessary,
-     * either due to exceeding size limits or excess capacity.
+     * Removes the specified block from the exhausted block list. To keep
+     * removal efficient, the block is swapped with the last element
+     * before being removed when it is not already the final entry.
      *
-     * @param block Pointer to the exhausted block to remove.
+     * The underlying memory owned by the block is released when the
+     * block object is destroyed during removal.
+     *
+     * @param block Pointer to the exhausted block to release.
      */
-    void releaseDetachedBlock(MemoryBlockT *block) noexcept {
+    static void releaseExhaustedBlock(MemoryBlockT *block) noexcept {
         MemoryBlockT *last_block = exhausted_blocks_.Last();
 
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-        MemoryRecord::ReleasedBlock(block->Capacity());
-#endif
-
+        // Move the target block to the end for O(1) removal.
         if (block != last_block) {
             QUtility::Swap(*block, *last_block);
         }
@@ -715,456 +1075,89 @@ struct ReserverCore {
     }
 
     /**
-     * @brief Transfers a fully used block from active to exhausted.
+     * @brief Moves an active block to the exhausted block list.
      *
-     * If the block is not the last in `blocks_`, it is swapped into position
-     * for efficient movement. Ownership is then moved into `exhausted_blocks_`.
+     * Removes the specified block from the active block list and transfers
+     * ownership to the exhausted block list.
      *
-     * @param block Pointer to the block to detach.
+     * To keep removal efficient, the block is first swapped with the last
+     * active block when necessary, allowing constant-time removal.
+     *
+     * @param block Pointer to the active block to move.
      */
-    void detachBlock(MemoryBlockT *block) noexcept {
-        MemoryBlockT *last_block = blocks_.Last();
+    static void moveToExhaustedBlock(MemoryBlockT *block) noexcept {
+        MemoryBlockT *last_block = active_blocks_.Last();
 
         if (block != last_block) {
+            // Move the target block to the end for O(1) removal.
             QUtility::Swap(*block, *last_block);
         }
 
         exhausted_blocks_ += QUtility::Move(*last_block);
-        blocks_.DropFast(SizeT{1});
+        active_blocks_.DropFast(SizeT{1});
     }
 
     /**
-     * @brief Reintegrates a reusable block back into the active pool.
+     * @brief Moves an exhausted block back to the active block list.
      *
-     * The block is taken from the end of `exhausted_blocks_`, optionally swapped
-     * with the provided pointer for consistency. The newly reattached block is then
-     * inserted into `blocks_`. If it has higher capacity than the current lead block,
-     * it is promoted to the front for faster reuse.
+     * Removes the specified block from the exhausted block list and
+     * transfers ownership to the active block list.
      *
-     * @param block Pointer to the block intended for reintegration.
+     * To keep removal efficient, the block is first swapped with the last
+     * exhausted block when necessary, allowing constant-time removal.
+     *
+     * After insertion, the block may be promoted to the front of the
+     * active block list if it has a larger usable capacity than the
+     * current leading block.
+     *
+     * @param block Pointer to the exhausted block to move.
      */
-    void reattachBlock(MemoryBlockT *block) noexcept {
+    static void moveToActiveBlock(MemoryBlockT *block) noexcept {
         MemoryBlockT *last_block = exhausted_blocks_.Last();
 
         if (block != last_block) {
+            // Move the target block to the end for O(1) removal.
             QUtility::Swap(*block, *last_block);
         }
 
-        blocks_ += QUtility::Move(*last_block);
+        active_blocks_ += QUtility::Move(*last_block);
 
-        last_block = blocks_.Last();
+        last_block = active_blocks_.Last();
 
-        // Promote higher-capacity blocks for better fit-first performance.
-        if (blocks_.First()->UsableSize() < last_block->UsableSize()) {
-            QUtility::Swap(*(blocks_.Storage()), *last_block);
+        // Keep the largest active block at the front to improve search efficiency.
+        if (active_blocks_.First()->UsableSize() < last_block->UsableSize()) {
+            QUtility::Swap(*(active_blocks_.Storage()), *last_block);
         }
 
         exhausted_blocks_.DropFast(SizeT{1});
     }
 
     /**
-     * @brief Active memory blocks currently serving allocation requests.
+     * @brief Active memory blocks available for allocation requests.
      *
-     * Each block in this array participates in reservation attempts. When a block becomes full,
-     * it may be moved to `exhausted_blocks_`. The first block is usually the one with the largest
-     * usable capacity, aiding first-fit scans for performance.
+     * Blocks in this array participate in allocation searches and may
+     * satisfy new reservation requests. When a block becomes fully
+     * consumed, it is moved to `exhausted_blocks_`.
+     *
+     * The largest active block is typically kept at the front of the
+     * array to improve allocation search efficiency.
      */
-    // TODO: Consider linked storage for active/exhausted blocks.
-    LiteArray<MemoryBlockT> blocks_{};
+    inline static thread_local LiteArray<MemoryBlockT> active_blocks_{};
 
     /**
-     * @brief Detached memory blocks that are temporarily exhausted or oversized.
+     * @brief Exhausted memory blocks currently excluded from allocation searches.
      *
-     * Blocks in this list are no longer serving active reservations. Depending on configuration
-     * and available capacity, they may be recycled, cleared, or released entirely. This array
-     * prevents waste by preserving reusable memory regions without incurring allocation cost.
+     * These blocks are temporarily removed from the primary allocation
+     * path because they have no immediately available space for new
+     * reservations or are dedicated to a specific allocation.
+     *
+     * Depending on allocator state, exhausted blocks may later be
+     * reactivated, reset, or released.
      */
-    LiteArray<MemoryBlockT> exhausted_blocks_{};
+    inline static thread_local LiteArray<MemoryBlockT> exhausted_blocks_{};
 };
 
-/**
- * @brief High-level interface to the memory reservation system.
- *
- * Provides static functions for acquiring and returning typed regions of memory,
- * routed through per-core arenas for locality and thread-centric performance.
- */
-struct Reserver {
-    using Core = ReserverCore<>;
-
-    Reserver()                            = delete;
-    Reserver(Reserver &&)                 = delete;
-    Reserver(const Reserver &)            = delete;
-    Reserver &operator=(Reserver &&)      = delete;
-    Reserver &operator=(const Reserver &) = delete;
-    ~Reserver()                           = delete;
-
-    static constexpr SystemLong DEFAULT_ALIGNMENT_M1 = static_cast<SystemLong>(QENTEM_RESERVER_DEFAULT_ALIGNMENT - 1U);
-    static constexpr SystemLong DEFAULT_ALIGNMENT_N  = ~DEFAULT_ALIGNMENT_M1;
-
-    template <typename Type_T>
-    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong size) noexcept {
-        size *= sizeof(Type_T);
-        // Align the total byte size to the default alignment boundary.
-        size += DEFAULT_ALIGNMENT_M1;
-        size &= DEFAULT_ALIGNMENT_N;
-
-        return size;
-    }
-
-    /**
-     * @brief Reserves a memory region for `Type_T` with proper size and alignment.
-     *
-     * This function selects the arena tied to the current CPU core and requests memory sufficient
-     * to hold `size` elements of `Type_T`. The total byte size is automatically computed as:
-     *   `sizeof(Type_T) * size`, then aligned upward to the engine's default boundary.
-     *
-     * The final reservation is performed via `GetCurrentInstance().Reserve()`, using the specified alignment.
-     * This ensures the returned memory is correctly aligned and safe for placement-new.
-     *
-     * @tparam Type_T             The type of object for which memory is being reserved.
-     * @tparam CustomAlignment_T  Desired alignment (in bytes, defaults to engine's standard alignment).
-     * @param size                Number of `Type_T` elements to reserve space for (pre-rounding).
-     * @return Pointer to a reserved region suitable for storing `size` aligned `Type_T` objects.
-     *
-     * @see RoundUpBytes
-     */
-    template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
-    QENTEM_INLINE static Type_T *Reserve(SystemLong size) noexcept {
-        return reserve<Type_T, CustomAlignment_T>(RoundUpBytes<Type_T>(size));
-    }
-
-    /**
-     * @brief Releases a memory region reserved for `Type_T` back to the system.
-     *
-     * This function adjusts the given element count by computing `RoundUpBytes<Type_T>(size)`
-     * to ensure alignment consistency with the original reservation. It then attempts to return
-     * the memory region to the `ReserverCore` tied to the current CPU core. If that fails—
-     * and the platform supports symmetric multi-core arenas—it will search sibling cores
-     * (via `getReservers()`) for a match and attempts to return it to a valid arena.
-     *
-     * On single-core or embedded systems, the sole arena handles the release.
-     *
-     * @tparam Type_T The type originally reserved in the region.
-     * @param ptr     Pointer to the memory region to release.
-     * @param size    Number of `Type_T` elements originally requested (pre-rounding).
-     *
-     * @see RoundUpBytes
-     * @see getReservers
-     */
-    template <typename Type_T>
-    QENTEM_NOINLINE static void Release(Type_T *ptr, SystemLong size) noexcept {
-        if (ptr != nullptr) {
-            Core *instance = GetCurrentInstance();
-            size           = RoundUpBytes<Type_T>(size);
-
-#if defined(__linux__) || defined(_WIN32)
-            // Prefer returning to the current arena.
-            if (instance->Release(ptr, size)) {
-                return;
-            }
-
-            for (Core &reserver : reservers_) {
-                if ((&reserver != instance) && reserver.Release(ptr, size)) {
-                    return;
-                }
-            }
-#else
-            // Single-arena fallback path.
-            instance->Release(ptr, size);
-#endif
-        }
-    }
-
-    /**
-     * @brief Shrinks a previously reserved memory region by returning its unused tail.
-     *
-     * This function is used when a region originally reserved for `from_size` elements
-     * of type `Type_T` is no longer needed in full. It rounds both `from_size` and
-     * `to_size` up to their alignment boundaries using `RoundUpBytes<Type_T>()`, then
-     * releases the trailing excess, spanning from (ptr + to_size) to (ptr + from_size).
-     *
-     * On multi-core systems, it first attempts to return the tail to the current core’s
-     * arena. If that fails, it searches sibling arenas for a valid return path.
-     * On single-core systems, it falls back to the local arena.
-     *
-     * Typical use cases include:
-     * - Containers like `HArray` or `StringStream` that over-allocate and wish to reclaim unused space
-     * - JSON builders or buffers that shrink after parsing or compaction
-     *
-     * @tparam Type_T     The object type originally reserved.
-     * @param ptr         Pointer to the reserved memory region.
-     * @param from_size   Original number of `Type_T` elements requested.
-     * @param to_size     New number of `Type_T` elements still in use.
-     *
-     * @note Both `from_size` and `to_size` are internally aligned to type boundaries.
-     * @see RoundUpBytes
-     */
-    template <typename Type_T>
-    QENTEM_NOINLINE static void Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
-        if (ptr != nullptr) {
-            Core *instance = GetCurrentInstance();
-            from_size      = RoundUpBytes<Type_T>(from_size);
-            to_size        = RoundUpBytes<Type_T>(to_size);
-
-            if (from_size > to_size) {
-#if defined(__linux__) || defined(_WIN32)
-                // Prefer returning to the current arena.
-                if (instance->Shrink(ptr, from_size, to_size)) {
-                    return;
-                }
-
-                for (Core &reserver : reservers_) {
-                    if ((&reserver != instance) && reserver.Shrink(ptr, from_size, to_size)) {
-                        return;
-                    }
-                }
-#else
-                // Single-arena fallback path.
-                instance->Shrink(ptr, from_size, to_size);
-#endif
-            }
-        }
-    }
-
-    /**
-     * @brief Attempt to expand a previously reserved region in-place.
-     *
-     * This performs an in-place expansion of memory from `from_size` to `to_size`,
-     * provided the additional memory directly after `ptr` is free. No relocation
-     * occurs. If expansion is not possible, the original reservation remains untouched.
-     *
-     * @param ptr        Pointer to the existing allocation.
-     * @param from_size  Current allocation size in bytes.
-     * @param to_size    Desired allocation size in bytes.
-     * @return true if the allocation was expanded in-place; false otherwise.
-     */
-    template <typename Type_T>
-    QENTEM_NOINLINE static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
-        if (ptr != nullptr) {
-            Core *instance = GetCurrentInstance();
-            from_size      = RoundUpBytes<Type_T>(from_size);
-            to_size        = RoundUpBytes<Type_T>(to_size);
-
-            if (from_size < to_size) {
-#if defined(__linux__) || defined(_WIN32)
-                // Prefer returning to the current arena.
-
-                const SystemLong new_size = instance->TryExpand(ptr, from_size, to_size);
-
-                if (new_size == to_size) {
-                    return true;
-                }
-
-                if (new_size == 0) {
-                    for (Core &reserver : reservers_) {
-                        if ((&reserver != instance) && reserver.TryExpand(ptr, from_size, to_size) == to_size) {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-#else
-                // Single-arena fallback path.
-                return (instance->TryExpand(ptr, from_size, to_size) == to_size);
-#endif
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @brief Empties the current thread's arena and reclaims all reserved memory regions.
-     *
-     * Should be used with care—this releases all memory regions tracked by the current core’s arena.
-     */
-    QENTEM_INLINE static void Reset() noexcept {
-        GetCurrentInstance()->Reset();
-    }
-
-    /**
-     * @brief Empties all arenas across every core and reclaims their reserved memory regions.
-     *
-     * Unlike Reset(), which affects only the current thread's arena, this function traverses
-     * all per-core reservers and clears them. Use with extreme caution—this will invalidate
-     * every allocation managed by the system, regardless of the thread or core it originated from.
-     */
-    QENTEM_INLINE static void ResetAll() noexcept {
-#if defined(__linux__) || defined(_WIN32)
-        for (Core &reserver : reservers_) {
-            reserver.Reset();
-        }
-#else
-        reserver_.Reset();
-#endif
-    }
-
-    /**
-     * @brief Reports whether all arenas are empty.
-     *
-     * On Linux and Windows, this checks every core’s arena to ensure no active
-     * allocations remain. On other platforms, it only inspects the primary arena.
-     *
-     * @return true if (a) all per-core arenas are empty on supported platforms,
-     *         or (b) the primary arena is empty elsewhere.
-     */
-    QENTEM_INLINE static bool IsEmpty() noexcept {
-#if defined(__linux__) || defined(_WIN32)
-        for (const Core &reserver : reservers_) {
-            if (!(reserver.IsEmpty())) {
-                return false;
-            }
-        }
-
-        return true;
-#else
-        return reserver_.IsEmpty();
-#endif
-    }
-
-    // malloc
-    QENTEM_NOINLINE static void *LibcReserve(SystemLong size) noexcept {
-        size += sizeof(SystemLong);
-
-        void       *ptr   = Reserve<char>(size);
-        SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
-
-        *l_ptr = size;
-        ++l_ptr;
-
-        return l_ptr;
-    }
-
-    // calloc
-    QENTEM_NOINLINE static void *LibcReserveClear(SystemLong count, SystemLong item_size) noexcept {
-        const SystemLong size = (count * item_size) + sizeof(SystemLong);
-
-        SystemLong  r_size = RoundUpBytes<char>(size);
-        void       *ptr    = reserve<char>(r_size);
-        SystemLong *l_ptr  = static_cast<SystemLong *>(ptr);
-
-        *l_ptr = r_size;
-        ++l_ptr;
-
-        r_size -= sizeof(SystemLong);
-
-        if (r_size != 0) {
-            MemoryUtils::SetToZeroByType(l_ptr, (r_size / sizeof(SystemLong)));
-        }
-
-        return l_ptr;
-    }
-
-    // realloc
-    QENTEM_NOINLINE static void *LibcResize(void *ptr, SystemLong new_size) {
-        if (ptr != nullptr) {
-            new_size += sizeof(SystemLong);
-            SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
-            --l_ptr;
-
-            const SystemLong size = *l_ptr;
-
-            if ((new_size > size) && TryExpand(reinterpret_cast<char *>(l_ptr), size, new_size)) {
-                return ptr;
-            }
-
-            if (new_size < size) {
-                Shrink(reinterpret_cast<char *>(l_ptr), size, new_size);
-                return ptr;
-            }
-
-            return nullptr;
-        }
-
-        return LibcReserve(new_size);
-    }
-
-    // free
-    QENTEM_NOINLINE static void LibcRelease(void *ptr) noexcept {
-        if (ptr != nullptr) {
-            SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
-            --l_ptr;
-
-            const SystemLong size = *l_ptr;
-
-            Release(reinterpret_cast<char *>(l_ptr), size);
-        }
-    }
-
-    /**
-     * @brief Provides access to the arena associated with the calling thread’s core.
-     *
-     * Each logical CPU owns a dedicated arena to promote spatial locality and
-     * eliminate cross-thread contention.
-     *
-     * For optimal correctness and performance, the calling thread should remain
-     * bound to a single logical core for its lifetime (e.g. via CPU affinity),
-     * as the arena selection is cached per thread.
-     *
-     * @return Reference to the active core’s memory management unit.
-     */
-    QENTEM_INLINE static Core *GetCurrentInstance() noexcept {
-#if defined(__linux__) || defined(_WIN32)
-        thread_local Core &reserver = reservers_.Storage()[CPUHelper::GetCurrentCore()];
-
-        return &reserver;
-#else
-        return &reserver_;
-#endif
-    }
-
-    /**
-     * @brief Returns the reserver instance at the given index.
-     *
-     * On platforms supporting multiple static reserver instances, this provides
-     * direct access to the underlying storage backing the reserver array at
-     * the specified index.
-     * On other platforms, it resolves to the single global reserver object,
-     * ignoring the index.
-     *
-     * This is intended for early-use scenarios (e.g., during program startup)
-     * where a stable reserver address is required before full initialization
-     * paths are established.
-     *
-     * @param core_id Index of the reserver instance to retrieve.
-     * @return Pointer to the reserver instance at the specified index.
-     */
-    QENTEM_INLINE static Core *GetInstanceAt(SizeT core_id) noexcept {
-#if defined(__linux__) || defined(_WIN32)
-        return (reservers_.Storage() + core_id);
-#else
-        (void)core_id;
-        return &reserver_;
-#endif
-    }
-
-  private:
-    template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
-    QENTEM_NOINLINE static Type_T *reserve(SystemLong size) noexcept {
-        // TODO: Replace CPU-based arena routing with thread-local arenas to support
-        // multiple workers sharing the same CPU.
-
-        if constexpr (CustomAlignment_T >= QENTEM_RESERVER_DEFAULT_ALIGNMENT) {
-            // constexpr SizeT32 align = (SizeT32{1} << Platform::FindLastBit(CustomAlignment_T));
-            // (align>=CustomAlignment_T?align:(align+1))
-
-            return static_cast<Type_T *>(GetCurrentInstance()->Reserve<CustomAlignment_T>(size));
-        } else {
-            return static_cast<Type_T *>(GetCurrentInstance()->Reserve<QENTEM_RESERVER_DEFAULT_ALIGNMENT>(size));
-        }
-    }
-
-// TODO: Replace CPU-indexed reservers with thread-local arenas.
-// Temporary plan: protect block attach/detach using linked lists and locks.
-#if defined(__linux__) || defined(_WIN32)
-    inline static LiteArray<ReserverCore<>> reservers_{static_cast<SizeT>(CPUHelper::GetMaxCPUID() + 1U), true};
-#else
-    inline static ReserverCore<> reserver_{};
-#endif
-};
+using Reserver = ReserverCore<>;
 
 } // namespace Qentem
 
