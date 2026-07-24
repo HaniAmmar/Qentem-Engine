@@ -439,8 +439,8 @@ struct QPool {
         return (SystemLong{POOL_HEADER_SIZE} + (SystemLong{ITEM_SIZE} * getStorageCount()));
     }
 
-    inline static SystemLong reserve_size_{getStorageSize()};
-    inline static SizeT32    storage_size_{getStorageCount()};
+    const SystemLong reserve_size_{getStorageSize()};
+    const SizeT32    storage_size_{getStorageCount()};
 
     Item   *list_{nullptr};    ///< Head of the free-list (LIFO order).
     Pool   *storage_{nullptr}; ///< Singly-linked list of owned memory blocks backing the pool.
