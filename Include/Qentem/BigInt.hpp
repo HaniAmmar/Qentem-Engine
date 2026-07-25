@@ -878,6 +878,13 @@ struct BigInt {
      */
     void Add(Number_T number, SizeT32 index = 0) noexcept {
         // Propagate the addition and any carry across limbs
+
+#if defined(QENTEM_DEBUG) && !defined(_WIN32)
+        if (index > MaxIndex()) {
+            __builtin_trap();
+        }
+#endif
+
         do {
             const Number_T tmp = storage_[index];
             storage_[index] += number;
@@ -950,6 +957,12 @@ struct BigInt {
      * Updates the internal limb count if higher limbs become zero.
      */
     void Subtract(Number_T number, SizeT32 index = 0) noexcept {
+#if defined(QENTEM_DEBUG) && !defined(_WIN32)
+        if (index > MaxIndex()) {
+            __builtin_trap();
+        }
+#endif
+
         // Propagate the subtraction and any borrow across limbs
         do {
             const Number_T tmp = storage_[index];
@@ -1031,16 +1044,21 @@ struct BigInt {
      */
     void Multiply(Number_T multiplier) noexcept {
         // Start from the highest limb and propagate carries to higher limbs.
-        SizeT32 index = index_;
-        ++index;
 
-        do {
+        const Number_T carry = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(storage_[index_], multiplier);
+        SizeT32        index = index_;
+
+        if (index_ < MaxIndex()) {
+            Add(carry, (index_ + 1U));
+        }
+
+        while (index != 0) {
             const SizeT32 current_index = index;
             --index;
             // Multiply the current limb; Add() will handle carry propagation.
-            // if (storage_[index] != 0)
+
             Add(DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(storage_[index], multiplier), current_index);
-        } while (index != 0);
+        }
     }
 
     /**
