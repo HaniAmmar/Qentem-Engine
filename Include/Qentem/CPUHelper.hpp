@@ -39,8 +39,7 @@ struct alignas(QENTEM_CACHE_LINE_SIZE) CPUSet {
     static constexpr SizeT32 BIT_WIDTH    = (sizeof(SystemLong) * 8U);
     static constexpr SizeT32 BIT_WIDTH_M1 = (BIT_WIDTH - 1U);
     static constexpr SizeT32 SIZE         = ((QENTEM_MAX_CPU_CORES + (BIT_WIDTH - 1U)) / BIT_WIDTH);
-    // static constexpr SizeT32 SHIFT        = Platform::FindFirstBit(BIT_WIDTH);
-    static constexpr SizeT32 SHIFT = (BIT_WIDTH == SystemLong{64} ? 6U : 5U);
+    static constexpr SizeT32 SHIFT        = Platform::FindFirstBitConstexpr(BIT_WIDTH);
 
     QENTEM_INLINE CPUSet() noexcept = default;
 
