@@ -367,18 +367,6 @@ struct Platform {
     }
 
     template <typename Number_T>
-    QENTEM_INLINE static constexpr SizeT32 FindFirstBitConstexpr(Number_T value) noexcept {
-        SizeT32 shift = 0;
-
-        while ((value & Number_T{1}) == 0) {
-            value >>= 1U;
-            ++shift;
-        }
-
-        return shift;
-    }
-
-    template <typename Number_T>
     QENTEM_INLINE static constexpr SizeT32 FindLastBit(Number_T value) noexcept {
 #if defined(QENTEM_DEBUG)
         if (value == 0) {
@@ -414,6 +402,18 @@ struct Platform {
         }
     }
 #endif // _MSC_VER
+
+    template <typename Number_T>
+    QENTEM_INLINE static constexpr SizeT32 FindFirstBitConstexpr(Number_T value) noexcept {
+        SizeT32 shift = 0;
+
+        while ((value & Number_T{1}) == 0) {
+            value >>= 1U;
+            ++shift;
+        }
+
+        return shift;
+    }
     ///////////////////////////////////////
     template <typename, typename, SizeT32>
     struct SIMDCompare_T {};
