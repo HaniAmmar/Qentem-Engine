@@ -145,6 +145,8 @@ struct ReserverCore {
      */
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
     QENTEM_NOINLINE static Type_T *Reserve(SystemLong size) noexcept {
+        static_assert((CustomAlignment_T > 0) && ((CustomAlignment_T & (CustomAlignment_T - 1)) == 0),
+                      "alignment must be power-of-two");
         return static_cast<Type_T *>(reserveRound<Type_T, CustomAlignment_T>(size));
     }
 
@@ -556,8 +558,14 @@ struct ReserverCore {
         ///////////////////////////////////////////////////////////
         // Phase 2: No existing block could satisfy the request.
 
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
+        const SystemLong adjusted_size = size;
+#else
+        const SystemLong adjusted_size = (size + (CustomAlignment_T << 1U)); // Ensure correct alignment.
+#endif
+
         // Allocate a new block large enough for the request.
-        MemoryBlockT new_block{(size <= BlockSize_T) ? BlockSize_T : size};
+        MemoryBlockT new_block{(adjusted_size <= BlockSize_T) ? BlockSize_T : adjusted_size};
 
         new_block.DecreaseAvailable(size);
 
@@ -639,7 +647,7 @@ struct ReserverCore {
      * Active blocks:
      * - The released region is marked free.
      * - Availability is increased.
-     * - Fully empty blocks may be released to reduce memory usage.
+     * - Fully empty blocks may be released when other active blocks remain.
      *
      * Exhausted blocks:
      * - Released regions within the usable area restore available space and
@@ -669,9 +677,8 @@ struct ReserverCore {
                 block.IncreaseAvailable(size);
                 block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
 
-                // If the block becomes fully empty and is not the primary block,
-                // release it to reduce memory usage.
-                if ((&block != active_blocks_.First()) && block.IsEmpty()) {
+                // Release fully empty blocks while preserving at least one active block.
+                if ((active_blocks_.Size() != SizeT{1}) && block.IsEmpty()) {
                     releaseBlock(&block);
                 }
 
@@ -738,8 +745,8 @@ struct ReserverCore {
      *         otherwise `false`.
      */
     static bool shrink(void *ptr, SystemLong from_size, SystemLong to_size) {
-        char            *shrink_from = (static_cast<char *>(ptr) + to_size);
-        const SystemLong diff        = (from_size - to_size);
+        char            *ptr_tail = (static_cast<char *>(ptr) + to_size);
+        const SystemLong diff     = (from_size - to_size);
 
         // Phase 1: Search active blocks.
         for (MemoryBlockT &block : active_blocks_) {
@@ -750,7 +757,7 @@ struct ReserverCore {
 #endif
 
                 block.IncreaseAvailable(diff);
-                block.ReleaseRegion(shrink_from, (diff >> block.DefaultAlignmentBit()));
+                block.ReleaseRegion(ptr_tail, (diff >> block.DefaultAlignmentBit()));
 
                 return true;
             }
@@ -768,7 +775,7 @@ struct ReserverCore {
 
                 if (ptr >= block.Data()) {
                     // Normal allocation tracked by the block's region table.
-                    block.ReleaseRegion(shrink_from, (diff >> block.DefaultAlignmentBit()));
+                    block.ReleaseRegion(ptr_tail, (diff >> block.DefaultAlignmentBit()));
                     moveToActiveBlock(&block);
                 }
 
@@ -846,10 +853,10 @@ struct ReserverCore {
      *         region exists.
      */
     template <SizeT32 CustomAlignment_T>
-    static void *reserveFirstFit(MemoryBlockT *block, SystemLong chunks) noexcept {
-        constexpr SystemLong alignment_m1 = static_cast<SystemLong>(CustomAlignment_T - 1U);
-        constexpr SystemLong alignment_n  = ~alignment_m1;
-        constexpr SizeT32    bit_width_m1 = (BIT_WIDTH - 1U);
+    static void *reserveFirstFit(MemoryBlockT *block, const SystemLong chunks) noexcept {
+        constexpr SystemLong alignment_mask     = static_cast<SystemLong>(CustomAlignment_T - 1U);
+        constexpr SystemLong alignment_mask_inv = ~alignment_mask;
+        constexpr SizeT32    bit_width_mask_m1  = (BIT_WIDTH - 1U);
 
         const SystemLong *table       = static_cast<const SystemLong *>(block->Base());
         const SystemLong  table_size  = block->TableSize();
@@ -878,24 +885,33 @@ struct ReserverCore {
             SystemLong current = table[table_index];
 
             while (current != 0) {
-                SizeT32 available = (bit_width_m1 - Platform::FindLastBit(current));
+                SizeT32 available = (bit_width_mask_m1 - Platform::FindLastBit(current));
                 region_size += available;
 
                 if (region_size >= chunks) {
                     const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
 
                     if constexpr (CustomAlignment_T <= Alignment_T) {
-                        return block->ReserveRegion(bit_index, chunks);
+                        block->ReserveRegion(bit_index, chunks);
+                        return (static_cast<char *>(block->Data()) +
+                                (bit_index << MemoryBlockT::DefaultAlignmentBit()));
                     } else {
-                        const SystemLong raw_index =
-                            (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
-                        const SystemLong aligned_index = ((raw_index + alignment_m1) & alignment_n);
-                        const SystemLong alignment_shift_count =
-                            ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
+                        const SystemLong ptr        = (reinterpret_cast<SystemLong>(block->Data()) +
+                                                       (bit_index << MemoryBlockT::DefaultAlignmentBit()));
+                        const SystemLong diff       = (((ptr + alignment_mask) & alignment_mask_inv) - ptr);
+                        const SystemLong index_diff = (diff >> MemoryBlockT::DefaultAlignmentBit());
 
-                        // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
-                        if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
-                            return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
+                        if (region_size >= index_diff) {
+                            region_size -= index_diff;
+
+                            if (region_size >= chunks) {
+                                block->ReserveRegion((bit_index + index_diff), chunks);
+                                return reinterpret_cast<void *>(ptr + diff);
+                            } else {
+                                start_bit += index_diff;
+                                start_index += (start_bit >> MemoryBlockT::TableBitShift());
+                                start_bit &= bit_width_mask_m1;
+                            }
                         }
                     }
                 }
@@ -903,7 +919,7 @@ struct ReserverCore {
                 current <<= available;
                 shifted += available;
                 current   = ~current;
-                available = (bit_width_m1 - Platform::FindLastBit(current));
+                available = (bit_width_mask_m1 - Platform::FindLastBit(current));
                 current   = ~current;
                 shifted += available;
                 current <<= available;
@@ -919,17 +935,25 @@ struct ReserverCore {
                 const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
 
                 if constexpr (CustomAlignment_T <= Alignment_T) {
-                    return block->ReserveRegion(bit_index, chunks);
+                    block->ReserveRegion(bit_index, chunks);
+                    return (static_cast<char *>(block->Data()) + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
                 } else {
-                    const SystemLong raw_index =
-                        (block->DataAlignment() + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
-                    const SystemLong aligned_index = ((raw_index + alignment_m1) & alignment_n);
-                    const SystemLong alignment_shift_count =
-                        ((aligned_index - raw_index) >> MemoryBlockT::DefaultAlignmentBit());
+                    const SystemLong ptr        = (reinterpret_cast<SystemLong>(block->Data()) +
+                                                   (bit_index << MemoryBlockT::DefaultAlignmentBit()));
+                    const SystemLong diff       = (((ptr + alignment_mask) & alignment_mask_inv) - ptr);
+                    const SystemLong index_diff = (diff >> MemoryBlockT::DefaultAlignmentBit());
 
-                    // Don't pass start_index nor start_bit, as they might changed because of 'alignment'
-                    if ((region_size > alignment_shift_count) && (region_size - alignment_shift_count) >= chunks) {
-                        return block->ReserveRegion((bit_index + alignment_shift_count), chunks);
+                    if (region_size >= index_diff) {
+                        region_size -= index_diff;
+
+                        if (region_size >= chunks) {
+                            block->ReserveRegion((bit_index + index_diff), chunks);
+                            return reinterpret_cast<void *>(ptr + diff);
+                        } else {
+                            start_bit += index_diff;
+                            start_index += (start_bit >> MemoryBlockT::TableBitShift());
+                            start_bit &= bit_width_mask_m1;
+                        }
                     }
                 }
             }

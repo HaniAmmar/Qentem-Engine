@@ -35,10 +35,11 @@ static void TestReserver1(QTest &test) {
 
     using Core = ReserverCore<(sizeof(void *) * 2), page_size>;
 
-    char *var1;
-    char *var2;
-    char *var3;
-    char *var4;
+    char      *var1;
+    char      *var2;
+    char      *var3;
+    char      *var4;
+    SystemLong ptr_number;
 
     var1 = Core::Reserve<char>(size);
     var2 = Core::Reserve<char>(size);
@@ -52,26 +53,81 @@ static void TestReserver1(QTest &test) {
     test.IsTrue(Core::IsEmpty(), __LINE__);
     test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
 
-    var1 = Core::Reserve<char>(size);
-
-    SystemLong ptr_number = reinterpret_cast<SystemLong>(var1);
+    var1       = Core::Reserve<char>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
     test.IsEqual((ptr_number & (size - 1U)), SystemLong{0}, __LINE__);
     Core::Release(var1, size);
+
+    var1       = Core::Reserve<char>(size + 15);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (size - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size + 15);
 
     var1       = Core::Reserve<char, 32U>(size);
     ptr_number = reinterpret_cast<SystemLong>(var1);
     test.IsEqual((ptr_number & (32U - 1U)), SystemLong{0}, __LINE__);
     Core::Release(var1, size);
 
+    var2       = Core::Reserve<char>(size);
+    var1       = Core::Reserve<char, 64U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (64U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+
+    var2       = Core::Reserve<char>(size);
+    var1       = Core::Reserve<char, 64U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (64U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+
+    var2       = Core::Reserve<char, 32U>(size);
+    var1       = Core::Reserve<char, 64U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (64U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+
     var1       = Core::Reserve<char, 64U>(size);
     ptr_number = reinterpret_cast<SystemLong>(var1);
     test.IsEqual((ptr_number & (64U - 1U)), SystemLong{0}, __LINE__);
     Core::Release(var1, size);
 
+    var2       = Core::Reserve<char>(size);
     var1       = Core::Reserve<char, 128U>(size);
     ptr_number = reinterpret_cast<SystemLong>(var1);
     test.IsEqual((ptr_number & (128U - 1U)), SystemLong{0}, __LINE__);
     Core::Release(var1, size);
+    Core::Release(var2, size);
+
+    var2       = Core::Reserve<char, 32U>(size);
+    var1       = Core::Reserve<char, 128U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (128U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+
+    var2       = Core::Reserve<char, 64U>(size);
+    var1       = Core::Reserve<char, 128U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (128U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+
+    var2       = Core::Reserve<char, 128U>(size);
+    var1       = Core::Reserve<char, 128U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (128U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
+
+    var2       = Core::Reserve<char, 256U>(size);
+    var1       = Core::Reserve<char, 128U>(size);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (128U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, size);
+    Core::Release(var2, size);
 
     var1       = Core::Reserve<char, 256U>(size);
     ptr_number = reinterpret_cast<SystemLong>(var1);
@@ -107,14 +163,26 @@ static void TestReserver1(QTest &test) {
     test.IsEqual((ptr_number & (256U - 1U)), SystemLong{0}, __LINE__);
     Core::Release(var_s, 1);
 
+    struct alignas(256) Small2 {
+        char Data[3];
+    };
+
+    test.IsEqual(SizeT32{alignof(Small2)}, SizeT32{256}, __LINE__);
+    auto var_s2 = Core::Reserve<Small2>(1);
+    ptr_number  = reinterpret_cast<SystemLong>(var_s2);
+    test.IsEqual((ptr_number & (256U - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var_s2, 1);
+
     Core::Reset();
 }
 
 static void TestReserver2(QTest &test) {
     constexpr SizeT32 size      = (sizeof(void *) * 2);
     constexpr SizeT32 page_size = 4096;
+    SystemLong        ptr_number;
 
-    using Core = ReserverCore<(sizeof(void *) * 2), page_size>;
+    using Core  = ReserverCore<(sizeof(void *) * 2), page_size>;
+    using Core2 = ReserverCore<(sizeof(void *) * 2), page_size * 2U>;
 
     char *var1;
     char *var2;
@@ -136,6 +204,44 @@ static void TestReserver2(QTest &test) {
     test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
 
     Core::Reset();
+
+    var1 = Core::Reserve<char, page_size>(page_size * 2);
+
+    test.IsNotNull(var1, __LINE__);
+    ptr_number = reinterpret_cast<SystemLong>(var1);
+    test.IsEqual((ptr_number & (page_size - 1U)), SystemLong{0}, __LINE__);
+    Core::Release(var1, page_size * 2);
+
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsTrue((Core::TotalBlocks() <= SizeT{1}), __LINE__);
+
+    var1 = Core::Reserve<char>(256);
+    var2 = Core::Reserve<char>(64);
+    Core::Release(var1, 256);
+    var3       = Core::Reserve<char, page_size>(page_size);
+    ptr_number = reinterpret_cast<SystemLong>(var3);
+    Core::Release(var2, 64);
+    Core::Release(var3, page_size);
+
+    test.IsEqual((ptr_number & (page_size - 1U)), SystemLong{0}, __LINE__);
+    test.IsTrue(Core::IsEmpty(), __LINE__);
+    test.IsTrue((Core::TotalBlocks() <= SizeT{1}), __LINE__);
+
+    Core::Reset();
+
+    var1 = Core2::Reserve<char>(256);
+    var2 = Core2::Reserve<char>(64);
+    Core2::Release(var1, 256);
+    var3       = Core2::Reserve<char, page_size>(page_size);
+    ptr_number = reinterpret_cast<SystemLong>(var3);
+    Core2::Release(var2, 64);
+    Core2::Release(var3, page_size);
+
+    test.IsEqual((ptr_number & (page_size - 1U)), SystemLong{0}, __LINE__);
+    test.IsTrue(Core2::IsEmpty(), __LINE__);
+    test.IsTrue((Core2::TotalBlocks() <= SizeT{1}), __LINE__);
+
+    Core2::Reset();
 }
 
 static void TestReserver3(QTest &test) {
@@ -236,6 +342,8 @@ static void TestReserverShrink(QTest &test) {
     SystemLong half = max / 2;
     var1            = static_cast<char *>(Core::Reserve<char>(max));
 
+    test.IsEqual(static_cast<void *>(var1), Core::GetActiveBlocks()->First()->Data(), __LINE__);
+
     // Shrink the large allocation by half.
     test.IsTrue(Core::Shrink(var1, max, half), __LINE__);
 
@@ -250,11 +358,7 @@ static void TestReserverShrink(QTest &test) {
     Core::Release(var2, 8 * 1024);
     test.IsFalse(Core::IsEmpty(), __LINE__);
 
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-    test.IsEqual(Core::TotalBlocks(), SizeT{2}, __LINE__);
-#else
     test.IsEqual(Core::TotalBlocks(), SizeT{1}, __LINE__);
-#endif
 
     // Finally release the remaining half of var1.
     Core::Release(var1, max - half);

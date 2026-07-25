@@ -108,7 +108,6 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Base(), Alignment_T), __LINE__);
 #endif
     test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Data(), Alignment_T), __LINE__);
-    test.IsTrue(TestMemoryBlockVerifyAlignment(mb.Data(), mb.DataAlignment()), __LINE__);
 
     SizeT32 default_alignment = Alignment_T;
     SizeT32 alignment         = 0;
@@ -183,7 +182,9 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     test.IsEqual(mb.Available(), mb.UsableSize(), __LINE__);
     ///////////////////
 
-    void       *region  = mb.ReserveRegion(0, mb.Available() / Alignment_T);
+    void *region = mb.Data();
+    mb.ReserveRegion(0, mb.Available() / Alignment_T);
+
     SystemLong *table   = static_cast<SystemLong *>(mb.Base());
     SystemLong  t_index = 0;
 
@@ -195,27 +196,36 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     mb.ReleaseRegion(region, mb.Available() / Alignment_T);
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
-    region          = mb.ReserveRegion(0, 1);
+    region = mb.Data();
+    mb.ReserveRegion(0, 1);
+
     SystemLong map0 = table[0];
     test.IsEqual(table[0], (map0 | SystemLong{1} << (MemoryBlockPointerWidth - 1)), __LINE__);
     mb.ReleaseRegion(region, 1);
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
-    region = mb.ReserveRegion(0, 2);
-    map0   = table[0];
+    region = mb.Data();
+    mb.ReserveRegion(0, 2);
+
+    map0 = table[0];
     test.IsEqual(table[0], (map0 | SystemLong{3} << (MemoryBlockPointerWidth - 2)), __LINE__);
     mb.ReleaseRegion(region, 2);
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
-    region = mb.ReserveRegion(0, 3);
-    map0   = table[0];
+    region = mb.Data();
+    mb.ReserveRegion(0, 3);
+
+    map0 = table[0];
     test.IsEqual(table[0], (map0 | SystemLong{7} << (MemoryBlockPointerWidth - 3)), __LINE__);
     mb.ReleaseRegion(region, 3);
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
     if (((mb.TableSize() * MemoryBlockPointerWidth) - unusable_regions) > MemoryBlockPointerWidth * SystemLong{2}) {
-        region = mb.ReserveRegion(MemoryBlockPointerWidth - 8, 16);
-        map0   = table[0];
+        region =
+            (static_cast<char *>(mb.Data()) + ((MemoryBlockPointerWidth - 8) << MemoryBlockT::DefaultAlignmentBit()));
+        mb.ReserveRegion(MemoryBlockPointerWidth - 8, 16);
+
+        map0 = table[0];
         test.IsEqual(table[0], (map0 | SystemLong{255}), __LINE__);
         SystemLong map1 = table[1];
         test.IsEqual(table[1], (map1 | (SystemLong{255} << (MemoryBlockPointerWidth - 8))), __LINE__);
@@ -223,8 +233,12 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
         mb.ReleaseRegion(region, 16);
         test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
-        region        = mb.ReserveRegion(0, 3);
-        void *region2 = mb.ReserveRegion(MemoryBlockPointerWidth - 8, 16);
+        region = mb.Data();
+        mb.ReserveRegion(0, 3);
+
+        void *region2 =
+            (static_cast<char *>(mb.Data()) + ((MemoryBlockPointerWidth - 8) << MemoryBlockT::DefaultAlignmentBit()));
+        mb.ReserveRegion(MemoryBlockPointerWidth - 8, 16);
 
         test.IsNotEqual(region, region2, __LINE__);
 

@@ -1,16 +1,16 @@
 /**
  * @file MemoryBlock.hpp
- * @brief Fixed-size memory block with zero-overhead region tracking via bitfield.
+ * @brief Fixed-size memory block with metadata-free allocations and bitfield-based tracking.
  *
- * Provides a low-level, page-aligned memory region that is subdivided into
- * fixed-size aligned chunks. Allocation state is tracked using a compact
- * bitfield stored at the beginning of the block. Suitable for use in
- * high-performance memory managers.
+ * Provides a contiguous memory region subdivided into fixed-size aligned chunks.
+ * Allocation state is tracked through a compact bitfield table stored within the
+ * block, allowing allocation and release operations without per-allocation metadata.
  *
- * This component is header-only, non-STL, and designed for embedded or
- * high-throughput systems. No internal dynamic allocation is performed.
+ * MemoryBlock serves as the foundation of ReserverCore and is designed for
+ * high-performance allocation workloads where predictable memory layout,
+ * alignment control, and efficient region reuse are required.
  *
- * @tparam Alignment_T The minimum alignment (and chunk size) in bytes.
+ * @tparam Alignment_T Minimum allocation alignment and chunk size in bytes.
  *
  * @author Hani Ammar
  * @date 2026
@@ -29,21 +29,13 @@
 
 namespace Qentem {
 
-/**
- * @brief Memory block with bitfield-based region tracking and strict alignment.
- *
- * Allocates a contiguous memory region aligned to system page boundaries and subdivides it
- * into fixed-size chunks tracked via a bitfield table. Provides zero-metadata allocation
- * and release via region reservation logic.
- *
- * @tparam Alignment_T Chunk alignment in bytes. Must be power of two.
- */
 template <SizeT32 Alignment_T>
 struct MemoryBlock {
-    static constexpr SystemLong BITS_IN_CHAR        = SystemLong{8};
     static constexpr SystemLong MAX_SYSTEM_INT_TYPE = ~SystemLong{0};
+    static constexpr SizeT32    BITS_IN_CHAR_SHIFT  = 3U;
     static constexpr SizeT32    PTR_SIZE            = sizeof(void *);
-    static constexpr SizeT32    BIT_WIDTH           = (PTR_SIZE * 8U);
+    static constexpr SizeT32    BIT_WIDTH           = (PTR_SIZE << BITS_IN_CHAR_SHIFT);
+    static constexpr SizeT32    PTR_SIZE_SHIFT      = (PTR_SIZE == 8U ? 3 : 2);
     static constexpr SystemLong ALIGNMENT_MASK      = static_cast<SystemLong>(Alignment_T - 1U);
     static constexpr SystemLong ALIGNMENT_MASK_INV  = ~ALIGNMENT_MASK;
 
@@ -52,14 +44,27 @@ struct MemoryBlock {
     MemoryBlock &operator=(const MemoryBlock &) = delete;
 
     /**
-     * @brief Constructs a memory block with at least the given capacity.
+     * @brief Constructs a memory block with at least the requested capacity.
      *
-     * Reserves a page-aligned memory region from the system. Internally aligns the
-     * start of usable memory to the specified chunk alignment and initializes the
-     * bitfield table for tracking chunk usage. If the requested capacity is less than
-     * a system page, it will be rounded up. Otherwise, it is rounded up to the nearest page.
+     * Reserves a contiguous memory region from the operating system and prepares it
+     * for chunk-based allocation tracking. The requested capacity is rounded up to
+     * at least one system page and aligned to a page boundary when larger sizes are
+     * requested.
      *
-     * @param capacity Minimum number of bytes to reserve (may be rounded up).
+     * During initialization:
+     * - Space is reserved for the allocation bitfield table.
+     * - The usable allocation area is aligned to `Alignment_T`.
+     * - Regions occupied by the table and alignment padding are excluded from
+     *   the usable allocation space.
+     * - Internal tracking values are calculated for fast region reservation
+     *   and release operations.
+     *
+     * The resulting block contains a compact bitfield table followed by an
+     * aligned usable memory region. No per-allocation metadata is stored within
+     * user allocations.
+     *
+     * @param capacity Minimum number of bytes to reserve. The final block size
+     *                 may be increased to satisfy page-size requirements.
      */
     explicit MemoryBlock(SystemLong capacity) noexcept : capacity_{capacity} {
         static_assert((Alignment_T > 0) && ((Alignment_T & (Alignment_T - 1)) == 0),
@@ -71,21 +76,11 @@ struct MemoryBlock {
             capacity_ = SystemMemory::GetPageSize();
         }
 
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-        capacity_ += SystemMemory::GetPageSize(); // Insure correct alignment
-#endif
+        base_ = SystemMemory::Reserve(capacity_);
 
-        base_raw_ = SystemMemory::Reserve(capacity_);
-
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-        {
-            const SystemLong aligned_address =
-                ((reinterpret_cast<SystemLong>(base_raw_) + ALIGNMENT_MASK) & ALIGNMENT_MASK_INV);
-            base_ = reinterpret_cast<void *>(aligned_address);
-        }
-#endif
-
-        table_size_ = (capacity_ / (Alignment_T * BITS_IN_CHAR));
+        table_size_ = capacity_;
+        table_size_ >>= DefaultAlignmentBit();
+        table_size_ >>= BITS_IN_CHAR_SHIFT;
 
         table_mask_shift_ = BIT_WIDTH;
 
@@ -98,19 +93,15 @@ struct MemoryBlock {
         const SystemLong aligned_usable_base = ((usable_base_raw + ALIGNMENT_MASK) & ALIGNMENT_MASK_INV);
         const SystemLong unusable =
             (((table_size_ + (aligned_usable_base - usable_base_raw)) + ALIGNMENT_MASK) & ALIGNMENT_MASK_INV);
-
-        table_size_ /= PTR_SIZE;
-
-        const SizeT32 unusable_bits    = static_cast<SizeT32>(unusable >> DefaultAlignmentBit());
-        const SizeT32 unusable_indices = (unusable_bits / BIT_WIDTH);
-
-        table_size_ -= unusable_indices;
-        table_mask_shift_ -= (unusable_bits - (unusable_indices * BIT_WIDTH));
-
         data_ = reinterpret_cast<char *>(aligned_usable_base);
 
-        // Compute actual alignment of the usable region (lowest power-of-two divisor)
-        data_alignment_ = (1U << Platform::FindFirstBit(aligned_usable_base));
+        table_size_ >>= PTR_SIZE_SHIFT;
+
+        const SizeT32 unusable_bits    = static_cast<SizeT32>(unusable >> DefaultAlignmentBit());
+        const SizeT32 unusable_indices = (unusable_bits >> TableBitShift());
+
+        table_size_ -= unusable_indices;
+        table_mask_shift_ -= (unusable_bits - (unusable_indices << TableBitShift()));
 
         usable_size_ = (capacity_ - unusable);
         available_   = usable_size_;
@@ -125,48 +116,40 @@ struct MemoryBlock {
     }
 
     QENTEM_INLINE MemoryBlock(MemoryBlock &&src) noexcept
-        : base_raw_{src.base_raw_}, data_{src.data_}, usable_size_{src.usable_size_}, available_{src.available_},
+        : base_{src.base_}, data_{src.data_}, usable_size_{src.usable_size_}, available_{src.available_},
           next_index_{src.next_index_}, table_size_{src.table_size_}, capacity_{src.capacity_},
-          data_alignment_{src.data_alignment_}, table_mask_shift_{src.table_mask_shift_} {
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-        base_ = src.base_;
-#endif
-
-        src.base_raw_ = nullptr;
+          table_mask_shift_{src.table_mask_shift_} {
+        src.base_ = nullptr;
     }
 
     QENTEM_INLINE MemoryBlock &operator=(MemoryBlock &&src) noexcept {
         if (this != &src) {
             release();
 
-            base_raw_ = src.base_raw_;
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-            base_ = src.base_;
-#endif
+            base_     = src.base_;
+            src.base_ = nullptr;
+
             data_             = src.data_;
             usable_size_      = src.usable_size_;
             available_        = src.available_;
             next_index_       = src.next_index_;
             table_size_       = src.table_size_;
             capacity_         = src.capacity_;
-            data_alignment_   = src.data_alignment_;
             table_mask_shift_ = src.table_mask_shift_;
-
-            src.base_raw_ = nullptr;
         }
 
         return *this;
     }
 
     /**
-     * @brief Returns the beginning of the memory block.
+     * @brief Returns the base address of the memory block.
      *
-     * This is the first byte of the reserved block and includes both
-     * allocator-managed structures (such as the region tracking table)
-     * and the usable allocation area.
+     * This is the beginning of the reserved memory region and includes both
+     * the allocation bitfield table and the usable allocation area.
      *
-     * Unlike `Data()`, this pointer does not necessarily refer to memory
-     * that can be returned by normal allocation requests.
+     * The returned pointer represents the entire block and may point to
+     * allocator-managed data. It is not generally suitable for normal
+     * allocation requests.
      *
      * @return Pointer to the beginning of the memory block.
      *
@@ -177,13 +160,11 @@ struct MemoryBlock {
     }
 
     /**
-     * @brief Returns the beginning of the usable allocation area.
+     * @brief Returns the start of the usable allocation area.
      *
-     * This pointer is aligned according to the block's alignment requirements
-     * and marks the first byte that may be returned by normal allocation
-     * requests.
-     *
-     * Memory preceding this address is reserved for allocator-managed data.
+     * This pointer marks the first byte that may be returned by allocation
+     * requests. It is aligned according to `Alignment_T` and always resides
+     * after the allocation bitfield table and any required alignment padding.
      *
      * @return Pointer to the first allocatable byte of the block.
      *
@@ -193,43 +174,66 @@ struct MemoryBlock {
         return data_;
     }
 
-    /**
-     * @brief Returns the actual alignment of the usable data pointer.
-     *
-     * This reflects the largest power-of-two divisor of the `Data()` address,
-     * computed from the least significant set bit. It represents the true alignment
-     * of the memory region, which may be equal to or greater than the requested alignment.
-     *
-     * @return Alignment (in bytes) of the usable memory region.
-     */
-    QENTEM_INLINE SizeT32 DataAlignment() noexcept {
-        return data_alignment_;
+    QENTEM_INLINE const void *Data() const noexcept {
+        return data_;
     }
 
     /**
-     * @brief Returns the shift amount corresponding to the chunk alignment.
+     * @brief Returns log2(Alignment_T).
      *
-     * For example, if Alignment_T is 16, returns 4.
+     * Converts the allocation alignment into its corresponding bit shift.
+     * This allows divisions and multiplications by the alignment size to
+     * be performed using bitwise operations.
+     *
+     * Examples:
+     * - Alignment_T = 8   -> returns 3
+     * - Alignment_T = 16  -> returns 4
+     * - Alignment_T = 64  -> returns 6
+     *
+     * @return Base-2 logarithm of Alignment_T.
      */
-    QENTEM_INLINE static constexpr SizeT32 DefaultAlignmentBit() noexcept {
-        return Platform::FindFirstBit(Alignment_T);
+    QENTEM_INLINE static SizeT32 DefaultAlignmentBit() noexcept {
+        return Platform::FindFirstBitConstexpr(Alignment_T);
     }
 
-    QENTEM_INLINE const void *End() const noexcept {
-        return (static_cast<const char *>(base_) + capacity_);
-    }
-
+    /**
+     * @brief Returns a reference to the allocation search hint.
+     *
+     * This index records the bitmap position from which the next allocation
+     * search should begin, reducing repeated scans of fully occupied regions.
+     *
+     * @return Reference to the next bitmap index used during allocation searches.
+     */
     QENTEM_INLINE SystemLong &GetRefNextIndex() noexcept {
         return next_index_;
     }
 
+    /**
+     * @brief Returns the number of bitmap entries used by this block.
+     *
+     * The returned value represents the size of the allocation tracking
+     * table in units of SystemLong entries.
+     *
+     * @return Number of bitmap entries in the allocation table.
+     */
     QENTEM_INLINE SystemLong TableSize() const noexcept {
         return table_size_;
     }
 
-    QENTEM_INLINE static constexpr SizeT32 TableFirstBit() noexcept {
-        // BIT_WIDTH = bits in one entry (e.g., 64); result = log2(BIT_WIDTH) = 6
-        return Platform::FindFirstBit(BIT_WIDTH);
+    /**
+     * @brief Returns log2(BIT_WIDTH).
+     *
+     * Converts the number of bits stored in a bitmap entry into the shift
+     * value used to translate between bit counts and bitmap table indices.
+     *
+     * Examples:
+     * - BIT_WIDTH = 32 -> returns 5
+     * - BIT_WIDTH = 64 -> returns 6
+     *
+     * @return Shift value corresponding to BIT_WIDTH.
+     */
+    QENTEM_INLINE static constexpr SizeT32 TableBitShift() noexcept {
+        return Platform::FindFirstBitConstexpr(BIT_WIDTH);
     }
 
     QENTEM_INLINE SystemLong Capacity() const noexcept {
@@ -256,6 +260,10 @@ struct MemoryBlock {
         available_ -= size;
     }
 
+    QENTEM_INLINE const void *End() const noexcept {
+        return (static_cast<const char *>(base_) + capacity_);
+    }
+
     /**
      * @brief Clears the allocation table and resets all bits to 0 (free).
      *
@@ -280,22 +288,11 @@ struct MemoryBlock {
         table[table_size_m1] = table_mask;
     }
 
-    /**
-     * @brief Reserves a range of contiguous aligned chunks.
-     *
-     * Marks bits in the allocation table as used. Returns a pointer to the aligned region
-     * corresponding to the given bit index and chunk size.
-     *
-     * @param bit_index Starting chunk index.
-     * @param chunks Number of chunks to reserve.
-     * @return Aligned pointer to reserved memory region.
-     */
-    void *ReserveRegion(SystemLong bit_index, SystemLong chunks) {
+    void ReserveRegion(SystemLong bit_index, SystemLong chunks) {
         SystemLong *table       = static_cast<SystemLong *>(Base());
-        SystemLong  table_index = (bit_index >> TableFirstBit());
+        SystemLong  table_index = (bit_index >> TableBitShift());
 
-        void *ptr = (static_cast<char *>(Data()) + (bit_index << DefaultAlignmentBit()));
-        bit_index -= (table_index << TableFirstBit());
+        bit_index -= (table_index << TableBitShift());
         SystemLong mask = MAX_SYSTEM_INT_TYPE;
         mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
         mask >>= bit_index;
@@ -313,8 +310,6 @@ struct MemoryBlock {
 
         next_index_ += static_cast<SystemLong>(table[table_index] == MAX_SYSTEM_INT_TYPE);
         next_index_ = ((table_index != table_size_) ? table_index : 0);
-
-        return ptr;
     }
 
     void ReserveRegion(SystemLong table_index, SystemLong bit_index, SystemLong chunks) noexcept {
@@ -338,15 +333,6 @@ struct MemoryBlock {
         next_index_ = ((table_index != table_size_) ? table_index : 0);
     }
 
-    /**
-     * @brief Releases a previously reserved memory region.
-     *
-     * Clears the corresponding bits in the allocation table, marking the specified
-     * chunk range as free. The region must exactly match a prior reservation.
-     *
-     * @param ptr    Pointer returned by ReserveRegion().
-     * @param chunks Number of chunks originally reserved.
-     */
     void ReleaseRegion(void *ptr, SystemLong chunks) noexcept {
         SystemLong *table = static_cast<SystemLong *>(Base());
         SystemLong  table_index;
@@ -403,41 +389,32 @@ struct MemoryBlock {
         bit_index = (ptr_int >> DefaultAlignmentBit());
 
         // Divide bit index by BIT_WIDTH (i.e., 64) to find table word index.
-        table_index = (bit_index >> TableFirstBit());
+        table_index = (bit_index >> TableBitShift());
 
         // Compute residual bit position within the selected 64-bit word.
-        bit_index -= (table_index << TableFirstBit());
+        bit_index -= (table_index << TableBitShift());
     }
 
   private:
     QENTEM_INLINE void release() {
-        if (base_raw_ != nullptr) {
-            SystemMemory::Release(base_raw_, capacity_);
+        if (base_ != nullptr) {
+            SystemMemory::Release(base_, capacity_);
+
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
             MemoryRecord::ReleasedBlock(capacity_);
 #endif
 
-            base_raw_ = nullptr;
+            base_ = nullptr;
         }
     }
 
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-    void *base_raw_{nullptr};
-    void *base_{nullptr};
-#else
-    union {
-        void *base_raw_{nullptr};
-        void *base_;
-    };
-#endif
-
+    void      *base_{nullptr};
     void      *data_{nullptr};
     SystemLong usable_size_{0};
     SystemLong available_{0};
     SystemLong next_index_{0};
     SystemLong table_size_{0};
     SystemLong capacity_{0};
-    SizeT32    data_alignment_{0};
     SizeT32    table_mask_shift_{0};
 };
 
