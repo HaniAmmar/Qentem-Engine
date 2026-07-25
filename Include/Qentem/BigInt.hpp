@@ -1271,7 +1271,9 @@ struct BigInt {
                 divisor_is_power_of_two = IsEqual(residual, divisor);
             }
 
+            estimate.Copy(*this);
             residual.Copy(*this);
+
             Clear();
 
             while (true) {
