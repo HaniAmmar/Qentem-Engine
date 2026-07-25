@@ -889,10 +889,13 @@ struct ReserverCore {
                 region_size += available;
 
                 if (region_size >= chunks) {
-                    const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
+                    const SystemLong bit_index = (start_bit + (start_index << MemoryBlockT::TableBitShift()));
 
                     if constexpr (CustomAlignment_T <= Alignment_T) {
-                        block->ReserveRegion(bit_index, chunks);
+                        start_index += (start_bit >> MemoryBlockT::TableBitShift());
+                        start_bit &= bit_width_mask_m1;
+                        block->ReserveRegion(start_index, start_bit, chunks);
+
                         return (static_cast<char *>(block->Data()) +
                                 (bit_index << MemoryBlockT::DefaultAlignmentBit()));
                     } else {
@@ -905,13 +908,19 @@ struct ReserverCore {
                             region_size -= index_diff;
 
                             if (region_size >= chunks) {
-                                block->ReserveRegion((bit_index + index_diff), chunks);
+                                SystemLong       reserve_bit_index = (bit_index + index_diff);
+                                const SystemLong reserve_table_index =
+                                    (reserve_bit_index >> MemoryBlockT::TableBitShift());
+
+                                reserve_bit_index -= (reserve_table_index << MemoryBlockT::TableBitShift());
+
+                                block->ReserveRegion(reserve_table_index, reserve_bit_index, chunks);
                                 return reinterpret_cast<void *>(ptr + diff);
-                            } else {
-                                start_bit += index_diff;
-                                start_index += (start_bit >> MemoryBlockT::TableBitShift());
-                                start_bit &= bit_width_mask_m1;
                             }
+
+                            start_bit += index_diff;
+                            start_index += (start_bit >> MemoryBlockT::TableBitShift());
+                            start_bit &= bit_width_mask_m1;
                         }
                     }
                 }
@@ -932,10 +941,13 @@ struct ReserverCore {
             region_size += (BIT_WIDTH - shifted);
 
             if (region_size >= chunks) {
-                const SystemLong bit_index = (start_bit + (BIT_WIDTH * start_index));
+                const SystemLong bit_index = (start_bit + (start_index << MemoryBlockT::TableBitShift()));
 
                 if constexpr (CustomAlignment_T <= Alignment_T) {
-                    block->ReserveRegion(bit_index, chunks);
+                    start_index += (start_bit >> MemoryBlockT::TableBitShift());
+                    start_bit &= bit_width_mask_m1;
+                    block->ReserveRegion(start_index, start_bit, chunks);
+
                     return (static_cast<char *>(block->Data()) + (bit_index << MemoryBlockT::DefaultAlignmentBit()));
                 } else {
                     const SystemLong ptr        = (reinterpret_cast<SystemLong>(block->Data()) +
@@ -947,13 +959,18 @@ struct ReserverCore {
                         region_size -= index_diff;
 
                         if (region_size >= chunks) {
-                            block->ReserveRegion((bit_index + index_diff), chunks);
+                            SystemLong       reserve_bit_index   = (bit_index + index_diff);
+                            const SystemLong reserve_table_index = (reserve_bit_index >> MemoryBlockT::TableBitShift());
+
+                            reserve_bit_index -= (reserve_table_index << MemoryBlockT::TableBitShift());
+
+                            block->ReserveRegion(reserve_table_index, reserve_bit_index, chunks);
                             return reinterpret_cast<void *>(ptr + diff);
-                        } else {
-                            start_bit += index_diff;
-                            start_index += (start_bit >> MemoryBlockT::TableBitShift());
-                            start_bit &= bit_width_mask_m1;
                         }
+
+                        start_bit += index_diff;
+                        start_index += (start_bit >> MemoryBlockT::TableBitShift());
+                        start_bit &= bit_width_mask_m1;
                     }
                 }
             }

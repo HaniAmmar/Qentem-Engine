@@ -32,10 +32,10 @@ namespace Qentem {
 template <SizeT32 Alignment_T>
 struct MemoryBlock {
     static constexpr SystemLong MAX_SYSTEM_INT_TYPE = ~SystemLong{0};
-    static constexpr SizeT32    BITS_IN_CHAR_SHIFT  = 3U;
+    static constexpr SizeT32    BITS_IN_CHAR_SHIFT  = Platform::FindFirstBitConstexpr(8U);
     static constexpr SizeT32    PTR_SIZE            = sizeof(void *);
     static constexpr SizeT32    BIT_WIDTH           = (PTR_SIZE << BITS_IN_CHAR_SHIFT);
-    static constexpr SizeT32    PTR_SIZE_SHIFT      = (PTR_SIZE == 8U ? 3 : 2);
+    static constexpr SizeT32    PTR_SIZE_SHIFT      = Platform::FindFirstBitConstexpr(PTR_SIZE);
     static constexpr SystemLong ALIGNMENT_MASK      = static_cast<SystemLong>(Alignment_T - 1U);
     static constexpr SystemLong ALIGNMENT_MASK_INV  = ~ALIGNMENT_MASK;
 
@@ -288,33 +288,16 @@ struct MemoryBlock {
         table[table_size_m1] = table_mask;
     }
 
-    void ReserveRegion(SystemLong bit_index, SystemLong chunks) {
-        SystemLong *table       = static_cast<SystemLong *>(Base());
-        SystemLong  table_index = (bit_index >> TableBitShift());
-
-        bit_index -= (table_index << TableBitShift());
-        SystemLong mask = MAX_SYSTEM_INT_TYPE;
-        mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
-        mask >>= bit_index;
-        table[table_index] |= mask;
-
-        chunks += bit_index;
-
-        while (chunks > BIT_WIDTH) {
-            chunks -= BIT_WIDTH;
-            mask = MAX_SYSTEM_INT_TYPE;
-            mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
-            ++table_index;
-            table[table_index] |= mask;
-        }
-
-        next_index_ += static_cast<SystemLong>(table[table_index] == MAX_SYSTEM_INT_TYPE);
-        next_index_ = ((table_index != table_size_) ? table_index : 0);
-    }
-
     void ReserveRegion(SystemLong table_index, SystemLong bit_index, SystemLong chunks) noexcept {
         SystemLong *table = static_cast<SystemLong *>(Base());
         SystemLong  mask  = MAX_SYSTEM_INT_TYPE;
+
+#if defined(QENTEM_DEBUG) && !defined(_WIN32)
+        if (bit_index == BIT_WIDTH) {
+            __builtin_trap();
+        }
+#endif
+
         mask <<= ((chunks < BIT_WIDTH) ? (BIT_WIDTH - chunks) : 0);
         mask >>= bit_index;
         table[table_index] |= mask;
@@ -330,7 +313,7 @@ struct MemoryBlock {
         }
 
         next_index_ += static_cast<SystemLong>(table[table_index] == MAX_SYSTEM_INT_TYPE);
-        next_index_ = ((table_index != table_size_) ? table_index : 0);
+        next_index_ = ((table_index != table_size_) ? next_index_ : 0);
     }
 
     void ReleaseRegion(void *ptr, SystemLong chunks) noexcept {

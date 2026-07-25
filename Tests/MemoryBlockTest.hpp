@@ -89,6 +89,8 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     using MemoryBlockT = MemoryBlock<Alignment_T>;
 
     MemoryBlockT mb{capacity};
+    SystemLong   reserve_bit_index;
+    SystemLong   reserve_table_index;
 
 #ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
     test.IsTrue(mb.Capacity() >= SystemLong{expected_capacity}, __LINE__);
@@ -183,7 +185,8 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     ///////////////////
 
     void *region = mb.Data();
-    mb.ReserveRegion(0, mb.Available() / Alignment_T);
+
+    mb.ReserveRegion(0, 0, mb.Available() / Alignment_T);
 
     SystemLong *table   = static_cast<SystemLong *>(mb.Base());
     SystemLong  t_index = 0;
@@ -197,7 +200,7 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
     region = mb.Data();
-    mb.ReserveRegion(0, 1);
+    mb.ReserveRegion(0, 0, 1);
 
     SystemLong map0 = table[0];
     test.IsEqual(table[0], (map0 | SystemLong{1} << (MemoryBlockPointerWidth - 1)), __LINE__);
@@ -205,7 +208,7 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
     region = mb.Data();
-    mb.ReserveRegion(0, 2);
+    mb.ReserveRegion(0, 0, 2);
 
     map0 = table[0];
     test.IsEqual(table[0], (map0 | SystemLong{3} << (MemoryBlockPointerWidth - 2)), __LINE__);
@@ -213,7 +216,7 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
     region = mb.Data();
-    mb.ReserveRegion(0, 3);
+    mb.ReserveRegion(0, 0, 3);
 
     map0 = table[0];
     test.IsEqual(table[0], (map0 | SystemLong{7} << (MemoryBlockPointerWidth - 3)), __LINE__);
@@ -223,7 +226,12 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
     if (((mb.TableSize() * MemoryBlockPointerWidth) - unusable_regions) > MemoryBlockPointerWidth * SystemLong{2}) {
         region =
             (static_cast<char *>(mb.Data()) + ((MemoryBlockPointerWidth - 8) << MemoryBlockT::DefaultAlignmentBit()));
-        mb.ReserveRegion(MemoryBlockPointerWidth - 8, 16);
+
+        reserve_bit_index   = (MemoryBlockPointerWidth - 8);
+        reserve_table_index = (reserve_bit_index >> MemoryBlockT::TableBitShift());
+        reserve_bit_index -= (reserve_table_index << MemoryBlockT::TableBitShift());
+
+        mb.ReserveRegion(reserve_table_index, reserve_bit_index, 16);
 
         map0 = table[0];
         test.IsEqual(table[0], (map0 | SystemLong{255}), __LINE__);
@@ -234,11 +242,14 @@ static void TestMemoryBlock(QTest &test, LiteArray<SystemLong> &a_table, SystemL
         test.IsTrue(TestMemoryBlockVerifyTable(a_table, static_cast<SystemLong *>(mb.Base())), __LINE__);
 
         region = mb.Data();
-        mb.ReserveRegion(0, 3);
+        mb.ReserveRegion(0, 0, 3);
 
         void *region2 =
             (static_cast<char *>(mb.Data()) + ((MemoryBlockPointerWidth - 8) << MemoryBlockT::DefaultAlignmentBit()));
-        mb.ReserveRegion(MemoryBlockPointerWidth - 8, 16);
+        reserve_bit_index   = (MemoryBlockPointerWidth - 8);
+        reserve_table_index = (reserve_bit_index >> MemoryBlockT::TableBitShift());
+        reserve_bit_index -= (reserve_table_index << MemoryBlockT::TableBitShift());
+        mb.ReserveRegion(reserve_table_index, reserve_bit_index, 16);
 
         test.IsNotEqual(region, region2, __LINE__);
 
