@@ -23,7 +23,7 @@
 #ifndef QENTEM_TEST_H
 #define QENTEM_TEST_H
 
-#if !defined(_WIN32)
+#if defined(__linux__)
 extern "C" int __cxa_thread_atexit(void (*f)(), void *o, void *d) {
     int __cxa_thread_atexit_impl(void (*)(), void *, void *);
     return __cxa_thread_atexit_impl(f, o, d);
