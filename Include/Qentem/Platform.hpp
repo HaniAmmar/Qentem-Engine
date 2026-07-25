@@ -317,7 +317,7 @@ struct Platform {
 #endif // _M_X64
     }
 
-#else  // _MSC_VER
+#else // _MSC_VER
     QENTEM_INLINE static constexpr SizeT32 PopCount(unsigned int value) {
         return static_cast<SizeT32>(__builtin_popcount(value));
     }
@@ -332,6 +332,12 @@ struct Platform {
 
     template <typename Number_T>
     QENTEM_INLINE static constexpr SizeT32 FindFirstBit(Number_T value) noexcept {
+#if defined(QENTEM_DEBUG)
+        if (value == 0) {
+            __builtin_trap();
+        }
+#endif
+
         // 'value' should be bigger than zero.
         constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
 
@@ -374,6 +380,12 @@ struct Platform {
 
     template <typename Number_T>
     QENTEM_INLINE static constexpr SizeT32 FindLastBit(Number_T value) noexcept {
+#if defined(QENTEM_DEBUG)
+        if (value == 0) {
+            __builtin_trap();
+        }
+#endif
+
         // 'value' should be bigger than zero.
         constexpr SizeT32 int_size    = (sizeof(int) * 8U);
         constexpr SizeT32 taken_size  = (int_size - 1U);
