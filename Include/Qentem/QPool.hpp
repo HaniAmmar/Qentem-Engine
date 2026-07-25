@@ -43,10 +43,6 @@
 #include "Qentem/SystemMemory.hpp"
 #include "Qentem/MemoryUtils.hpp"
 
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-#include "Qentem/MemoryRecord.hpp"
-#endif
-
 namespace Qentem {
 
 /**
@@ -346,12 +342,6 @@ struct QPool {
 #else
             SystemMemory::Release(storage_, (reserve_size_ + TYPE_ALIGN_T));
 #endif
-
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-            MemoryRecord::Released(reserve_size_);
-            MemoryRecord::ReleasedBlock(reserve_size_);
-#endif
-
             storage_ = next_pool;
         }
     }
@@ -374,11 +364,6 @@ struct QPool {
             Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(reserve_size_));
 #else
             Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(reserve_size_ + TYPE_ALIGN_T));
-#endif
-
-#ifdef QENTEM_ENABLE_MEMORY_RECORD
-            MemoryRecord::ReservedBlock(reserve_size_);
-            MemoryRecord::Reserved(reserve_size_);
 #endif
 
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
