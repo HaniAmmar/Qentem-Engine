@@ -88,18 +88,26 @@ Memory usage can be tuned at compile time through `QENTEM_RESERVER_BLOCK_SIZE`, 
 
 ## Memory Model
 
-Qentem uses a custom memory reservation system (`Reserver`) designed for predictable, low-overhead allocation and long-term memory reuse.
+Qentem uses a custom memory reservation system (`Reserver`) designed for predictable, low-overhead allocation and efficient memory reuse.
 
-### Key characteristics:
+### Key characteristics
 
-* Block-based reservation model with no allocation metadata stored inside user memory.
-* First-fit region selection with bitfield tracking for fast reuse.
-* Fixed-size preallocated blocks to reduce fragmentation.
-* Optional memory diagnostics via `MemoryRecord`.
+* Block-based allocation with no per-allocation metadata stored in user memory.
+* Bitfield-backed first-fit region tracking for fast allocation and reclamation.
+* Thread-local allocator instances to eliminate contention during normal operation.
+* Automatic reuse of freed regions and release of unused blocks when appropriate.
+* Support for custom allocation alignment beyond the allocator's default alignment.
+* Optional allocation diagnostics through `MemoryRecord`.
 
-### Threading model:
+### Threading model
 
-Reserver is intentionally designed for core-pinned, single-threaded workloads and does not currently provide internal synchronization. This model enables predictable allocation behavior and naturally extends to per-core allocator designs.
+Each thread owns an independent `ReserverCore` instance through thread-local storage.
+Allocations and releases are expected to occur on the same thread that owns the
+allocator instance. Because no shared allocator state exists between threads,
+normal allocation paths require no locks or synchronization.
+
+This design favors high-throughput workloads by keeping allocation state local
+to the executing thread while minimizing allocator contention and cache traffic.
 
 ## Documentation
 
