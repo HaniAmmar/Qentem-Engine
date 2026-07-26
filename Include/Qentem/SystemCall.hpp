@@ -67,7 +67,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7) : "cc", "memory");
 
     return r0;
-#elif defined(__riscv) && (__riscv_xlen == 64)
+#elif defined(__riscv)
     register SystemLongI a7 __asm__("a7") = name;
     register SystemLongI a0 __asm__("a0") = v1;
 
@@ -113,7 +113,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
 
     return r0;
 
-#elif defined(__riscv) && (__riscv_xlen == 64)
+#elif defined(__riscv)
     register SystemLongI a7 __asm__("a7") = name;
     register SystemLongI a0 __asm__("a0") = v1;
     register SystemLongI a1 __asm__("a1") = v2;
@@ -162,7 +162,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2) : "cc", "memory");
 
     return r0;
-#elif defined(__riscv) && (__riscv_xlen == 64)
+#elif defined(__riscv)
     register SystemLongI a7 __asm__("a7") = name;
     register SystemLongI a0 __asm__("a0") = v1;
     register SystemLongI a1 __asm__("a1") = v2;
@@ -217,7 +217,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2), "r"(r3) : "cc", "memory");
 
     return r0;
-#elif defined(__riscv) && (__riscv_xlen == 64)
+#elif defined(__riscv)
     register SystemLongI a7 __asm__("a7") = name;
     register SystemLongI a0 __asm__("a0") = v1;
     register SystemLongI a1 __asm__("a1") = v2;
@@ -276,7 +276,7 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2), "r"(r3), "r"(r4) : "cc", "memory");
 
     return r0;
-#elif defined(__riscv) && (__riscv_xlen == 64)
+#elif defined(__riscv)
     register SystemLongI a7 __asm__("a7") = name;
     register SystemLongI a0 __asm__("a0") = v1;
     register SystemLongI a1 __asm__("a1") = v2;
@@ -350,8 +350,8 @@ QENTEM_INLINE inline static SystemLongI SystemCall_(SystemLongI name, SystemLong
     __asm__ __volatile__("svc 0" : "+r"(r0) : "r"(r7), "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r5) : "cc", "memory");
 
     return r0;
-#elif defined(__riscv) && (__riscv_xlen == 64)
-    // RISC-V 64-bit: a7=nr, a0..a5=args -> a0
+#elif defined(__riscv)
+    // RISC-V: a7=nr, a0..a5=args -> a0
     register SystemLongI a7 __asm__("a7") = name;
     register SystemLongI a0 __asm__("a0") = v1;
     register SystemLongI a1 __asm__("a1") = v2;
