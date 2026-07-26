@@ -1155,42 +1155,63 @@ struct BigInt {
      */
     template <typename BigInt_T>
     void Square(BigInt_T &result) const noexcept {
-        SizeT32 offset = Index();
-        ++offset;
+        const SizeT32 max_index = Index();
+        SizeT32       index_a   = 0;
 
         result.Clear();
 
-        do {
-            const SizeT32 current_offset = offset;
-            --offset;
-            SizeT32 sub_offset = (offset << 1U);
+        while (index_a <= max_index) {
+            Number_T       number_a = storage_[index_a];
+            const Number_T carry    = DoubleWidthArithmetic<Number_T, BitWidth()>::Square(number_a);
 
-            Number_T number = storage_[offset];
-            Number_T carry  = DoubleWidthArithmetic<Number_T, BitWidth()>::Square(number);
+            SizeT32 diag_index = (index_a << 1U);
 
-            // Add the diagonal term: a[i]² at offset (2 * i).
-            result.Add(number, sub_offset);
-            result.Add(carry, (current_offset + offset));
+            if (diag_index <= result.MaxIndex()) {
+                // Diagonal term: a[i]² at offset (2 * i).
+                result.Add(number_a, diag_index);
+                ++diag_index;
 
-            SizeT32 sub_numer_offset = offset;
-
-            while (sub_numer_offset != 0) {
-                const SizeT32 current_sub_offset = sub_offset;
-
-                --sub_numer_offset;
-                --sub_offset;
-
-                number = storage_[offset];
-                carry  = DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number, storage_[sub_numer_offset]);
-
-                // Add the off-diagonal term twice:
-                // 2 * a[i] * a[j] at offset (i + j).
-                result.Add(number, sub_offset);
-                result.Add(number, sub_offset);
-                result.Add(carry, current_sub_offset);
-                result.Add(carry, current_sub_offset);
+                if (diag_index <= result.MaxIndex()) {
+                    result.Add(carry, diag_index);
+                }
             }
-        } while (offset != 0);
+
+            if (diag_index > result.MaxIndex()) {
+                break;
+            }
+
+            SizeT32 index_b = (index_a + 1U);
+
+            while (index_b <= max_index) {
+                number_a = storage_[index_a];
+
+                const Number_T cross_carry =
+                    DoubleWidthArithmetic<Number_T, BitWidth()>::Multiply(number_a, storage_[index_b]);
+
+                SizeT32 current_index = (index_a + index_b);
+                // Off-diagonal term added twice: 2 * a[i] * a[j] at offset (i + j).
+
+                if (current_index <= result.MaxIndex()) {
+                    result.Add(number_a, current_index);
+                    result.Add(number_a, current_index);
+
+                    ++current_index;
+
+                    if (current_index <= result.MaxIndex()) {
+                        result.Add(cross_carry, current_index);
+                        result.Add(cross_carry, current_index);
+                        ++index_b;
+                        continue;
+                    }
+                }
+
+                // Remaining products can only contribute to higher limbs,
+                // which are outside the destination range.
+                break;
+            }
+
+            ++index_a;
+        }
     }
 
     /**

@@ -2581,6 +2581,33 @@ static void TestBigInt15(QTest &test, StringStream<char> &stream) {
     BigIntToStream(stream, b_result_64);
     test.IsEqual(stream, "115792089237316195423570985008687907852589419931798687112530834793049593217025", __LINE__);
 
+    value1 = 144115188075855871;
+
+    value1.Square(result);
+    BigIntToStream(stream, result);
+    // Expected low 64 bits of:
+    // 20769187434139310225891609165168641
+    test.IsEqual(stream, "18158513697557839873", __LINE__);
+
+    value1 = 4311744512; // = 2^24 + 2^32  → storage_[3] = 0x01, storage_[4] = 0x01
+    value1.Square(result);
+    BigIntToStream(stream, result);
+    // Full square = 2^48 + 2^57 + 2^64; the 2^64 term is truncated away.
+    test.IsEqual(stream, "144396663052566528", __LINE__);
+
+    {
+        BigInt<SizeT8, 56U> tmp{};
+
+        value1 = 269484032;
+        value1.Square(tmp);
+        BigIntToStream(stream, tmp);
+        test.IsEqual(stream, "564049465049088", __LINE__);
+
+        value1 = 16777216;
+        value1.Square(tmp);
+        BigIntToStream(stream, tmp);
+        test.IsEqual(stream, "281474976710656", __LINE__);
+    }
     // SizeT32 a_number{65535};
     // SizeT32 b_number{65535};
 
