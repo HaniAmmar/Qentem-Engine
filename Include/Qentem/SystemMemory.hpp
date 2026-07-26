@@ -26,11 +26,12 @@
     // Prevent <windows.h> from defining min/max macros that interfere with standard headers
     #define NOMINMAX
     #include <windows.h>
-
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #if defined(__linux__)
         #include "Qentem/SystemCall.hpp"
         #include "Qentem/LinuxConstants.hpp"
+        #include "Qentem/SystemAuxv.hpp"
+
         #include <linux/mman.h>
     #else
         // POSIX-style platforms: mmap, sysconf, etc.
@@ -95,13 +96,11 @@ struct SystemMemory {
     #if defined(_WIN32)
             DWORD old_protect;
             return (::VirtualProtect(ptr, static_cast<SystemLong>(size), PAGE_NOACCESS, &old_protect) != 0);
+    #elif defined(__linux__)
+        constexpr int no_access = 0;
+        return (SystemCall(__NR_mprotect, reinterpret_cast<SystemLongI>(ptr), size, no_access) == 0);
     #else
-            #if defined(__linux__)
-                constexpr int no_access = 0;
-                return (SystemCall(__NR_mprotect, reinterpret_cast<SystemLongI>(ptr), size, no_access) == 0);
-            #else
-                return (::mprotect(ptr, size, PROT_NONE) == 0);
-            #endif
+        return (::mprotect(ptr, size, PROT_NONE) == 0);
     #endif
 #else
         (void)ptr;
@@ -146,7 +145,7 @@ struct SystemMemory {
     QENTEM_INLINE static SystemLongI ReserveEx(void *address_hint, SystemLong length, int protection, int mapping_flags,
                                                int file_descriptor, SystemLong offset) noexcept {
         return SystemCall(
-#if defined(__i386__) || defined(__arm__) || defined(__ARM_EABI__)
+#if defined(__i386__) || defined(__arm__) || (defined(__riscv) && (__riscv_xlen == 32))
             __NR_mmap2,
 #else
             __NR_mmap,
@@ -180,12 +179,10 @@ struct SystemMemory {
     #if defined(_WIN32)
             (void)size;
             ::VirtualFree(ptr, 0, MEM_RELEASE);
+    #elif defined(__linux__)
+        SystemCall(__NR_munmap,reinterpret_cast<SystemLongI>(ptr), size);
     #else
-        #if defined(__linux__)
-            SystemCall(__NR_munmap,reinterpret_cast<SystemLongI>(ptr), size);
-        #else
-            ::munmap(ptr, size);
-        #endif
+        ::munmap(ptr, size);
     #endif
 #else
         // Size ignored when using malloc-based fallback.
@@ -236,90 +233,26 @@ struct SystemMemory {
         // clang-format off
 #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
     #if defined(_WIN32)
-        SYSTEM_INFO info;
-        GetSystemInfo(&info);
-        return static_cast<SystemLong>(info.dwPageSize);
+            SYSTEM_INFO info;
+            GetSystemInfo(&info);
+            return static_cast<SystemLong>(info.dwPageSize);
+    #elif defined(__linux__)
+            constexpr SystemLong page_size_id{6}; // AT_PAGESZ
+            SystemLong           page_size;
+
+            return (SystemAuxv::Scan(page_size_id, page_size) ? page_size : QENTEM_FALLBACK_SYSTEM_PAGE_SIZE);
     #else
-        #if defined(__linux__)
-            constexpr int page_size_id  = 6;    // AT_PAGESZ
-            constexpr const char *AUXV_PATH = "/proc/self/auxv";
-
-            SystemLong page_size = QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
-
-            const int fd = static_cast<int>(SystemCall(__NR_openat, Q_AT_FDCWD,
-                                                reinterpret_cast<SystemLongI>(AUXV_PATH),
-                                                Q_RDONLY, 0));
-
-            if (fd >= 0) {
-                struct aux_st_{
-                    SystemLong Type;
-                    SystemLong Value;
-                } aux[4];
-
-                 bool done = false;
-
-                 unsigned char *ptr = reinterpret_cast< unsigned char*>(&aux);
-                SizeT32 filled = 0;
-
-                while (!done) {
-                   const SystemLongI ret = SystemCall(__NR_read, fd,
-                                          reinterpret_cast<SystemLongI>(ptr + filled),
-                                          (sizeof(aux) - filled));
-
-                    if (ret > 0) {
-                        filled += static_cast<SizeT32>(ret);
-                        SizeT32 index = 0;
-
-                        while (filled >= sizeof(aux_st_)) {
-                            if (aux[index].Type == page_size_id) {
-                                page_size = aux[index].Value;
-                                done = true;
-                                break;
-                            }
-
-                            // Reset buffer for next record
-                            filled -= static_cast<SizeT32>(sizeof(aux_st_));
-                            ++index;
-                        }
-
-                        if (filled != 0) {
-                            SizeT32 offset = 0;
-                            // leftover bytes start immediately after the last fully processed record
-                            SizeT32 src_index = (index * static_cast<SizeT32>(sizeof(aux_st_)));
-
-                            if (src_index != 0) {
-                                while(offset < filled) {
-                                    ptr[offset] =  ptr[src_index];
-                                    ++src_index;
-                                    ++offset;
-                                }
-                            }
-                        }
-
-                        continue;
-                    }
-
-                    // EOF or error — stop
-                    break;
-                }
-
-                SystemCall(__NR_close, fd);
-            }
-
-            return page_size;
-        #else
             return static_cast<SystemLong>(::sysconf(
-                #if defined(_SC_PAGESIZE)
-                            _SC_PAGESIZE
-                #else
-                            _SC_PAGE_SIZE
-                #endif
+    #if defined(_SC_PAGESIZE)
+                _SC_PAGESIZE
+    #else
+                _SC_PAGE_SIZE
+    #endif
                 ));
-        #endif
     #endif
 #else
-    // Fallback for freestanding
-    return QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
+        // Fallback for freestanding
+        return QENTEM_FALLBACK_SYSTEM_PAGE_SIZE;
 #endif
         // clang-format on
     }
@@ -342,104 +275,102 @@ struct SystemMemory {
     #if defined(_WIN32)
         (void)flags;
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    #else
-        #if defined(__linux__)
-            // MAP_STACK was added in Linux 2.6.27; define manually if missing
-            #if !defined(MAP_STACK)
-                #define QENTEM_LINUX_MAP_STACK 0x20000
-            #else
-                #define QENTEM_LINUX_MAP_STACK MAP_STACK
-            #endif
-
-            flags |= MAP_PRIVATE | MAP_ANONYMOUS | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
-
-            // if (Platform::PopCount(size) == 1) {
-            //     SizeT32 index = (size >> 13U);
-
-            //     if (index != 0) {
-            //         index = Platform::FindLastBit(index);
-            //     }
-
-            //     switch (index) {
-            //         case 0: {
-            //             break;
-            //         }
-
-            //         case 1: // 16KiB
-            //         case 2: // 32KiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_16KB;
-            //             break;
-            //         }
-
-            //         case 3: // 64KiB
-            //         case 4: // 128KiB
-            //         case 5: // 256KiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_64KB;
-            //             break;
-            //         }
-
-            //         case 6: // 512KiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_512KB;
-            //             break;
-            //         }
-
-            //         case 7: // 1MiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_1MB;
-            //             break;
-            //         }
-
-            //         case 8: // 2MiB
-            //         case 9: // 4MiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_2MB;
-            //             break;
-            //         }
-
-            //         case 10: // 8MiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_8MB;
-            //             break;
-            //         }
-
-            //         case 11: // 16MiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_16MB;
-            //             break;
-            //         }
-
-            //         case 12: // 32MiB
-            //         {
-            //             flags |= MAP_HUGETLB | MAP_HUGE_32MB;
-            //             break;
-            //         }
-
-            //         default: {
-            //         }
-            //     }
-            // }
-
-            return reinterpret_cast<void *>(
-                SystemCall(
-                    #if defined(__i386__) || defined(__arm__) || defined(__ARM_EABI__)
-                        __NR_mmap2,
-                    #else
-                        __NR_mmap,
-                    #endif
-                        0, // null
-                        size,
-                        (PROT_READ | PROT_WRITE),
-                        flags,
-                        -1,
-                        0)
-            );
+    #elif defined(__linux__)
+        // MAP_STACK was added in Linux 2.6.27; define manually if missing
+        #if !defined(MAP_STACK)
+            #define QENTEM_LINUX_MAP_STACK 0x20000
         #else
-            (void)flags;
-            return ::mmap(nullptr, size, (PROT_READ | PROT_WRITE), (MAP_PRIVATE | MAP_ANONYMOUS | flags), -1, 0);
+            #define QENTEM_LINUX_MAP_STACK MAP_STACK
         #endif
+
+        flags |= MAP_PRIVATE | MAP_ANONYMOUS | (IS_STACK_MEMORY_T ? QENTEM_LINUX_MAP_STACK : 0);
+
+        // if (Platform::PopCount(size) == 1) {
+        //     SizeT32 index = (size >> 13U);
+
+        //     if (index != 0) {
+        //         index = Platform::FindLastBit(index);
+        //     }
+
+        //     switch (index) {
+        //         case 0: {
+        //             break;
+        //         }
+
+        //         case 1: // 16KiB
+        //         case 2: // 32KiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_16KB;
+        //             break;
+        //         }
+
+        //         case 3: // 64KiB
+        //         case 4: // 128KiB
+        //         case 5: // 256KiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_64KB;
+        //             break;
+        //         }
+
+        //         case 6: // 512KiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_512KB;
+        //             break;
+        //         }
+
+        //         case 7: // 1MiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_1MB;
+        //             break;
+        //         }
+
+        //         case 8: // 2MiB
+        //         case 9: // 4MiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_2MB;
+        //             break;
+        //         }
+
+        //         case 10: // 8MiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_8MB;
+        //             break;
+        //         }
+
+        //         case 11: // 16MiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_16MB;
+        //             break;
+        //         }
+
+        //         case 12: // 32MiB
+        //         {
+        //             flags |= MAP_HUGETLB | MAP_HUGE_32MB;
+        //             break;
+        //         }
+
+        //         default: {
+        //         }
+        //     }
+        // }
+
+        return reinterpret_cast<void *>(
+            SystemCall(
+                #if defined(__i386__) || defined(__arm__) || (defined(__riscv) && (__riscv_xlen == 32))
+                    __NR_mmap2,
+                #else
+                    __NR_mmap,
+                #endif
+                    0, // null
+                    size,
+                    (PROT_READ | PROT_WRITE),
+                    flags,
+                    -1,
+                    0)
+        );
+    #else
+        (void)flags;
+        return ::mmap(nullptr, size, (PROT_READ | PROT_WRITE), (MAP_PRIVATE | MAP_ANONYMOUS | flags), -1, 0);
     #endif
 #else
         (void)flags;
