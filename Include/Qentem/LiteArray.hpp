@@ -1,13 +1,12 @@
 /**
  * @file LiteArray.hpp
- * @brief Lightweight dynamic array with minimal overhead, used internally in memory subsystems.
+ * @brief Dynamic array with page-sized system memory Backend
  *
- * `LiteArray` is a simplified dynamic array intended for internal use by the `Reserver` memory allocator
- * and related components. It provides basic storage, ownership, and resizing logic for trivially
- * constructible and destructible types. It assumes move semantics and does not support copy semantics.
- *
- * This array is not intended for general-purpose use and is excluded from the public Qentem API.
- * Use only within low-level memory components where minimal dependencies and overhead are required.
+ * LiteArray is a page-backed dynamic array that stores elements in
+ * contiguous memory with minimal allocation overhead. It is designed for cases
+ * where resizing support is needed, but advanced allocator behavior is not.
+ * Growth and release are handled through the system memory provider, making the
+ * container simple, predictable, and suitable for low-level runtime use.
  *
  * @author Hani Ammar
  * @date 2026
@@ -17,274 +16,54 @@
 #ifndef QENTEM_LITE_ARRAY_H
 #define QENTEM_LITE_ARRAY_H
 
+#include "Qentem/ArrayBase.hpp"
 #include "Qentem/SystemMemory.hpp"
-#include "Qentem/MemoryUtils.hpp"
+#include "Qentem/Platform.hpp"
 
 namespace Qentem {
 
-template <typename Type_T>
-struct LiteArray {
-    QENTEM_INLINE LiteArray() noexcept = default;
-
-    LiteArray(const LiteArray &)            = delete;
-    LiteArray &operator=(const LiteArray &) = delete;
-
-    QENTEM_INLINE explicit LiteArray(SizeT capacity, bool initialize = false) noexcept {
-        if (capacity != 0) {
-            reserve(capacity);
-
-            if (initialize) {
-                size_ = capacity_;
-                MemoryUtils::ConstructRange(storage_, (storage_ + size_));
-            }
-        }
-    }
-
-    QENTEM_INLINE LiteArray(LiteArray &&src) noexcept
-        : storage_{src.storage_}, capacity_{src.capacity_}, size_{src.size_} {
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-        raw_storage_     = src.raw_storage_;
-        src.raw_storage_ = nullptr;
-#endif
-
-        src.storage_  = nullptr;
-        src.capacity_ = 0;
-        src.size_     = 0;
-    }
-
-    QENTEM_INLINE LiteArray &operator=(LiteArray &&src) noexcept {
-        if (this != &src) {
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-            void *old_raw_storage = raw_storage_;
-            raw_storage_          = src.raw_storage_;
-            src.raw_storage_      = nullptr;
-#endif
-            Type_T     *old_storage  = storage_;
-            const SizeT old_capacity = capacity_;
-            const SizeT old_size     = size_;
-
-            storage_  = src.storage_;
-            capacity_ = src.capacity_;
-            size_     = src.size_;
-
-            src.storage_  = nullptr;
-            src.capacity_ = 0;
-            src.size_     = 0;
-
-            if (old_storage != nullptr) {
-                // Just in case the copied array is not a child array, do this last.
-                MemoryUtils::Destruct(old_storage, (old_storage + old_size));
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-                release(old_raw_storage, old_capacity);
-#else
-                release(old_storage, old_capacity);
-#endif
-            }
-        }
-
-        return *this;
-    }
-
-    QENTEM_INLINE ~LiteArray() noexcept {
-        if (storage_ != nullptr) {
-            MemoryUtils::Destruct(storage_, End());
-
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-            release(raw_storage_, capacity_);
-#else
-            release(storage_, capacity_);
-#endif
-        }
-    }
-
-    QENTEM_INLINE void operator+=(Type_T &&item) noexcept {
-        if (size_ == capacity_) {
-            expand((capacity_ != 0) ? (capacity_ * SizeT{2}) : SizeT{1});
-        }
-
-        MemoryUtils::Construct((storage_ + size_), QUtility::Move(item));
-        ++size_;
-    }
-
-    template <typename... Values_T>
-    void ResizeInit(SizeT new_size, Values_T &&...values) {
-        if (new_size >= capacity_) {
-            expand((capacity_ != 0) ? (capacity_ * SizeT{2}) : SizeT{1});
-        }
-
-        if (new_size > size_) {
-            Type_T *current = storage_;
-            MemoryUtils::ConstructRange((current + size_), (current + new_size),
-                                        QUtility::Forward<Values_T>(values)...);
-            size_ = new_size;
-        }
-    }
-
-    QENTEM_INLINE Type_T &Insert(Type_T &&item) noexcept {
-        const SizeT size = size_;
-
-        *this += QUtility::Move(item);
-
-        return storage_[size];
-    }
-
-    QENTEM_INLINE void Drop(const SizeT size) noexcept {
-        if (size <= Size()) {
-            const SizeT new_size = (Size() - size);
-
-            MemoryUtils::Destruct((Storage() + new_size), End());
-            size_ = new_size;
-        }
-    }
-
-    QENTEM_INLINE void DropFast(const SizeT size) noexcept {
-        size_ -= size;
-    }
-
-    QENTEM_INLINE void Clear() noexcept {
-        MemoryUtils::Destruct(storage_, End());
-        size_ = 0;
-    }
-
-    QENTEM_INLINE void Reset() noexcept {
-        if (storage_ != nullptr) {
-            MemoryUtils::Destruct(storage_, End());
-
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-            release(raw_storage_, capacity_);
-#else
-            release(storage_, capacity_);
-#endif
-        }
-
-        storage_  = nullptr;
-        capacity_ = 0;
-        size_     = 0;
-    }
-
-    QENTEM_INLINE bool IsEmpty() const noexcept {
-        return (Size() == 0);
-    }
-
-    QENTEM_INLINE bool IsNotEmpty() const noexcept {
-        return (Size() != 0);
-    }
-
-    QENTEM_INLINE Type_T *Storage() noexcept {
-        return storage_;
-    }
-
-    QENTEM_INLINE SizeT Size() const noexcept {
-        return size_;
-    }
-
-    QENTEM_INLINE SizeT Capacity() const noexcept {
-        return capacity_;
-    }
-
-    QENTEM_INLINE const Type_T *First() const noexcept {
-        return storage_;
-    }
-
-    QENTEM_INLINE Type_T *Last() noexcept {
-        if (IsNotEmpty()) {
-            return (Storage() + (Size() - SizeT{1}));
-        }
-
-        return nullptr;
-    }
-
-    QENTEM_INLINE const Type_T *Last() const noexcept {
-        if (IsNotEmpty()) {
-            return (First() + (Size() - SizeT{1}));
-        }
-
-        return nullptr;
-    }
-
-    QENTEM_INLINE const Type_T *End() const noexcept {
-        return (First() + Size());
-    }
-
-    // For STL
-    QENTEM_INLINE const Type_T *begin() const noexcept {
-        return First();
-    }
-
-    QENTEM_INLINE const Type_T *end() const noexcept {
-        return End();
-    }
-
-    QENTEM_INLINE Type_T *begin() noexcept {
-        return Storage();
-    }
-
-    QENTEM_INLINE Type_T *end() noexcept {
-        return (Storage() + Size());
-    }
-
-  private:
-    QENTEM_NOINLINE void expand(SizeT new_capacity) noexcept {
-        Type_T *old_storage = storage_;
-
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-        void *old_raw_storage = raw_storage_;
-#endif
-
-        const SizeT old_capacity = Capacity();
-
-        reserve(new_capacity);
-
-        if (old_storage != nullptr) {
-            MemoryUtils::CopyTo(storage_, old_storage, Size());
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-            release(old_raw_storage, old_capacity);
-#else
-            release(old_storage, old_capacity);
-#endif
-        }
-    }
-
-    /**
-     * @brief Reserves raw memory for element storage, rounded to page size.
-     *
-     * This reserves in **bytes**, but stores capacity as number of elements.
-     * Ensures proper alignment and page efficiency.
-     */
-    QENTEM_INLINE void reserve(SizeT capacity) noexcept {
+// Array memory backend that forwards allocation operations to SystemMemory.
+struct ArrayPageBackend {
+    template <typename Type_T>
+    QENTEM_INLINE static Type_T *Reserve(SizeT &capacity) {
         SizeT capacity_bytes = (capacity * sizeof(Type_T));
 
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
+
         if (capacity_bytes > SystemMemory::GetPageSize()) {
             capacity_bytes = SystemMemory::AlignToPageSize(capacity_bytes);
         } else {
             capacity_bytes = static_cast<SizeT>(SystemMemory::GetPageSize());
         }
 
-        storage_ = static_cast<Type_T *>(SystemMemory::Reserve(capacity_bytes));
-#else
-        raw_storage_                     = SystemMemory::Reserve(capacity_bytes + 64U);
-        const SystemLong raw_address     = reinterpret_cast<SystemLong>(raw_storage_);
-        const SystemLong aligned_address = ((raw_address + SystemLong{63}) & ~SystemLong{63});
-        storage_                         = reinterpret_cast<Type_T *>(aligned_address);
+        capacity = (capacity_bytes / sizeof(Type_T));
 #endif
 
-        capacity_ = (capacity_bytes / sizeof(Type_T));
+        return static_cast<Type_T *>(SystemMemory::Reserve(capacity_bytes));
     }
 
-    static void release(void *storage, SizeT capacity) noexcept {
+    template <typename Type_T>
+    QENTEM_INLINE static void Release(Type_T *storage, SizeT capacity) {
         SystemMemory::Release(storage, (capacity * sizeof(Type_T)));
     }
 
-#ifdef QENTEM_SYSTEM_MEMORY_FALLBACK
-    void *raw_storage_{nullptr};
-#endif
+    template <typename Type_T>
+    QENTEM_INLINE constexpr static bool Shrink(Type_T *, SizeT, SizeT) noexcept {
+        return false;
+    }
 
-    Type_T *storage_{nullptr};
-    SizeT   capacity_{0};
-    SizeT   size_{0};
+    template <typename Type_T>
+    QENTEM_INLINE constexpr static bool TryExpand(Type_T *, SizeT, SizeT) noexcept {
+        return false;
+    }
+};
+
+template <typename Type_T, SizeT Expansion_Multiplier_T = 2, typename MemoryProvider_T = ArrayPageBackend>
+struct LiteArray : public ArrayBase<Type_T, Expansion_Multiplier_T, MemoryProvider_T> {
+    using BaseT = ArrayBase<Type_T, Expansion_Multiplier_T, MemoryProvider_T>;
+    using BaseT::BaseT;
 };
 
 } // namespace Qentem
 
-#endif // QENTEM_LITE_ARRAY_H
+#endif
