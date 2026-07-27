@@ -107,7 +107,7 @@ static void TestHList1(QTest &test) {
     }
 
     numbers1.Compress();
-    test.IsEqual(numbers1.Size(), 20U, __LINE__);
+    test.IsEqual(numbers1.Size(), SizeT{20U}, __LINE__);
     test.IsTrue((numbers1.Capacity() >= 20), __LINE__);
 
     for (SizeT i = 100; i <= 105; i++) {
@@ -124,7 +124,7 @@ static void TestHList1(QTest &test) {
         test.IsFalse(numbers1.Has(key), __LINE__);
     }
 
-    test.IsEqual(numbers1.ActualSize(), 15U, __LINE__);
+    test.IsEqual(numbers1.ActualSize(), SizeT{15}, __LINE__);
     test.IsTrue((numbers1.Capacity() >= 20U), __LINE__);
 
     for (SizeT i = 0; i <= 120; i++) {
@@ -142,13 +142,13 @@ static void TestHList1(QTest &test) {
     }
 
     numbers1.Compress();
-    test.IsEqual(numbers1.Size(), 0U, __LINE__);
+    test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
 
     numbers1.Reserve(16);
     numbers1["a"];
     numbers1.Compress();
-    test.IsEqual(numbers1.Size(), 1U, __LINE__);
-    test.IsEqual(numbers1.Capacity(), 16U, __LINE__);
+    test.IsEqual(numbers1.Size(), SizeT{1}, __LINE__);
+    test.IsEqual(numbers1.Capacity(), SizeT{2}, __LINE__);
 }
 
 static void TestHListNumeric(QTest &test) {

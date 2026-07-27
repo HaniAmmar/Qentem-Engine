@@ -736,15 +736,15 @@ struct HashTable {
         reorder();
 
         if (Size() != 0) {
-            if (old_size != Size()) {
-                HItem_T    *storage      = Storage();
-                const SizeT old_capacity = Capacity();
+            const SizeT old_capacity = Capacity();
+            const SizeT new_capacity = MemoryUtils::AlignToPow2(Size());
 
-                setCapacity(MemoryUtils::AlignToPow2(Size()));
-                resetLinks(storage, (storage + Capacity()), Capacity());
-                generateHash();
-                Reserver::Shrink(storage, old_capacity, Capacity());
+            if ((old_size != new_capacity) && Reserver::Shrink(Storage(), old_capacity, new_capacity)) {
+                setCapacity(new_capacity);
             }
+
+            resetLinks(Storage(), (Storage() + Capacity()), Capacity());
+            generateHash();
         } else {
             Reset(); // If nothing remains, free all memory
         }
