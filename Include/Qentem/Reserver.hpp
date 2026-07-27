@@ -86,12 +86,23 @@ struct ReserverCore {
     /// Number of bits in SystemLong (typically 32 or 64).
     static constexpr SizeT32 BIT_WIDTH = (sizeof(SystemLong) * 8U);
 
-    QENTEM_INLINE ReserverCore() noexcept         = delete;
+    QENTEM_INLINE ReserverCore() noexcept  = default;
+    QENTEM_INLINE ~ReserverCore() noexcept = default;
+
+    ReserverCore &operator=(ReserverCore &&src) noexcept {
+        if (this != &src) {
+            // Allows the bootstrap ReserverCore from _start() to be transferred into the thread-local instance after
+            // TLS is ready.
+            active_blocks_    = QUtility::Move(src.active_blocks_);
+            exhausted_blocks_ = QUtility::Move(src.exhausted_blocks_);
+        }
+
+        return *this;
+    }
+
     ReserverCore(ReserverCore &&)                 = delete;
-    ReserverCore &operator=(ReserverCore &&)      = delete;
     ReserverCore(const ReserverCore &)            = delete;
     ReserverCore &operator=(const ReserverCore &) = delete;
-    QENTEM_INLINE ~ReserverCore() noexcept        = delete;
 
     static_assert(Alignment_T >= sizeof(void *), "Alignment_T must be at least the size of a pointer.");
     static_assert((Alignment_T & (sizeof(void *) - 1U)) == 0, "Alignment_T must be a multiple of sizeof(void *).");
@@ -144,7 +155,7 @@ struct ReserverCore {
      * @see reserveRound
      */
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
-    QENTEM_NOINLINE static Type_T *Reserve(SystemLong size) noexcept {
+    QENTEM_NOINLINE Type_T *Reserve(SystemLong size) noexcept {
         static_assert((CustomAlignment_T > 0) && ((CustomAlignment_T & (CustomAlignment_T - 1)) == 0),
                       "alignment must be power-of-two");
         return static_cast<Type_T *>(reserveRound<Type_T, CustomAlignment_T>(size));
@@ -170,7 +181,7 @@ struct ReserverCore {
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    QENTEM_NOINLINE static void Release(Type_T *ptr, SystemLong size) noexcept {
+    QENTEM_NOINLINE void Release(Type_T *ptr, SystemLong size) noexcept {
         if (ptr != nullptr) {
             release(ptr, RoundUpBytes<Type_T>(size));
         }
@@ -208,7 +219,7 @@ struct ReserverCore {
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    QENTEM_NOINLINE static bool Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+    QENTEM_NOINLINE bool Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         from_size = RoundUpBytes<Type_T>(from_size);
         to_size   = RoundUpBytes<Type_T>(to_size);
 
@@ -246,7 +257,7 @@ struct ReserverCore {
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    QENTEM_NOINLINE static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+    QENTEM_NOINLINE bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         if (ptr != nullptr) {
             from_size = RoundUpBytes<Type_T>(from_size);
             to_size   = RoundUpBytes<Type_T>(to_size);
@@ -269,7 +280,7 @@ struct ReserverCore {
      *
      * @note All outstanding reservations become invalid after this call.
      */
-    QENTEM_INLINE static void Reset() noexcept {
+    QENTEM_INLINE void Reset() noexcept {
         // Drop all memory blocks from both active and retired lists.
         active_blocks_.Reset();
         exhausted_blocks_.Reset();
@@ -285,7 +296,7 @@ struct ReserverCore {
      * @return `true` if all managed memory is currently free;
      *         otherwise `false`.
      */
-    QENTEM_INLINE static bool IsEmpty() noexcept {
+    QENTEM_INLINE bool IsEmpty() const noexcept {
         // Scan all active blocks. Any reserved region means the allocator is not empty.
         for (const MemoryBlockT &block : active_blocks_) {
             if (!(block.IsEmpty())) {
@@ -308,7 +319,7 @@ struct ReserverCore {
      *
      * @return Total number of managed memory blocks.
      */
-    QENTEM_INLINE static SizeT TotalBlocks() noexcept {
+    QENTEM_INLINE SizeT TotalBlocks() const noexcept {
         return (active_blocks_.Size() + exhausted_blocks_.Size());
     }
 
@@ -321,7 +332,7 @@ struct ReserverCore {
      *
      * @return Pointer to the array of active memory blocks.
      */
-    QENTEM_INLINE static const LiteArray<MemoryBlockT> *GetActiveBlocks() noexcept {
+    QENTEM_INLINE const LiteArray<MemoryBlockT> *GetActiveBlocks() const noexcept {
         return &active_blocks_;
     }
 
@@ -334,7 +345,7 @@ struct ReserverCore {
      *
      * @return Pointer to the array of exhausted memory blocks.
      */
-    QENTEM_INLINE static const LiteArray<MemoryBlockT> *GetExhaustedBlocks() noexcept {
+    QENTEM_INLINE const LiteArray<MemoryBlockT> *GetExhaustedBlocks() const noexcept {
         return &exhausted_blocks_;
     }
 
@@ -358,7 +369,7 @@ struct ReserverCore {
      * @see LibcResize
      * @see LibcRelease
      */
-    QENTEM_NOINLINE static void *LibcReserve(SystemLong size) noexcept {
+    QENTEM_NOINLINE void *LibcReserve(SystemLong size) noexcept {
         SystemLong  r_size = RoundUpBytes<char>(size + sizeof(SystemLong));
         void       *ptr    = reserveNoRound<Alignment_T>(r_size);
         SystemLong *l_ptr  = static_cast<SystemLong *>(ptr);
@@ -392,7 +403,7 @@ struct ReserverCore {
      * @see LibcResize
      * @see LibcRelease
      */
-    QENTEM_NOINLINE static void *LibcReserveClear(SystemLong count, SystemLong item_size) noexcept {
+    QENTEM_NOINLINE void *LibcReserveClear(SystemLong count, SystemLong item_size) noexcept {
         SystemLong  r_size = RoundUpBytes<char>((count * item_size) + sizeof(SystemLong));
         void       *ptr    = reserveNoRound<Alignment_T>(r_size);
         SystemLong *l_ptr  = static_cast<SystemLong *>(ptr);
@@ -426,7 +437,7 @@ struct ReserverCore {
      * @see LibcReserveClear
      * @see LibcResize
      */
-    QENTEM_NOINLINE static void LibcRelease(void *ptr) noexcept {
+    QENTEM_NOINLINE void LibcRelease(void *ptr) noexcept {
         if (ptr != nullptr) {
             SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
 
@@ -462,7 +473,7 @@ struct ReserverCore {
      * @see LibcReserveClear
      * @see LibcRelease
      */
-    QENTEM_NOINLINE static void *LibcResize(void *ptr, SystemLong size) {
+    QENTEM_NOINLINE void *LibcResize(void *ptr, SystemLong size) noexcept {
         if (ptr != nullptr) {
             SystemLong *l_ptr = static_cast<SystemLong *>(ptr);
             --l_ptr;
@@ -528,7 +539,7 @@ struct ReserverCore {
      *       this function. Use `RoundUpBytes<T>()` when appropriate.
      */
     template <SizeT32 CustomAlignment_T = Alignment_T>
-    static void *reserve(SystemLong size) {
+    void *reserve(SystemLong size) noexcept {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
         MemoryRecord::Reserved(size);
 #endif
@@ -608,7 +619,7 @@ struct ReserverCore {
      * @return Pointer to the reserved memory region.
      */
     template <SizeT32 CustomAlignment_T>
-    QENTEM_NOINLINE static void *reserveNoRound(SystemLong size) noexcept {
+    QENTEM_NOINLINE void *reserveNoRound(SystemLong size) noexcept {
         if constexpr (CustomAlignment_T >= Alignment_T) {
             return reserve<CustomAlignment_T>(size);
         } else {
@@ -633,7 +644,7 @@ struct ReserverCore {
      * @return Pointer to the reserved memory region.
      */
     template <typename Type_T, SizeT32 CustomAlignment_T>
-    QENTEM_NOINLINE static void *reserveRound(SystemLong size) noexcept {
+    QENTEM_NOINLINE void *reserveRound(SystemLong size) noexcept {
         return reserveNoRound<CustomAlignment_T>(RoundUpBytes<Type_T>(size));
     }
 
@@ -666,7 +677,7 @@ struct ReserverCore {
      *          have been released previously. Violating these requirements
      *          results in undefined behavior.
      */
-    static bool release(void *ptr, SystemLong size) {
+    bool release(void *ptr, SystemLong size) noexcept {
         // Phase 1: Search active blocks.
         for (MemoryBlockT &block : active_blocks_) {
             // Regular allocation from the block's usable region.
@@ -744,7 +755,7 @@ struct ReserverCore {
      * @return `true` if the allocation was successfully shrunk;
      *         otherwise `false`.
      */
-    static bool shrink(void *ptr, SystemLong from_size, SystemLong to_size) {
+    bool shrink(void *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         char            *ptr_tail = (static_cast<char *>(ptr) + to_size);
         const SystemLong diff     = (from_size - to_size);
 
@@ -817,7 +828,7 @@ struct ReserverCore {
      *         `from_size` if expansion was not possible, or
      *         `0` if the pointer does not belong to any active block.
      */
-    static SystemLong tryExpand(void *ptr, SystemLong from_size, SystemLong to_size) {
+    SystemLong tryExpand(void *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         const SystemLong diff = (to_size - from_size);
 
         for (MemoryBlockT &block : active_blocks_) {
@@ -853,7 +864,7 @@ struct ReserverCore {
      *         region exists.
      */
     template <SizeT32 CustomAlignment_T>
-    static void *reserveFirstFit(MemoryBlockT *block, const SystemLong chunks) noexcept {
+    void *reserveFirstFit(MemoryBlockT *block, const SystemLong chunks) noexcept {
         constexpr SystemLong alignment_mask     = static_cast<SystemLong>(CustomAlignment_T - 1U);
         constexpr SystemLong alignment_mask_inv = ~alignment_mask;
         constexpr SizeT32    bit_width_mask_m1  = (BIT_WIDTH - 1U);
@@ -1002,7 +1013,7 @@ struct ReserverCore {
      * @return `true` if the requested region was reserved;
      *         otherwise `false`.
      */
-    static bool reserveAt(MemoryBlockT *block, void *ptr, SystemLong chunks) {
+    bool reserveAt(MemoryBlockT *block, void *ptr, SystemLong chunks) noexcept {
         constexpr SizeT32 bit_width_m1 = (BIT_WIDTH - 1U);
 
         const SystemLong *table = static_cast<const SystemLong *>(block->Base());
@@ -1081,7 +1092,7 @@ struct ReserverCore {
      *
      * @param block Pointer to the active block to release.
      */
-    static void releaseBlock(MemoryBlockT *block) noexcept {
+    void releaseBlock(MemoryBlockT *block) noexcept {
         MemoryBlockT *last_block = active_blocks_.Last();
 
         // Move the target block to the end for O(1) removal.
@@ -1104,7 +1115,7 @@ struct ReserverCore {
      *
      * @param block Pointer to the exhausted block to release.
      */
-    static void releaseExhaustedBlock(MemoryBlockT *block) noexcept {
+    void releaseExhaustedBlock(MemoryBlockT *block) noexcept {
         MemoryBlockT *last_block = exhausted_blocks_.Last();
 
         // Move the target block to the end for O(1) removal.
@@ -1126,7 +1137,7 @@ struct ReserverCore {
      *
      * @param block Pointer to the active block to move.
      */
-    static void moveToExhaustedBlock(MemoryBlockT *block) noexcept {
+    void moveToExhaustedBlock(MemoryBlockT *block) noexcept {
         MemoryBlockT *last_block = active_blocks_.Last();
 
         if (block != last_block) {
@@ -1153,7 +1164,7 @@ struct ReserverCore {
      *
      * @param block Pointer to the exhausted block to move.
      */
-    static void moveToActiveBlock(MemoryBlockT *block) noexcept {
+    void moveToActiveBlock(MemoryBlockT *block) noexcept {
         MemoryBlockT *last_block = exhausted_blocks_.Last();
 
         if (block != last_block) {
@@ -1183,7 +1194,7 @@ struct ReserverCore {
      * The largest active block is typically kept at the front of the
      * array to improve allocation search efficiency.
      */
-    inline static thread_local LiteArray<MemoryBlockT> active_blocks_{};
+    LiteArray<MemoryBlockT> active_blocks_{};
 
     /**
      * @brief Exhausted memory blocks currently excluded from allocation searches.
@@ -1195,10 +1206,70 @@ struct ReserverCore {
      * Depending on allocator state, exhausted blocks may later be
      * reactivated, reset, or released.
      */
-    inline static thread_local LiteArray<MemoryBlockT> exhausted_blocks_{};
+    LiteArray<MemoryBlockT> exhausted_blocks_{};
 };
 
-using Reserver = ReserverCore<>;
+struct Reserver {
+    template <typename Type_T>
+    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong size) noexcept {
+        return reserver_.RoundUpBytes<Type_T>(size);
+    }
+
+    template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
+    QENTEM_INLINE static Type_T *Reserve(SystemLong size) noexcept {
+        return reserver_.Reserve<Type_T, CustomAlignment_T>(size);
+    }
+
+    template <typename Type_T>
+    QENTEM_INLINE static void Release(Type_T *ptr, SystemLong size) noexcept {
+        reserver_.Release<Type_T>(ptr, size);
+    }
+
+    template <typename Type_T>
+    QENTEM_INLINE static bool Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+        return reserver_.Shrink<Type_T>(ptr, from_size, to_size);
+    }
+
+    template <typename Type_T>
+    QENTEM_INLINE static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+        return reserver_.TryExpand<Type_T>(ptr, from_size, to_size);
+    }
+
+    QENTEM_INLINE static void Reset() noexcept {
+        reserver_.Reset();
+    }
+
+    QENTEM_INLINE static bool IsEmpty() noexcept {
+        return reserver_.IsEmpty();
+    }
+
+    QENTEM_INLINE static SizeT TotalBlocks() noexcept {
+        return reserver_.TotalBlocks();
+    }
+
+    QENTEM_INLINE static ReserverCore<> *GetInstance() noexcept {
+        return &reserver_;
+    }
+
+    QENTEM_INLINE static void *LibcReserve(SystemLong size) noexcept {
+        return reserver_.LibcReserve(size);
+    }
+
+    QENTEM_INLINE static void *LibcReserveClear(SystemLong count, SystemLong item_size) noexcept {
+        return reserver_.LibcReserveClear(count, item_size);
+    }
+
+    QENTEM_INLINE static void LibcRelease(void *ptr) noexcept {
+        reserver_.LibcRelease(ptr);
+    }
+
+    QENTEM_INLINE static void *LibcResize(void *ptr, SystemLong size) noexcept {
+        return reserver_.LibcResize(ptr, size);
+    }
+
+  private:
+    inline static thread_local ReserverCore<> reserver_{};
+};
 
 } // namespace Qentem
 
