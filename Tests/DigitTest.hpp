@@ -5331,7 +5331,7 @@ static void TestFloatToString5(QTest &test, StringStream<char> &stream) {
     RealToStreamEqual(test, stream, 505.3125F, 6U, "505.312", __LINE__);
     RealToStreamEqual(test, stream, 505.003125F, 6U, "505.003", __LINE__);
 
-#if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
+#if defined(QENTEM_ENABLE_FLOAT_16)
     RealToStreamEqual(test, stream, 15.5F16, 6U, "15.5", __LINE__);
     RealToStreamEqual(test, stream, 65504.0F16, 6U, "65504", __LINE__);
     RealToStreamEqual(test, stream, 5.96046e-8F16, 6U, "5.96046e-08", __LINE__);

@@ -260,7 +260,7 @@ struct RealNumberInfo<Number_T, 1U> {
     static constexpr SizeT32 MaxCut       = 1U;
 };
 
-#if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
+#if defined(QENTEM_ENABLE_BFLOAT_16)
 // bfloat16_t
 template <>
 struct RealNumberInfo<BFloatT16, 2U> {

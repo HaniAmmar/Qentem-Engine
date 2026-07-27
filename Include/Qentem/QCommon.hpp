@@ -106,13 +106,9 @@ namespace Qentem {
 #define QENTEM_VALUE_EXPANSION_MULTIPLIER 8U
 #endif
 
-#ifndef QENTEM_ENABLE_FLOAT_16
-#define QENTEM_ENABLE_FLOAT_16 0
-#endif
+// #define QENTEM_ENABLE_FLOAT_16
 
-#ifndef QENTEM_ENABLE_BFLOAT_16
-#define QENTEM_ENABLE_BFLOAT_16 0
-#endif
+// #define QENTEM_ENABLE_BFLOAT_16
 
 #ifndef QENTEM_DOUBLE_PRECISION
 #define QENTEM_DOUBLE_PRECISION 15U
@@ -277,7 +273,7 @@ struct QentemConfig {
 //               Extended Floating Types (Optional)          //
 ///////////////////////////////////////////////////////////////
 
-#if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
+#if defined(QENTEM_ENABLE_BFLOAT_16)
 using BFloatT16 = decltype(0.0BF16); // bfloat16_t, requires C++23
 #endif
 

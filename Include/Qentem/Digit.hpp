@@ -484,15 +484,15 @@ struct Digit {
             if (precision < max_nanosecond) {
                 if (start > precision) {
                     // Entire fractional part is below requested precision
-                    start  = precision;
+                    start  = static_cast<SizeT>(precision);
                     length = 0;
                 } else {
                     const SizeT og_length = length;
-                    length                = (precision - start);
+                    length                = static_cast<SizeT>(precision - start);
 
                     if (og_length > SizeT{1}) {
                         // Look at digit immediately after cutoff to decide rounding
-                        SizeT index = precision;
+                        SizeT index = static_cast<SizeT>(precision);
 
                         Char_T       *number = (storage + index);
                         const Char_T *first  = (storage + start);
@@ -510,7 +510,7 @@ struct Digit {
                             if (number < storage) {
                                 // All digits rolled over → increment seconds
                                 ++seconds;
-                                start  = precision;
+                                start  = static_cast<SizeT>(precision);
                                 length = 0;
                             } else if (number < first) {
                                 // Rounded into a new leading digit (e.g. .999 → .1000)

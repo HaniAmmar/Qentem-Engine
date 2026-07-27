@@ -468,14 +468,14 @@ struct CPUHelper {
 
                         if ((index < length) || (buffer[index] == '\n')) {
                             last_number = current_number;
-                            Digit::FastStringToNumber(current_number, number_buffer, number_index);
+                            Digit::FastStringToNumber(current_number, number_buffer, static_cast<SizeT>(number_index));
                             number_index = 0;
 
                             if (is_range) {
                                 is_range = false;
 
                                 while (++last_number < current_number) {
-                                    bit_index = (static_cast<SizeT>(last_number) >> CPUSet::SHIFT);
+                                    bit_index = (last_number >> CPUSet::SHIFT);
                                     bit       = (SystemLong{1} << (last_number & CPUSet::BIT_WIDTH_M1));
                                     info.OnlineCores.Storage()[bit_index] |= bit;
 
@@ -485,7 +485,7 @@ struct CPUHelper {
                                 is_range = (buffer[index] == '-');
                             }
 
-                            bit_index = (static_cast<SizeT>(current_number) >> CPUSet::SHIFT);
+                            bit_index = (current_number >> CPUSet::SHIFT);
                             bit       = (SystemLong{1} << (current_number & CPUSet::BIT_WIDTH_M1));
                             info.OnlineCores.Storage()[bit_index] |= bit;
 

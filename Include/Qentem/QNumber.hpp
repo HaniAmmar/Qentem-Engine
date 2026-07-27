@@ -174,8 +174,7 @@ union QNumber16 {
 
     template <typename Number2_T>
     QENTEM_INLINE explicit QNumber16(const Number2_T num) noexcept {
-#if (defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)) ||                                              \
-    (defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1))
+#if defined(QENTEM_ENABLE_FLOAT_16) || defined(QENTEM_ENABLE_BFLOAT_16)
         if constexpr (IsFloat<Number2_T>()) {
             Real = num;
         } else
@@ -199,8 +198,7 @@ union QNumber16 {
 
     template <typename Number2_T>
     QENTEM_INLINE QNumber16 &operator=(const Number2_T num) noexcept {
-#if (defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)) ||                                              \
-    (defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1))
+#if defined(QENTEM_ENABLE_FLOAT_16) || defined(QENTEM_ENABLE_BFLOAT_16)
         if constexpr (IsFloat<Number2_T>()) {
             Real = num;
         } else
