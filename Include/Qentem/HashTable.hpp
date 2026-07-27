@@ -34,7 +34,7 @@ struct HTableItem_T {
     /**
      * @brief Hash value for the key.
      */
-    SizeT Hash{};
+    SizeT Hash{0};
 
     /**
      * @brief Index of this item in the array (Storage), or Capacity() as sentinel.
@@ -46,14 +46,14 @@ struct HTableItem_T {
      * When acting as an item, `Position` is simply its stable index in Storage,
      * typically equal to its insertion order.
      */
-    SizeT Position{};
+    SizeT Position{0};
 
     /**
      * @brief Link to the next item in the collision chain.
      *
      * Stores the index of the next item in Storage[], or Capacity() as end-of-chain.
      */
-    SizeT Next{};
+    SizeT Next{0};
 
     /**
      * @brief The key associated with this item.
@@ -599,11 +599,9 @@ struct HashTable {
             if (capacity > Capacity()) {
                 release(Storage(), Capacity());
                 reserve(capacity);
-            } else if (capacity < Capacity()) {
-                HItem_T *storage = Storage();
-                Reserver::Shrink(storage, Capacity(), capacity);
+            } else if ((capacity < Capacity()) && Reserver::Shrink(Storage(), Capacity(), capacity)) {
                 setCapacity(capacity);
-                resetLinks(storage, (storage + Capacity()), Capacity());
+                resetLinks(Storage(), (Storage() + Capacity()), Capacity());
             }
         } else {
             Reset();
@@ -623,21 +621,19 @@ struct HashTable {
     void Resize(SizeT new_capacity) {
         if (new_capacity != 0) {
             if (new_capacity < Capacity()) {
-                HItem_T    *storage      = Storage();
                 const SizeT old_capacity = Capacity();
+                const SizeT capacity     = MemoryUtils::AlignToPow2(new_capacity);
 
                 if (Size() > new_capacity) {
                     // Shrink: Destruct of elements outside new bounds
-                    MemoryUtils::Destruct((storage + new_capacity), (storage + Size()));
+                    MemoryUtils::Destruct((Storage() + new_capacity), (Storage() + Size()));
                     setSize(new_capacity); // Adjust logical size
                 }
 
                 reorder();
-                setCapacity(MemoryUtils::AlignToPow2(new_capacity));
-                resetLinks(storage, (storage + Capacity()), Capacity());
+                setCapacity(Reserver::Shrink(Storage(), old_capacity, capacity) ? capacity : Capacity());
+                resetLinks(Storage(), (Storage() + Capacity()), Capacity());
                 generateHash();
-
-                Reserver::Shrink(storage, old_capacity, Capacity());
             } else if (new_capacity > Capacity()) {
                 expand(new_capacity);
             }
@@ -770,14 +766,12 @@ struct HashTable {
             const SizeT old_capacity = Capacity();
             const SizeT new_capacity = MemoryUtils::AlignToPow2(Size());
 
-            if (new_capacity != old_capacity) {
-                HItem_T *storage = Storage();
+            if ((new_capacity != old_capacity) && Reserver::Shrink(Storage(), old_capacity, new_capacity)) {
                 setCapacity(new_capacity);
-
-                resetLinks(storage, (storage + Capacity()), Capacity());
-                generateHash();
-                Reserver::Shrink(storage, old_capacity, Capacity());
             }
+
+            resetLinks(Storage(), (Storage() + Capacity()), Capacity());
+            generateHash();
         } else {
             Reset(); // If nothing remains, free all memory
         }

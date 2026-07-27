@@ -295,9 +295,8 @@ struct String {
 
             if (capacity > Capacity()) {
                 expand(capacity);
-            } else if (capacity < Capacity()) {
+            } else if ((capacity < Capacity()) && Reserver::Shrink(Storage(), Capacity(), capacity)) {
                 capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity + SizeT{1}) / sizeof(Char_T));
-                Reserver::Shrink(Storage(), Capacity(), capacity);
                 --capacity;
                 setCapacity(capacity);
             }

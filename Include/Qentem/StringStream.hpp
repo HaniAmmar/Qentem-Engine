@@ -242,9 +242,8 @@ struct StringStream {
 
             if (capacity > Capacity()) {
                 expand(capacity);
-            } else if (capacity < Capacity()) {
+            } else if (capacity < Capacity() && Reserver::Shrink(Storage(), Capacity(), capacity)) {
                 capacity = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(capacity) / sizeof(Char_T));
-                Reserver::Shrink(Storage(), Capacity(), capacity);
                 setCapacity(capacity);
             }
         } else {

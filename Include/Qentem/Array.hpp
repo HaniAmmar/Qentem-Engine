@@ -272,8 +272,7 @@ struct Array {
 
             if (capacity > Capacity()) {
                 expand(capacity);
-            } else if (capacity < Capacity()) {
-                Reserver::Shrink(Storage(), Capacity(), capacity);
+            } else if ((capacity < Capacity()) && Reserver::Shrink(Storage(), Capacity(), capacity)) {
                 setCapacity(capacity);
             }
 
@@ -294,8 +293,9 @@ struct Array {
                     setSize(new_capacity);
                 }
 
-                Reserver::Shrink(Storage(), Capacity(), new_capacity);
-                setCapacity(new_capacity);
+                if (Reserver::Shrink(Storage(), Capacity(), new_capacity)) {
+                    setCapacity(new_capacity);
+                }
             } else if (new_capacity > Capacity()) {
                 expand(new_capacity);
             }
