@@ -39,12 +39,13 @@ enum struct ValueType : SizeT8 {
 template <typename Char_T>
 struct Value {
     using NotationConstants = JSONUtils::NotationConstants_T<Char_T>;
-    using VItem             = HAItem_T<String<Char_T>, Value>;
 
     using StringT     = String<Char_T>;
     using StringViewT = StringView<Char_T>;
     using ArrayT      = Array<Value, QENTEM_VALUE_EXPANSION_MULTIPLIER>;
     using ObjectT     = HArray<StringT, Value, QENTEM_VALUE_EXPANSION_MULTIPLIER>;
+
+    using VItem = typename ObjectT::HItem;
 
     Value() noexcept : array_{} {
     }
