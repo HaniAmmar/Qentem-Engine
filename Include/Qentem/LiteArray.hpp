@@ -43,7 +43,9 @@ struct ArrayPageBackend {
 
     template <typename Type_T>
     QENTEM_INLINE static void Release(Type_T *storage, SizeT capacity) {
-        SystemMemory::Release(storage, (capacity * sizeof(Type_T)));
+        if (storage != nullptr) {
+            SystemMemory::Release(storage, (capacity * sizeof(Type_T)));
+        }
     }
 
     template <typename Type_T>

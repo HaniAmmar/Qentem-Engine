@@ -48,7 +48,9 @@ struct StringStreamPageBackend {
 
     template <typename Char_T>
     QENTEM_INLINE static void Release(Char_T *storage, SizeT capacity) {
-        SystemMemory::Release(storage, (capacity * sizeof(Char_T)));
+        if (storage != nullptr) {
+            SystemMemory::Release(storage, (capacity * sizeof(Char_T)));
+        }
     }
 
     template <typename Char_T>
