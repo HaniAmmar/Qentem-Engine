@@ -1,10 +1,15 @@
 /**
  * @file HashTableAdapters.hpp
- * @brief Provides key-type adapters for Qentem Engine hash tables.
+ * @brief Hash table adapters and key utilities.
  *
- * This header defines convenience wrappers for HashTable, allowing easy use with
- * string-like keys (via StringHashTable) and number keys (via NumberHashTable).
- * Each adapter exposes extra overloads and checks to ensure correct usage.
+ * Provides specialized hash table implementations and key utility policies
+ * for string and numeric key types. These adapters extend the generic
+ * HashTable interface with key-specific hashing, comparison, and lookup
+ * operations while preserving a common API and storage model.
+ *
+ * The selected implementation can be configured with a custom numeric type
+ * for capacities, indexes, hash values, and internal bookkeeping, allowing
+ * hash tables to operate independently of SizeT when required.
  *
  * @author Hani Ammar
  * @date 2026
@@ -17,59 +22,53 @@
 #include "Qentem/QTraits.hpp"
 #include "Qentem/HashTable.hpp"
 #include "Qentem/QNumber.hpp"
-#include "Qentem/StringUtils.hpp"
 #include "Qentem/StringView.hpp"
 
 namespace Qentem {
 
 /**
- * @brief Number key utilities for Qentem hash tables.
+ * @brief Numeric key utilities for hash table operations.
  *
- * Provides static methods for hashing and comparing numeric keys in the context
- * of hash table operations. Designed to be used as a KeyUtils policy for hash tables
- * that use integral (or other numeric) types as keys.
+ * NumberKeyUtils_T provides hashing and comparison functions for numeric
+ * keys used by HashTable and related containers. It is intended for
+ * integral, enumeration, pointer-sized, and other numeric key types
+ * where hashing can be performed directly from the key value.
  *
- * @tparam Key_T Numeric key type (e.g., int, unsigned, etc.). Must support equality comparison.
+ * Hash values are represented using Number_T, allowing the hash width
+ * and internal numeric representation to be configured independently
+ * of SizeT.
  *
- * Example usage:
- *   using Table = HashTable<unsigned int, NumberKeyUtils_T<unsigned int>, ...>;
+ * @tparam Key_T
+ *         Numeric key type. Must support equality comparison.
+ * @tparam Number_T
+ *         Numeric type used for capacities, indexes,
+ *         hash values, and internal bookkeeping.
  */
-template <typename Key_T>
+template <typename Key_T, typename Number_T>
 struct NumberKeyUtils_T {
+    using NumberT = Number_T;
+
     /**
      * @brief Computes a non-zero hash value for numeric keys.
      *
-     * For numeric types, this function ensures that all keys—*even zero*—are hashed
-     * to a nonzero value, thus preserving the integrity of the hash table's
-     * empty-slot convention (zero indicates an empty slot).
+     * Numeric keys are hashed directly from their underlying value. Since
+     * zero is reserved internally to represent an empty hash slot, a
+     * zero-valued key is mapped to 1 to guarantee a non-zero hash result.
      *
-     * - For any key whose integer representation is nonzero, returns the value as-is.
-     * - For zero-valued keys:
-     *   - If the key type is narrower than the hash type, the bits are shifted up,
-     *     and the lowest bit is set to ensure a nonzero result.
-     *   - Otherwise, returns all bits set (~0) to avoid ambiguity with empty slots.
+     * @param key
+     *         Numeric key to hash.
      *
-     * @param key Numeric key to hash.
-     * @return Nonzero hash value for the given key.
+     * @return
+     *         Non-zero hash value for the given key.
      */
-    QENTEM_INLINE static SizeT Hash(const Key_T &key) noexcept {
-        constexpr SizeT32 key_size = sizeof(SizeT);
-        constexpr SizeT32 n_size   = sizeof(Key_T);
+    QENTEM_INLINE static NumberT Hash(const Key_T &key) noexcept {
+        constexpr SizeT32 key_size = sizeof(Key_T);
 
         using QNumberTypeT = typename QNumberAutoTypeT<Key_T, key_size>::QNumberType_T;
 
-        auto        q_key = QNumberTypeT{key}.Natural;
-        const SizeT hash  = static_cast<SizeT>(q_key);
+        auto q_key = QNumberTypeT{key}.Natural;
 
-        if (hash != 0) {
-            return hash;
-        }
-
-        if constexpr (key_size > n_size) {
-            return (static_cast<SizeT>(q_key >> ((key_size - n_size) * 8U)) | SizeT{1});
-        } else {
-            return static_cast<SizeT>(~SizeT{0});
-        }
+        return (q_key != 0) ? static_cast<NumberT>(q_key) : NumberT{1};
     }
 
     /**
@@ -81,24 +80,33 @@ struct NumberKeyUtils_T {
      * @param key2  The second numeric key.
      * @return True if the keys are equal, false otherwise.
      */
-    QENTEM_INLINE static bool IsEqual(SizeT, SizeT, const Key_T &key1, const Key_T &key2) noexcept {
+    QENTEM_INLINE static bool IsEqual(NumberT, NumberT, const Key_T &key1, const Key_T &key2) noexcept {
         return (key1 == key2);
     }
 };
 
 /**
- * @brief String key utilities for Qentem hash tables.
+ * @brief String key utilities for hash table operations.
  *
- * This struct provides static methods for hashing and comparing string-like keys
- * in the context of hash table operations. It is designed to be used as a key utility
- * (KeyUtils) template parameter for HashTable and its adapters. Supports hashing
- * from both a string object and raw character pointer, as well as equality checks
- * between string keys and raw character data.
+ * StringKeyUtils_T provides hashing and comparison functions for string-like
+ * keys used by HashTable and related containers. It supports operations on
+ * both key objects and raw character sequences, allowing efficient lookup
+ * without requiring temporary key construction.
  *
- * @tparam Key_T The string key type, which must provide CharType, First(), Length(), and IsEqual().
+ * Hash values are represented using Number_T, enabling the hash width to be
+ * configured independently of SizeT.
+ *
+ * @tparam Key_T
+ *         String key type. Must provide CharType, First(), Length(),
+ *         and IsEqual().
+ * @tparam Number_T
+ *         Numeric type used for capacities, indexes,
+ *         hash values, and internal bookkeeping.
  */
-template <typename Key_T>
+template <typename Key_T, typename Number_T>
 struct StringKeyUtils_T {
+    using NumberT = Number_T;
+
     /**
      * @brief Character type associated with the key.
      */
@@ -111,8 +119,8 @@ struct StringKeyUtils_T {
      * @param length Number of characters to hash.
      * @return The computed hash value.
      */
-    QENTEM_INLINE static SizeT Hash(const Char_T *str, SizeT length) {
-        return StringUtils::Hash(str, length);
+    QENTEM_INLINE static NumberT Hash(const Char_T *str, NumberT length) {
+        return StringUtils::Hash<Char_T, NumberT>(str, length);
     }
 
     /**
@@ -123,7 +131,7 @@ struct StringKeyUtils_T {
      * @param key The string key object.
      * @return The computed hash value.
      */
-    QENTEM_INLINE static SizeT Hash(const Key_T &key) {
+    QENTEM_INLINE static NumberT Hash(const Key_T &key) {
         return Hash(key.First(), key.Length());
     }
 
@@ -139,37 +147,46 @@ struct StringKeyUtils_T {
      * @return True if both hashes and keys match, false otherwise.
      */
     template <typename KeyType_T>
-    QENTEM_INLINE static bool IsEqual(SizeT hash1, SizeT hash2, const KeyType_T &key1, const Key_T &key2) {
+    QENTEM_INLINE static bool IsEqual(NumberT hash1, NumberT hash2, const KeyType_T &key1, const Key_T &key2) {
         return ((hash1 == hash2) && key1.IsEqual(key2.First(), key2.Length()));
     }
 };
 
-// -------------- String Adapter ------------------
 /**
- * @brief String-keyed hash table adapter for Qentem Engine.
+ * @brief Hash table specialized for string-like keys.
  *
- * This adapter provides a hash table with string-like keys, exposing overloads for
- * raw character pointers and length parameters, in addition to object-based key APIs.
- * All key handling (hashing, comparison) is delegated to StringKeyUtils_T, ensuring
- * consistent behavior and maximum efficiency for string lookup.
+ * StringHashTable extends HashTable with convenience overloads for
+ * character sequences and string objects while preserving the storage
+ * layout, growth behavior, and memory management of the underlying
+ * hash table implementation.
  *
- * This struct inherits all core hash table functionality from the generic HashTable
- * base and does not alter storage layout or reallocation semantics. Capacity growth
- * behavior is inherited unchanged and remains controlled at compile time via the
- * expansion multiplier.
+ * Hashing and key comparison are delegated to StringKeyUtils_T,
+ * providing efficient lookup from both key objects and raw character
+ * sequences without requiring temporary key construction.
  *
- * It is intended for use with keys that implement CharType, First(), Length(),
- * and IsEqual().
+ * The container uses Number_T for capacities, indexes, hash values,
+ * and internal bookkeeping, allowing its numeric width to be configured
+ * independently of SizeT.
  *
- * @tparam StringKey_T Key type. Must be copyable, movable, and support equality.
- * @tparam HItem_T     Storage type. Must have members: Hash, Next, Key, and provide
- *                     Clear(), MoveDoublecat(), and related lifecycle operations.
+ * @tparam StringKey_T
+ *         String key type. Must provide CharType, First(), Length(),
+ *         and IsEqual().
+ * @tparam Number_T
+ *         Numeric type used for capacities, indexes,
+ *         hash values, and internal bookkeeping.
+ * @tparam HItem_T
+ *         Hash table item type.
  * @tparam Expansion_Multiplier_T
- *                     Compile-time capacity growth factor propagated to the base
- *                     HashTable. Must be greater than 1.
+ *         Compile-time capacity growth factor used during reallocation.
+ * @tparam MemoryProvider_T
+ *         Memory backend used for storage management.
  */
-template <typename StringKey_T, typename HItem_T, SizeT Expansion_Multiplier_T>
-struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKey_T>, HItem_T, Expansion_Multiplier_T> {
+template <typename StringKey_T, typename Number_T, typename HItem_T, Number_T Expansion_Multiplier_T,
+          typename MemoryProvider_T>
+struct StringHashTable : public HashTable<StringKey_T, Number_T, StringKeyUtils_T<StringKey_T, Number_T>, HItem_T,
+                                          Expansion_Multiplier_T, MemoryProvider_T> {
+    using NumberT = Number_T;
+
     /**
      * @brief Character type associated with the string key.
      */
@@ -178,19 +195,17 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
     /**
      * @brief Key utilities trait for string hashing and comparison.
      */
-    using KeyUtilsT = StringKeyUtils_T<StringKey_T>;
+    using KeyUtilsT = StringKeyUtils_T<StringKey_T, Number_T>;
 
     /**
      * @brief Base hash table type.
      */
-    using BaseT = HashTable<StringKey_T, KeyUtilsT, HItem_T, Expansion_Multiplier_T>;
+    using BaseT = HashTable<StringKey_T, Number_T, KeyUtilsT, HItem_T, Expansion_Multiplier_T, MemoryProvider_T>;
 
     /**
      * @brief Inherit all constructors from the base hash table.
      */
     using BaseT::BaseT;
-    // using BaseT::...; // c++17
-    // (Other 'using BaseT::...' lines follow in the full struct.)
 
     using BaseT::ActualSize;
     using BaseT::begin;
@@ -245,7 +260,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      */
-    QENTEM_INLINE void Insert(const Char_T *str, const SizeT length) {
+    QENTEM_INLINE void Insert(const Char_T *str, const NumberT length) {
         tryInsert(str, length);
     }
 
@@ -256,9 +271,9 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return True if the key is present in the table, false otherwise.
      */
-    QENTEM_INLINE bool Has(const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE bool Has(const Char_T *str, const NumberT length) const noexcept {
         if (IsNotEmpty()) {
-            SizeT index;
+            NumberT index;
             return (find(index, str, length) != nullptr);
         }
 
@@ -273,9 +288,9 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param hash   Hash value to use for the lookup.
      * @return Pointer to the item if found, nullptr otherwise.
      */
-    QENTEM_INLINE HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) noexcept {
+    QENTEM_INLINE HItem_T *GetItem(const Char_T *str, const NumberT length, const NumberT hash) noexcept {
         if (IsNotEmpty()) {
-            SizeT *index;
+            NumberT *index;
             return find(index, str, length, hash);
         }
 
@@ -290,9 +305,9 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param hash   Hash value to use for the lookup.
      * @return Const pointer to the item if found, nullptr otherwise.
      */
-    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const SizeT length, const SizeT hash) const noexcept {
+    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const NumberT length, const NumberT hash) const noexcept {
         if (IsNotEmpty()) {
-            SizeT index;
+            NumberT index;
             return find(index, str, length, hash);
         }
 
@@ -306,7 +321,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return Pointer to the item if found, nullptr otherwise.
      */
-    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const NumberT length) noexcept {
         return GetItem(str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -317,7 +332,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return Const pointer to the item if found, nullptr otherwise.
      */
-    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const NumberT length) const noexcept {
         return GetItem(str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -329,7 +344,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters to use from the array.
      * @return True if the key was found and index is set, false otherwise.
      */
-    QENTEM_INLINE bool GetIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE bool GetIndex(NumberT &index, const Char_T *str, const NumberT length) const noexcept {
         if (IsNotEmpty()) {
             find(index, str, length);
             return (index != Capacity());
@@ -344,7 +359,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param str    Pointer to the character array representing the key.
      * @param length Number of characters to use from the array.
      */
-    QENTEM_INLINE void Remove(const Char_T *str, SizeT length) noexcept {
+    QENTEM_INLINE void Remove(const Char_T *str, NumberT length) noexcept {
         remove(str, length);
     }
 
@@ -375,7 +390,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      *
      * @note If the item is not found, @p index is set to the appropriate insertion point in the chain.
      */
-    QENTEM_INLINE HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length, const SizeT hash) noexcept {
+    QENTEM_INLINE HItem_T *find(NumberT *&index, const Char_T *str, const NumberT length, const NumberT hash) noexcept {
         return find(index, StringView<Char_T>{str, length}, hash);
     }
 
@@ -391,8 +406,8 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param hash        Precomputed hash value of the key.
      * @return Const pointer to the found item, or nullptr if not found.
      */
-    QENTEM_INLINE const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length,
-                                      const SizeT hash) const noexcept {
+    QENTEM_INLINE const HItem_T *find(NumberT &index, const Char_T *str, const NumberT length,
+                                      const NumberT hash) const noexcept {
         return find(index, StringView<Char_T>{str, length}, hash);
     }
 
@@ -406,7 +421,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length    Number of characters in the key array.
      * @return Pointer to the found item, or nullptr if not found.
      */
-    QENTEM_INLINE HItem_T *find(SizeT *&index, const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE HItem_T *find(NumberT *&index, const Char_T *str, const NumberT length) noexcept {
         return find(index, str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -420,7 +435,7 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length    Number of characters in the key array.
      * @return Const pointer to the found item, or nullptr if not found.
      */
-    QENTEM_INLINE const HItem_T *find(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
+    QENTEM_INLINE const HItem_T *find(NumberT &index, const Char_T *str, const NumberT length) const noexcept {
         return find(index, str, length, KeyUtilsT::Hash(str, length));
     }
 
@@ -437,14 +452,14 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param length Number of characters in the key array.
      * @return Pointer to the found or newly inserted item.
      */
-    QENTEM_INLINE HItem_T *tryInsert(const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE HItem_T *tryInsert(const Char_T *str, const NumberT length) noexcept {
         if (Size() == Capacity()) {
-            expand(Capacity() * SizeT{2});
+            expand(Capacity() * NumberT{2});
         }
 
-        const SizeT hash = KeyUtilsT::Hash(str, length);
-        SizeT      *index;
-        HItem_T    *item = find(index, str, length, hash);
+        const NumberT hash = KeyUtilsT::Hash(str, length);
+        NumberT      *index;
+        HItem_T      *item = find(index, str, length, hash);
 
         if (item == nullptr) {
             item = insert(index, StringKey_T{str, length}, hash);
@@ -463,9 +478,9 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
      * @param str    Pointer to the character array representing the key to remove.
      * @param length Number of characters in the key array.
      */
-    QENTEM_INLINE void remove(const Char_T *str, const SizeT length) noexcept {
+    QENTEM_INLINE void remove(const Char_T *str, const NumberT length) noexcept {
         if (IsNotEmpty()) {
-            SizeT   *index;
+            NumberT *index;
             HItem_T *item = find(index, str, length);
 
             remove(index, item);
@@ -474,71 +489,90 @@ struct StringHashTable : public HashTable<StringKey_T, StringKeyUtils_T<StringKe
 };
 
 /**
- * @brief Selects the appropriate hash table adapter (string or number) at compile time.
+ * @brief Selects the appropriate hash table implementation at compile time.
  *
- * This set of templates chooses between StringHashTable and NumberHashTable based
- * on whether the key type is a recognized numeric type, using QTraits::IsNumber.
+ * HashTableSelector chooses between NumberHashTable and StringHashTable
+ * based on the key type. Numeric keys use NumberHashTable, while all
+ * other key types use StringHashTable.
  *
- * The expansion multiplier is forwarded unchanged to the selected adapter, ensuring
- * that capacity growth behavior is preserved consistently and remains part of the
- * resulting hash table type.
+ * The selected implementation preserves the configured numeric width,
+ * growth policy, and memory backend, ensuring consistent behavior across
+ * all specializations with no runtime overhead.
  *
- * Usage: Use AutoHashTable<Key_T, HItem_T, Expansion_Multiplier_T> as a base class
- * for associative containers.
- *
- * @tparam Key_T   The key type.
- * @tparam HItem_T The hash table item type (must provide Key, Hash, Next, Clear, etc.).
+ * @tparam Key_T
+ *         The key type.
+ * @tparam Number_T
+ *         Numeric type used for capacities, indexes,
+ *         hash values, and internal bookkeeping.
+ * @tparam HItem_T
+ *         The hash table item type.
  * @tparam Expansion_Multiplier_T
- *                 Compile-time capacity growth factor propagated to the selected
- *                 hash table adapter.
- * @tparam is_number (internal) SFINAE: true for number types, false for string types.
+ *         Compile-time capacity growth factor propagated to the selected
+ *         hash table implementation.
+ * @tparam MemoryProvider_T
+ *         Memory backend used for storage management.
+ * @tparam is_number
+ *         Implementation detail indicating whether Key_T is numeric.
  */
-
-// Primary template: does not define Type (selected via partial specialization)
-template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T, bool = QTraits::IsNumber<Key_T>::value>
+template <typename Key_T, typename Number_T, typename HItem_T, Number_T Expansion_Multiplier_T,
+          typename MemoryProvider_T, bool = QTraits::IsNumber<Key_T>::value>
 struct HashTableSelector;
 
 // Specialization for non-numeric (string-like) keys
 /**
  * @brief Specialization: selects StringHashTable for non-numeric key types.
  */
-template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T>
-struct HashTableSelector<Key_T, HItem_T, Expansion_Multiplier_T, false> {
+template <typename Key_T, typename Number_T, typename HItem_T, Number_T Expansion_Multiplier_T,
+          typename MemoryProvider_T>
+struct HashTableSelector<Key_T, Number_T, HItem_T, Expansion_Multiplier_T, MemoryProvider_T, false> {
     /// Type alias for string-keyed hash table.
-    using Type = StringHashTable<Key_T, HItem_T, Expansion_Multiplier_T>;
+    using Type = StringHashTable<Key_T, Number_T, HItem_T, Expansion_Multiplier_T, MemoryProvider_T>;
 };
 
 // Specialization for numeric keys
 /**
  * @brief Specialization: selects NumberHashTable for numeric key types.
  */
-template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T>
-struct HashTableSelector<Key_T, HItem_T, Expansion_Multiplier_T, true> {
+template <typename Key_T, typename Number_T, typename HItem_T, Number_T Expansion_Multiplier_T,
+          typename MemoryProvider_T>
+struct HashTableSelector<Key_T, Number_T, HItem_T, Expansion_Multiplier_T, MemoryProvider_T, true> {
     /// Type alias for number-keyed hash table.
-    using Type = HashTable<Key_T, NumberKeyUtils_T<Key_T>, HItem_T, Expansion_Multiplier_T>;
+    using Type = HashTable<Key_T, Number_T, NumberKeyUtils_T<Key_T, Number_T>, HItem_T, Expansion_Multiplier_T,
+                           MemoryProvider_T>;
 };
 
 /**
  * @brief Type alias for automatic hash table selection.
  *
- * Resolves to StringHashTable if Key_T is not a recognized number type,
- * or NumberHashTable if Key_T is a recognized number type (per QTraits::IsNumber).
+ * AutoHashTable selects the most appropriate hash table implementation
+ * for the specified key type. Numeric keys use NumberHashTable, while
+ * all other key types use StringHashTable.
  *
- * The selected hash table inherits its capacity growth behavior from the
- * provided expansion multiplier, which is forwarded unchanged and becomes
- * part of the resulting type. No runtime configuration is introduced.
+ * The selected implementation uses Number_T for capacities, indexes,
+ * hash values, and internal bookkeeping, allowing the table's numeric
+ * width to be configured independently of SizeT.
  *
- * Example:
- *   using Table = AutoHashTable<MyKeyType, MyItemType>;
+ * Capacity growth behavior is controlled at compile time through the
+ * expansion multiplier and is forwarded unchanged to the selected
+ * implementation, introducing no runtime overhead.
  *
- * @tparam Key_T   The key type.
- * @tparam HItem_T The hash table item type.
+ * @tparam Key_T
+ *         The key type.
+ * @tparam Number_T
+ *         Numeric type used for capacities, indexes,
+ *         hash values, and internal bookkeeping.
+ * @tparam HItem_T
+ *         The hash table item type.
  * @tparam Expansion_Multiplier_T
- *                 Compile-time capacity growth factor used by the selected
- *                 hash table implementation.
+ *         Compile-time capacity growth factor used by the selected
+ *         hash table implementation.
+ * @tparam MemoryProvider_T
+ *         Memory backend used for storage management.
  */
-template <typename Key_T, typename HItem_T, SizeT Expansion_Multiplier_T>
-using AutoHashTable = typename HashTableSelector<Key_T, HItem_T, Expansion_Multiplier_T>::Type;
+template <typename Key_T, typename Number_T, typename HItem_T, Number_T Expansion_Multiplier_T,
+          typename MemoryProvider_T>
+using AutoHashTable =
+    typename HashTableSelector<Key_T, Number_T, HItem_T, Expansion_Multiplier_T, MemoryProvider_T>::Type;
 
 } // namespace Qentem
 
