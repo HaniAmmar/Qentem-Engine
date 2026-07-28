@@ -6,9 +6,8 @@
  * throughout the Qentem Engine library. This structure is primarily based on JSON data models,
  * enabling flexible and efficient handling of JSON-like data.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_VALUE_H

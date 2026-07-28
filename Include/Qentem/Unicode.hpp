@@ -14,9 +14,8 @@
  * Example:
  *   Qentem::Unicode::ToUTF<char>(0x10A7B, output);
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_UNICODE_H

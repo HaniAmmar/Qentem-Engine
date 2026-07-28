@@ -10,9 +10,8 @@
  *   SystemLongI r = SystemCall(__NR_somecall, arg1, arg2, ...);
  *   // negative return values correspond to -errno
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_SYSTEM_CALL_HPP

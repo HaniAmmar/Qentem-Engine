@@ -1,4 +1,24 @@
-
+/**
+ * @file QConsole.hpp
+ * @brief Lightweight buffered console output utility.
+ *
+ * This header defines Qentem::QConsole, a static console helper that provides
+ * buffered text output, formatted value printing, optional ANSI color support,
+ * and platform-specific stdout writing. Output is accumulated in an internal
+ * buffer and flushed automatically when the buffer reaches a predefined size
+ * or manually through Flush().
+ *
+ * Supported features include:
+ * - Buffered console output.
+ * - Formatted value printing through ToCharsHelper.
+ * - ANSI terminal color sequences.
+ * - Runtime output enable/disable control.
+ * - Automatic buffer flushing during program shutdown.
+ * - Platform-specific implementations for Windows, Linux, and POSIX systems.
+ *
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
+ */
 
 #ifndef QENTEM_CONSOLE_H
 #define QENTEM_CONSOLE_H

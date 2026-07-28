@@ -10,9 +10,8 @@
  * This component brings together multiple parsing and execution techniques,
  * supporting complex expressions and flexible syntax for end users.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_Q_EXPRESSION_H

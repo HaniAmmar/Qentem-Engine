@@ -5,9 +5,8 @@
  * Provides lightweight thread-local counters for tracking memory allocations,
  * releases, active memory usage, peak usage, and reserved memory blocks.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_MEMORY_RECORD_HPP

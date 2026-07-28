@@ -8,9 +8,8 @@
  * deeply nested structures. Optional support for C-style line and block
  * comments is provided as a preprocessing step.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_JSON_H

@@ -7,9 +7,8 @@
  * provides convenience functions for safely extracting strings and numeric
  * values while handling missing nodes gracefully.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef WEBSITE_VALUE_PATH_H

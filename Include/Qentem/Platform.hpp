@@ -6,9 +6,8 @@
  * platform-specific features, ensuring consistent behavior and compatibility across
  * different operating systems and compiler environments.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_PLATFORM_H

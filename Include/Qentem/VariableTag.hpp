@@ -4,9 +4,8 @@
  *
  * This header exists independently to avoid dependency cycles between Tags.hpp and Template.hpp.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_VARIABLE_TAG_H

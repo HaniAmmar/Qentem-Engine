@@ -16,9 +16,8 @@
  * generation, serialization, and other workloads requiring efficient
  * in-memory character accumulation.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_STRING_STREAM_H

@@ -32,9 +32,8 @@
  * @note The pool retains ownership of all objects at all times.
  *       Destructors are invoked only when the pool itself is destroyed.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_OBJECT_POOL_H

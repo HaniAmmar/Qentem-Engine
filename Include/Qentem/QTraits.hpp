@@ -9,9 +9,8 @@
  * type detection like IsNumber<Type_T>, and callable introspection traits including
  * FunctionParentType and FunctionFirstArgType.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_TRAITS_H

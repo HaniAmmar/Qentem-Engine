@@ -12,9 +12,8 @@
  * The system uses type decay and static dispatch to eliminate ambiguity and avoid overload pitfalls
  * across pointer and value categories. Supports safe fallback for unknown types via iteration-based rendering.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_TO_CHARS_HELPER_H

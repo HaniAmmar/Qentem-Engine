@@ -17,9 +17,8 @@
  * This class serves as the foundation for StringStream, LiteStream, and
  * other stream types built on the same write-oriented interface.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_STRING_STREAM_BASE_H

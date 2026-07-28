@@ -11,9 +11,8 @@
  *
  * On unknown or freestanding platforms, it transparently falls back to malloc.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_SYSTEM_MEMORY_HPP

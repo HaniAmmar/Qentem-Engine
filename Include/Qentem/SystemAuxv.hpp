@@ -14,9 +14,8 @@
  * while correctly handling partial reads and preserving portability across
  * supported Linux architectures.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_SYSTEM_AUXV_HPP

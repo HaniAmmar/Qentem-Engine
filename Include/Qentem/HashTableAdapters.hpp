@@ -11,9 +11,8 @@
  * for capacities, indexes, hash values, and internal bookkeeping, allowing
  * hash tables to operate independently of SizeT when required.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_HASH_TABLE_ADAPTERS_H

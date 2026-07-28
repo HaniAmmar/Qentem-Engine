@@ -11,9 +11,8 @@
  * The advanced constants and algorithms within this file are designed to maximize both
  * speed and correctness, and may challenge your understanding of floating-point math.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_DIGIT_UTILS_H

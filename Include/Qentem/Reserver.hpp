@@ -30,8 +30,7 @@
  * @note    Depends on MemoryBlock and LiteArray. Behavior is customizable
  *          through compile-time macros.
  *
- * @author  Hani Ammar
- * @date    2026
+ * @copyright Copyright (c) 2026 Hani Ammar
  * @license MIT
  */
 #ifndef QENTEM_RESERVER_HPP

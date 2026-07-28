@@ -7,9 +7,8 @@
  * scenarios requiring simultaneous lookup of several substrings or tokens, making it
  * ideal for template parsing and fast text processing tasks.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_FINDER_H

@@ -6,9 +6,8 @@
  * platform macros, endianness detection, SIMD flags, and utility constants that are
  * shared across all Qentem modules.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_COMMON_H

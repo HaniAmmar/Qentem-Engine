@@ -10,9 +10,8 @@
  * affinity, such as high-performance thread pools, fiber schedulers,
  * or NUMA-aware applications.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_CPU_HELPER_HPP

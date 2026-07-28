@@ -6,9 +6,8 @@
  * formatting, and conversion, supporting a wide range of integer and floating-point
  * operations throughout the Qentem Engine library.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_Q_NUMBER_H

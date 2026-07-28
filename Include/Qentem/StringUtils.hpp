@@ -6,9 +6,8 @@
  * string operations, such as trimming, searching, splitting, and case conversion.
  * supporting the internal needs of the Qentem Engine library.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_STRING_UTILS_H

@@ -21,9 +21,8 @@
  *  - Stores elements and hash metadata within a unified structure.
  *  - Rebuilds hash state when resized, discarding deleted entries.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright license MIT
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_H_ARRAY_BASE_H

@@ -12,9 +12,8 @@
  *
  * @tparam Alignment_T Minimum allocation alignment and chunk size in bytes.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_MEMORY_BLOCK_HPP

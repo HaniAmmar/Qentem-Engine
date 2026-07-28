@@ -44,10 +44,6 @@
  * @tparam Number_T Unsigned integer type used as the storage limb.
  * @tparam Bits     Maximum number of bits available for the integer value.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
- *
  * @note This implementation operates on unsigned integer limbs. Signed integer
  *       support can be implemented as a higher-level abstraction.
  * @note For best performance on modern systems, 32-bit or 64-bit limb types are
@@ -61,6 +57,9 @@
  *     BigInt<unsigned long long, 128U> value = 0xFFFFFFFFFFFFFFFFULL;
  *     value <<= 64U;
  *     value |= 0xFFFFFFFFFFFFFFFFULL;
+ *
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_BIG_INT_H

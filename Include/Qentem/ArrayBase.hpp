@@ -16,9 +16,8 @@
  * @tparam MemoryProvider_T
  *         Memory backend used for reserve, release, shrink, and expand operations.
  *
- * @author Hani
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_ARRAY_BASE_H

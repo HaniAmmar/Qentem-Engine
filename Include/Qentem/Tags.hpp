@@ -7,9 +7,8 @@
  * for parsing, representing, and manipulating tags within Qentem templates, supporting
  * features such as loops, conditionals, variables, and custom tag extensions.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_TAGS_H

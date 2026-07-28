@@ -11,9 +11,8 @@
  * tightly with the memory system and template architecture while offering a familiar
  * interface for dynamic text operations.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_STRING_H

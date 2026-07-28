@@ -19,9 +19,8 @@
  * without requiring a full rebuild of stored mappings. This design ensures
  * true O(1) insertion, eviction, and index lookup — even in dynamic table scenarios.
  *
- * @author Hani Ammar
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_DEQUE_HPP

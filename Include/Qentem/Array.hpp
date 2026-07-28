@@ -5,9 +5,8 @@
  * It stores elements in a single block of memory for fast indexed access,
  * efficient iteration, and low-overhead growth.
  *
- * @author Hani
- * @date 2026
- * @copyright MIT License
+ * @copyright Copyright (c) 2026 Hani Ammar
+ * @license MIT
  */
 
 #ifndef QENTEM_ARRAY_H
