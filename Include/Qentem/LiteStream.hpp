@@ -1,17 +1,19 @@
 /**
  * @file LiteStream.hpp
- * @brief Lightweight, page-expandable character stream.
+ * @brief Page-backed character stream.
  *
- * `LiteStream` is a minimal character stream backed by a page-aligned expandable buffer,
- * designed for efficient sequential writes. It supports single-character and block
- * writes, explicit null termination, and controlled capacity growth.
+ * LiteStream provides the StringStream interface using a page-based memory
+ * backend. Storage is allocated directly from SystemMemory and expanded in
+ * page-sized increments, making it suitable for sequential output workloads
+ * where predictable memory usage and minimal allocator overhead are desired.
  *
- * Capacity increases only when required and is rounded to system page boundaries,
- * providing predictable memory usage and avoiding excessive reallocation.
+ * Unlike StringStream, which uses Reserver for allocation and supports
+ * allocator-specific optimizations, LiteStream relies exclusively on
+ * page-backed storage and does not support in-place shrinking or expansion.
  *
- * Unlike `StringStream`, this class is intended for internal diagnostics, file logging,
- * and console output where simplicity, low overhead, and controlled expansion are
- * preferred over rich string manipulation.
+ * Typical use cases include logging, diagnostics, temporary text generation,
+ * and other write-oriented workloads where direct system memory allocation
+ * is preferred.
  *
  * @author Hani Ammar
  * @date 2026
@@ -21,189 +23,51 @@
 #ifndef QENTEM_LITE_STREAM_H
 #define QENTEM_LITE_STREAM_H
 
+#include "Qentem/StringStreamBase.hpp"
 #include "Qentem/SystemMemory.hpp"
-#include "Qentem/StringUtils.hpp"
+#include "Qentem/Platform.hpp"
 
 namespace Qentem {
+// Page-backed memory provider for StringStreamBase.
+struct StringStreamPageBackend {
+    template <typename Char_T>
+    QENTEM_INLINE static Char_T *Reserve(SizeT &capacity) {
+        SizeT capacity_bytes = (capacity * sizeof(Char_T));
 
-struct LiteStream {
-    using CharType = char;
-
-    LiteStream(LiteStream &&)                 = delete;
-    LiteStream(const LiteStream &)            = delete;
-    LiteStream &operator=(LiteStream &&)      = delete;
-    LiteStream &operator=(const LiteStream &) = delete;
-
-    QENTEM_INLINE LiteStream() noexcept = default;
-
-    QENTEM_INLINE explicit LiteStream(SizeT32 capacity) noexcept {
-        if (capacity != 0) {
-            reserve(capacity);
-        }
-    }
-
-    QENTEM_INLINE ~LiteStream() noexcept {
-        release(storage_, capacity_);
-    }
-
-    void Write(char ch) noexcept {
-        const SizeT32 new_length = (length_ + 1U);
-
-        if (Capacity() == length_) {
-            expand(new_length);
-        }
-
-        storage_[length_] = ch;
-        length_           = new_length;
-    }
-
-    void Write(const char *str, const SizeT32 length) noexcept {
-        const SizeT32 new_length = (length_ + length);
-
-        if (Capacity() < new_length) {
-            expand(new_length);
-        }
-
-        char   *des    = (storage_ + length_);
-        SizeT32 offset = 0;
-
-        while (offset < length) {
-            des[offset] = str[offset];
-            ++offset;
-        }
-
-        length_ = new_length;
-    }
-
-    void InsertNull() {
-        if (capacity_ < length_) {
-            expand(capacity_ + 1U);
-        }
-
-        storage_[length_] = char{0};
-    }
-
-    QENTEM_INLINE void Expect(SizeT32 length) {
-        length += length_;
-
-        if (Capacity() < length) {
-            expand(length);
-        }
-    }
-
-    QENTEM_INLINE void SetLength(SizeT32 length) noexcept {
-        if (capacity_ < length) {
-            expand(length);
-        }
-
-        length_ = length;
-    }
-
-    QENTEM_INLINE void Clear() noexcept {
-        length_ = 0;
-    }
-
-    QENTEM_INLINE void Reset() noexcept {
-        release(storage_, capacity_);
-
-        storage_  = nullptr;
-        capacity_ = 0;
-        length_   = 0;
-    }
-
-    QENTEM_INLINE char *Storage() noexcept {
-        return storage_;
-    }
-
-    QENTEM_INLINE const char *Storage() const noexcept {
-        return storage_;
-    }
-
-    QENTEM_INLINE const char *First() const noexcept {
-        return storage_;
-    }
-
-    QENTEM_INLINE char *Last() noexcept {
-        if (Capacity() != 0) {
-            return (storage_ + (length_ - 1U));
-        }
-
-        return nullptr;
-    }
-
-    QENTEM_INLINE const char *Last() const noexcept {
-        if (Capacity() != 0) {
-            return (storage_ + (length_ - 1U));
-        }
-
-        return nullptr;
-    }
-
-    QENTEM_INLINE SizeT32 Length() const noexcept {
-        return length_;
-    }
-
-    QENTEM_INLINE SizeT32 Capacity() const noexcept {
-        return capacity_;
-    }
-
-    QENTEM_INLINE bool IsEmpty() const noexcept {
-        return (Length() == 0);
-    }
-
-    QENTEM_INLINE bool IsNotEmpty() const noexcept {
-        return (Length() != 0);
-    }
-
-  private:
-    QENTEM_NOINLINE void expand(const SizeT32 new_capacity) noexcept {
-        constexpr SizeT32 long_m1        = (sizeof(SystemLong) - 1U);
-        SizeT32           aligned_length = (((length_ + long_m1) & ~long_m1) / sizeof(SystemLong));
-
-        char         *str          = storage_;
-        const SizeT32 old_capacity = capacity_;
-
-        reserve(new_capacity);
-
-        SystemLong *dst = reinterpret_cast<SystemLong *>(storage_);
-        SystemLong *src = reinterpret_cast<SystemLong *>(str);
-
-        SizeT32 offset = 0;
-        while (offset < aligned_length) {
-            dst[offset] = src[offset];
-            ++offset;
-        }
-
-        release(str, old_capacity);
-    }
-
-    QENTEM_INLINE static void release(char *storage, SizeT32 size) noexcept {
-        if (storage != nullptr) {
-            SystemMemory::Release(storage, size);
-        }
-    }
-
-    void reserve(SizeT32 capacity) noexcept {
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-        if (capacity > SystemMemory::GetPageSize()) {
-            capacity = SystemMemory::AlignToPageSize(capacity);
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
+        if (capacity_bytes > SystemMemory::GetPageSize()) {
+            capacity_bytes = SystemMemory::AlignToPageSize(capacity_bytes);
         } else {
-            capacity = SystemMemory::GetPageSize();
+            capacity_bytes = static_cast<SizeT>(SystemMemory::GetPageSize());
         }
-#else
-        capacity = (capacity + sizeof(SystemLong) - 1U) & ~(sizeof(SystemLong) - 1U);
-        capacity *= 2;
+
+        capacity = (capacity_bytes / sizeof(Char_T));
 #endif
 
-        storage_  = static_cast<char *>(SystemMemory::Reserve(capacity));
-        capacity_ = capacity;
+        return static_cast<Char_T *>(SystemMemory::Reserve(capacity_bytes));
     }
 
-    char   *storage_{nullptr};
-    SizeT32 capacity_{0};
-    SizeT32 length_{0};
+    template <typename Char_T>
+    QENTEM_INLINE static void Release(Char_T *storage, SizeT capacity) {
+        SystemMemory::Release(storage, (capacity * sizeof(Char_T)));
+    }
+
+    template <typename Char_T>
+    QENTEM_INLINE constexpr static bool Shrink(Char_T *, SizeT, SizeT) noexcept {
+        return false;
+    }
+
+    template <typename Char_T>
+    QENTEM_INLINE constexpr static bool TryExpand(Char_T *, SizeT, SizeT) noexcept {
+        return false;
+    }
+};
+
+struct LiteStream : public StringStreamBase<char, StringStreamPageBackend> {
+    using BaseT = StringStreamBase<char, StringStreamPageBackend>;
+    using BaseT::BaseT;
 };
 
 } // namespace Qentem
 
-#endif // QENTEM_LITE_STREAM_H
+#endif
