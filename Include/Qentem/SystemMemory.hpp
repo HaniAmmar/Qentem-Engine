@@ -58,7 +58,11 @@ struct SystemMemory {
      * @return Size of a memory page in bytes.
      */
     QENTEM_INLINE static SizeT32 GetPageSize() noexcept {
+#ifndef QENTEM_NO_LIBC
         return page_size_;
+#else  // QENTEM_NO_LIBC
+        return AuxInfo.PageSize;
+#endif // !QENTEM_NO_LIBC
     }
 
     /**
@@ -378,7 +382,9 @@ struct SystemMemory {
         // clang-format on
     }
 
+#ifndef QENTEM_NO_LIBC
     inline static const SizeT32 page_size_{static_cast<SizeT32>(ReadPageSize())};
+#endif // !QENTEM_NO_LIBC
 };
 
 } // namespace Qentem
