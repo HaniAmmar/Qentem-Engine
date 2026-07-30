@@ -41,8 +41,8 @@ struct StringView {
 
     constexpr StringView &operator=(StringView &&src) noexcept {
         if (this != &src) {
-            setStorage(src.First());
-            setLength(src.Length());
+            SetStorage(src.First());
+            SetLength(src.Length());
 
             src.clearStorage();
             src.clearLength();
@@ -53,16 +53,16 @@ struct StringView {
 
     constexpr StringView &operator=(const StringView &src) noexcept {
         if (this != &src) {
-            setStorage(src.First());
-            setLength(src.Length());
+            SetStorage(src.First());
+            SetLength(src.Length());
         }
 
         return *this;
     }
 
     constexpr StringView &operator=(const Char_T *str) noexcept {
-        setStorage(str);
-        setLength(StringUtils::Count(str));
+        SetStorage(str);
+        SetLength(StringUtils::Count(str));
 
         return *this;
     }
@@ -150,8 +150,8 @@ struct StringView {
             count = Length();
         }
 
-        setStorage(First() + count);
-        setLength(Length() - count);
+        SetStorage(First() + count);
+        SetLength(Length() - count);
     }
 
     constexpr void RemoveSuffix(SizeT count) noexcept {
@@ -159,7 +159,7 @@ struct StringView {
             count = Length();
         }
 
-        setLength(Length() - count);
+        SetLength(Length() - count);
     }
 
     QENTEM_INLINE constexpr const Char_T *First() const noexcept {
@@ -206,15 +206,15 @@ struct StringView {
         return End();
     }
 
-  private:
-    constexpr void setLength(SizeT length) noexcept {
-        length_ = length;
-    }
-
-    constexpr void setStorage(const Char_T *ptr) noexcept {
+    constexpr void SetStorage(const Char_T *ptr) noexcept {
         storage_ = ptr;
     }
 
+    constexpr void SetLength(SizeT length) noexcept {
+        length_ = length;
+    }
+
+  private:
     void clearStorage() noexcept {
         storage_ = nullptr;
     }
