@@ -38,7 +38,6 @@
 
 #include "Qentem/MemoryBlock.hpp"
 #include "Qentem/LiteArray.hpp"
-#include "Qentem/CPUHelper.hpp"
 
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
 #include "Qentem/MemoryRecord.hpp"
