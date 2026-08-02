@@ -108,29 +108,29 @@ struct ReserverCore {
     /**
      * @brief Rounds an allocation size up to the allocator's default alignment.
      *
-     * Converts a count of objects into a total byte size and rounds the result
+     * Converts an object count into a total byte size and rounds the result
      * up to the nearest allocator alignment boundary. This ensures that all
      * reserved regions satisfy the allocator's minimum alignment requirements.
      *
      * @tparam Type_T Type being allocated.
-     * @param size Number of objects to allocate.
+     * @param count Number of objects to allocate.
      *
      * @return Total allocation size in bytes, rounded up to the allocator's
      *         default alignment.
      */
     template <typename Type_T>
-    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong size) noexcept {
-        size *= sizeof(Type_T);
-        size += ALIGNMENT_MASK;
-        size &= ALIGNMENT_MASK_INV;
+    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong count) noexcept {
+        count *= sizeof(Type_T);
+        count += ALIGNMENT_MASK;
+        count &= ALIGNMENT_MASK_INV;
 
-        return size;
+        return count;
     }
 
     /**
      * @brief Reserves memory for one or more objects of the specified type.
      *
-     * Computes the total allocation size for `size` objects of `Type_T`,
+     * Computes the total allocation size for `count` objects of `Type_T`,
      * rounds the result up to the allocator's default alignment boundary,
      * and reserves a suitably aligned memory region.
      *
@@ -145,18 +145,18 @@ struct ReserverCore {
      * @tparam CustomAlignment_T Desired alignment in bytes. Defaults to
      *         `alignof(Type_T)`.
      *
-     * @param size Number of `Type_T` objects to reserve space for.
+     * @param count Number of `Type_T` objects to reserve space for.
      *
      * @return Pointer to an aligned memory region capable of storing
-     *         `size` objects of type `Type_T`.
+     *         `count` objects of type `Type_T`.
      *
      * @see reserveRound
      */
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
-    QENTEM_NOINLINE Type_T *Reserve(SystemLong size) noexcept {
+    QENTEM_NOINLINE Type_T *Reserve(SystemLong count) noexcept {
         static_assert((CustomAlignment_T > 0) && ((CustomAlignment_T & (CustomAlignment_T - 1)) == 0),
                       "alignment must be power-of-two");
-        return static_cast<Type_T *>(reserveRound<Type_T, CustomAlignment_T>(size));
+        return static_cast<Type_T *>(reserveRound<Type_T, CustomAlignment_T>(count));
     }
 
     /**
@@ -165,7 +165,7 @@ struct ReserverCore {
      * Converts the original object count into the aligned byte size used during
      * reservation and returns the region to the allocator for reuse.
      *
-     * The supplied `size` must match the number of objects originally passed to
+     * The supplied `count` must match the number of objects originally passed to
      * `Reserve()`. The allocator uses this value to reconstruct the reservation's
      * aligned byte size before releasing the region.
      *
@@ -173,15 +173,15 @@ struct ReserverCore {
      *
      * @tparam Type_T Type originally used when reserving the memory region.
      * @param ptr Pointer to the memory region to release.
-     * @param size Number of `Type_T` objects originally requested.
+     * @param count Number of `Type_T` objects originally requested.
      *
      * @see Reserve
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    QENTEM_NOINLINE void Release(Type_T *ptr, SystemLong size) noexcept {
+    QENTEM_NOINLINE void Release(Type_T *ptr, SystemLong count) noexcept {
         if (ptr != nullptr) {
-            release(ptr, RoundUpBytes<Type_T>(size));
+            release(ptr, RoundUpBytes<Type_T>(count));
         }
     }
 
@@ -189,11 +189,11 @@ struct ReserverCore {
      * @brief Shrinks a previously reserved memory region.
      *
      * Reduces the size of an existing reservation by releasing the unused tail
-     * portion back to the allocator. Both the original size and the target size
-     * are converted to aligned byte counts using `RoundUpBytes<Type_T>()` before
+     * portion back to the allocator. Both the original and target object counts
+     * are converted to aligned byte sizes using `RoundUpBytes<Type_T>()` before
      * the shrink operation is performed.
      *
-     * If `to_size` is smaller than `from_size`, the region spanning from the new
+     * If `to_count` is smaller than `from_count`, the region spanning from the new
      * end of the allocation to the original end is returned to the allocator for
      * future reuse. The leading portion of the reservation remains unchanged.
      *
@@ -204,22 +204,22 @@ struct ReserverCore {
      *
      * @tparam Type_T Type originally used when reserving the memory region.
      * @param ptr Pointer to the reserved memory region.
-     * @param from_size Original number of `Type_T` objects reserved.
-     * @param to_size New number of `Type_T` objects to retain.
+     * @param from_count Original number of `Type_T` objects reserved.
+     * @param to_count New number of `Type_T` objects to retain.
      *
      * @return `true` if the reservation was successfully shrunk;
      *         otherwise `false`.
      *
-     * @note Both sizes are internally converted to aligned byte counts before
+     * @note Both counts are internally converted to aligned byte sizes before
      *       the shrink operation is performed.
      *
      * @see shrink
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    QENTEM_NOINLINE bool Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
-        from_size = RoundUpBytes<Type_T>(from_size);
-        to_size   = RoundUpBytes<Type_T>(to_size);
+    QENTEM_NOINLINE bool Shrink(Type_T *ptr, SystemLong from_count, SystemLong to_count) noexcept {
+        const SystemLong from_size = RoundUpBytes<Type_T>(from_count);
+        const SystemLong to_size   = RoundUpBytes<Type_T>(to_count);
 
         if ((from_size > to_size) && (ptr != nullptr)) {
             return shrink(ptr, from_size, to_size);
@@ -231,22 +231,22 @@ struct ReserverCore {
     /**
      * @brief Attempts to expand a previously reserved region in-place.
      *
-     * Increases the size of an existing reservation from `from_size` to
-     * `to_size` without relocating the allocation. Both sizes are converted
-     * to aligned byte counts using `RoundUpBytes<Type_T>()` before the
+     * Increases the size of an existing reservation from `from_count` to
+     * `to_count` without relocating the allocation. Both counts are converted
+     * to aligned byte sizes using `RoundUpBytes<Type_T>()` before the
      * expansion is attempted.
      *
      * Expansion succeeds only if sufficient free space exists immediately
      * after the current reservation. The allocation remains at the same
      * address and no data is moved.
      *
-     * If `to_size` is less than or equal to `from_size`, no expansion is
+     * If `to_count` is less than or equal to `from_count`, no expansion is
      * required and the function returns `true`.
      *
      * @tparam Type_T Type originally used when reserving the memory region.
      * @param ptr Pointer to the existing reservation.
-     * @param from_size Current number of `Type_T` objects reserved.
-     * @param to_size Desired number of `Type_T` objects.
+     * @param from_count Current number of `Type_T` objects reserved.
+     * @param to_count Desired number of `Type_T` objects.
      *
      * @return `true` if the reservation already satisfies the requested size
      *         or was successfully expanded in-place; otherwise `false`.
@@ -255,10 +255,10 @@ struct ReserverCore {
      * @see RoundUpBytes
      */
     template <typename Type_T>
-    QENTEM_NOINLINE bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
+    QENTEM_NOINLINE bool TryExpand(Type_T *ptr, SystemLong from_count, SystemLong to_count) noexcept {
         if (ptr != nullptr) {
-            from_size = RoundUpBytes<Type_T>(from_size);
-            to_size   = RoundUpBytes<Type_T>(to_size);
+            const SystemLong from_size = RoundUpBytes<Type_T>(from_count);
+            const SystemLong to_size   = RoundUpBytes<Type_T>(to_count);
 
             return (from_size >= to_size) || (tryExpand(ptr, from_size, to_size) == to_size);
         }
@@ -637,13 +637,13 @@ struct ReserverCore {
      *
      * @tparam Type_T Type being allocated.
      * @tparam CustomAlignment_T Requested alignment in bytes.
-     * @param size Number of objects to allocate.
+     * @param count Number of objects to allocate.
      *
      * @return Pointer to the reserved memory region.
      */
     template <typename Type_T, SizeT32 CustomAlignment_T>
-    QENTEM_NOINLINE void *reserveRound(SystemLong size) noexcept {
-        return reserveNoRound<CustomAlignment_T>(RoundUpBytes<Type_T>(size));
+    QENTEM_NOINLINE void *reserveRound(SystemLong count) noexcept {
+        return reserveNoRound<CustomAlignment_T>(RoundUpBytes<Type_T>(count));
     }
 
     /**
@@ -1209,28 +1209,28 @@ struct ReserverCore {
 
 struct Reserver {
     template <typename Type_T>
-    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong size) noexcept {
-        return reserver_.RoundUpBytes<Type_T>(size);
+    QENTEM_INLINE static SystemLong RoundUpBytes(SystemLong count) noexcept {
+        return reserver_.RoundUpBytes<Type_T>(count);
     }
 
     template <typename Type_T, SizeT32 CustomAlignment_T = alignof(Type_T)>
-    QENTEM_INLINE static Type_T *Reserve(SystemLong size) noexcept {
-        return reserver_.Reserve<Type_T, CustomAlignment_T>(size);
+    QENTEM_INLINE static Type_T *Reserve(SystemLong count) noexcept {
+        return reserver_.Reserve<Type_T, CustomAlignment_T>(count);
     }
 
     template <typename Type_T>
-    QENTEM_INLINE static void Release(Type_T *ptr, SystemLong size) noexcept {
-        reserver_.Release<Type_T>(ptr, size);
+    QENTEM_INLINE static void Release(Type_T *ptr, SystemLong count) noexcept {
+        reserver_.Release<Type_T>(ptr, count);
     }
 
     template <typename Type_T>
-    QENTEM_INLINE static bool Shrink(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
-        return reserver_.Shrink<Type_T>(ptr, from_size, to_size);
+    QENTEM_INLINE static bool Shrink(Type_T *ptr, SystemLong from_count, SystemLong to_count) noexcept {
+        return reserver_.Shrink<Type_T>(ptr, from_count, to_count);
     }
 
     template <typename Type_T>
-    QENTEM_INLINE static bool TryExpand(Type_T *ptr, SystemLong from_size, SystemLong to_size) noexcept {
-        return reserver_.TryExpand<Type_T>(ptr, from_size, to_size);
+    QENTEM_INLINE static bool TryExpand(Type_T *ptr, SystemLong from_count, SystemLong to_count) noexcept {
+        return reserver_.TryExpand<Type_T>(ptr, from_count, to_count);
     }
 
     QENTEM_INLINE static void Reset() noexcept {
