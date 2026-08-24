@@ -39,7 +39,7 @@ QENTEM_NOINLINE static bool TestEvaluate(QNumber64 &number, const char *content,
     const Array<QExpression> exprs = TempCore::ParseExpressions(content, length);
     QExpression              result;
 
-    if (temp.Evaluate(result, exprs, value)) {
+    if (temp.Evaluate(result, exprs, content, value)) {
         number = result.ExprValue.Number;
         return true;
     }

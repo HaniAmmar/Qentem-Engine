@@ -294,10 +294,6 @@ struct TemplateCore {
         format_info_ = Digit::RealFormatInfo{precision, type};
     }
 
-    QENTEM_INLINE void Parse(Array<TagBit> &tags_cache) const {
-        parse(content_, length_, tags_cache);
-    }
-
     QENTEM_INLINE static void Parse(const Char_T *content, const SizeT length, Array<TagBit> &tags_cache) {
         parse(content, length, tags_cache);
     }
@@ -312,8 +308,10 @@ struct TemplateCore {
         render(tags_cache.First(), tags_cache.End(), 0, length_);
     }
 
-    QENTEM_INLINE bool Evaluate(QExpression &number, const QExpressions &exprs, const Value_T &value) noexcept {
+    QENTEM_INLINE bool Evaluate(QExpression &number, const QExpressions &exprs, const Char_T *content,
+                                const Value_T &value) noexcept {
         const QExpression *expr = exprs.First();
+        content_                = content;
         value_                  = &value;
 
         if (expr != nullptr) {
@@ -1370,7 +1368,7 @@ struct TemplateCore {
             SizeT         loop_index     = 0;
 
             if (loops_items_->Size() <= tag.Level) {
-                *loops_items_ += LoopItem{};
+                loops_items_->Insert(LoopItem{});
             }
 
             if (loop_set->IsObject()) {
