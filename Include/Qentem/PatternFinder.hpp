@@ -34,18 +34,18 @@ struct PatternFinder {
         match_ = 0U;
 
         while (offset_ < length_) {
-            SizeT32 id = WordsList_T::GetFirstCharID(content_[offset_]);
+            const SizeT32 *list;
+            SizeT32        count;
+            WordsList_T::SetList(content_[offset_], list, count);
 
-            if (id < WordsList_T::FirstCharsCount) {
+            if (count != 0) {
                 ++offset_;
 
                 const Number_T start_offset = offset_;
-                const SizeT32  group_count  = WordsList_T::GroupedByFirstCount[id];
-                const SizeT32 *group_list   = WordsList_T::GroupedByFirstChar[id];
-                id                          = 0U; // Reuse for 'word index'.
+                SizeT32        id           = 0U;
 
                 do {
-                    const SizeT32  word_id         = group_list[id];
+                    const SizeT32  word_id         = list[id];
                     const SizeT32  word_length     = WordsList_T::WordLength[word_id];
                     const Char_T  *word            = WordsList_T::Word[word_id];
                     const Number_T word_end_offset = Number_T(offset_ + word_length);
@@ -68,33 +68,16 @@ struct PatternFinder {
 
                         offset_ = start_offset;
                     }
-                } while (++id < group_count);
+                } while (++id < count);
 
                 continue;
             }
 
-            // if (WordsList_T::SingleCharsCount == 1U) {
-            // Match single chars.
             if (content_[offset_] == WordsList_T::SingleChar) {
                 match_ = SizeT32{1};
                 ++offset_;
                 return;
             }
-            // } else {
-            //     SizeT32 char_index{0U};
-
-            //     while (char_index < WordsList_T::SingleCharsCount) {
-            //         const SizeT32 word_id = WordsList_T::SingleCharGroup[char_index];
-
-            //         if (content_[offset_] == WordsList_T::Word[word_id][0]) {
-            //             match_ = (word_id + SizeT32{1});
-            //             ++offset_;
-            //             return;
-            //         }
-
-            //         ++char_index;
-            //     }
-            // }
 
             ++offset_;
         }
@@ -113,7 +96,7 @@ struct PatternFinder {
     }
 
     QENTEM_INLINE SizeT32 CurrentMatch() const noexcept {
-        // Call 'NextSegment()' before calling 'GetMatch()'.
+        // Call 'NextSegment()' before calling this function.
         return match_;
     }
 

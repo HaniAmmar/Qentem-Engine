@@ -668,33 +668,32 @@ template <typename Char_T>
 struct List {
     using TagPatterns = TagPatterns_T<Char_T>;
 
-    static constexpr SizeT32 SingleCharsCount{};
-    static constexpr SizeT32 FirstCharsCount{2U};
-
-    inline static constexpr SizeT32 GroupedByFirstChar[5][5] = {{1U, 2U, 3U, 4U, 5U}, {6U, 7U, 8U, 9U, 10U}};
-    // Not used.
-    inline static constexpr SizeT32 SingleCharGroup[]     = {1U, 2U};
-    inline static constexpr SizeT32 GroupedByFirstCount[] = {5U, 5U};
+    // inline static constexpr SizeT32 GroupedByFirstChar[2][5] = {{1U, 2U, 3U, 4U, 5U}, {6U, 7U, 8U, 9U, 10U}};
+    inline static constexpr SizeT32 InlineList[]       = {1U, 2U, 3U, 4U, 5U};
+    inline static constexpr SizeT32 InlineListCount    = (sizeof(InlineList) / sizeof(SizeT32));
+    inline static constexpr SizeT32 MultiLineList[]    = {6U, 7U, 8U, 9U, 10U};
+    inline static constexpr SizeT32 MultiLineListCount = (sizeof(MultiLineList) / sizeof(SizeT32));
 
     static constexpr const Char_T SingleChar{TagPatterns::InLineLastChar};
 
-    // Only unique first chars.
-    inline static constexpr const Char_T FirstChar[] = {TagPatterns::InLineFirstChar, TagPatterns::MultiLineFirstChar};
-
-    inline static SizeT32 GetFirstCharID(Char_T ch) noexcept {
+    inline static void SetList(Char_T ch, const SizeT32 *&list, SizeT32 &count) noexcept {
         // Only unique first chars.
 
         switch (ch) {
             case TagPatterns::InLineFirstChar: {
-                return 0U;
+                list  = &(InlineList[0]);
+                count = InlineListCount;
+                break;
             }
 
             case TagPatterns::MultiLineFirstChar: {
-                return 1U;
+                list  = &(MultiLineList[0]);
+                count = MultiLineListCount;
+                break;
             }
 
             default: {
-                return 2U;
+                count = 0;
             }
         }
     }
@@ -718,7 +717,19 @@ struct List {
 
     // length is the count of 'list[index] - 1'.
     // The last char is user for checking the end of the word.
-    inline static constexpr const SizeT32 WordLength[] = {1U, 3U, 3U, 4U, 4U, 1U, 3U, 5U, 1U, 3U, 3U};
+    inline static constexpr const SizeT32 WordLength[] = {
+        0,
+        3U, // var : var:
+        3U, // raw : raw:
+        4U, // math : math:
+        4U, // svar : svar:
+        1U, // i : if
+        3U, // loo : loop
+        5U, // /loop : /loop>
+        1U, // i : if
+        3U, // /if : /if>
+        3U  // els : else
+    };
 };
 
 } // namespace Tags
