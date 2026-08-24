@@ -35,7 +35,7 @@ QENTEM_NOINLINE static bool TestEvaluate(QNumber64 &number, const char *content,
     using TempCore = TemplateCore<char, Value<char>, StringStream<char>>;
 
     const SizeT              length = StringUtils::Count(content);
-    TempCore                 temp{content, length};
+    TempCore                 temp{};
     const Array<QExpression> exprs = TempCore::ParseExpressions(content, length);
     QExpression              result;
 

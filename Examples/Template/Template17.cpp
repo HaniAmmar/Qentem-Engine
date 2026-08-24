@@ -14,22 +14,19 @@ c++ -O3 ./Examples/Template/Template17.cpp -I ./Include -o ./Build/QTest.bin
 */
 
 // -- Cached Render Function (Pre-parses template once) --
-template <typename Char_T, typename Value_T, typename StringStream_T>
-inline static void CachedRender(const StringView<Char_T> &content, const Value_T &value, StringStream_T &stream,
-                                const StringView<Char_T> &template_name) {
+template <typename Char_T, typename StringStream_T, typename Value_T, typename Tags_Cache_T>
+inline static void CachedRender(StringStream_T &stream, const StringView<Char_T> &content, const Value_T &value,
+                                const StringView<Char_T> &template_name, Tags_Cache_T &tags_cache) {
     // This is not a thread-safe function, and it's here to show how to cache processed tags.
     // One lazy way to make it thread-safe is to Parse() all templates before
     // starting a multi-threading process.
 
     using Qentem::Array;
-    using Qentem::HArray;
-    using Qentem::String;
 
     using TemplateCore = Qentem::TemplateCore<Char_T, Value_T, StringStream_T>;
     using TagBit       = Qentem::Tags::TagBit;
 
-    TemplateCore                                 temp{content.First(), content.Length()};
-    static HArray<String<Char_T>, Array<TagBit>> tags_cache;
+    TemplateCore temp{};
 
     Array<TagBit> &tags = tags_cache.Get(template_name.First(), template_name.Length());
 
@@ -37,12 +34,16 @@ inline static void CachedRender(const StringView<Char_T> &content, const Value_T
         TemplateCore::Parse(content.First(), content.Length(), tags);
     }
 
-    temp.Render(tags, value, stream);
+    temp.Render(stream, content.First(), content.Length(), value, tags);
 }
 
 ////////////////////////////////////////////////////////////////////
 
 int main() {
+    using namespace Qentem;
+
+    HArray<String<char>, Array<Tags::TagBit>> tags_cache{};
+
     Qentem::Value<char> value = Qentem::JSON::Parse(R"(
 [
     {
@@ -102,7 +103,7 @@ int main() {
 
     for (unsigned int i = 0; i < 10000U; i++) {
         stream.Clear();
-        CachedRender(content, value, stream, template_name);
+        CachedRender(stream, content, value, template_name, tags_cache);
     }
 
     QConsole::Print(stream, '\n');

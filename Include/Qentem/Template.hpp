@@ -222,13 +222,13 @@ struct Template {
     template <typename Char_T, typename Value_T, typename StringStream_T>
     QENTEM_INLINE static StringStream_T &Render(const Char_T *content, SizeT length, const Value_T &value,
                                                 StringStream_T &stream, Array<Tags::TagBit> &tags_cache) {
-        TemplateCore<Char_T, Value_T, StringStream_T> temp{content, length};
+        TemplateCore<Char_T, Value_T, StringStream_T> temp{};
 
         if (tags_cache.IsEmpty()) {
-            temp.Parse(tags_cache);
+            temp.Parse(content, length, tags_cache);
         }
 
-        temp.Render(tags_cache, value, stream);
+        temp.Render(stream, content, length, value, tags_cache);
 
         return stream;
     }
@@ -262,7 +262,7 @@ struct Template {
 
 template <typename Char_T, typename Value_T, typename StringStream_T>
 struct TemplateCore {
-    TemplateCore() = delete;
+    TemplateCore() noexcept = default;
 
     TemplateCore(const Char_T *content, SizeT length) noexcept : content_{content}, length_{length} {
     }
@@ -298,6 +298,19 @@ struct TemplateCore {
         parse(content, length, tags_cache);
     }
 
+    void Render(StringStream_T &stream, const Char_T *content, SizeT length, const Value_T &value,
+                const Array<Tags::TagBit> &tags_cache) {
+        Array<LoopItem> loops_items{};
+
+        content_     = content;
+        value_       = &value;
+        stream_      = &stream;
+        loops_items_ = &loops_items;
+
+        render(tags_cache.First(), tags_cache.End(), 0, length);
+    }
+
+    // Old Render
     void Render(const Array<Tags::TagBit> &tags_cache, const Value_T &value, StringStream_T &stream) {
         Array<LoopItem> loops_items{};
 
@@ -2135,11 +2148,12 @@ struct TemplateCore {
         return false;
     }
 
-    const Value_T        *value_{nullptr};
-    StringStream_T       *stream_{nullptr};
-    Array<LoopItem>      *loops_items_{nullptr};
-    const Char_T         *content_;
-    const SizeT           length_;
+    const Value_T   *value_{nullptr};
+    StringStream_T  *stream_{nullptr};
+    Array<LoopItem> *loops_items_{nullptr};
+    const Char_T    *content_{nullptr};
+    const SizeT      length_{0};
+
     Digit::RealFormatInfo format_info_{QentemConfig::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT};
 };
 
