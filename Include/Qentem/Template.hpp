@@ -38,6 +38,12 @@ namespace Qentem {
  *      - raw: Same as {var:...} but without escaping, s: String, n: Number.
  *
  *
+ *
+ *  - {st:s|n}
+ *
+ *      - st: Same as {raw:...}, s: String, n: Number.
+ *
+ *
  *  - {math:var|e|n}
  *
  *      - var|e|n: variable, Equation or Number.
@@ -100,6 +106,27 @@ namespace Qentem {
  * {raw:name}, {raw:name[name2]}, {raw:name[name2][name3][...]}
  * {raw:name}, {raw:name[id]}, {raw:name[id][id2][...]}
  * {raw:id}, {raw:id[id2]}, {raw:id[id2][...]}
+ */
+
+/*
+ * Sub-Template Tag:
+ *
+ * {st:template_id}
+ *
+ * Renders a cached sub-template selected by the value of `template_id`.
+ *
+ * See Examples/Template/Template19.cpp
+ *
+ * Behavior Notes:
+ *
+ * - Dynamic selection: the tag value identifies the sub-template to render.
+ * - Independent scope: each sub-template gets its own loop context.
+ * - Shared value: parent and sub-template render against the same Value object.
+ * - Shared cache: sub-templates can reference other cached templates using {st:...}.
+ * - Same output: sub-template content is rendered directly into the current output stream.
+ * - Nesting: sub-templates may contain further sub-template tags.
+ * - Fallback: if the value is NotANumber or the template ID is out of bounds,
+ *   the original tag is rendered literally.
  */
 
 /*
@@ -205,6 +232,82 @@ struct TemplateCore;
 template <typename>
 struct QOperationSymbols_T;
 
+/**
+ * @brief Describes a template and identifies it within a template set.
+ *
+ * `TemplateData` is the lightweight, non-owning descriptor used to identify
+ * a template and provide its source content to the renderer.
+ *
+ * The `ID` uniquely identifies the template within the template set and is
+ * used by the rendering system to locate the corresponding
+ * `TemplateDataCache` entry.
+ *
+ * @tparam Value_T
+ *     Value type associated with the template rendering system.
+ */
+template <typename Value_T>
+struct TemplateData {
+    using CharType = typename Value_T::CharType;
+
+    /**
+     * @brief Pointer to the template source content.
+     *
+     * The content is not owned by `TemplateData`.
+     */
+    const CharType *Content{nullptr};
+
+    /**
+     * @brief Length of the template source content.
+     */
+    SizeT Length{0};
+
+    /**
+     * @brief Identifier of the template.
+     *
+     * The identifier is used as the index into the template cache.
+     */
+    SizeT ID{0};
+};
+
+/**
+ * @brief Cached representation of a parsed template.
+ *
+ * `TemplateDataCache` stores the source information and parsed tag
+ * representation of a template after it has been initialized by the
+ * rendering system.
+ *
+ * Cache entries are indexed by `TemplateData::ID`. The source content is
+ * retained together with the parsed `Tags` so that subsequent renders can
+ * reuse the parsed representation without parsing the template again.
+ *
+ * @tparam Value_T
+ *     Value type associated with the template rendering system.
+ */
+template <typename Value_T>
+struct TemplateDataCache {
+    using CharType = typename Value_T::CharType;
+
+    /**
+     * @brief Pointer to the cached template source content.
+     *
+     * The content is not owned by the cache.
+     */
+    const CharType *Content{nullptr};
+
+    /**
+     * @brief Length of the cached template source content.
+     */
+    SizeT Length{0};
+
+    /**
+     * @brief Parsed tag representation of the template.
+     *
+     * Populated when the template is parsed and reused by subsequent
+     * rendering operations.
+     */
+    Array<Tags::TagBit> Tags{};
+};
+
 struct Template {
     Template()                            = delete;
     Template(Template &&)                 = delete;
@@ -217,7 +320,121 @@ struct Template {
     // static void CachedRender(const StringView<Char_T> &content, const Value_T &value, StringStream_T &stream,
     //                                 const StringView<Char_T> &template_name) {
     //     // See Examples/Template/Template17.cpp
+    //     // See Examples/Template/Template19.cpp
     // }
+
+    /**
+     * @brief Renders a template using an automatically managed parsed-template cache.
+     *
+     * This is the recommended template-rendering entry point.
+     *
+     * The function manages the parsed representation of the supplied templates
+     * through `templates_cache`. Each template is identified by its
+     * `TemplateData::ID`, which is used as the index of its corresponding
+     * `TemplateDataCache` entry.
+     *
+     * On first use, a template's source content and length are copied into its
+     * cache entry and the template is parsed into its cached tag representation.
+     * Subsequent renders reuse the cached parsed tags without reparsing the
+     * template.
+     *
+     * The `main_template` is always initialized in the cache. The optional
+     * `sub_templates` array supplies the additional templates that may be
+     * referenced while rendering the main template. It does not need to contain
+     * all available application templates. Only the sub-templates that may be
+     * required by the current rendering path need to be supplied.
+     *
+     * The cache is automatically resized as necessary to accommodate the IDs of
+     * the supplied templates.
+     *
+     * @tparam StringStream_T
+     *     String stream type used to receive the rendered output.
+     *
+     * @tparam Value_T
+     *     Value type exposed to the template during rendering.
+     *
+     * @param stream
+     *     Output stream receiving the rendered result.
+     *
+     * @param templates_cache
+     *     Persistent cache of parsed template representations. Entries are
+     *     indexed by `TemplateData::ID`.
+     *
+     * @param value
+     *     Value supplied to the template renderer.
+     *
+     * @param main_template
+     *     Main template to render.
+     *
+     * @param sub_templates
+     *     Optional array containing the sub-templates that may be referenced by
+     *     `main_template`.
+     *
+     * @param sub_templates_count
+     *     Number of entries in `sub_templates`.
+     *
+     * @note
+     *     The cache retains the template source pointer and length supplied by
+     *     `TemplateData` and stores the parsed tag representation in
+     *     `TemplateDataCache::Tags`. The referenced template content must remain
+     *     valid for as long as the cache entry is used.
+     *
+     * @see TemplateData
+     * @see TemplateDataCache
+     */
+    template <typename StringStream_T, typename Value_T>
+    QENTEM_INLINE static void Render(StringStream_T &stream, Array<TemplateDataCache<Value_T>> &templates_cache,
+                                     const Value_T &value, const TemplateData<Value_T> *main_template,
+                                     const TemplateData<Value_T> *sub_templates       = nullptr,
+                                     SizeT                        sub_templates_count = 0) {
+        using CharType = typename StringStream_T::CharType;
+
+        TemplateCore<CharType, Value_T, StringStream_T> temp{};
+
+        if ((sub_templates != nullptr) && (sub_templates_count != 0)) {
+            const TemplateData<Value_T> *last = (sub_templates + (sub_templates_count - 1));
+
+            const SizeT max_id = ((last->ID > main_template->ID) ? last->ID : main_template->ID);
+
+            if (templates_cache.Size() <= max_id) {
+                templates_cache.ResizeWithDefaultInit((max_id + SizeT{1}));
+            }
+
+            do {
+                --sub_templates_count;
+
+                const TemplateData<Value_T> *sub_template = (sub_templates + sub_templates_count);
+
+                if (templates_cache.Size() <= sub_template->ID) {
+                    templates_cache.ResizeWithDefaultInit((sub_template->ID + SizeT{1}));
+                }
+
+                TemplateDataCache<Value_T> *sub_template_cache = (templates_cache.Storage() + sub_template->ID);
+
+                if (sub_template_cache->Content == nullptr) {
+                    sub_template_cache->Content = sub_template->Content;
+                    sub_template_cache->Length  = sub_template->Length;
+
+                    temp.Parse(sub_template_cache->Content, sub_template_cache->Length, sub_template_cache->Tags);
+                }
+            } while (sub_templates_count != 0);
+        }
+
+        if (templates_cache.Size() <= main_template->ID) {
+            templates_cache.ResizeWithDefaultInit((main_template->ID + SizeT{1}));
+        }
+
+        TemplateDataCache<Value_T> *main_template_cache = (templates_cache.Storage() + main_template->ID);
+
+        if (main_template_cache->Content == nullptr) {
+            main_template_cache->Content = main_template->Content;
+            main_template_cache->Length  = main_template->Length;
+
+            temp.Parse(main_template_cache->Content, main_template_cache->Length, main_template_cache->Tags);
+        }
+
+        temp.Render(stream, main_template_cache, templates_cache, value);
+    }
 
     template <typename Char_T, typename Value_T, typename StringStream_T>
     QENTEM_INLINE static StringStream_T &Render(const Char_T *content, SizeT length, const Value_T &value,
@@ -296,6 +513,19 @@ struct TemplateCore {
 
     QENTEM_INLINE static void Parse(const Char_T *content, const SizeT length, Array<TagBit> &tags_cache) {
         parse(content, length, tags_cache);
+    }
+
+    void Render(StringStream_T &stream, const TemplateDataCache<Value_T> *main_template,
+                const Array<TemplateDataCache<Value_T>> &templates_cache, const Value_T &value) {
+        Array<LoopItem> loops_items{};
+
+        templates_cache_ = &templates_cache;
+        content_         = main_template->Content;
+        value_           = &value;
+        stream_          = &stream;
+        loops_items_     = &loops_items;
+
+        render(main_template->Tags.First(), main_template->Tags.End(), 0, main_template->Length);
     }
 
     void Render(StringStream_T &stream, const Char_T *content, SizeT length, const Value_T &value,
@@ -513,7 +743,8 @@ struct TemplateCore {
                 }
 
                 case TagPatterns::VariableID:
-                case TagPatterns::RawVariableID: {
+                case TagPatterns::RawVariableID:
+                case TagPatterns::SubTemplateID: {
                     const SizeT offset = pattern_finder.GetOffset();
 
                     pattern_finder.NextSegment();
@@ -526,10 +757,22 @@ struct TemplateCore {
 
                         if (var_length != 0) {
                             VariableTag *tag;
-                            if (match == TagPatterns::VariableID) {
-                                tag = (storage->Insert(TagBit{})).MakeVariableTag();
-                            } else {
-                                tag = (storage->Insert(TagBit{})).MakeRawVariableTag();
+
+                            switch (match) {
+                                case TagPatterns::VariableID: {
+                                    tag = (storage->Insert(TagBit{})).MakeVariableTag();
+                                    break;
+                                }
+
+                                case TagPatterns::RawVariableID: {
+                                    tag = (storage->Insert(TagBit{})).MakeRawVariableTag();
+                                    break;
+                                }
+
+                                case TagPatterns::SubTemplateID: {
+                                    tag = (storage->Insert(TagBit{})).MakeSubTemplateTag();
+                                    break;
+                                }
                             }
 
                             tag->Info.Offset = offset;
@@ -1126,10 +1369,10 @@ struct TemplateCore {
 
         // Note: merge all to prevent recursion
         static constexpr HandlerFunc handlers[static_cast<SizeT8>(TagType::None)] = {
-            &TemplateCore::renderVariable, &TemplateCore::renderRawVariable,
-            &TemplateCore::renderMath,     &TemplateCore::renderSuperVariable,
-            &TemplateCore::renderInLineIf, &TemplateCore::renderLoop,
-            &TemplateCore::renderIf};
+            &TemplateCore::renderVariable,      &TemplateCore::renderRawVariable,
+            &TemplateCore::renderSubTemplate,   &TemplateCore::renderMath,
+            &TemplateCore::renderSuperVariable, &TemplateCore::renderInLineIf,
+            &TemplateCore::renderLoop,          &TemplateCore::renderIf};
 
         while (tag < end) {
             (this->*handlers[static_cast<SizeT8>(tag->GetType())])(tag, offset);
@@ -1180,8 +1423,59 @@ struct TemplateCore {
         const Value_T *value = getValue(tag);
 
         if ((value == nullptr) || !(value->CopyValueTo(*stream_, format_info_))) {
-            stream_->Write((content_ + t_offset), length);
+            if (tag.IDLength != 0) {
+                const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
+
+                if (key.Length() != 0) {
+                    StringUtils::EscapeHTMLSpecialChars(*stream_, key.First(), key.Length());
+                    return;
+                }
+            }
+
+            StringUtils::EscapeHTMLSpecialChars(*stream_, (content_ + t_offset), length);
         }
+    }
+
+    void renderSubTemplate(const TagBit *tagbit, SizeT &offset) const {
+        const VariableTag &tag = tagbit->GetVariableTag();
+        const SizeT        t_offset =
+            (((tag.Count <= SizeT8{1}) ? tag.Info.Offset : tag.List[0].Offset) - TagPatterns::SubTemplatePrefixLength);
+        const SizeT length = (tag.Length + TagPatterns::SubTemplateFullLength);
+
+        stream_->Write((content_ + offset), (t_offset - offset));
+        offset = t_offset;
+        offset += length;
+
+        const Value_T *value = getValue(tag);
+        QNumber64      sub_template_id;
+
+        if ((value != nullptr) && (value->GetNumberType() != QNumberType::NotANumber) &&
+            (templates_cache_ != nullptr)) {
+            value->SetNumber(sub_template_id);
+            const SizeT id = static_cast<SizeT>(sub_template_id.Natural);
+
+            if (id < templates_cache_->Size()) {
+                const TemplateDataCache<Value_T> *sub_template_cache = (templates_cache_->Storage() + id);
+
+                TemplateCore<Char_T, Value_T, StringStream_T> sub_temp{};
+                sub_temp.format_info_ = format_info_;
+
+                sub_temp.Render(*stream_, sub_template_cache, *templates_cache_, *value_);
+
+                return;
+            }
+        }
+
+        if (tag.IDLength != 0) {
+            const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
+
+            if (key.Length() != 0) {
+                StringUtils::EscapeHTMLSpecialChars(*stream_, key.First(), key.Length());
+                return;
+            }
+        }
+
+        StringUtils::EscapeHTMLSpecialChars(*stream_, (content_ + t_offset), length);
     }
 
     void renderMath(const TagBit *tagbit, SizeT &offset) const {
@@ -2147,6 +2441,8 @@ struct TemplateCore {
 
         return false;
     }
+
+    const Array<TemplateDataCache<Value_T>> *templates_cache_{nullptr};
 
     const Value_T   *value_{nullptr};
     StringStream_T  *stream_{nullptr};

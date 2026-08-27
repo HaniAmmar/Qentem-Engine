@@ -23,14 +23,15 @@ namespace Tags {
 struct TagBit;
 //////////////////////
 enum struct TagType : SizeT8 {
-    Variable      = 0, // {var:x}
-    RawVariable   = 1, // {raw:x}
-    Math          = 2, // {math:x}
-    SuperVariable = 3, // {svar:x1,x2,x3}
-    InLineIf      = 4, // {if x}
-    Loop          = 5, // <loop ...></loop>
-    If            = 6, // <if case="..."></if>
-    None          = 7,
+    Variable = 0,  // {var:x}
+    RawVariable,   // {raw:x}
+    SubTemplate,   // {st:x}
+    Math,          // {math:x}
+    SuperVariable, // {svar:x1,x2,x3}
+    InLineIf,      // {if x}
+    Loop,          // <loop ...></loop>
+    If,            // <if case="..."></if>
+    None,
 };
 
 // MathTag -------------------------------------------
@@ -117,7 +118,8 @@ struct TagBit {
     TagBit(const TagBit &src) : type_{src.type_} {
         switch (src.type_) {
             case TagType::Variable:
-            case TagType::RawVariable: {
+            case TagType::RawVariable:
+            case TagType::SubTemplate: {
                 const VariableTag &tag = src.GetVariableTag();
 
                 VariableTag *new_tag = Reserver::Reserve<VariableTag>(1);
@@ -218,6 +220,16 @@ struct TagBit {
         return tag;
     }
 
+    VariableTag *MakeSubTemplateTag() {
+        VariableTag *tag = Reserver::Reserve<VariableTag>(1);
+        MemoryUtils::Construct(tag);
+
+        type_    = TagType::SubTemplate;
+        storage_ = tag;
+
+        return tag;
+    }
+
     MathTag *MakeMathTag() {
         MathTag *tag = Reserver::Reserve<MathTag>(1);
         MemoryUtils::Construct(tag);
@@ -275,7 +287,8 @@ struct TagBit {
         if (storage_ != nullptr) {
             switch (GetType()) {
                 case TagType::Variable:
-                case TagType::RawVariable: {
+                case TagType::RawVariable:
+                case TagType::SubTemplate: {
                     VariableTag *ptr = &GetVariableTag();
                     MemoryUtils::Destruct(ptr);
                     Reserver::Release(&GetVariableTag(), 1);
@@ -397,15 +410,16 @@ struct TagPatterns_T {
 
     static constexpr SizeT32 VariableID      = 2U;
     static constexpr SizeT32 RawVariableID   = 3U;
-    static constexpr SizeT32 MathID          = 4U;
-    static constexpr SizeT32 SuperVariableID = 5U;
-    static constexpr SizeT32 InLineIfID      = 6U;
+    static constexpr SizeT32 SubTemplateID   = 4U;
+    static constexpr SizeT32 MathID          = 5U;
+    static constexpr SizeT32 SuperVariableID = 6U;
+    static constexpr SizeT32 InLineIfID      = 7U;
 
-    static constexpr SizeT32 LoopID    = 7U;
-    static constexpr SizeT32 LoopEndID = 8U;
-    static constexpr SizeT32 IfID      = 9U;
-    static constexpr SizeT32 IfEndID   = 10U;
-    static constexpr SizeT32 ElseID    = 11U;
+    static constexpr SizeT32 LoopID    = 8U;
+    static constexpr SizeT32 LoopEndID = 9U;
+    static constexpr SizeT32 IfID      = 10U;
+    static constexpr SizeT32 IfEndID   = 11U;
+    static constexpr SizeT32 ElseID    = 12U;
 
     static constexpr SizeT InLinePrefixLength{1};
     static constexpr SizeT InLineSuffixLength{1};
@@ -423,34 +437,33 @@ struct TagPatterns_T {
 
     // {var:
     static constexpr const Char_T *VariablePrefix = TPStrings::VariablePrefix;
-    static constexpr Char_T        Var_2ND_Char   = VariablePrefix[1U]; // Second character
     static constexpr SizeT         VariablePrefixLength{5};
     static constexpr SizeT         VariableFullLength = (VariablePrefixLength + InLineSuffixLength);
 
     // {raw:
     static constexpr const Char_T *RawVariablePrefix = TPStrings::RawVariablePrefix;
-    static constexpr Char_T        Raw_2ND_Char      = RawVariablePrefix[1U]; // Second character
     static constexpr SizeT         RawVariablePrefixLength{5};
     static constexpr SizeT         RawVariableFullLength = (RawVariablePrefixLength + InLineSuffixLength);
 
+    // {st:
+    static constexpr const Char_T *SubTemplatePrefix = TPStrings::SubTemplatePrefix;
+    static constexpr SizeT         SubTemplatePrefixLength{4};
+    static constexpr SizeT         SubTemplateFullLength = (SubTemplatePrefixLength + InLineSuffixLength);
+
     // {math:
-    static constexpr const Char_T *MathPrefix    = TPStrings::MathPrefix;
-    static constexpr Char_T        Math_2ND_Char = MathPrefix[1U]; // Second character
+    static constexpr const Char_T *MathPrefix = TPStrings::MathPrefix;
     static constexpr SizeT         MathPrefixLength{6};
 
     // {svar:
-    static constexpr const Char_T *SuperVariablePrefix    = TPStrings::SuperVariablePrefix;
-    static constexpr Char_T        SuperVariable_2ND_Char = SuperVariablePrefix[1U]; // Second character
+    static constexpr const Char_T *SuperVariablePrefix = TPStrings::SuperVariablePrefix;
     static constexpr SizeT         SuperVariablePrefixLength{6};
 
     // {if
-    static constexpr const Char_T *InLineIfPrefix    = TPStrings::InLineIfPrefix;
-    static constexpr Char_T        InlineIf_2ND_Char = InLineIfPrefix[1U]; // Second character
+    static constexpr const Char_T *InLineIfPrefix = TPStrings::InLineIfPrefix;
     static constexpr SizeT         InLineIfPrefixLength{3};
 
     // <loop
-    static constexpr const Char_T *LoopPrefix    = TPStrings::LoopPrefix;
-    static constexpr Char_T        Loop_2ND_Char = LoopPrefix[1U]; // Second character
+    static constexpr const Char_T *LoopPrefix = TPStrings::LoopPrefix;
     static constexpr SizeT         LoopPrefixLength{5};
 
     // </loop>
@@ -458,8 +471,7 @@ struct TagPatterns_T {
     static constexpr SizeT         LoopSuffixLength{7};
 
     // <if
-    static constexpr const Char_T *IfPrefix    = TPStrings::IfPrefix;
-    static constexpr Char_T        If_2ND_Char = IfPrefix[1U]; // Second character
+    static constexpr const Char_T *IfPrefix = TPStrings::IfPrefix;
     static constexpr SizeT         IfPrefixLength{3};
 
     static constexpr SizeT IfAfterElseLength{2}; // else[if]
@@ -516,6 +528,7 @@ struct TPStrings_T<Char_T, 1U> {
     static constexpr const Char_T *InLineSuffix        = "}";
     static constexpr const Char_T *VariablePrefix      = "var:";
     static constexpr const Char_T *RawVariablePrefix   = "raw:";
+    static constexpr const Char_T *SubTemplatePrefix   = "st:";
     static constexpr const Char_T *MathPrefix          = "math:";
     static constexpr const Char_T *SuperVariablePrefix = "svar:";
     static constexpr const Char_T *InLineIfPrefix      = "if";
@@ -547,6 +560,7 @@ struct TPStrings_T<Char_T, 2U> {
     static constexpr const Char_T *InLineSuffix        = u"}";
     static constexpr const Char_T *VariablePrefix      = u"var:";
     static constexpr const Char_T *RawVariablePrefix   = u"raw:";
+    static constexpr const Char_T *SubTemplatePrefix   = u"st:";
     static constexpr const Char_T *MathPrefix          = u"math:";
     static constexpr const Char_T *SuperVariablePrefix = u"svar:";
     static constexpr const Char_T *InLineIfPrefix      = u"if";
@@ -578,6 +592,7 @@ struct TPStrings_T<Char_T, 4U> {
     static constexpr const Char_T *InLineSuffix        = U"}";
     static constexpr const Char_T *VariablePrefix      = U"var:";
     static constexpr const Char_T *RawVariablePrefix   = U"raw:";
+    static constexpr const Char_T *SubTemplatePrefix   = U"st:";
     static constexpr const Char_T *MathPrefix          = U"math:";
     static constexpr const Char_T *SuperVariablePrefix = U"svar:";
     static constexpr const Char_T *InLineIfPrefix      = U"if";
@@ -608,6 +623,7 @@ struct TPStrings_T<wchar_t, 4U> {
     static constexpr const wchar_t *InLineSuffix        = L"}";
     static constexpr const wchar_t *VariablePrefix      = L"var:";
     static constexpr const wchar_t *RawVariablePrefix   = L"raw:";
+    static constexpr const wchar_t *SubTemplatePrefix   = L"st:";
     static constexpr const wchar_t *MathPrefix          = L"math:";
     static constexpr const wchar_t *SuperVariablePrefix = L"svar:";
     static constexpr const wchar_t *InLineIfPrefix      = L"if";
@@ -641,6 +657,7 @@ struct TPStrings_T<wchar_t, 2U> {
 
     static constexpr const wchar_t *VariablePrefix      = L"var:";
     static constexpr const wchar_t *RawVariablePrefix   = L"raw:";
+    static constexpr const wchar_t *SubTemplatePrefix   = L"st:";
     static constexpr const wchar_t *MathPrefix          = L"math:";
     static constexpr const wchar_t *SuperVariablePrefix = L"svar:";
     static constexpr const wchar_t *InLineIfPrefix      = L"if";
@@ -668,10 +685,9 @@ template <typename Char_T>
 struct List {
     using TagPatterns = TagPatterns_T<Char_T>;
 
-    // inline static constexpr SizeT32 GroupedByFirstChar[2][5] = {{1U, 2U, 3U, 4U, 5U}, {6U, 7U, 8U, 9U, 10U}};
-    inline static constexpr SizeT32 InlineList[]       = {1U, 2U, 3U, 4U, 5U};
+    inline static constexpr SizeT32 InlineList[]       = {1U, 2U, 3U, 4U, 5U, 6U};
     inline static constexpr SizeT32 InlineListCount    = (sizeof(InlineList) / sizeof(SizeT32));
-    inline static constexpr SizeT32 MultiLineList[]    = {6U, 7U, 8U, 9U, 10U};
+    inline static constexpr SizeT32 MultiLineList[]    = {7U, 8U, 9U, 10U, 11U};
     inline static constexpr SizeT32 MultiLineListCount = (sizeof(MultiLineList) / sizeof(SizeT32));
 
     static constexpr const Char_T SingleChar{TagPatterns::InLineLastChar};
@@ -706,8 +722,8 @@ struct List {
         nullptr,
 
         // First group starts with {
-        TagPatterns::VariablePrefix, TagPatterns::RawVariablePrefix, TagPatterns::MathPrefix,
-        TagPatterns::SuperVariablePrefix, TagPatterns::InLineIfPrefix,
+        TagPatterns::VariablePrefix, TagPatterns::RawVariablePrefix, TagPatterns::SubTemplatePrefix,
+        TagPatterns::MathPrefix, TagPatterns::SuperVariablePrefix, TagPatterns::InLineIfPrefix,
 
         // Second group starts with <
         TagPatterns::LoopPrefix, TagPatterns::LoopSuffix, TagPatterns::IfPrefix, TagPatterns::IfSuffix,
@@ -721,6 +737,7 @@ struct List {
         0,
         3U, // var : var:
         3U, // raw : raw:
+        2U, // st : st:
         4U, // math : math:
         4U, // svar : svar:
         1U, // i : if

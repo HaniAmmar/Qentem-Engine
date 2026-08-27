@@ -3742,6 +3742,178 @@ static void TestRender2(QTest &test) {
     ss.Clear();
 }
 
+static void TestSubTemplateTag1(QTest &test) {
+    StringStream<char> stream{};
+    const char        *main_content;
+    const char        *sub_content1;
+    const char        *sub_content2;
+    Value<char>        value{};
+    SizeT              id_gen{0};
+
+    Array<TemplateDataCache<Value<char>>> templates_cache{};
+
+    TemplateData<Value<char>> main_template{};
+
+    TemplateData<Value<char>> sub_templates[4]{};
+    SizeT                     sub_templates_count = 4;
+
+    main_content = R"({st:id]})";
+    test.IsEqual(Template::Render(main_content, value, stream), R"({st:id]})", __LINE__);
+    stream.Clear();
+
+    main_content = R"({st:6key3]})";
+    test.IsEqual(Template::Render(main_content, value, stream), R"({st:6key3]})", __LINE__);
+    stream.Clear();
+
+    value["template_id"] = 0;
+
+    main_content = R"({st:template_id})";
+    test.IsEqual(Template::Render(main_content, value, stream), R"({st:template_id})", __LINE__);
+    stream.Clear();
+
+    value["template_id"] = 100;
+
+    main_content = R"({st:template_id})";
+    test.IsEqual(Template::Render(main_content, value, stream), R"({st:template_id})", __LINE__);
+    stream.Clear();
+
+    main_content = R"(start content {st:template_id} end content)";
+
+    main_template = {main_content, StringUtils::Count(main_content), 0};
+
+    Template::Render(stream, templates_cache, value, &main_template);
+    test.IsEqual(stream, R"(start content {st:template_id} end content)", __LINE__);
+    test.IsEqual(templates_cache.Size(), SizeT{1}, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Content, main_template.Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Length, main_template.Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[0].Tags.Size() != 0), __LINE__);
+    stream.Clear();
+    templates_cache.Clear();
+
+    main_template = {main_content, StringUtils::Count(main_content), 5};
+
+    Template::Render(stream, templates_cache, value, &main_template);
+    test.IsEqual(stream, R"(start content {st:template_id} end content)", __LINE__);
+    test.IsEqual(templates_cache.Size(), SizeT{6}, __LINE__);
+    test.IsNotEqual(templates_cache.Storage()[0].Content, main_template.Content, __LINE__);
+    test.IsNotEqual(templates_cache.Storage()[0].Length, main_template.Length, __LINE__);
+    test.IsFalse((templates_cache.Storage()[0].Tags.Size() != 0), __LINE__);
+    test.IsEqual(templates_cache.Storage()[5].Content, main_template.Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[5].Length, main_template.Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[5].Tags.Size() != 0), __LINE__);
+    stream.Clear();
+    templates_cache.Clear();
+
+    main_template = {main_content, StringUtils::Count(main_content), 0};
+
+    Template::Render(stream, templates_cache, value, &main_template, sub_templates, sub_templates_count);
+    test.IsEqual(stream, R"(start content {st:template_id} end content)", __LINE__);
+    test.IsEqual(templates_cache.Size(), SizeT{1}, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Content, main_template.Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Length, main_template.Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[0].Tags.Size() != 0), __LINE__);
+    stream.Clear();
+    templates_cache.Clear();
+    value.Reset();
+
+    value["abc"] = "ABC";
+
+    main_content = R"((start content) {st:template_id} (end content))";
+    sub_content1 = R"((start sub content) {var:abc} (end sub content))";
+
+    main_template        = {main_content, StringUtils::Count(main_content), id_gen++};
+    value["template_id"] = id_gen;
+    sub_templates[0]     = {sub_content1, StringUtils::Count(sub_content1), id_gen++};
+
+    sub_templates_count = 1;
+
+    Template::Render(stream, templates_cache, value, &main_template, sub_templates, sub_templates_count);
+    test.IsEqual(stream, R"((start content) (start sub content) ABC (end sub content) (end content))", __LINE__);
+    test.IsEqual(templates_cache.Size(), SizeT{2}, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Content, main_template.Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Length, main_template.Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[0].Tags.Size() != 0), __LINE__);
+    test.IsEqual(templates_cache.Storage()[1].Content, sub_templates[0].Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[1].Length, sub_templates[0].Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[1].Tags.Size() != 0), __LINE__);
+    stream.Clear();
+    templates_cache.Clear();
+    value.Reset();
+    id_gen = 0;
+
+    value["abc1"] = "ABC1";
+    value["abc2"] = "ABC2";
+
+    main_content = R"((start content) {st:template_id1} (end content))";
+    sub_content1 = R"((start sub content1) {var:abc1} {st:template_id2} (end sub content1))";
+    sub_content2 = R"((start sub content2) {var:abc2} (end sub content2))";
+
+    main_template         = {main_content, StringUtils::Count(main_content), id_gen++};
+    value["template_id1"] = id_gen;
+    sub_templates[0]      = {sub_content1, StringUtils::Count(sub_content1), id_gen++};
+    value["template_id2"] = id_gen;
+    sub_templates[1]      = {sub_content2, StringUtils::Count(sub_content2), id_gen++};
+
+    sub_templates_count = 2;
+
+    Template::Render(stream, templates_cache, value, &main_template, sub_templates, sub_templates_count);
+    test.IsEqual(
+        stream,
+        R"((start content) (start sub content1) ABC1 (start sub content2) ABC2 (end sub content2) (end sub content1) (end content))",
+        __LINE__);
+    test.IsEqual(templates_cache.Size(), SizeT{3}, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Content, main_template.Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Length, main_template.Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[0].Tags.Size() != 0), __LINE__);
+    test.IsEqual(templates_cache.Storage()[1].Content, sub_templates[0].Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[1].Length, sub_templates[0].Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[1].Tags.Size() != 0), __LINE__);
+    test.IsEqual(templates_cache.Storage()[2].Content, sub_templates[1].Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[2].Length, sub_templates[1].Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[2].Tags.Size() != 0), __LINE__);
+
+    stream.Clear();
+    templates_cache.Clear();
+    value.Reset();
+    id_gen = 0;
+
+    value["abc1"] = "ABC1";
+    value["abc2"] = "ABC2";
+
+    main_content = R"((start content) {st:template_id1} {st:template_id2} (end content))";
+    sub_content1 = R"((start sub content1) {var:abc1} (end sub content1))";
+    sub_content2 = R"((start sub content2) {var:abc2} (end sub content2))";
+
+    main_template         = {main_content, StringUtils::Count(main_content), id_gen++};
+    value["template_id1"] = id_gen;
+    sub_templates[0]      = {sub_content1, StringUtils::Count(sub_content1), id_gen++};
+    value["template_id2"] = id_gen;
+    sub_templates[1]      = {sub_content2, StringUtils::Count(sub_content2), id_gen++};
+
+    sub_templates_count = 2;
+
+    Template::Render(stream, templates_cache, value, &main_template, sub_templates, sub_templates_count);
+    test.IsEqual(
+        stream,
+        R"((start content) (start sub content1) ABC1 (end sub content1) (start sub content2) ABC2 (end sub content2) (end content))",
+        __LINE__);
+    test.IsEqual(templates_cache.Size(), SizeT{3}, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Content, main_template.Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[0].Length, main_template.Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[0].Tags.Size() != 0), __LINE__);
+    test.IsEqual(templates_cache.Storage()[1].Content, sub_templates[0].Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[1].Length, sub_templates[0].Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[1].Tags.Size() != 0), __LINE__);
+    test.IsEqual(templates_cache.Storage()[2].Content, sub_templates[1].Content, __LINE__);
+    test.IsEqual(templates_cache.Storage()[2].Length, sub_templates[1].Length, __LINE__);
+    test.IsTrue((templates_cache.Storage()[2].Tags.Size() != 0), __LINE__);
+
+    stream.Clear();
+    templates_cache.Clear();
+    value.Reset();
+    id_gen = 0;
+}
+
 static int RunTemplateTests() {
     QTest test{"Template.hpp", __FILE__};
 
@@ -3774,6 +3946,8 @@ static int RunTemplateTests() {
 
     test.Test("Render Test 1", TestRender1);
     test.Test("Render Test 2", TestRender2);
+
+    test.Test("Sub Template Tag Test 1", TestSubTemplateTag1);
 
     return test.EndTests();
 }

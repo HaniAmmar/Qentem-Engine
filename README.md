@@ -65,12 +65,17 @@ Qentem Engine is a lightweight, high-performance C++ library built around custom
 
 ### Template Rendering
 
-* Ultra-fast template rendering engine.
-* Safe expression evaluation with automatic HTML escaping.
-* Raw output support when escaping is not desired.
-* Nested loops with sorting and grouping support.
-* Conditional and inline expression evaluation.
-* Built-in sandboxed expression parser and evaluator with support for arithmetic, bitwise, comparison, and logical operations.
+ * Ultra-fast, low-overhead template rendering engine.
+ * Safe expression evaluation with automatic HTML escaping.
+ * Raw output support when escaping is explicitly not desired.
+ * Nested loops with sorting and grouping support.
+ * Conditional rendering and inline expression evaluation.
+ * Built-in sandboxed expression parser and evaluator supporting arithmetic, bitwise, comparison, and logical operations.
+ * Composable templates with dynamic sub-template selection through `{st:template_id}`.
+ * Per-render sub-template availability, allowing only the templates that may be needed by the current rendering path to be supplied.
+ * Sub-templates render directly into the same output stream as their parent template, avoiding the need to first render them into an intermediate string.
+ * Shared render data between parent and sub-templates, with independent loop state for each template render.
+ * Nested sub-templates, allowing a selected sub-template to render additional sub-templates of its own.
 
 ## Requirements
 
