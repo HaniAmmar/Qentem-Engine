@@ -27,12 +27,12 @@
  * @warning Arenas are thread-local and must only be accessed by their owning
  *          thread. Concurrent access to the same arena is unsupported.
  *
- * @note    Depends on MemoryBlock and LiteArray. Behavior is customizable
- *          through compile-time macros.
+ * @note    Behavior is customizable through compile-time macros.
  *
  * @copyright Copyright (c) 2026 Hani Ammar
  * @license MIT
  */
+
 #ifndef QENTEM_RESERVER_HPP
 #define QENTEM_RESERVER_HPP
 
@@ -87,6 +87,10 @@ struct ReserverCore {
     QENTEM_INLINE ReserverCore() noexcept  = default;
     QENTEM_INLINE ~ReserverCore() noexcept = default;
 
+    ReserverCore(ReserverCore &&)                 = delete;
+    ReserverCore(const ReserverCore &)            = delete;
+    ReserverCore &operator=(const ReserverCore &) = delete;
+
     ReserverCore &operator=(ReserverCore &&src) noexcept {
         if (this != &src) {
             // Allows the bootstrap ReserverCore from _start() to be transferred into the thread-local instance after
@@ -98,9 +102,12 @@ struct ReserverCore {
         return *this;
     }
 
-    ReserverCore(ReserverCore &&)                 = delete;
-    ReserverCore(const ReserverCore &)            = delete;
-    ReserverCore &operator=(const ReserverCore &) = delete;
+    void operator+=(ReserverCore &&src) noexcept {
+        // Allows the bootstrap ReserverCore from _start() to be transferred into the thread-local instance after
+        // TLS is ready.
+        active_blocks_ += QUtility::Move(src.active_blocks_);
+        exhausted_blocks_ += QUtility::Move(src.exhausted_blocks_);
+    }
 
     static_assert(Alignment_T >= sizeof(void *), "Alignment_T must be at least the size of a pointer.");
     static_assert((Alignment_T & (sizeof(void *) - 1U)) == 0, "Alignment_T must be a multiple of sizeof(void *).");
