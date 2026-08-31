@@ -185,11 +185,11 @@ struct JSON {
             }
 
             if (content[offset] == NotationConstants::SSquareChar) {
-                value = {ValueType::Array};
-                arr   = parent->GetArray();
+                value = ValueT{ValueType::Array};
+                arr   = value.GetArray();
             } else {
-                value = {ValueType::Object};
-                obj   = parent->GetObject();
+                value = ValueT{ValueType::Object};
+                obj   = value.GetObject();
             }
 
             while ((++offset < length) && ((content[offset] == WhiteSpaceChars::SpaceChar) ||
@@ -220,7 +220,7 @@ struct JSON {
                                 if (obj != nullptr) {
                                     if (obj_value == nullptr) {
                                         // Name
-                                        obj_value = &((*obj)[String<Char_T>{str, len}]);
+                                        obj_value = &(obj->Get(String<Char_T>{str, len}));
                                     } else {
                                         *obj_value = ValueT{String<Char_T>{str, len}};
                                         obj_value  = nullptr;

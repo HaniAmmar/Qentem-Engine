@@ -47,10 +47,12 @@ struct Value {
 
     using VItem = typename ObjectT::HItem;
 
-    Value() noexcept : array_{} {
-    }
+    template <typename StringStream_T>
+    using CopyValueToStringFunction_T = void(StringStream_T &, const Char_T *, SizeT);
 
-    ~Value() {
+    Value() noexcept = default;
+
+    ~Value() noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 MemoryUtils::Destruct(&object_);
@@ -72,24 +74,25 @@ struct Value {
         }
     }
 
-    Value(Value &&val) noexcept : array_{} {
+    Value(Value &&val) noexcept {
         switch (val.Type()) {
             case ValueType::Object: {
-                object_ = QUtility::Move(val.object_);
+                MemoryUtils::Construct(&object_, QUtility::Move(val.object_));
                 break;
             }
 
             case ValueType::Array: {
-                array_ = QUtility::Move(val.array_);
+                MemoryUtils::Construct(&array_, QUtility::Move(val.array_));
                 break;
             }
 
             case ValueType::String: {
-                string_ = QUtility::Move(val.string_);
+                MemoryUtils::Construct(&string_, QUtility::Move(val.string_));
                 break;
             }
 
             default: {
+                MemoryUtils::Construct(&array_);
                 number_ = val.number_;
             }
         }
@@ -98,27 +101,28 @@ struct Value {
         val.setTypeToUndefined();
     }
 
-    Value(const Value &val) : array_{} {
+    Value(const Value &val) noexcept {
         copyValue(val);
     }
 
-    QENTEM_INLINE explicit Value(ValueType type) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(ValueType type) noexcept {
         setType(type);
     }
 
-    QENTEM_INLINE explicit Value(ValueType type, SizeT size) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(ValueType type, SizeT size) noexcept {
         switch (type) {
             case ValueType::Array: {
-                array_.Reserve(size);
+                MemoryUtils::Construct(&array_, size);
                 break;
             }
 
             case ValueType::Object: {
-                object_.Reserve(size);
+                MemoryUtils::Construct(&object_, size);
                 break;
             }
 
             default: {
+                MemoryUtils::Construct(&array_);
             }
         }
 
@@ -153,11 +157,11 @@ struct Value {
         setTypeToString();
     }
 
-    QENTEM_INLINE explicit Value(const Char_T *str) : string_{str} {
+    QENTEM_INLINE explicit Value(const Char_T *str) noexcept : string_{str} {
         setTypeToString();
     }
 
-    QENTEM_INLINE explicit Value(const Char_T *str, SizeT length) : string_{str, length} {
+    QENTEM_INLINE explicit Value(const Char_T *str, SizeT length) noexcept : string_{str, length} {
         setTypeToString();
     }
 
@@ -184,11 +188,11 @@ struct Value {
         }
     }
 
-    QENTEM_INLINE explicit Value(NullType) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(NullType) noexcept {
         setTypeToNull();
     }
 
-    QENTEM_INLINE explicit Value(bool bl) noexcept : array_{} {
+    QENTEM_INLINE explicit Value(bool bl) noexcept {
         if (bl) {
             setTypeToTrue();
         } else {
@@ -235,7 +239,7 @@ struct Value {
         return *this;
     }
 
-    QENTEM_INLINE Value &operator=(const Value &val) {
+    QENTEM_INLINE Value &operator=(const Value &val) noexcept {
         if (this != &val) {
             reset();
             copyValue(val);
@@ -244,7 +248,7 @@ struct Value {
         return *this;
     }
 
-    void SetPointerToValue(const Value *val_ptr) {
+    void SetPointerToValue(const Value *val_ptr) noexcept {
         reset();
 
         if (val_ptr != nullptr) {
@@ -262,7 +266,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const ObjectT &obj) {
+    Value &operator=(const ObjectT &obj) noexcept {
         reset();
         setTypeToObject();
 
@@ -280,7 +284,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const ArrayT &arr) {
+    Value &operator=(const ArrayT &arr) noexcept {
         reset();
         setTypeToArray();
 
@@ -298,7 +302,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const StringT &str) {
+    Value &operator=(const StringT &str) noexcept {
         reset();
         setTypeToString();
 
@@ -307,7 +311,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const StringT *str) {
+    Value &operator=(const StringT *str) noexcept {
         if (str != nullptr) {
             reset();
             setTypeToString();
@@ -318,7 +322,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(StringT *str) {
+    Value &operator=(StringT *str) noexcept {
         if (str != nullptr) {
             reset();
             setTypeToString();
@@ -329,7 +333,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const StringViewT &str_v) {
+    Value &operator=(const StringViewT &str_v) noexcept {
         reset();
         setTypeToString();
 
@@ -338,7 +342,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const Char_T *str) {
+    Value &operator=(const Char_T *str) noexcept {
         reset();
         setTypeToString();
 
@@ -410,7 +414,7 @@ struct Value {
         return *this;
     }
 
-    void operator+=(Value &&val) {
+    void operator+=(Value &&val) noexcept {
         if (isObject() && val.isObject()) {
             object_ += QUtility::Move(val.object_);
             val.setTypeToUndefined();
@@ -424,7 +428,7 @@ struct Value {
         }
     }
 
-    void operator+=(const Value &val) {
+    void operator+=(const Value &val) noexcept {
         if (isObject() && val.isObject()) {
             object_ += val.object_;
         } else {
@@ -438,7 +442,7 @@ struct Value {
     }
 
     // Only to value of type array
-    void AddPointerToValue(const Value *val_ptr) {
+    void AddPointerToValue(const Value *val_ptr) noexcept {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -450,7 +454,7 @@ struct Value {
         array_ += QUtility::Move(val);
     }
 
-    void operator+=(ObjectT &&obj) {
+    void operator+=(ObjectT &&obj) noexcept {
         if (isObject()) {
             object_ += QUtility::Move(obj);
         } else {
@@ -463,11 +467,11 @@ struct Value {
         }
     }
 
-    QENTEM_INLINE void operator+=(const ObjectT &obj) {
+    QENTEM_INLINE void operator+=(const ObjectT &obj) noexcept {
         *this += ObjectT(obj);
     }
 
-    void operator+=(ArrayT &&arr) {
+    void operator+=(ArrayT &&arr) noexcept {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -480,11 +484,11 @@ struct Value {
         }
     }
 
-    QENTEM_INLINE void operator+=(const ArrayT &arr) {
+    QENTEM_INLINE void operator+=(const ArrayT &arr) noexcept {
         (*this) += ArrayT(arr);
     }
 
-    void operator+=(StringT &&str) {
+    void operator+=(StringT &&str) noexcept {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -493,20 +497,20 @@ struct Value {
         array_ += Value{QUtility::Move(str)};
     }
 
-    QENTEM_INLINE void operator+=(const StringT &str) {
+    QENTEM_INLINE void operator+=(const StringT &str) noexcept {
         *this += StringT(str);
     }
 
-    QENTEM_INLINE void operator+=(const StringViewT &str) {
+    QENTEM_INLINE void operator+=(const StringViewT &str) noexcept {
         *this += StringT(str.First(), str.Length());
     }
 
-    QENTEM_INLINE void operator+=(const Char_T *str) {
+    QENTEM_INLINE void operator+=(const Char_T *str) noexcept {
         *this += StringT(str);
     }
 
     template <typename Number_T>
-    void operator+=(Number_T num) {
+    void operator+=(Number_T num) noexcept {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -515,7 +519,7 @@ struct Value {
         array_ += Value{num};
     }
 
-    void operator+=(NullType) {
+    void operator+=(NullType) noexcept {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -524,7 +528,7 @@ struct Value {
         array_ += Value{nullptr};
     }
 
-    void operator+=(bool is_true) {
+    void operator+=(bool is_true) noexcept {
         if (!isArray()) {
             reset();
             setTypeToArray();
@@ -534,12 +538,12 @@ struct Value {
     }
 
     template <typename Stream_T>
-    friend Stream_T &operator<<(Stream_T &out, const Value &value) {
+    friend Stream_T &operator<<(Stream_T &out, const Value &value) noexcept {
         out << value.Stringify();
         return out;
     }
 
-    Value &operator[](const Char_T *str) {
+    Value &operator[](const Char_T *str) noexcept {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -548,7 +552,7 @@ struct Value {
         return (object_[str]);
     }
 
-    Value &operator[](const StringViewT &key) {
+    Value &operator[](const StringViewT &key) noexcept {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -557,7 +561,7 @@ struct Value {
         return (object_.Get(key.First(), key.Length()));
     }
 
-    Value &operator[](StringT &&key) {
+    Value &operator[](StringT &&key) noexcept {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -566,7 +570,7 @@ struct Value {
         return (object_[QUtility::Move(key)]);
     }
 
-    Value &operator[](const StringT &key) {
+    Value &operator[](const StringT &key) noexcept {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -575,7 +579,7 @@ struct Value {
         return (object_[key]);
     }
 
-    Value &operator[](SizeT index) {
+    Value &operator[](SizeT index) noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Array) {
@@ -605,12 +609,12 @@ struct Value {
     }
 
     template <typename Type_T>
-    Value &operator[](Type_T index) {
+    Value &operator[](Type_T index) noexcept {
         return (*this)[SizeT(index)];
     }
 
     // Will insert the str if it does not exist.
-    Value &Get(const Char_T *str, SizeT length) {
+    Value &Get(const Char_T *str, SizeT length) noexcept {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -619,7 +623,7 @@ struct Value {
         return (object_.Get(str, length));
     }
 
-    Value &Get(const StringViewT &key) {
+    Value &Get(const StringViewT &key) noexcept {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -628,7 +632,7 @@ struct Value {
         return (object_.Get(key.First(), key.Length()));
     }
 
-    void Insert(const StringViewT &key, Value &&val) {
+    void Insert(const StringViewT &key, Value &&val) noexcept {
         if (!isObject()) {
             reset();
             setTypeToObject();
@@ -872,7 +876,7 @@ struct Value {
         return (type > val.Type());
     }
 
-    void Merge(Value &&val) {
+    void Merge(Value &&val) noexcept {
         if (isUndefined()) {
             setTypeToArray();
         }
@@ -895,7 +899,7 @@ struct Value {
         val.Reset();
     }
 
-    void Merge(const Value &val) {
+    void Merge(const Value &val) noexcept {
         if (isUndefined()) {
             setTypeToArray();
         }
@@ -1443,7 +1447,7 @@ struct Value {
         return GetValue(key.First(), key.Length());
     }
 
-    Value *Storage() {
+    Value *Storage() noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 VItem *item = object_.Storage();
@@ -1451,6 +1455,8 @@ struct Value {
                 if (item != nullptr) {
                     return &(item->Value);
                 }
+
+                return nullptr;
             }
 
             case ValueType::Array: {
@@ -1462,30 +1468,7 @@ struct Value {
         }
     }
 
-    const Value *Storage() const {
-        switch (Type()) {
-            case ValueType::Object: {
-                const VItem *item = object_.First();
-
-                if (item != nullptr) {
-                    return &(item->Value);
-                }
-            }
-
-            case ValueType::Array: {
-                return array_.First();
-            }
-
-            case ValueType::ValuePtr: {
-                return value_->First();
-            }
-
-            default:
-                return nullptr;
-        }
-    }
-
-    const Value *First() const {
+    const Value *Storage() const noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 const VItem *item = object_.First();
@@ -1510,7 +1493,32 @@ struct Value {
         }
     }
 
-    Value *Last() {
+    const Value *First() const noexcept {
+        switch (Type()) {
+            case ValueType::Object: {
+                const VItem *item = object_.First();
+
+                if (item != nullptr) {
+                    return &(item->Value);
+                }
+
+                return nullptr;
+            }
+
+            case ValueType::Array: {
+                return array_.First();
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->First();
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    Value *Last() noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 VItem *item = object_.Last();
@@ -1531,7 +1539,7 @@ struct Value {
         }
     }
 
-    const Value *Last() const {
+    const Value *Last() const noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 const VItem *item = object_.Last();
@@ -1556,7 +1564,7 @@ struct Value {
         }
     }
 
-    const Value *End() const {
+    const Value *End() const noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 const VItem *item = object_.End();
@@ -1564,6 +1572,8 @@ struct Value {
                 if (item != nullptr) {
                     return &(item->Value);
                 }
+
+                return nullptr;
             }
 
             case ValueType::Array: {
@@ -1789,13 +1799,10 @@ struct Value {
         }
     }
 
-    template <typename StringStream_T>
-    using CopyValueToStringFunction_T = void(StringStream_T &, const Char_T *, SizeT);
-
     template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>>
     bool CopyValueTo(StringStream_T              &stream,
                      const Digit::RealFormatInfo &format_info = Digit::RealFormatInfo{QentemConfig::DoublePrecision},
-                     StringFunction_T            *string_function = nullptr) const {
+                     StringFunction_T            *string_function = nullptr) const noexcept {
         switch (Type()) {
             case ValueType::String: {
                 if (string_function != nullptr) {
@@ -1850,7 +1857,7 @@ struct Value {
     }
 
     template <typename StringStream_T>
-    bool CopyKeyAt(StringStream_T &stream, SizeT index) const {
+    bool CopyKeyAt(StringStream_T &stream, SizeT index) const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -2119,7 +2126,7 @@ struct Value {
         }
     }
 
-    void RemoveExcessStorage() {
+    void RemoveExcessStorage() noexcept {
         if (isArray()) {
             array_.Compress();
 
@@ -2153,7 +2160,7 @@ struct Value {
         return type_;
     }
 
-    bool GroupBy(Value &groupedValue, const Char_T *key_str, const SizeT length) const {
+    bool GroupBy(Value &groupedValue, const Char_T *key_str, const SizeT length) const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Array) {
@@ -2230,7 +2237,7 @@ struct Value {
         return false;
     }
 
-    QENTEM_INLINE bool GroupBy(Value &groupedValue, const Char_T *str) const {
+    QENTEM_INLINE bool GroupBy(Value &groupedValue, const Char_T *str) const noexcept {
         return GroupBy(groupedValue, str, StringUtils::Count(str));
     }
 
@@ -2246,7 +2253,7 @@ struct Value {
     }
 
     template <typename Stream_T>
-    Stream_T &Stringify(Stream_T &stream, SizeT32 precision = QentemConfig::DoublePrecision) const {
+    Stream_T &Stringify(Stream_T &stream, SizeT32 precision = QentemConfig::DoublePrecision) const noexcept {
         const ValueType type = Type();
 
         switch (type) {
@@ -2272,7 +2279,7 @@ struct Value {
         return stream;
     }
 
-    QENTEM_INLINE StringT Stringify(SizeT32 precision = QentemConfig::DoublePrecision) const {
+    QENTEM_INLINE StringT Stringify(SizeT32 precision = QentemConfig::DoublePrecision) const noexcept {
         StringStream<Char_T> stream;
         return Stringify(stream, precision).GetString();
     }
@@ -2297,7 +2304,7 @@ struct Value {
 
   private:
     template <typename Stream_T>
-    static void stringifyObject(const ObjectT &obj, Stream_T &stream, SizeT32 precision) {
+    static void stringifyObject(const ObjectT &obj, Stream_T &stream, SizeT32 precision) noexcept {
         stream.Write(NotationConstants::SCurlyChar);
 
         const VItem *h_item = obj.First();
@@ -2327,7 +2334,7 @@ struct Value {
     }
 
     template <typename Stream_T>
-    static void stringifyArray(const ArrayT &arr, Stream_T &stream, SizeT32 precision) {
+    static void stringifyArray(const ArrayT &arr, Stream_T &stream, SizeT32 precision) noexcept {
         stream.Write(NotationConstants::SSquareChar);
 
         const Value *item = arr.First();
@@ -2352,7 +2359,7 @@ struct Value {
     }
 
     template <typename Stream_T>
-    static void stringifyValue(const Value &val, Stream_T &stream, SizeT32 precision) {
+    static void stringifyValue(const Value &val, Stream_T &stream, SizeT32 precision) noexcept {
         switch (val.Type()) {
             case ValueType::Object: {
                 stringifyObject(val.object_, stream, precision);
@@ -2526,7 +2533,7 @@ struct Value {
         }
     }
 
-    void copyValue(const Value &val) {
+    void copyValue(const Value &val) noexcept {
         switch (val.Type()) {
             case ValueType::Object: {
                 object_ = val.object_;
@@ -2552,8 +2559,8 @@ struct Value {
     }
 
     union {
+        ObjectT      object_{};
         ArrayT       array_;
-        ObjectT      object_;
         StringT      string_;
         QNumber64    number_;
         const Value *value_;
