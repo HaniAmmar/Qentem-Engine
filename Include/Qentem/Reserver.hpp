@@ -84,8 +84,8 @@ struct ReserverCore {
     /// Number of bits in SystemLong (typically 32 or 64).
     static constexpr SizeT32 BIT_WIDTH = (sizeof(SystemLong) * 8U);
 
-    QENTEM_INLINE ReserverCore() noexcept  = default;
-    QENTEM_INLINE ~ReserverCore() noexcept = default;
+    ReserverCore() noexcept  = default;
+    ~ReserverCore() noexcept = default;
 
     ReserverCore(ReserverCore &&)                 = delete;
     ReserverCore(const ReserverCore &)            = delete;
@@ -95,8 +95,20 @@ struct ReserverCore {
         if (this != &src) {
             // Allows the bootstrap ReserverCore from _start() to be transferred into the thread-local instance after
             // TLS is ready.
-            active_blocks_    = QUtility::Move(src.active_blocks_);
-            exhausted_blocks_ = QUtility::Move(src.exhausted_blocks_);
+
+            blocks_ = QUtility::Move(src.blocks_);
+
+            active_first_ = src.active_first_;
+            active_last_  = src.active_last_;
+
+            exhausted_first_ = src.exhausted_first_;
+            exhausted_last_  = src.exhausted_last_;
+
+            src.active_first_ = nullptr;
+            src.active_last_  = nullptr;
+
+            src.exhausted_first_ = nullptr;
+            src.exhausted_last_  = nullptr;
         }
 
         return *this;
@@ -105,8 +117,41 @@ struct ReserverCore {
     void operator+=(ReserverCore &&src) noexcept {
         // Allows the bootstrap ReserverCore from _start() to be transferred into the thread-local instance after
         // TLS is ready.
-        active_blocks_ += QUtility::Move(src.active_blocks_);
-        exhausted_blocks_ += QUtility::Move(src.exhausted_blocks_);
+        MemoryBlockT *block = src.active_first_;
+
+        while (block != nullptr) {
+            MemoryBlockT *next = block->GetNext();
+
+            block->GetPrev() = nullptr;
+            block->GetNext() = nullptr;
+
+            addBlock(QUtility::Move(*block));
+            insertIntoList(blocks_.Last(), active_first_, active_last_);
+
+            block = next;
+        }
+
+        block = src.exhausted_first_;
+
+        while (block != nullptr) {
+            MemoryBlockT *next = block->GetNext();
+
+            block->GetPrev() = nullptr;
+            block->GetNext() = nullptr;
+
+            addBlock(QUtility::Move(*block));
+            insertIntoList(blocks_.Last(), exhausted_first_, exhausted_last_);
+
+            block = next;
+        }
+
+        src.blocks_.Reset();
+
+        src.active_first_ = nullptr;
+        src.active_last_  = nullptr;
+
+        src.exhausted_first_ = nullptr;
+        src.exhausted_last_  = nullptr;
     }
 
     static_assert(Alignment_T >= sizeof(void *), "Alignment_T must be at least the size of a pointer.");
@@ -286,30 +331,38 @@ struct ReserverCore {
      * @note All outstanding reservations become invalid after this call.
      */
     QENTEM_INLINE void Reset() noexcept {
-        // Drop all memory blocks from both active and retired lists.
-        active_blocks_.Reset();
-        exhausted_blocks_.Reset();
+        // Drop all managed memory blocks and reset both linked lists.
+        blocks_.Reset();
+
+        active_first_ = nullptr;
+        active_last_  = nullptr;
+
+        exhausted_first_ = nullptr;
+        exhausted_last_  = nullptr;
     }
 
     /**
      * @brief Determines whether the allocator contains no active reservations.
      *
-     * This check verifies that:
-     * - Every active block contains no reserved regions.
-     * - No exhausted blocks remain managed by the allocator.
+     * The reserver is considered empty when no exhausted blocks remain and all
+     * managed blocks contain no reserved regions.
      *
      * @return `true` if all managed memory is currently free;
      *         otherwise `false`.
      */
     QENTEM_INLINE bool IsEmpty() const noexcept {
         // Scan all active blocks. Any reserved region means the allocator is not empty.
-        for (const MemoryBlockT &block : active_blocks_) {
-            if (!(block.IsEmpty())) {
-                return false;
+        if (exhausted_first_ == nullptr) {
+            for (const MemoryBlockT &block : blocks_) {
+                if (!(block.IsEmpty())) {
+                    return false;
+                }
             }
+
+            return true;
         }
 
-        return exhausted_blocks_.IsEmpty();
+        return false;
     }
 
     /**
@@ -325,33 +378,47 @@ struct ReserverCore {
      * @return Total number of managed memory blocks.
      */
     QENTEM_INLINE SizeT TotalBlocks() const noexcept {
-        return (active_blocks_.Size() + exhausted_blocks_.Size());
+        return (blocks_.Size());
     }
 
     /**
-     * @brief Returns the active memory blocks managed by the allocator.
+     * @brief Returns the first active memory block.
      *
-     * Provides read-only access to the collection of active blocks currently
-     * participating in allocation requests. This function is primarily intended
-     * for diagnostics, debugging, and unit testing.
+     * Provides read-only access to the first block in the active block list.
+     * The remaining active blocks can be traversed through each block's next
+     * pointer.
      *
-     * @return Pointer to the array of active memory blocks.
+     * @return Pointer to the first active memory block, or `nullptr` if no
+     *         active blocks exist.
      */
-    QENTEM_INLINE const LiteArray<MemoryBlockT> *GetActiveBlocks() const noexcept {
-        return &active_blocks_;
+    QENTEM_INLINE const MemoryBlockT *GetActiveBlocks() const noexcept {
+        return active_first_;
     }
 
     /**
-     * @brief Returns the exhausted memory blocks managed by the allocator.
+     * @brief Returns the first exhausted memory block.
      *
-     * Provides read-only access to blocks that are currently excluded from the
-     * primary allocation path. This function is primarily intended for
-     * diagnostics, debugging, and unit testing.
+     * Provides read-only access to the first block in the exhausted block list.
+     * The remaining exhausted blocks can be traversed through each block's next
+     * pointer.
      *
-     * @return Pointer to the array of exhausted memory blocks.
+     * @return Pointer to the first exhausted memory block, or `nullptr` if no
+     *         exhausted blocks exist.
      */
-    QENTEM_INLINE const LiteArray<MemoryBlockT> *GetExhaustedBlocks() const noexcept {
-        return &exhausted_blocks_;
+    QENTEM_INLINE const MemoryBlockT *GetExhaustedBlocks() const noexcept {
+        return exhausted_first_;
+    }
+
+    /**
+     * @brief Returns the managed memory block storage.
+     *
+     * Provides read-only access to the single container holding both active and
+     * exhausted memory blocks.
+     *
+     * @return Pointer to the managed memory block container.
+     */
+    QENTEM_INLINE const LiteArray<MemoryBlockT> *GetBlocks() const noexcept {
+        return &blocks_;
     }
 
     /**
@@ -554,21 +621,25 @@ struct ReserverCore {
 
         const SystemLong chunks = (size >> MemoryBlockT::DefaultAlignmentBit());
 
-        for (MemoryBlockT &current_block : active_blocks_) {
-            if (current_block.Available() >= size) {
-                void *ptr = reserveFirstFit<CustomAlignment_T>(&current_block, chunks);
+        MemoryBlockT *block = active_first_;
+
+        while (block != nullptr) {
+            if (block->Available() >= size) {
+                void *ptr = reserveFirstFit<CustomAlignment_T>(block, chunks);
 
                 if (ptr != nullptr) {
-                    current_block.DecreaseAvailable(size);
+                    block->DecreaseAvailable(size);
 
                     // Move fully consumed blocks to the exhausted list.
-                    if (current_block.Available() == 0) {
-                        moveToExhaustedBlock(&current_block);
+                    if (block->Available() == 0) {
+                        moveToExhaustedBlock(block);
                     }
 
                     return ptr;
                 }
             }
+
+            block = block->GetNext();
         }
 
         ///////////////////////////////////////////////////////////
@@ -581,24 +652,23 @@ struct ReserverCore {
 #endif
 
         // Allocate a new block large enough for the request.
-        MemoryBlockT new_block{(adjusted_size <= BlockSize_T) ? BlockSize_T : adjusted_size};
+        addBlock(MemoryBlockT{(adjusted_size <= BlockSize_T) ? BlockSize_T : adjusted_size});
+        MemoryBlockT *new_block = blocks_.Last();
 
-        new_block.DecreaseAvailable(size);
-
-        MemoryBlockT *new_block_ptr;
+        new_block->DecreaseAvailable(size);
 
         // The new block has remaining capacity after this allocation.
-        if (size < new_block.UsableSize()) {
-            new_block_ptr = &(active_blocks_.Insert(QUtility::Move(new_block)));
-
+        if (size < new_block->UsableSize()) {
             // Initialize region tracking for the newly inserted block.
-            new_block_ptr->ClearTable();
+            new_block->ClearTable();
 
-            void *ptr = reserveFirstFit<CustomAlignment_T>(new_block_ptr, chunks);
+            void *ptr = reserveFirstFit<CustomAlignment_T>(new_block, chunks);
 
-            // Keep the largest active block at the front to improve search efficiency.
-            if (active_blocks_.First()->UsableSize() < new_block_ptr->UsableSize()) {
-                QUtility::Swap(*(active_blocks_.Storage()), *new_block_ptr);
+            if ((active_first_ == nullptr) || (active_first_->UsableSize() > new_block->UsableSize())) {
+                insertIntoList(new_block, active_first_, active_last_);
+            } else {
+                // Keep the largest active block at the front to improve search efficiency.
+                insertIntoListTop(new_block, active_first_, active_last_);
             }
 
             return ptr;
@@ -606,9 +676,9 @@ struct ReserverCore {
 
         // The request consumes the entire block; place it directly
         // in the exhausted list and return its base address.
-        new_block_ptr = &(exhausted_blocks_.Insert(QUtility::Move(new_block)));
+        insertIntoList(new_block, exhausted_first_, exhausted_last_);
 
-        return new_block_ptr->Base();
+        return new_block->Base();
     }
 
     /**
@@ -684,48 +754,58 @@ struct ReserverCore {
      */
     bool release(void *ptr, SystemLong size) noexcept {
         // Phase 1: Search active blocks.
-        for (MemoryBlockT &block : active_blocks_) {
+
+        MemoryBlockT *block = active_first_;
+
+        while (block != nullptr) {
             // Regular allocation from the block's usable region.
-            if ((ptr >= block.Data()) && (ptr < block.End())) {
+            if ((ptr >= block->Base()) && (ptr < block->End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Released(size);
 #endif
-                block.IncreaseAvailable(size);
-                block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
+                block->IncreaseAvailable(size);
+                block->ReleaseRegion(ptr, (size >> block->DefaultAlignmentBit()));
 
                 // Release fully empty blocks while preserving at least one active block.
-                if ((active_blocks_.Size() != SizeT{1}) && block.IsEmpty()) {
-                    releaseBlock(&block);
+                if (block->IsEmpty() && (active_first_ != active_last_)) {
+                    releaseActiveBlock(block);
                 }
 
                 return true;
             }
+
+            block = block->GetNext();
         }
 
         // Phase 2: Search exhausted blocks.
-        for (MemoryBlockT &block : exhausted_blocks_) {
+
+        block = exhausted_first_;
+
+        while (block != nullptr) {
             // Whole-block allocation returned from Base().
-            if ((ptr >= block.Base()) && (ptr < block.End())) {
+            if ((ptr >= block->Base()) && (ptr < block->End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Released(size);
 #endif
-                if (ptr >= block.Data()) {
+                if (ptr >= block->Data()) {
                     // Restore available space and return the block to the active list.
-                    block.IncreaseAvailable(size);
-                    block.ReleaseRegion(ptr, (size >> block.DefaultAlignmentBit()));
-                    moveToActiveBlock(&block);
-                } else if ((block.Capacity() != BlockSize_T) || active_blocks_.IsNotEmpty()) {
+                    block->IncreaseAvailable(size);
+                    block->ReleaseRegion(ptr, (size >> block->DefaultAlignmentBit()));
+                    moveToActiveBlock(block);
+                } else if ((block->Capacity() != BlockSize_T) || (active_first_ != nullptr)) {
                     // Release oversized blocks or extra standard blocks.
-                    releaseExhaustedBlock(&block);
+                    releaseExhaustedBlock(block);
                 } else {
                     // Reuse the last remaining standard-sized block.
-                    block.ClearTable();
-                    block.IncreaseAvailable(size);
-                    moveToActiveBlock(&block);
+                    block->ClearTable();
+                    block->IncreaseAvailable(size);
+                    moveToActiveBlock(block);
                 }
 
                 return true;
             }
+
+            block = block->GetNext();
         }
 
 #if defined(QENTEM_DEBUG) && !defined(_WIN32)
@@ -765,34 +845,42 @@ struct ReserverCore {
         const SystemLong diff     = (from_size - to_size);
 
         // Phase 1: Search active blocks.
-        for (MemoryBlockT &block : active_blocks_) {
+
+        MemoryBlockT *block = active_first_;
+
+        while (block != nullptr) {
             // Allocation from the block's normal allocation region.
-            if ((ptr >= block.Data()) && (ptr < block.End())) {
+            if ((ptr >= block->Data()) && (ptr < block->End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Shrink(diff);
 #endif
 
-                block.IncreaseAvailable(diff);
-                block.ReleaseRegion(ptr_tail, (diff >> block.DefaultAlignmentBit()));
+                block->IncreaseAvailable(diff);
+                block->ReleaseRegion(ptr_tail, (diff >> block->DefaultAlignmentBit()));
 
                 return true;
             }
+
+            block = block->GetNext();
         }
 
         // Phase 2: Search exhausted blocks.
-        for (MemoryBlockT &block : exhausted_blocks_) {
-            // Allocation belongs to this exhausted block.
-            if ((ptr >= block.Base()) && (ptr < block.End())) {
+
+        block = exhausted_first_;
+
+        while (block != nullptr) {
+            // Allocation belongs to this exhausted block->
+            if ((ptr >= block->Base()) && (ptr < block->End())) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                 MemoryRecord::Shrink(diff);
 #endif
 
-                block.IncreaseAvailable(diff);
+                block->IncreaseAvailable(diff);
 
-                if (ptr >= block.Data()) {
+                if (ptr >= block->Data()) {
                     // Normal allocation tracked by the block's region table.
-                    block.ReleaseRegion(ptr_tail, (diff >> block.DefaultAlignmentBit()));
-                    moveToActiveBlock(&block);
+                    block->ReleaseRegion(ptr_tail, (diff >> block->DefaultAlignmentBit()));
+                    moveToActiveBlock(block);
                 }
 
                 // Whole-block allocations do not use the region tracking table.
@@ -802,6 +890,8 @@ struct ReserverCore {
 
                 return true;
             }
+
+            block = block->GetNext();
         }
 
 #if defined(QENTEM_DEBUG) && !defined(_WIN32)
@@ -836,21 +926,25 @@ struct ReserverCore {
     SystemLong tryExpand(void *ptr, SystemLong from_size, SystemLong to_size) noexcept {
         const SystemLong diff = (to_size - from_size);
 
-        for (MemoryBlockT &block : active_blocks_) {
-            if ((ptr >= block.Data()) && (ptr < block.End())) {
+        MemoryBlockT *block = active_first_;
+
+        while (block != nullptr) {
+            if ((ptr >= block->Data()) && (ptr < block->End())) {
                 // Attempt to reserve the region immediately following the allocation.
-                if (reserveAt(&block, (static_cast<char *>(ptr) + from_size),
+                if (reserveAt(block, (static_cast<char *>(ptr) + from_size),
                               (diff >> MemoryBlockT::DefaultAlignmentBit()))) {
 #ifdef QENTEM_ENABLE_MEMORY_RECORD
                     MemoryRecord::Expand(diff);
 #endif
-                    block.DecreaseAvailable(diff);
+                    block->DecreaseAvailable(diff);
 
                     return to_size;
                 }
 
                 return from_size;
             }
+
+            block = block->GetNext();
         }
 
         // Unknown origin — pointer does not belong to any known region.
@@ -1086,34 +1180,78 @@ struct ReserverCore {
     }
 
     /**
+     * @brief Moves an exhausted block back to the active block list.
+     *
+     * Removes the specified block from the exhausted block list and transfers
+     * it to the active block list.
+     *
+     * The block is inserted at the front when its usable capacity is greater
+     * than the current leading active block; otherwise it is appended to the
+     * end of the active list.
+     *
+     * @param block Pointer to the exhausted block to move.
+     */
+    void moveToActiveBlock(MemoryBlockT *block) noexcept {
+        dropFromList(block, exhausted_first_, exhausted_last_);
+
+        if ((active_first_ == nullptr) || (active_first_->UsableSize() > block->UsableSize())) {
+            insertIntoList(block, active_first_, active_last_);
+        } else {
+            // Keep the largest active block at the front to improve search efficiency.
+            insertIntoListTop(block, active_first_, active_last_);
+        }
+    }
+
+    /**
+     * @brief Moves an active block to the exhausted block list.
+     *
+     * Removes the specified block from the active block list and transfers
+     * it to the end of the exhausted block list.
+     *
+     * @param block Pointer to the active block to move.
+     */
+    void moveToExhaustedBlock(MemoryBlockT *block) noexcept {
+        dropFromList(block, active_first_, active_last_);
+        insertIntoList(block, exhausted_first_, exhausted_last_);
+    }
+
+    /**
      * @brief Releases an active memory block from the allocator.
      *
-     * Removes the specified block from the active block list. To keep
-     * removal efficient, the block is swapped with the last element
-     * before being removed when it is not already the final entry.
+     * Removes the specified block from the active block list. The block's
+     * physical storage slot is swapped with the last element of `blocks_`
+     * before removal when necessary, allowing constant-time removal.
      *
      * The underlying memory owned by the block is released when the
      * block object is destroyed during removal.
      *
      * @param block Pointer to the active block to release.
      */
-    void releaseBlock(MemoryBlockT *block) noexcept {
-        MemoryBlockT *last_block = active_blocks_.Last();
+    void releaseActiveBlock(MemoryBlockT *block) noexcept {
+        // 1. Remove target from its logical list.
+        // 2. Swap target slot with the physical last slot.
+        // 3. Repair the links for the object that was moved.
+        // 4. Drop the physical last slot.
+
+        MemoryBlockT *last_block = blocks_.Last();
+
+        dropFromList(block, active_first_, active_last_);
 
         // Move the target block to the end for O(1) removal.
         if (block != last_block) {
             QUtility::Swap(*block, *last_block);
+            adjustLinks(block, last_block);
         }
 
-        active_blocks_.Drop(SizeT{1});
+        blocks_.Drop(SizeT{1});
     }
 
     /**
      * @brief Releases an exhausted memory block from the allocator.
      *
-     * Removes the specified block from the exhausted block list. To keep
-     * removal efficient, the block is swapped with the last element
-     * before being removed when it is not already the final entry.
+     * Removes the specified block from the exhausted block list. The block's
+     * physical storage slot is swapped with the last element of `blocks_`
+     * before removal when necessary, allowing constant-time removal.
      *
      * The underlying memory owned by the block is released when the
      * block object is destroyed during removal.
@@ -1121,97 +1259,193 @@ struct ReserverCore {
      * @param block Pointer to the exhausted block to release.
      */
     void releaseExhaustedBlock(MemoryBlockT *block) noexcept {
-        MemoryBlockT *last_block = exhausted_blocks_.Last();
+        MemoryBlockT *last_block = blocks_.Last();
+
+        dropFromList(block, exhausted_first_, exhausted_last_);
 
         // Move the target block to the end for O(1) removal.
         if (block != last_block) {
             QUtility::Swap(*block, *last_block);
+            adjustLinks(block, last_block);
         }
 
-        exhausted_blocks_.Drop(SizeT{1});
+        blocks_.Drop(SizeT{1});
     }
 
     /**
-     * @brief Moves an active block to the exhausted block list.
+     * @brief Adds a memory block to the managed block storage.
      *
-     * Removes the specified block from the active block list and transfers
-     * ownership to the exhausted block list.
+     * Adds the specified block to the allocator's single block container.
+     * When the container is full, its storage is expanded and all existing
+     * active and exhausted blocks are moved into the new storage.
      *
-     * To keep removal efficient, the block is first swapped with the last
-     * active block when necessary, allowing constant-time removal.
+     * Because the active and exhausted block lists store direct pointers to
+     * their `MemoryBlockT` elements, expanding `blocks_` invalidates those
+     * pointers. The lists are therefore rebuilt while the blocks are moved,
+     * preserving their logical order and updating all pointers to reference
+     * the new storage.
      *
-     * @param block Pointer to the active block to move.
+     * The next block pointer is saved before each move so traversal of the
+     * original list remains valid while its elements are relocated.
+     *
+     * @param block Memory block to add to the managed block storage.
      */
-    void moveToExhaustedBlock(MemoryBlockT *block) noexcept {
-        MemoryBlockT *last_block = active_blocks_.Last();
+    void addBlock(MemoryBlockT &&block) noexcept {
+        if (blocks_.Size() == blocks_.Capacity()) {
+            LiteArray<MemoryBlockT> new_blocks{blocks_.Capacity() << 1U};
 
-        if (block != last_block) {
-            // Move the target block to the end for O(1) removal.
-            QUtility::Swap(*block, *last_block);
+            MemoryBlockT *old_block = active_first_;
+
+            active_first_ = nullptr;
+            active_last_  = nullptr;
+
+            while (old_block != nullptr) {
+                MemoryBlockT *next = old_block->GetNext();
+
+                new_blocks += QUtility::Move(*old_block);
+                insertIntoList(new_blocks.Last(), active_first_, active_last_);
+
+                old_block = next;
+            }
+
+            old_block = exhausted_first_;
+
+            exhausted_first_ = nullptr;
+            exhausted_last_  = nullptr;
+
+            while (old_block != nullptr) {
+                MemoryBlockT *next = old_block->GetNext();
+
+                new_blocks += QUtility::Move(*old_block);
+                insertIntoList(new_blocks.Last(), exhausted_first_, exhausted_last_);
+
+                old_block = next;
+            }
+
+            blocks_ = QUtility::Move(new_blocks);
         }
 
-        exhausted_blocks_ += QUtility::Move(*last_block);
-        active_blocks_.DropFast(SizeT{1});
+        blocks_ += QUtility::Move(block);
     }
 
     /**
-     * @brief Moves an exhausted block back to the active block list.
+     * @brief Inserts a block at the beginning of a linked list.
      *
-     * Removes the specified block from the exhausted block list and
-     * transfers ownership to the active block list.
+     * The block becomes the first element of the list and is linked to the
+     * previous first element. If the list is empty, the block also becomes
+     * the last element.
      *
-     * To keep removal efficient, the block is first swapped with the last
-     * exhausted block when necessary, allowing constant-time removal.
-     *
-     * After insertion, the block may be promoted to the front of the
-     * active block list if it has a larger usable capacity than the
-     * current leading block.
-     *
-     * @param block Pointer to the exhausted block to move.
+     * @param block Block to insert.
+     * @param first Reference to the first block in the list.
+     * @param last Reference to the last block in the list.
      */
-    void moveToActiveBlock(MemoryBlockT *block) noexcept {
-        MemoryBlockT *last_block = exhausted_blocks_.Last();
+    static void insertIntoListTop(MemoryBlockT *block, MemoryBlockT *&first, MemoryBlockT *&last) noexcept {
+        block->GetPrev() = nullptr;
+        block->GetNext() = first;
 
-        if (block != last_block) {
-            // Move the target block to the end for O(1) removal.
-            QUtility::Swap(*block, *last_block);
+        if (first != nullptr) {
+            first->GetPrev() = block;
+        } else {
+            last = block;
         }
 
-        active_blocks_ += QUtility::Move(*last_block);
-
-        last_block = active_blocks_.Last();
-
-        // Keep the largest active block at the front to improve search efficiency.
-        if (active_blocks_.First()->UsableSize() < last_block->UsableSize()) {
-            QUtility::Swap(*(active_blocks_.Storage()), *last_block);
-        }
-
-        exhausted_blocks_.DropFast(SizeT{1});
+        first = block;
     }
 
     /**
-     * @brief Active memory blocks available for allocation requests.
+     * @brief Appends a block to the end of a linked list.
      *
-     * Blocks in this array participate in allocation searches and may
-     * satisfy new reservation requests. When a block becomes fully
-     * consumed, it is moved to `exhausted_blocks_`.
+     * The block becomes the last element of the list. If the list is empty,
+     * the block also becomes the first element.
      *
-     * The largest active block is typically kept at the front of the
-     * array to improve allocation search efficiency.
+     * @param block Block to insert.
+     * @param first Reference to the first block in the list.
+     * @param last Reference to the last block in the list.
      */
-    LiteArray<MemoryBlockT> active_blocks_{};
+    static void insertIntoList(MemoryBlockT *block, MemoryBlockT *&first, MemoryBlockT *&last) noexcept {
+        if (first == nullptr) {
+            block->GetPrev() = nullptr;
+            first            = block;
+        } else {
+            block->GetPrev() = last;
+            last->GetNext()  = block;
+        }
+
+        last             = block;
+        block->GetNext() = nullptr;
+    }
 
     /**
-     * @brief Exhausted memory blocks currently excluded from allocation searches.
+     * @brief Removes a block from a linked list.
      *
-     * These blocks are temporarily removed from the primary allocation
-     * path because they have no immediately available space for new
-     * reservations or are dedicated to a specific allocation.
+     * Unlinks the specified block from its neighboring blocks and updates the
+     * list's first and last pointers when necessary. If the block is the only
+     * element, both list pointers become `nullptr`. The removed block's
+     * previous and next pointers are cleared.
      *
-     * Depending on allocator state, exhausted blocks may later be
-     * reactivated, reset, or released.
+     * @param block Block to remove.
+     * @param first Reference to the first block in the list.
+     * @param last Reference to the last block in the list.
      */
-    LiteArray<MemoryBlockT> exhausted_blocks_{};
+    static void dropFromList(MemoryBlockT *block, MemoryBlockT *&first, MemoryBlockT *&last) noexcept {
+        MemoryBlockT *&prev = block->GetPrev();
+        MemoryBlockT *&next = block->GetNext();
+
+        if (prev != nullptr) {
+            prev->GetNext() = next;
+        } else {
+            first = next;
+        }
+
+        if (next != nullptr) {
+            next->GetPrev() = prev;
+        } else {
+            last = prev;
+        }
+
+        prev = nullptr;
+        next = nullptr;
+    }
+
+    /**
+     * @brief Repairs linked-list references after a block changes storage position.
+     *
+     * Reconnects the neighboring blocks and updates the appropriate list
+     * boundary when `old_pos` has been replaced by `new_pos` in `blocks_`.
+     * This is used after swapping a block with the last physical element
+     * before removing that element from the container.
+     *
+     * @param new_pos New storage position of the moved block.
+     * @param old_pos Previous storage position referenced by the list.
+     */
+    void adjustLinks(MemoryBlockT *new_pos, MemoryBlockT *old_pos) noexcept {
+        MemoryBlockT *prev = old_pos->GetPrev();
+        MemoryBlockT *next = old_pos->GetNext();
+
+        if (prev != nullptr) {
+            prev->GetNext() = new_pos;
+        } else if (active_first_ == old_pos) {
+            active_first_ = new_pos;
+        } else {
+            exhausted_first_ = new_pos;
+        }
+
+        if (next != nullptr) {
+            next->GetPrev() = new_pos;
+        } else if (active_last_ == old_pos) {
+            active_last_ = new_pos;
+        } else {
+            exhausted_last_ = new_pos;
+        }
+    }
+
+    MemoryBlockT *active_first_{nullptr};
+    MemoryBlockT *active_last_{nullptr};
+
+    MemoryBlockT *exhausted_first_{nullptr};
+    MemoryBlockT *exhausted_last_{nullptr};
+
+    LiteArray<MemoryBlockT> blocks_{};
 };
 
 struct Reserver {

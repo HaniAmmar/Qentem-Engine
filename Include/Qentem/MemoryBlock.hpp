@@ -113,11 +113,10 @@ struct MemoryBlock {
     QENTEM_INLINE ~MemoryBlock() noexcept {
         release();
     }
-
     QENTEM_INLINE MemoryBlock(MemoryBlock &&src) noexcept
-        : base_{src.base_}, data_{src.data_}, usable_size_{src.usable_size_}, available_{src.available_},
-          next_index_{src.next_index_}, table_size_{src.table_size_}, capacity_{src.capacity_},
-          table_mask_shift_{src.table_mask_shift_} {
+        : base_{src.base_}, data_{src.data_}, prev_{src.prev_}, next_{src.next_}, usable_size_{src.usable_size_},
+          available_{src.available_}, next_index_{src.next_index_}, table_size_{src.table_size_},
+          capacity_{src.capacity_}, table_mask_shift_{src.table_mask_shift_} {
         src.base_ = nullptr;
     }
 
@@ -129,6 +128,8 @@ struct MemoryBlock {
             src.base_ = nullptr;
 
             data_             = src.data_;
+            prev_             = src.prev_;
+            next_             = src.next_;
             usable_size_      = src.usable_size_;
             available_        = src.available_;
             next_index_       = src.next_index_;
@@ -377,6 +378,14 @@ struct MemoryBlock {
         bit_index -= (table_index << TableBitShift());
     }
 
+    QENTEM_INLINE MemoryBlock *&GetPrev() noexcept {
+        return prev_;
+    }
+
+    QENTEM_INLINE MemoryBlock *&GetNext() noexcept {
+        return next_;
+    }
+
   private:
     QENTEM_INLINE void release() {
         if (base_ != nullptr) {
@@ -390,8 +399,12 @@ struct MemoryBlock {
         }
     }
 
-    void      *base_{nullptr};
-    void      *data_{nullptr};
+    void *base_{nullptr};
+    void *data_{nullptr};
+
+    MemoryBlock *prev_{nullptr};
+    MemoryBlock *next_{nullptr};
+
     SystemLong usable_size_{0};
     SystemLong available_{0};
     SystemLong next_index_{0};

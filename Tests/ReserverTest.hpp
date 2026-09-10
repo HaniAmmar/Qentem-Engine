@@ -234,6 +234,16 @@ static void TestReserver2(QTest &test) {
     test.IsEqual((ptr_number & (page_size - 1U)), SystemLong{0}, __LINE__);
     test.IsTrue(r2.IsEmpty(), __LINE__);
     test.IsTrue((r2.TotalBlocks() <= SizeT{1}), __LINE__);
+
+    r.Reset();
+    r2.Reset();
+
+    var1 = r.Reserve<char>(page_size * 2);
+    var2 = r.Reserve<char>(page_size / 2);
+    r.Release(var1, page_size * 2);
+    r.Release(var2, page_size / 2);
+
+    test.IsTrue(r.IsEmpty(), __LINE__);
 }
 
 static void TestReserver3(QTest &test) {
@@ -328,11 +338,12 @@ static void TestReserverShrink(QTest &test) {
     test.IsEqual(r.TotalBlocks(), SizeT{1}, __LINE__);
 
     // Full allocation from the top block.
-    SystemLong max  = r.GetActiveBlocks()->First()->UsableSize();
+    SystemLong max  = r.GetActiveBlocks()->UsableSize();
     SystemLong half = max / 2;
     var1            = static_cast<char *>(r.Reserve<char>(max));
 
-    test.IsEqual(static_cast<void *>(var1), r.GetActiveBlocks()->First()->Data(), __LINE__);
+    test.IsNull(r.GetActiveBlocks(), __LINE__);
+    test.IsEqual(static_cast<void *>(var1), r.GetExhaustedBlocks()->Data(), __LINE__);
 
     // Shrink the large allocation by half.
     test.IsTrue(r.Shrink(var1, max, half), __LINE__);
