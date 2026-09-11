@@ -95,7 +95,7 @@ struct SystemMemory {
      */
     QENTEM_INLINE static bool ProtectGuardPage(void *ptr, SystemLong size) noexcept {
         // clang-format off
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+#ifndef  QENTEM_SYSTEM_MEMORY_FALLBACK
     #if defined(_WIN32)
             DWORD old_protect;
             return (::VirtualProtect(ptr, static_cast<SystemLong>(size), PAGE_NOACCESS, &old_protect) != 0);
@@ -178,7 +178,7 @@ struct SystemMemory {
      */
     QENTEM_INLINE static void Release(void *ptr, SystemLong size) noexcept {
         // clang-format off
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+#ifndef  QENTEM_SYSTEM_MEMORY_FALLBACK
     #if defined(_WIN32)
             (void)size;
             ::VirtualFree(ptr, 0, MEM_RELEASE);
@@ -209,10 +209,10 @@ struct SystemMemory {
  * @param start  Pointer to the start of the region (must be page-aligned).
  * @param size   Size in bytes to release (must be multiple of page size).
  */
-#if !defined(_WIN32)
+#ifndef _WIN32
     QENTEM_INLINE static void ReleasePages(void *start, SystemLong size) noexcept {
         // clang-format off
-    #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+    #ifndef  QENTEM_SYSTEM_MEMORY_FALLBACK
         #if defined(__linux__)
             SystemCall(__NR_munmap,reinterpret_cast<SystemLongI>(start), size);
         #else
@@ -234,7 +234,7 @@ struct SystemMemory {
      */
     QENTEM_NOINLINE static SystemLong ReadPageSize() noexcept {
         // clang-format off
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+#ifndef  QENTEM_SYSTEM_MEMORY_FALLBACK
     #if defined(_WIN32)
             SYSTEM_INFO info;
             GetSystemInfo(&info);
@@ -274,13 +274,13 @@ struct SystemMemory {
     template <bool IS_STACK_MEMORY_T>
     QENTEM_INLINE static void *reserve(SystemLong size, SizeT32 flags) noexcept {
         // clang-format off
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+#ifndef  QENTEM_SYSTEM_MEMORY_FALLBACK
     #if defined(_WIN32)
         (void)flags;
         return ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     #elif defined(__linux__)
         // MAP_STACK was added in Linux 2.6.27; define manually if missing
-        #if !defined(MAP_STACK)
+        #ifndef MAP_STACK
             #define QENTEM_LINUX_MAP_STACK 0x20000
         #else
             #define QENTEM_LINUX_MAP_STACK MAP_STACK
