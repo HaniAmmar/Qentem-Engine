@@ -32,6 +32,9 @@
  * @note The pool retains ownership of all objects at all times.
  *       Destructors are invoked only when the pool itself is destroyed.
  *
+ * @note `sizeof(Type_T)` must be small enough for at least one item to fit
+ *       in a system page together with the pool header.
+ *
  * @copyright Copyright (c) 2026 Hani Ammar
  * @license MIT
  */
@@ -300,18 +303,18 @@ struct QPool {
      * with the most recently allocated block.
      *
      * For the first block, only the remaining subset of constructed objects
-     * (constructed_ % storage_size_) is destroyed. All earlier blocks are known
+     * (constructed_ % per_storage_capacity_) is destroyed. All earlier blocks are known
      * to be fully constructed and are therefore fully destructed.
      *
      * After destruction, each pool block is released back to the system.
      */
     void destruct() {
-        SizeT32 count = (constructed_ % storage_size_);
+        SizeT32 count = (constructed_ % per_storage_capacity_);
 
         while (storage_ != nullptr) {
             Pool *next_pool = storage_->Next;
 
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
             Item *items = reinterpret_cast<Item *>(reinterpret_cast<unsigned char *>(storage_) + POOL_HEADER_SIZE);
 #else
             const SystemLong raw_address = reinterpret_cast<SystemLong>(storage_);
@@ -334,12 +337,12 @@ struct QPool {
             }
 
             constructed_ -= count;
-            count = storage_size_;
+            count = per_storage_capacity_;
 
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-            SystemMemory::Release(storage_, reserve_size_);
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
+            SystemMemory::Release(storage_, SystemMemory::GetPageSize());
 #else
-            SystemMemory::Release(storage_, (reserve_size_ + TYPE_ALIGN_T));
+            SystemMemory::Release(storage_, (SystemMemory::GetPageSize() + TYPE_ALIGN_T));
 #endif
             storage_ = next_pool;
         }
@@ -359,13 +362,13 @@ struct QPool {
      */
     QENTEM_NOINLINE void expand(SizeT32 count) {
         do {
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
-            Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(reserve_size_));
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
+            Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(SystemMemory::GetPageSize()));
 #else
-            Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(reserve_size_ + TYPE_ALIGN_T));
+            Pool *pool = static_cast<Pool *>(SystemMemory::Reserve(SystemMemory::GetPageSize() + TYPE_ALIGN_T));
 #endif
 
-#if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK)
+#ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
             Item *items = reinterpret_cast<Item *>(reinterpret_cast<unsigned char *>(pool) + POOL_HEADER_SIZE);
 #else
             const SystemLong raw_address = reinterpret_cast<SystemLong>(pool);
@@ -375,7 +378,7 @@ struct QPool {
                 reinterpret_cast<unsigned char *>(reinterpret_cast<Pool *>(aligned_address)) + POOL_HEADER_SIZE);
 #endif
 
-            SizeT32 index = storage_size_;
+            SizeT32 index = per_storage_capacity_;
 
             // Link the newly allocated pool block into the storage chain
             pool->Next = storage_;
@@ -406,30 +409,11 @@ struct QPool {
         return ((SystemMemory::GetPageSize() - POOL_HEADER_SIZE) / ITEM_SIZE);
     }
 
-    /**
-     * @brief Computes the total size, in bytes, of a single storage block.
-     *
-     * The storage block consists of:
-     *  - one pointer-sized header used for internal bookkeeping
-     *  - a contiguous array of items determined by getStorageCount()
-     *
-     * When system memory fallback is disabled, the resulting size is rounded up
-     * to the nearest system page boundary to ensure page-aligned allocation.
-     *
-     * @return Size in bytes to reserve for one storage block.
-     */
-    QENTEM_INLINE static SystemLong getStorageSize() noexcept {
-        // static_assert((STORAGE_SIZE > 0), "Object size exceeds page size — cannot fit even one item.");
-        return (SystemLong{POOL_HEADER_SIZE} + (SystemLong{ITEM_SIZE} * getStorageCount()));
-    }
-
-    const SystemLong reserve_size_{getStorageSize()};
-    const SizeT32    storage_size_{getStorageCount()};
-
-    Item   *list_{nullptr};    ///< Head of the free-list (LIFO order).
-    Pool   *storage_{nullptr}; ///< Singly-linked list of owned memory blocks backing the pool.
-    SizeT32 in_use_{0};        ///< Number of objects currently in use.
-    SizeT32 constructed_{0};   ///< Total number of objects constructed over the lifetime of the pool.
+    Item         *list_{nullptr};    ///< Head of the free-list (LIFO order).
+    Pool         *storage_{nullptr}; ///< Singly-linked list of owned memory blocks backing the pool.
+    SizeT32       in_use_{0};        ///< Number of objects currently in use.
+    SizeT32       constructed_{0};   ///< Total number of objects constructed over the lifetime of the pool.
+    const SizeT32 per_storage_capacity_{getStorageCount()};
 };
 
 } // namespace Qentem
