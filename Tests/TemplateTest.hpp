@@ -3752,10 +3752,10 @@ static void TestSubTemplateTag1(QTest &test) {
 
     Array<TemplateDataCache<Value<char>>> templates_cache{};
 
-    TemplateData<Value<char>> main_template{};
+    TemplateData<char> main_template{};
 
-    TemplateData<Value<char>> sub_templates[4]{};
-    SizeT                     sub_templates_count = 4;
+    TemplateData<char> sub_templates[4]{};
+    SizeT              sub_templates_count = 4;
 
     main_content = R"({st:id]})";
     test.IsEqual(Template::Render(main_content, value, stream), R"({st:id]})", __LINE__);

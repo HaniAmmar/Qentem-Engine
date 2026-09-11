@@ -242,19 +242,17 @@ struct QOperationSymbols_T;
  * used by the rendering system to locate the corresponding
  * `TemplateDataCache` entry.
  *
- * @tparam Value_T
- *     Value type associated with the template rendering system.
+ * @tparam Char_T
+ *     Char type associated with the template rendering system.
  */
-template <typename Value_T>
+template <typename Char_T>
 struct TemplateData {
-    using CharType = typename Value_T::CharType;
-
     /**
      * @brief Pointer to the template source content.
      *
      * The content is not owned by `TemplateData`.
      */
-    const CharType *Content{nullptr};
+    const Char_T *Content{nullptr};
 
     /**
      * @brief Length of the template source content.
@@ -384,15 +382,16 @@ struct Template {
      */
     template <typename StringStream_T, typename Value_T>
     QENTEM_INLINE static void Render(StringStream_T &stream, Array<TemplateDataCache<Value_T>> &templates_cache,
-                                     const Value_T &value, const TemplateData<Value_T> *main_template,
-                                     const TemplateData<Value_T> *sub_templates       = nullptr,
-                                     SizeT                        sub_templates_count = 0) {
+                                     const Value_T                                         &value,
+                                     const TemplateData<typename StringStream_T::CharType> *main_template,
+                                     const TemplateData<typename StringStream_T::CharType> *sub_templates = nullptr,
+                                     SizeT                                                  sub_templates_count = 0) {
         using CharType = typename StringStream_T::CharType;
 
         TemplateCore<CharType, Value_T, StringStream_T> temp{};
 
         if ((sub_templates != nullptr) && (sub_templates_count != 0)) {
-            const TemplateData<Value_T> *last = (sub_templates + (sub_templates_count - 1));
+            const TemplateData<CharType> *last = (sub_templates + (sub_templates_count - 1));
 
             const SizeT max_id = ((last->ID > main_template->ID) ? last->ID : main_template->ID);
 
@@ -403,7 +402,7 @@ struct Template {
             do {
                 --sub_templates_count;
 
-                const TemplateData<Value_T> *sub_template = (sub_templates + sub_templates_count);
+                const TemplateData<CharType> *sub_template = (sub_templates + sub_templates_count);
 
                 if (templates_cache.Size() <= sub_template->ID) {
                     templates_cache.ResizeWithDefaultInit((sub_template->ID + SizeT{1}));

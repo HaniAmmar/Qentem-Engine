@@ -232,12 +232,12 @@ int main() {
     using namespace Qentem;
 
     /*
-     * TemplateData<Value<char>> describes one renderable template.
+     * TemplateData<char> describes one renderable template.
      *
      * The template ID is the identity used by {st:...} to select a
      * sub-template.
      */
-    using TemplateDataChar = TemplateData<Value<char>>;
+    using TemplateDataChar = TemplateData<char>;
 
     /*
      * All templates render into this one stream.
