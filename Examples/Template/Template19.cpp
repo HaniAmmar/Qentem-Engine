@@ -258,7 +258,7 @@ int main() {
      *
      * A template is parsed only once and can then be rendered repeatedly.
      */
-    Array<TemplateDataCache<Value<char>>> templates_cache{};
+    Array<TemplateDataCache<char>> templates_cache{};
 
     /*
      * Render data shared by the parent template and its sub-template.

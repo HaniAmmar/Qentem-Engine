@@ -3730,7 +3730,7 @@ static void TestSubTemplateLTag1(QTest &test) {
     Value<wchar_t>        value{};
     SizeT                 id_gen{0};
 
-    Array<TemplateDataCache<Value<wchar_t>>> templates_cache{};
+    Array<TemplateDataCache<wchar_t>> templates_cache{};
 
     TemplateData<wchar_t> main_template{};
 

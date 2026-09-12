@@ -3730,7 +3730,7 @@ static void TestSubTemplateUTag1(QTest &test) {
     Value<char16_t>        value{};
     SizeT                  id_gen{0};
 
-    Array<TemplateDataCache<Value<char16_t>>> templates_cache{};
+    Array<TemplateDataCache<char16_t>> templates_cache{};
 
     TemplateData<char16_t> main_template{};
 

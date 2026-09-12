@@ -243,7 +243,7 @@ struct QOperationSymbols_T;
  * `TemplateDataCache` entry.
  *
  * @tparam Char_T
- *     Char type associated with the template rendering system.
+ *     Character type associated with the template rendering system.
  */
 template <typename Char_T>
 struct TemplateData {
@@ -278,19 +278,17 @@ struct TemplateData {
  * retained together with the parsed `Tags` so that subsequent renders can
  * reuse the parsed representation without parsing the template again.
  *
- * @tparam Value_T
- *     Value type associated with the template rendering system.
+ * @tparam Char_T
+ *     Character type associated with the template rendering system.
  */
-template <typename Value_T>
+template <typename Char_T>
 struct TemplateDataCache {
-    using CharType = typename Value_T::CharType;
-
     /**
      * @brief Pointer to the cached template source content.
      *
      * The content is not owned by the cache.
      */
-    const CharType *Content{nullptr};
+    const Char_T *Content{nullptr};
 
     /**
      * @brief Length of the cached template source content.
@@ -380,18 +378,15 @@ struct Template {
      * @see TemplateData
      * @see TemplateDataCache
      */
-    template <typename StringStream_T, typename Value_T>
-    QENTEM_INLINE static void Render(StringStream_T &stream, Array<TemplateDataCache<Value_T>> &templates_cache,
-                                     const Value_T                                         &value,
-                                     const TemplateData<typename StringStream_T::CharType> *main_template,
-                                     const TemplateData<typename StringStream_T::CharType> *sub_templates = nullptr,
-                                     SizeT                                                  sub_templates_count = 0) {
-        using CharType = typename StringStream_T::CharType;
-
-        TemplateCore<CharType, Value_T, StringStream_T> temp{};
+    template <typename StringStream_T, typename Value_T, typename Char_T = typename StringStream_T::CharType>
+    QENTEM_INLINE static void Render(StringStream_T &stream, Array<TemplateDataCache<Char_T>> &templates_cache,
+                                     const Value_T &value, const TemplateData<Char_T> *main_template,
+                                     const TemplateData<Char_T> *sub_templates       = nullptr,
+                                     SizeT                       sub_templates_count = 0) {
+        TemplateCore<Char_T, Value_T, StringStream_T> temp{};
 
         if ((sub_templates != nullptr) && (sub_templates_count != 0)) {
-            const TemplateData<CharType> *last = (sub_templates + (sub_templates_count - 1));
+            const TemplateData<Char_T> *last = (sub_templates + (sub_templates_count - 1));
 
             const SizeT max_id = ((last->ID > main_template->ID) ? last->ID : main_template->ID);
 
@@ -402,13 +397,13 @@ struct Template {
             do {
                 --sub_templates_count;
 
-                const TemplateData<CharType> *sub_template = (sub_templates + sub_templates_count);
+                const TemplateData<Char_T> *sub_template = (sub_templates + sub_templates_count);
 
                 if (templates_cache.Size() <= sub_template->ID) {
                     templates_cache.ResizeWithDefaultInit((sub_template->ID + SizeT{1}));
                 }
 
-                TemplateDataCache<Value_T> *sub_template_cache = (templates_cache.Storage() + sub_template->ID);
+                TemplateDataCache<Char_T> *sub_template_cache = (templates_cache.Storage() + sub_template->ID);
 
                 if (sub_template_cache->Content == nullptr) {
                     sub_template_cache->Content = sub_template->Content;
@@ -423,7 +418,7 @@ struct Template {
             templates_cache.ResizeWithDefaultInit((main_template->ID + SizeT{1}));
         }
 
-        TemplateDataCache<Value_T> *main_template_cache = (templates_cache.Storage() + main_template->ID);
+        TemplateDataCache<Char_T> *main_template_cache = (templates_cache.Storage() + main_template->ID);
 
         if (main_template_cache->Content == nullptr) {
             main_template_cache->Content = main_template->Content;
@@ -514,8 +509,8 @@ struct TemplateCore {
         parse(content, length, tags_cache);
     }
 
-    void Render(StringStream_T &stream, const TemplateDataCache<Value_T> *main_template,
-                const Array<TemplateDataCache<Value_T>> &templates_cache, const Value_T &value) {
+    void Render(StringStream_T &stream, const TemplateDataCache<Char_T> *main_template,
+                const Array<TemplateDataCache<Char_T>> &templates_cache, const Value_T &value) {
         Array<LoopItem> loops_items{};
 
         templates_cache_ = &templates_cache;
@@ -1454,7 +1449,7 @@ struct TemplateCore {
             const SizeT id = static_cast<SizeT>(sub_template_id.Natural);
 
             if (id < templates_cache_->Size()) {
-                const TemplateDataCache<Value_T> *sub_template_cache = (templates_cache_->Storage() + id);
+                const TemplateDataCache<Char_T> *sub_template_cache = (templates_cache_->Storage() + id);
 
                 TemplateCore<Char_T, Value_T, StringStream_T> sub_temp{};
                 sub_temp.format_info_ = format_info_;
@@ -2441,7 +2436,7 @@ struct TemplateCore {
         return false;
     }
 
-    const Array<TemplateDataCache<Value_T>> *templates_cache_{nullptr};
+    const Array<TemplateDataCache<Char_T>> *templates_cache_{nullptr};
 
     const Value_T   *value_{nullptr};
     StringStream_T  *stream_{nullptr};
