@@ -48,7 +48,7 @@ struct Value {
     using VItem = typename ObjectT::HItem;
 
     template <typename StringStream_T>
-    using CopyValueToStringFunction_T = void(StringStream_T &, const Char_T *, SizeT);
+    using CopyValueToStringFunction_T = void (*)(StringStream_T &, const Char_T *, SizeT);
 
     Value() noexcept = default;
 
@@ -1799,10 +1799,52 @@ struct Value {
         }
     }
 
-    template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>>
+    /**
+     * @brief Writes this value to the supplied output stream.
+     *
+     * Strings and boolean values are written directly to `stream`. Integer
+     * values are converted directly to the output stream, while floating-point
+     * values are formatted according to `format_info`.
+     *
+     * The optional `string_function` can be used to customize how string values
+     * are written to the output stream.
+     *
+     * @tparam StringStream_T
+     *     Output stream type receiving the value representation.
+     *
+     * @tparam StringFunction_T
+     *     Function type used to write string values. Defaults to
+     *     `CopyValueToStringFunction_T<StringStream_T>`.
+     *
+     * @tparam ScratchBuffer_T
+     *     Temporary mutable string stream type used for floating-point
+     *     formatting when the destination stream cannot provide persistent,
+     *     mutable access to the generated characters.
+     *
+     * @param stream
+     *     Output stream receiving the value representation.
+     *
+     * @param format_info
+     *     Formatting options used when the value is a floating-point number.
+     *
+     * @param string_function
+     *     Optional function used to write string values. When `nullptr`, the
+     *     string is written directly using `stream.Write()`.
+     *
+     * @param scratch_buffer
+     *     Optional temporary buffer used for floating-point values when the
+     *     output stream is a flushable or streaming destination, such as a
+     *     network buffer, or when output is compressed on the fly. Floating-point
+     *     formatting is performed in multiple stages and requires direct access
+     *     to the generated characters while the value is being formatted.
+     *     Integer and other value types do not require this buffer.
+     */
+    template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>,
+              typename ScratchBuffer_T = StringStream_T>
     bool CopyValueTo(StringStream_T              &stream,
                      const Digit::RealFormatInfo &format_info = Digit::RealFormatInfo{QentemConfig::DoublePrecision},
-                     StringFunction_T            *string_function = nullptr) const noexcept {
+                     StringFunction_T             string_function = nullptr,
+                     ScratchBuffer_T             *scratch_buffer  = nullptr) const noexcept {
         switch (Type()) {
             case ValueType::String: {
                 if (string_function != nullptr) {
@@ -1825,7 +1867,14 @@ struct Value {
             }
 
             case ValueType::Double: {
-                Digit::NumberToString(stream, number_.Real, format_info);
+                if (scratch_buffer == nullptr) {
+                    Digit::NumberToString(stream, number_.Real, format_info);
+                } else {
+                    scratch_buffer->Clear();
+                    Digit::NumberToString(*scratch_buffer, number_.Real, format_info);
+                    stream.Write(scratch_buffer->First(), scratch_buffer->Length());
+                }
+
                 break;
             }
 
@@ -1845,7 +1894,7 @@ struct Value {
             }
 
             case ValueType::ValuePtr: {
-                return value_->CopyValueTo(stream, format_info, string_function);
+                return value_->CopyValueTo(stream, format_info, string_function, scratch_buffer);
             }
 
             default: {

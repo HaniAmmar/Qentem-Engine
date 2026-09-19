@@ -226,7 +226,7 @@ namespace Qentem {
  * <if case='...'>...<else if case='...' /> <else if case='...' />...<else>...</if>
  */
 
-template <typename, typename, typename>
+template <typename Char_T, typename Value_T, typename StringStream_T, typename ScratchBuffer_T = StringStream_T>
 struct TemplateCore;
 
 template <typename>
@@ -346,6 +346,19 @@ struct Template {
      * @tparam StringStream_T
      *     String stream type used to receive the rendered output.
      *
+     * @tparam ScratchBuffer_T
+     *     Temporary mutable string stream type used for intermediate formatting.
+     *     It is primarily used by floating-point formatting, which generates and
+     *     modifies its representation in multiple stages and therefore requires
+     *     direct access to the generated characters in a contiguous buffer.
+     *
+     *     When the output stream is a flushable or streaming destination, such as
+     *     a network buffer, the generated output may be flushed before formatting
+     *     is complete. Likewise, when output is compressed on the fly, the
+     *     previously written characters may no longer be directly accessible.
+     *     In either case, staged formatting cannot safely operate on the output
+     *     stream itself.
+     *
      * @tparam Value_T
      *     Value type exposed to the template during rendering.
      *
@@ -369,6 +382,14 @@ struct Template {
      * @param sub_templates_count
      *     Number of entries in `sub_templates`.
      *
+     * @param scratch_buffer
+     *     Optional temporary buffer required when the output stream does not
+     *     provide persistent, mutable access to the generated characters, such
+     *     as when rendering directly to a network buffer or when output is
+     *     compressed on the fly. It is primarily needed for floating-point
+     *     formatting, which is performed in multiple stages and requires direct
+     *     access to the generated characters while the value is being formatted.
+     *
      * @note
      *     The cache retains the template source pointer and length supplied by
      *     `TemplateData` and stores the parsed tag representation in
@@ -378,12 +399,13 @@ struct Template {
      * @see TemplateData
      * @see TemplateDataCache
      */
-    template <typename StringStream_T, typename Value_T, typename Char_T = typename StringStream_T::CharType>
+    template <typename StringStream_T, typename Value_T, typename Char_T = typename StringStream_T::CharType,
+              typename ScratchBuffer_T = StringStream_T>
     QENTEM_INLINE static void Render(StringStream_T &stream, Array<TemplateDataCache<Char_T>> &templates_cache,
                                      const Value_T &value, const TemplateData<Char_T> *main_template,
-                                     const TemplateData<Char_T> *sub_templates       = nullptr,
-                                     SizeT                       sub_templates_count = 0) {
-        TemplateCore<Char_T, Value_T, StringStream_T> temp{};
+                                     const TemplateData<Char_T> *sub_templates = nullptr, SizeT sub_templates_count = 0,
+                                     ScratchBuffer_T *scratch_buffer = nullptr) {
+        TemplateCore<Char_T, Value_T, StringStream_T, ScratchBuffer_T> temp{};
 
         if ((sub_templates != nullptr) && (sub_templates_count != 0)) {
             const TemplateData<Char_T> *last = (sub_templates + (sub_templates_count - 1));
@@ -427,7 +449,7 @@ struct Template {
             temp.Parse(main_template_cache->Content, main_template_cache->Length, main_template_cache->Tags);
         }
 
-        temp.Render(stream, main_template_cache, templates_cache, value);
+        temp.Render(stream, main_template_cache, templates_cache, value, scratch_buffer);
     }
 
     template <typename Char_T, typename Value_T, typename StringStream_T>
@@ -471,7 +493,7 @@ struct Template {
     }
 };
 
-template <typename Char_T, typename Value_T, typename StringStream_T>
+template <typename Char_T, typename Value_T, typename StringStream_T, typename ScratchBuffer_T>
 struct TemplateCore {
     TemplateCore() noexcept = default;
 
@@ -510,26 +532,29 @@ struct TemplateCore {
     }
 
     void Render(StringStream_T &stream, const TemplateDataCache<Char_T> *main_template,
-                const Array<TemplateDataCache<Char_T>> &templates_cache, const Value_T &value) {
+                const Array<TemplateDataCache<Char_T>> &templates_cache, const Value_T &value,
+                ScratchBuffer_T *scratch_buffer = nullptr) {
         Array<LoopItem> loops_items{};
 
         templates_cache_ = &templates_cache;
-        content_         = main_template->Content;
         value_           = &value;
         stream_          = &stream;
+        scratch_buffer_  = scratch_buffer;
         loops_items_     = &loops_items;
+        content_         = main_template->Content;
 
         render(main_template->Tags.First(), main_template->Tags.End(), 0, main_template->Length);
     }
 
     void Render(StringStream_T &stream, const Char_T *content, SizeT length, const Value_T &value,
-                const Array<Tags::TagBit> &tags_cache) {
+                const Array<Tags::TagBit> &tags_cache, ScratchBuffer_T *scratch_buffer = nullptr) {
         Array<LoopItem> loops_items{};
 
-        content_     = content;
-        value_       = &value;
-        stream_      = &stream;
-        loops_items_ = &loops_items;
+        value_          = &value;
+        stream_         = &stream;
+        scratch_buffer_ = scratch_buffer;
+        loops_items_    = &loops_items;
+        content_        = content;
 
         render(tags_cache.First(), tags_cache.End(), 0, length);
     }
@@ -1389,8 +1414,8 @@ struct TemplateCore {
         const Value_T *value = getValue(tag);
 
         if ((value == nullptr) ||
-            !(value->CopyValueTo(*stream_, format_info_,
-                                 &(StringUtils::EscapeHTMLSpecialChars<StringStream_T, Char_T>)))) {
+            !(value->CopyValueTo(*stream_, format_info_, StringUtils::EscapeHTMLSpecialChars<StringStream_T, Char_T>,
+                                 scratch_buffer_))) {
             if (tag.IDLength != 0) {
                 const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
 
@@ -1416,7 +1441,7 @@ struct TemplateCore {
 
         const Value_T *value = getValue(tag);
 
-        if ((value == nullptr) || !(value->CopyValueTo(*stream_, format_info_))) {
+        if ((value == nullptr) || !(value->CopyValueTo(*stream_, format_info_, rawVariableWriteCB, scratch_buffer_))) {
             if (tag.IDLength != 0) {
                 const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
 
@@ -1451,7 +1476,7 @@ struct TemplateCore {
             if (id < templates_cache_->Size()) {
                 const TemplateDataCache<Char_T> *sub_template_cache = (templates_cache_->Storage() + id);
 
-                TemplateCore<Char_T, Value_T, StringStream_T> sub_temp{};
+                TemplateCore<Char_T, Value_T, StringStream_T, ScratchBuffer_T> sub_temp{};
                 sub_temp.format_info_ = format_info_;
 
                 sub_temp.Render(*stream_, sub_template_cache, *templates_cache_, *value_);
@@ -1493,7 +1518,14 @@ struct TemplateCore {
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit::NumberToString(*stream_, result.ExprValue.Number.Real, format_info_);
+                    if (scratch_buffer_ == nullptr) {
+                        Digit::NumberToString(*stream_, result.ExprValue.Number.Real, format_info_);
+                    } else {
+                        scratch_buffer_->Clear();
+                        Digit::NumberToString(*scratch_buffer_, result.ExprValue.Number.Real, format_info_);
+                        stream_->Write(scratch_buffer_->First(), scratch_buffer_->Length());
+                    }
+
                     break;
                 }
 
@@ -2436,10 +2468,15 @@ struct TemplateCore {
         return false;
     }
 
+    static void rawVariableWriteCB(StringStream_T &stream, const Char_T *str, SizeT length) {
+        stream.Write(str, length);
+    }
+
     const Array<TemplateDataCache<Char_T>> *templates_cache_{nullptr};
 
     const Value_T   *value_{nullptr};
     StringStream_T  *stream_{nullptr};
+    ScratchBuffer_T *scratch_buffer_{nullptr};
     Array<LoopItem> *loops_items_{nullptr};
     const Char_T    *content_{nullptr};
     const SizeT      length_{0};
