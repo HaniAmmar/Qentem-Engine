@@ -48,19 +48,6 @@
 namespace Qentem {
 
 /**
- * @brief Callback type for constructing an object in the pool.
- *
- * Invoked when a previously unconstructed item is retrieved via `Get()`.
- * The callback is responsible for initializing the object in-place at the
- * provided pointer, using the forwarded constructor arguments.
- *
- * @tparam Type_T  The type of object to construct.
- * @tparam Args_T  Constructor argument types.
- */
-template <typename Type_T, typename... Args_T>
-using QPoolConstructCB_T = void (*)(Type_T *, Args_T...);
-
-/**
  * @brief Callback type for destroying an object in the pool.
  *
  * Invoked by the pool when objects are destructed, either during
@@ -178,11 +165,12 @@ struct QPool {
      * is taken from the free list.
      *
      * If this retrieval exceeds the number of objects previously constructed,
-     * the object is constructed in-place using the forwarded arguments.
+     * the object is constructed in-place using `MemoryUtils::Construct` with
+     * the forwarded arguments.
      *
-     * @tparam Args_T Argument types for `Type_T`'s constructor.
-     * @param args    Constructor arguments forwarded to `Type_T`.
-     * @return Pointer to a constructed object owned by the pool.
+     * @tparam Args_T Types of the arguments forwarded to `Type_T`'s constructor.
+     * @param args Arguments forwarded to `Type_T`'s constructor.
+     * @return Pointer to the object retrieved from the pool.
      */
     template <typename... Args_T>
     Type_T *Get(Args_T &&...args) {
@@ -206,16 +194,17 @@ struct QPool {
     /**
      * @brief Retrieves an object from the pool using a custom construction callback.
      *
-     * Behaves identically to `Get()` except that object construction is delegated
-     * to the provided callback when the object has not been constructed before.
+     * Behaves like `Get()` except that construction of a previously unconstructed
+     * object is delegated to the provided callback instead of `MemoryUtils::Construct`.
      *
-     * @tparam Args_T Argument types forwarded to the construction callback.
-     * @param construct_cb Callback responsible for constructing the object.
-     * @param args         Arguments forwarded to the callback.
-     * @return Pointer to a constructed object owned by the pool.
+     * @tparam ConstructCB_T Type of the custom construction callback.
+     * @tparam Args_T Types of the arguments forwarded to the construction callback.
+     * @param construct_cb Callback used to construct the object.
+     * @param args Arguments forwarded to `construct_cb`.
+     * @return Pointer to the object retrieved from the pool.
      */
-    template <typename... Args_T>
-    Type_T *Get(QPoolConstructCB_T<Type_T, Args_T...> construct_cb, Args_T &&...args) {
+    template <typename ConstructCB_T, typename... Args_T>
+    Type_T *GetCustom(ConstructCB_T construct_cb, Args_T &&...args) {
         if (list_ == nullptr) {
             expand(1U);
         }
