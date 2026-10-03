@@ -195,33 +195,35 @@ struct SystemMemory {
         // clang-format on
     }
 
-/**
- * @brief Releases a range of memory pages previously reserved via Reserve().
- *
- * This function is used to return memory to the operating system. The specified region
- * must be both page-aligned and a multiple of the system page size.
- *
- * On POSIX systems, `munmap()` is used to fully unmap the address space and release
- * the memory back to the kernel.
- *
- * This function is excluded on Windows platforms.
- *
- * @param start  Pointer to the start of the region (must be page-aligned).
- * @param size   Size in bytes to release (must be multiple of page size).
- */
-#ifndef _WIN32
-    QENTEM_INLINE static void ReleasePages(void *start, SystemLong size) noexcept {
+    /**
+     * @brief Releases a range of memory pages previously reserved via Reserve().
+     *
+     * This function returns the specified page-aligned region to the operating system.
+     * The start address must be page-aligned and the size must be a multiple of the
+     * system page size.
+     *
+     * On POSIX systems, `munmap()` is used to unmap the specified address range.
+     *
+     * @return `true` if the region was successfully unmapped, otherwise `false`.
+     *
+     * @param start  Pointer to the start of the region (must be page-aligned).
+     * @param size   Size in bytes to release (must be a multiple of page size).
+     */
+    QENTEM_INLINE static bool ReleasePages(void *start, SystemLong size) noexcept {
         // clang-format off
-    #ifndef  QENTEM_SYSTEM_MEMORY_FALLBACK
+    #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK) && !defined(_WIN32)
         #if defined(__linux__)
-            SystemCall(__NR_munmap,reinterpret_cast<SystemLongI>(start), size);
+            return (SystemCall(__NR_munmap,
+                                reinterpret_cast<SystemLongI>(start),
+                                size) == 0);
         #else
-            ::munmap(start, size);
+            return (::munmap(start, size) == 0);
         #endif
     #else
-            // Fallback mode: platform does not support release; act as no-op.
+            // Fallback mode: platform does not support release.
             (void)start;
             (void)size;
+            return false;
     #endif
         // clang-format on
     }
