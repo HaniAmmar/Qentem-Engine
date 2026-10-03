@@ -17,7 +17,6 @@
 
 #include "Qentem/ArrayBase.hpp"
 #include "Qentem/SystemMemory.hpp"
-#include "Qentem/Platform.hpp"
 
 namespace Qentem {
 
@@ -28,7 +27,6 @@ struct ArrayPageBackend {
         SizeT capacity_bytes = (capacity * sizeof(Type_T));
 
 #ifndef QENTEM_SYSTEM_MEMORY_FALLBACK
-
         if (capacity_bytes > SystemMemory::GetPageSize()) {
             capacity_bytes = SystemMemory::AlignToPageSize(capacity_bytes);
         } else {

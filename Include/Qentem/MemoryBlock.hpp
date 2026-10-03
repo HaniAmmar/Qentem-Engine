@@ -113,6 +113,7 @@ struct MemoryBlock {
     QENTEM_INLINE ~MemoryBlock() noexcept {
         release();
     }
+
     QENTEM_INLINE MemoryBlock(MemoryBlock &&src) noexcept
         : base_{src.base_}, data_{src.data_}, prev_{src.prev_}, next_{src.next_}, usable_size_{src.usable_size_},
           available_{src.available_}, next_index_{src.next_index_}, table_size_{src.table_size_},
