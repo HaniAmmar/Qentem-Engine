@@ -30,12 +30,12 @@ struct ArrayReserverBackend {
     }
 
     template <typename Type_T>
-    QENTEM_INLINE static bool Shrink(Type_T *storage, SizeT from_size, SizeT to_size) noexcept {
+    QENTEM_INLINE static bool Shrink(Type_T *storage, SizeT from_size, SizeT &to_size) noexcept {
         return Reserver::Shrink<Type_T>(storage, from_size, to_size);
     }
 
     template <typename Type_T>
-    QENTEM_INLINE static bool TryExpand(Type_T *storage, SizeT from_size, SizeT to_size) noexcept {
+    QENTEM_INLINE static bool TryExpand(Type_T *storage, SizeT from_size, SizeT &to_size) noexcept {
         return Reserver::TryExpand(storage, from_size, to_size);
     }
 };

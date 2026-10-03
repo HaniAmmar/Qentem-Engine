@@ -41,13 +41,13 @@ struct StringStreamReserverBackend {
     }
 
     template <typename Char_T>
-    QENTEM_INLINE static bool Shrink(Char_T *storage, SizeT from_size, SizeT to_size) noexcept {
+    QENTEM_INLINE static bool Shrink(Char_T *storage, SizeT from_size, SizeT &to_size) noexcept {
         to_size = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(to_size) / sizeof(Char_T));
         return Reserver::Shrink<Char_T>(storage, from_size, to_size);
     }
 
     template <typename Char_T>
-    QENTEM_INLINE static bool TryExpand(Char_T *storage, SizeT from_size, SizeT to_size) noexcept {
+    QENTEM_INLINE static bool TryExpand(Char_T *storage, SizeT from_size, SizeT &to_size) noexcept {
         to_size = static_cast<SizeT>(Reserver::RoundUpBytes<Char_T>(to_size) / sizeof(Char_T));
         return Reserver::TryExpand(storage, from_size, to_size);
     }

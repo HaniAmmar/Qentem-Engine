@@ -38,12 +38,12 @@ struct HListReserverBackend {
     }
 
     template <typename HItem_T, typename Number_T>
-    QENTEM_INLINE static bool Shrink(HItem_T *storage, Number_T from_size, Number_T to_size) noexcept {
+    QENTEM_INLINE static bool Shrink(HItem_T *storage, Number_T from_size, Number_T &to_size) noexcept {
         return Reserver::Shrink<HItem_T>(storage, from_size, to_size);
     }
 
     template <typename HItem_T, typename Number_T>
-    QENTEM_INLINE static bool TryExpand(HItem_T *storage, Number_T from_size, Number_T to_size) noexcept {
+    QENTEM_INLINE static bool TryExpand(HItem_T *storage, Number_T from_size, Number_T &to_size) noexcept {
         return Reserver::TryExpand(storage, from_size, to_size);
     }
 };

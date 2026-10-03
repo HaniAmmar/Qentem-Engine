@@ -236,7 +236,7 @@ struct ArrayBase {
         return tmp;
     }
 
-    void Reserve(const SizeT capacity, bool initialize = false) {
+    void Reserve(SizeT capacity, bool initialize = false) {
         if (capacity != 0) {
             Clear();
 
@@ -472,11 +472,11 @@ struct ArrayBase {
         MemoryProvider_T::Release(storage, capacity);
     }
 
-    QENTEM_INLINE static bool shrink(Type_T *storage, SizeT from_size, SizeT to_size) noexcept {
+    QENTEM_INLINE static bool shrink(Type_T *storage, SizeT from_size, SizeT &to_size) noexcept {
         return MemoryProvider_T::template Shrink<Type_T>(storage, from_size, to_size);
     }
 
-    QENTEM_INLINE static bool tryExpand(Type_T *storage, SizeT from_size, SizeT to_size) noexcept {
+    QENTEM_INLINE static bool tryExpand(Type_T *storage, SizeT from_size, SizeT &to_size) noexcept {
         return MemoryProvider_T::TryExpand(storage, from_size, to_size);
     }
 

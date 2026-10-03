@@ -657,7 +657,7 @@ struct HashTable {
         if (new_capacity != 0) {
             if (new_capacity < Capacity()) {
                 const NumberT old_capacity = Capacity();
-                const NumberT capacity     = MemoryUtils::AlignToPow2(new_capacity);
+                NumberT       capacity     = MemoryUtils::AlignToPow2(new_capacity);
 
                 if (Size() > new_capacity) {
                     // Shrink: Destruct of elements outside new bounds
@@ -768,7 +768,7 @@ struct HashTable {
 
         if (Size() != 0) {
             const NumberT old_capacity = Capacity();
-            const NumberT new_capacity = MemoryUtils::AlignToPow2(Size());
+            NumberT       new_capacity = MemoryUtils::AlignToPow2(Size());
 
             if ((old_size != new_capacity) && shrink(Storage(), old_capacity, new_capacity)) {
                 setCapacity(new_capacity);
@@ -799,7 +799,7 @@ struct HashTable {
     void RemoveExcessStorage() noexcept {
         if (Size() != 0) {
             const NumberT old_capacity = Capacity();
-            const NumberT new_capacity = MemoryUtils::AlignToPow2(Size());
+            NumberT       new_capacity = MemoryUtils::AlignToPow2(Size());
 
             if ((new_capacity != old_capacity) && shrink(Storage(), old_capacity, new_capacity)) {
                 setCapacity(new_capacity);
@@ -1576,11 +1576,11 @@ struct HashTable {
         MemoryProvider_T::Release(storage, capacity);
     }
 
-    QENTEM_INLINE static bool shrink(HItem_T *storage, NumberT from_size, NumberT to_size) noexcept {
+    QENTEM_INLINE static bool shrink(HItem_T *storage, NumberT from_size, NumberT &to_size) noexcept {
         return MemoryProvider_T::template Shrink<HItem_T>(storage, from_size, to_size);
     }
 
-    QENTEM_INLINE static bool tryExpand(HItem_T *storage, NumberT from_size, NumberT to_size) noexcept {
+    QENTEM_INLINE static bool tryExpand(HItem_T *storage, NumberT from_size, NumberT &to_size) noexcept {
         return MemoryProvider_T::TryExpand(storage, from_size, to_size);
     }
 
