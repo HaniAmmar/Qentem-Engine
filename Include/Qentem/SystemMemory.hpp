@@ -227,7 +227,42 @@ struct SystemMemory {
     #endif
         // clang-format on
     }
-#endif
+
+    /**
+     * @brief Expands a previously reserved memory mapping in place.
+     *
+     * The specified mapping must be page-aligned, and both the old and new sizes
+     * must be multiples of the system page size. The mapping is expanded only when
+     * sufficient virtual address space is available immediately after the existing
+     * mapping.
+     *
+     * On Linux, `mremap()` is used without `MREMAP_MAYMOVE`, so the mapping address
+     * remains unchanged. If the mapping cannot be expanded in place, the operation
+     * fails and the original mapping is left unchanged.
+     *
+     * @return `true` if the mapping was successfully expanded, otherwise `false`.
+     *
+     * @param start     Pointer to the start of the mapping (must be page-aligned).
+     * @param old_size  Current size of the mapping in bytes.
+     * @param new_size  New size of the mapping in bytes.
+     */
+    QENTEM_INLINE static bool ExpandPages(void *start, SystemLong old_size, SystemLong new_size) noexcept {
+        // clang-format off
+        #if !defined(QENTEM_SYSTEM_MEMORY_FALLBACK) && defined(__linux__)
+            return (SystemCall(__NR_mremap,
+                            reinterpret_cast<SystemLongI>(start),
+                            old_size,
+                            new_size,
+                            0) == reinterpret_cast<SystemLongI>(start));
+        #else
+            // Platform or fallback mode does not support expansion.
+            (void)start;
+            (void)old_size;
+            (void)new_size;
+            return false;
+        #endif
+        // clang-format on
+    }
 
     /**
      * @brief Returns the native system page size (e.g., 4096 bytes on x86).
