@@ -630,9 +630,13 @@ struct ReserverCore {
                 if (ptr != nullptr) {
                     block->DecreaseAvailable(size);
 
-                    // Move fully consumed blocks to the exhausted list.
                     if (block->Available() == 0) {
+                        // Move fully consumed blocks to the exhausted list.
                         moveToExhaustedBlock(block);
+                    } else if (block != active_first_) {
+                        // Prefer the most recently successful active block to improve allocation locality.
+                        dropFromList(block, active_first_, active_last_);
+                        insertIntoListTop(block, active_first_, active_last_);
                     }
 
                     return ptr;
