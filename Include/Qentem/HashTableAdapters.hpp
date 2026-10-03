@@ -320,7 +320,7 @@ struct StringHashTable : public HashTable<StringKey_T, Number_T, StringKeyUtils_
      * @param length Number of characters to use from the array.
      * @return Pointer to the item if found, nullptr otherwise.
      */
-    QENTEM_INLINE const HItem_T *GetItem(const Char_T *str, const NumberT length) noexcept {
+    QENTEM_INLINE HItem_T *GetItem(const Char_T *str, const NumberT length) noexcept {
         return GetItem(str, length, KeyUtilsT::Hash(str, length));
     }
 
