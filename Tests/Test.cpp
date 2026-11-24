@@ -48,6 +48,7 @@ int main() {
     //     Test::RunTemplateTests();
     //     Test::RunTemplateUTests();
     //     Test::RunTemplateLTests();
+    //     Test::Encoding::RunBase64Tests();
     // }
 
     const int ret = Test::RunTests();

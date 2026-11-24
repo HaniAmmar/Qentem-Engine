@@ -198,3 +198,11 @@ add_test(NAME TemplateUTest COMMAND TemplateUTest)
 if (ENABLE_COVERAGE)
     target_link_libraries(TemplateUTest --coverage)
  endif()
+
+# Encoding/Base64
+add_executable(Base64Test Tests/Encoding/Base64Test.cpp)
+add_test(NAME Base64Test COMMAND Base64Test)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(Base64Test --coverage)
+ endif()

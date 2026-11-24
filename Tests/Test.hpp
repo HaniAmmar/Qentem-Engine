@@ -28,7 +28,6 @@ extern "C" int __cxa_thread_atexit(void (*f)(), void *o, void *d) {
     int __cxa_thread_atexit_impl(void (*)(), void *, void *);
     return __cxa_thread_atexit_impl(f, o, d);
 }
-
 #endif
 
 // clang-format off
@@ -53,6 +52,7 @@ extern "C" int __cxa_thread_atexit(void (*f)(), void *o, void *d) {
 #include "TemplateTest.hpp"
 #include "TemplateLTest.hpp"
 #include "TemplateUTest.hpp"
+#include "Encoding/Base64Test.hpp"
 // clang-format on
 
 namespace Qentem {
@@ -141,6 +141,7 @@ static int RunTests() {
     ((Test::RunTemplateTests() == 0) ? ++passed : ++failed);
     ((Test::RunTemplateUTests() == 0) ? ++passed : ++failed);
     ((Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
+    ((Test::Encoding::RunBase64Tests() == 0) ? ++passed : ++failed);
 
     return PrintResult(passed, failed);
 }
