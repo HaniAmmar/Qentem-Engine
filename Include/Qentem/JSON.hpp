@@ -27,7 +27,7 @@ struct JSON {
 
     template <typename Char_T, typename Number_T>
     QENTEM_INLINE static Value<Char_T> Parse(const Char_T *content, Number_T length) {
-        StringStream<Char_T> stream;
+        StringStream<Char_T> stream{};
         return Parse(stream, content, SizeT(length));
     }
 
@@ -43,7 +43,7 @@ struct JSON {
 
     template <typename Char_T, typename Number_T>
     QENTEM_INLINE static Value<Char_T> ParseWithComments(const Char_T *content, Number_T length) {
-        StringStream<Char_T> stream;
+        StringStream<Char_T> stream{};
         return ParseWithComments(stream, content, SizeT(length));
     }
 

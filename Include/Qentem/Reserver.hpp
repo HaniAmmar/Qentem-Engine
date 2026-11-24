@@ -1516,4 +1516,4 @@ struct Reserver {
 
 } // namespace Qentem
 
-#endif // QENTEM_RESERVER_HPP
+#endif

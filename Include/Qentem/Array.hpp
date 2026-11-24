@@ -40,7 +40,7 @@ struct ArrayReserverBackend {
     }
 };
 
-template <typename Type_T, SizeT Expansion_Multiplier_T = 2, typename MemoryProvider_T = ArrayReserverBackend>
+template <typename Type_T, SizeT Expansion_Multiplier_T = 2U, typename MemoryProvider_T = ArrayReserverBackend>
 struct Array : public ArrayBase<Type_T, Expansion_Multiplier_T, MemoryProvider_T> {
     using BaseT = ArrayBase<Type_T, Expansion_Multiplier_T, MemoryProvider_T>;
     using BaseT::BaseT;

@@ -125,7 +125,7 @@ struct LiteHListReserverBackend {
  * @tparam Expansion_Multiplier_T Compile-time capacity growth factor.
  * @tparam MemoryProvider_T Memory backend used for storage management.
  */
-template <typename Key_T, SizeT Expansion_Multiplier_T = 2, typename MemoryProvider_T = LiteHListReserverBackend>
+template <typename Key_T, SizeT Expansion_Multiplier_T = 2U, typename MemoryProvider_T = LiteHListReserverBackend>
 using LiteHList = typename HListSelector<Key_T, SizeT, Expansion_Multiplier_T, MemoryProvider_T>::Type;
 
 } // namespace Qentem

@@ -98,7 +98,7 @@ struct ArrayPageBackend {
     }
 };
 
-template <typename Type_T, SizeT Expansion_Multiplier_T = 2, typename MemoryProvider_T = ArrayPageBackend>
+template <typename Type_T, SizeT Expansion_Multiplier_T = 2U, typename MemoryProvider_T = ArrayPageBackend>
 struct LiteArray : public ArrayBase<Type_T, Expansion_Multiplier_T, MemoryProvider_T> {
     using BaseT = ArrayBase<Type_T, Expansion_Multiplier_T, MemoryProvider_T>;
     using BaseT::BaseT;

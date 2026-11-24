@@ -56,7 +56,7 @@ struct HArrayReserverBackend {
  * @tparam Expansion_Multiplier_T Compile-time capacity growth factor.
  * @tparam MemoryProvider_T Memory backend used for storage management.
  */
-template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T = 2,
+template <typename Key_T, typename Value_T, SizeT Expansion_Multiplier_T = 2U,
           typename MemoryProvider_T = HArrayReserverBackend>
 using HArray = typename HArraySelector<Key_T, SizeT, Value_T, Expansion_Multiplier_T, MemoryProvider_T>::Type;
 
