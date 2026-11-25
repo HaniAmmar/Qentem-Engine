@@ -378,10 +378,10 @@ enum struct TemplatesID : unsigned {
 
 int main() {
     using namespace Qentem;
-    using TemplateDataChar = TemplateData<Value<char>>;
+    using TemplateDataChar = TemplateData<char>;
 
     StringStream<char> stream{};
-    Array<TemplateDataCache<Value<char>>> templates_cache{};
+    Array<TemplateDataCache<char>> templates_cache{};
     Value<char> value{};
 
     constexpr const char *generic_template = R"(
