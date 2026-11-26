@@ -5338,6 +5338,251 @@ static void TestFloatToString5(QTest &test, StringStream<char> &stream) {
 #endif
 }
 
+static void TestToHex1(QTest &test, StringStream<char> &stream) {
+    StringView<char> hex;
+    SizeT            length;
+
+    hex = "0";
+    test.IsEqual(Digit::NumberToHexMinimal(nullptr, SizeT8{0}), 0U, __LINE__);
+
+    hex    = "F0";
+    length = Digit::NumberToHexMinimal(stream.Buffer(SizeT{2}), SizeT8{0xF0});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "F";
+    stream.SetLength(SizeT{1});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT8{0x0F});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "FC";
+    stream.SetLength(SizeT{2});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT8{0xFC});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "";
+    stream.SetLength(SizeT{0});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT16{0});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "ABCD";
+    stream.SetLength(SizeT{4});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT16{0xABCD});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "fedc";
+    stream.SetLength(SizeT{4});
+    length = Digit::NumberToHexMinimal<true>(stream.Storage(), SizeT16{0xFEDC});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex    = "xxxc";
+    stream = hex;
+    length = Digit::NumberToHexMinimal<true>(stream.Storage(), SizeT16{0x000C});
+    test.IsEqual(length, SizeT{1}, __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex    = "xxAB";
+    stream = hex;
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT16{0x00AB});
+    test.IsEqual(length, SizeT{2}, __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "AB00";
+    stream.SetLength(SizeT{4});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT16{0xAB00});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex    = "0AB0";
+    stream = hex;
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT16{0x0AB0});
+    test.IsEqual(length, SizeT{3}, __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "00000000";
+    stream.Clear();
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT32{0});
+    test.IsEqual(length, stream.Length(), __LINE__);
+
+    hex    = "000000AB";
+    stream = hex;
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT32{0x000000AB});
+    test.IsEqual(length, SizeT{2}, __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex    = "00FFCDAB";
+    stream = hex;
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT32{0x00FFCDAB});
+    test.IsEqual(length, SizeT{6}, __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "FEDCABCD";
+    stream.SetLength(SizeT{8});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT32{0xFEDCABCD});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "12345678";
+    stream.SetLength(SizeT{8});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT32{0x12345678});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "87654321";
+    stream.SetLength(SizeT{8});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT32{0x87654321});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "0000000000000000";
+    stream.Clear();
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT64{0});
+    test.IsEqual(length, stream.Length(), __LINE__);
+
+    hex = "12345678abcdef01";
+    stream.SetLength(SizeT{16});
+    length = Digit::NumberToHexMinimal<true>(stream.Storage(), SizeT64{0x12345678abcdef01});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "1000000000000001";
+    stream.SetLength(SizeT{16});
+    length = Digit::NumberToHexMinimal<true>(stream.Storage(), SizeT64{0x1000000000000001});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "1000000000000000";
+    stream.SetLength(SizeT{16});
+    length = Digit::NumberToHexMinimal<true>(stream.Storage(), SizeT64{0x1000000000000000});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex    = "0000000000000001";
+    stream = hex;
+    length = Digit::NumberToHexMinimal<true>(stream.Storage(), SizeT64{0x0000000000000001});
+    test.IsEqual(length, SizeT{1}, __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "1234567812345678";
+    stream.SetLength(SizeT{16});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT64{0x1234567812345678});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "8765432187654321";
+    stream.SetLength(SizeT{16});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT64{0x8765432187654321});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "FFFFFFFFFFFFFFFF";
+    stream.SetLength(SizeT{16});
+    length = Digit::NumberToHexMinimal(stream.Storage(), SizeT64{0xFFFFFFFFFFFFFFFF});
+    test.IsEqual(length, stream.Length(), __LINE__);
+    test.IsEqual(stream, hex, __LINE__);
+}
+
+static void TestToHex2(QTest &test, StringStream<char> &stream) {
+    StringView<char> hex;
+
+    hex = "00";
+    stream.SetLength(SizeT{2});
+    Digit::NumberToHex(stream.Storage(), SizeT8{0x00});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "F0";
+    stream.SetLength(SizeT{2});
+    Digit::NumberToHex(stream.Storage(), SizeT8{0xF0});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "0F";
+    stream.SetLength(SizeT{2});
+    Digit::NumberToHex(stream.Storage(), SizeT8{0x0F});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "FC";
+    stream.SetLength(SizeT{2});
+    Digit::NumberToHex(stream.Storage(), SizeT8{0xFC});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "0000";
+    stream.SetLength(SizeT{4});
+    Digit::NumberToHex(stream.Storage(), SizeT16{0});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "ABCD";
+    stream.SetLength(SizeT{4});
+    Digit::NumberToHex(stream.Storage(), SizeT16{0xABCD});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "fedc";
+    stream.SetLength(SizeT{4});
+    Digit::NumberToHex<true>(stream.Storage(), SizeT16{0xFEDC});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "00000000";
+    stream.SetLength(SizeT{8});
+    Digit::NumberToHex(stream.Storage(), SizeT32{0});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "FEDCABCD";
+    stream.SetLength(SizeT{8});
+    Digit::NumberToHex(stream.Storage(), SizeT32{0xFEDCABCD});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "12345678";
+    stream.SetLength(SizeT{8});
+    Digit::NumberToHex(stream.Storage(), SizeT32{0x12345678});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "87654321";
+    stream.SetLength(SizeT{8});
+    Digit::NumberToHex(stream.Storage(), SizeT32{0x87654321});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "0000000000000000";
+    stream.SetLength(SizeT{16});
+    Digit::NumberToHex(stream.Storage(), SizeT64{0});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "12345678abcdef01";
+    stream.SetLength(SizeT{16});
+    Digit::NumberToHex<true>(stream.Storage(), SizeT64{0x12345678abcdef01});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "1234567812345678";
+    stream.SetLength(SizeT{16});
+    Digit::NumberToHex(stream.Storage(), SizeT64{0x1234567812345678});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "8765432187654321";
+    stream.SetLength(SizeT{16});
+    Digit::NumberToHex(stream.Storage(), SizeT64{0x8765432187654321});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex = "FFFFFFFFFFFFFFFF";
+    stream.SetLength(SizeT{16});
+    Digit::NumberToHex(stream.Storage(), SizeT64{0xFFFFFFFFFFFFFFFF});
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex                   = "46464646464646464646464646464646";
+    StringView<char> text = "FFFFFFFFFFFFFFFF";
+    stream.Clear();
+    Digit::ToHex(stream.Buffer(text.Length() * 2U), reinterpret_cast<const SizeT8 *>(text.First()), text.Length());
+    test.IsEqual(stream, hex, __LINE__);
+
+    hex =
+        "436F6E73656374657475722061646970697363696E6720656C697420717569737175652066617563696275732065782073617069656E207669746165";
+    text = "Consectetur adipiscing elit quisque faucibus ex sapien vitae";
+    stream.Clear();
+    Digit::ToHex(stream.Buffer(text.Length() * 2U), reinterpret_cast<const SizeT8 *>(text.First()), text.Length());
+    test.IsEqual(stream, hex, __LINE__);
+}
+
 static int RunDigitTests() {
     QTest test{"Digit.hpp", __FILE__};
 
@@ -5378,6 +5623,9 @@ static int RunDigitTests() {
     test.Test("FloatToString Test 3", TestFloatToString3, false, stream);
     test.Test("FloatToString Test 4", TestFloatToString4, false, stream);
     test.Test("FloatToString Test 5", TestFloatToString5, false, stream);
+
+    test.Test("ToHex Test 1", TestToHex1, false, stream);
+    test.Test("ToHex Test 2", TestToHex2, false, stream);
 
     stream.Reset();
 

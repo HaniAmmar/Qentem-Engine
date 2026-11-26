@@ -159,13 +159,8 @@ struct ToCharsHelper {
     struct Writer<Stream_T, void> {
         static void Write(Stream_T &stream, const void *ptr) {
             static constexpr SizeT32 TOTAL_LENGTH{sizeof(void *) * 2U};
-            char                     buffer[TOTAL_LENGTH];
-            const SizeT32            length = Digit::NumberToHex(&(buffer[0]), reinterpret_cast<SystemLong>(ptr));
-            const SizeT32            offset = (TOTAL_LENGTH - length);
-
             stream.Write("0x", SizeT{2});
-            Digit::InsertZeros(stream, offset);
-            stream.Write(&(buffer[offset]), length);
+            Digit::NumberToHex(stream.Buffer(SizeT{TOTAL_LENGTH}), reinterpret_cast<SystemLong>(ptr));
         }
     };
 

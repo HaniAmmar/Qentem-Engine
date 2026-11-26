@@ -222,54 +222,129 @@ struct Digit {
         return number;
     }
 
+    /**
+     * @brief Converts an integer to its minimal-width hexadecimal representation.
+     *
+     * Writes the hexadecimal digits into the end of the destination buffer,
+     * omitting leading zeros. The output is right-aligned within the buffer.
+     *
+     * @tparam Lowercase If true, uses lowercase hexadecimal digits (a-f).
+     *                   Otherwise, uses uppercase hexadecimal digits (A-F).
+     * @tparam Number_T  Unsigned integer type to convert.
+     *
+     * @param[out] buffer Destination buffer. Must have a capacity of at least
+     *                    sizeof(Number_T) * 2 characters.
+     * @param[in] number  Integer value to convert.
+     *
+     * @return Number of hexadecimal characters written.
+     *
+     * @note The first output character is located at
+     *       buffer + (sizeof(Number_T) * 2 - return_value).
+     * @note Does not append a null terminator.
+     *
+     * @note If number is zero, writes nothing and returns 0.
+     */
     template <bool Lowercase = false, typename Number_T>
-    static SizeT32 NumberToHex(char *buffer, Number_T number) {
-        static constexpr char HexTable[]  = "0123456789ABCDEF";
-        static constexpr char HexTableL[] = "0123456789abcdef";
-        constexpr SizeT32     length      = (sizeof(Number_T) * 2U);
+    static SizeT32 NumberToHexMinimal(char *buffer, Number_T number) {
+        static constexpr const char *table  = (Lowercase ? DigitUtils::HexTableL : DigitUtils::HexTableU);
+        static constexpr SizeT32     length = (sizeof(Number_T) * 2U);
 
         SizeT32 index{length};
 
-        if constexpr (Lowercase) {
-            while (index != 0) {
+        while (number != 0) {
+            --index;
+            buffer[index] = table[static_cast<SizeT32>(number & Number_T{0x0F})];
+            number >>= 4U;
+
+            if (number != 0) {
                 --index;
-                buffer[index] = HexTableL[static_cast<SizeT32>(number & Number_T{0xF})];
+                buffer[index] = table[static_cast<SizeT32>((number & Number_T{0x0F}))];
                 number >>= 4U;
 
-                if (number != 0) {
-                    --index;
-                    buffer[index] = HexTableL[static_cast<SizeT32>((number & Number_T{0xF}))];
-                    number >>= 4U;
+                continue;
+            }
 
-                    if (number != 0) {
-                        continue;
-                    }
-                }
+            break;
+        }
 
+        return (length - index);
+    }
+
+    /**
+     * @brief Converts an integer to its fixed-width hexadecimal representation.
+     *
+     * Writes exactly two hexadecimal characters for each byte of the input
+     * integer, including leading zeros. The output is right-aligned during
+     * conversion.
+     *
+     * @tparam Lowercase If true, uses lowercase hexadecimal digits (a-f).
+     *                   Otherwise, uses uppercase hexadecimal digits (A-F).
+     * @tparam Number_T  Unsigned integer type to convert.
+     *
+     * @param[out] buffer Destination buffer. Must have a capacity of at least
+     *                    sizeof(Number_T) * 2 characters.
+     * @param[in] number  Integer value to convert.
+     *
+     * @note Always writes exactly sizeof(Number_T) * 2 characters.
+     * @note Does not append a null terminator.
+     */
+    template <bool Lowercase = false, typename Number_T>
+    static void NumberToHex(char *buffer, Number_T number) {
+        static constexpr const char *table  = (Lowercase ? DigitUtils::HexTableL : DigitUtils::HexTableU);
+        static constexpr SizeT32     length = (sizeof(Number_T) * 2U);
+
+        SizeT32 index{length};
+
+        while (true) {
+            --index;
+            buffer[index] = table[static_cast<SizeT32>(number & Number_T{0x0F})];
+            number >>= 4U;
+
+            --index;
+            buffer[index] = table[static_cast<SizeT32>((number & Number_T{0x0F}))];
+
+            if (index == 0) {
                 break;
             }
 
-            return (length - index);
-        } else {
-            while (index != 0) {
-                --index;
-                buffer[index] = HexTable[static_cast<SizeT32>(number & Number_T{0xF})];
-                number >>= 4U;
+            number >>= 4U;
+        }
+    }
 
-                if (number != 0) {
-                    --index;
-                    buffer[index] = HexTable[static_cast<SizeT32>((number & Number_T{0xF}))];
-                    number >>= 4U;
+    /**
+     * @brief Converts a byte sequence to its hexadecimal representation.
+     *
+     * Converts each input byte into two hexadecimal characters, writing the
+     * high nibble first and the low nibble second. The input byte order is
+     * preserved.
+     *
+     * @tparam Lowercase If true, uses lowercase hexadecimal digits (a-f).
+     *                   Otherwise, uses uppercase hexadecimal digits (A-F).
+     *
+     * @param[out] buffer Destination buffer. Must have a capacity of at least
+     *                    length * 2 characters.
+     * @param[in] byte    Pointer to the first input byte.
+     * @param[in] length  Number of input bytes to convert.
+     *
+     * @note Always writes exactly length * 2 characters.
+     * @note Does not append a null terminator.
+     * @note A zero-length input produces no output.
+     */
+    template <bool Lowercase = false>
+    static void ToHex(char *buffer, const SizeT8 *byte, SizeT length) {
+        static constexpr const char *table = (Lowercase ? DigitUtils::HexTableL : DigitUtils::HexTableU);
 
-                    if (number != 0) {
-                        continue;
-                    }
-                }
+        while (length != 0) {
+            SizeT8 c = *byte;
 
-                break;
-            }
+            *buffer = table[static_cast<SizeT32>(c >> 4U)];
+            ++buffer;
 
-            return (length - index);
+            *buffer = table[static_cast<SizeT32>(c & SizeT8{0x0F})];
+            ++buffer;
+
+            --length;
+            ++byte;
         }
     }
 

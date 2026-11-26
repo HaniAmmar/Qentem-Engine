@@ -107,6 +107,10 @@ static const char DigitTable1[] = {"00010203040506070809101112131415161718192021
                                    "90919293949596979899"};
 static const char DigitTable2[] = {"0123456789"};
 ///////////////////////////////////////////////////
+static const char HexTableU[] = "0123456789ABCDEF";
+static const char HexTableL[] = "0123456789abcdef";
+///////////////////////////////////////////////////
+
 template <SizeT32>
 struct DigitConst {};
 
